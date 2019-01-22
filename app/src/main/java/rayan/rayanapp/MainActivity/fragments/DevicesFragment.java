@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +21,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Helper.SimpleItemTouchHelperCallback;
 import rayan.rayanapp.MainActivity.MainActivity;
 import rayan.rayanapp.MainActivity.OnStatusIconClickListener;
 import rayan.rayanapp.MainActivity.adapters.DevicesRecyclerViewAdapter;
@@ -30,12 +28,11 @@ import rayan.rayanapp.MainActivity.viewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class DevicesFragment extends Fragment implements OnStatusIconClickListener , DevicesRecyclerViewAdapter.OnDragStartListener{
+public class DevicesFragment extends Fragment implements OnStatusIconClickListener {
     DevicesFragmentViewModel devicesFragmentViewModel;
     public DevicesFragment() {}
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    private ItemTouchHelper mItemTouchHelper;
     DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     List<Device> devices = new ArrayList<>();
     public static DevicesFragment newInstance() {
@@ -45,7 +42,7 @@ public class DevicesFragment extends Fragment implements OnStatusIconClickListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
+        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices);
         devicesRecyclerViewAdapter.setListener(this);
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
         devicesFragmentViewModel.getAllDevices().observe(this, devices -> {
@@ -61,9 +58,6 @@ public class DevicesFragment extends Fragment implements OnStatusIconClickListen
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(devicesRecyclerViewAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
         return view;
     }
 
@@ -77,10 +71,5 @@ public class DevicesFragment extends Fragment implements OnStatusIconClickListen
     @Override
     public void onPin2Clicked(Object Item) {
         devicesFragmentViewModel.togglePin2((Device) Item, MainActivity.PROTOCOL.equals(AppConstants.UDP));
-    }
-
-    @Override
-    public void onDragStarted(RecyclerView.ViewHolder viewHolder) {
-        mItemTouchHelper.startDrag(viewHolder);
     }
 }

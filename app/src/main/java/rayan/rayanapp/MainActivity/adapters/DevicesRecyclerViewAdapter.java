@@ -5,14 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Helper.ItemTouchHelperAdapter;
 import rayan.rayanapp.MainActivity.OnStatusIconClickListener;
 import rayan.rayanapp.MainActivity.viewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.MainActivity.viewHolders.DeviceViewHolder2Bridges;
@@ -20,26 +18,14 @@ import rayan.rayanapp.R;
 import rayan.rayanapp.Util.DevicesDiffCallBack;
 import rayan.rayanapp.Util.GenericRecyclerViewAdapter;
 
-public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnStatusIconClickListener<Device>, DeviceViewHolder1Bridge>
-        implements ItemTouchHelperAdapter {
-
-    public interface OnDragStartListener {
-        void onDragStarted(RecyclerView.ViewHolder viewHolder);
-    }
+public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnStatusIconClickListener<Device>, DeviceViewHolder1Bridge> {
 
 
-    private OnDragStartListener dragStartListener;
-    public DevicesRecyclerViewAdapter(Context context, List<Device> devices, OnDragStartListener dragStartListener) {
+    public DevicesRecyclerViewAdapter(Context context, List<Device> devices) {
         super(context);
         this.items = devices;
-        this.dragStartListener = dragStartListener;
     }
 
-    @Override
-    public void onBindViewHolder(DeviceViewHolder1Bridge holder, int position) {
-        Device item = items.get(position);
-        holder.onBind(item, getListener(), dragStartListener);
-    }
 
     public void updateItems(List<Device> items){
         if (items == null) {
@@ -72,19 +58,4 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
             return 2;
         else return 3;
     }
-
-    @Override
-    public void onItemDismiss(int position) {
-        items.remove(position);
-        notifyItemRemoved(position);
-    }
-
-    @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        Device prev = items.remove(fromPosition);
-        items.add(toPosition > fromPosition ? toPosition - 1 : toPosition, prev);
-        notifyItemMoved(fromPosition, toPosition);
-    }
-
-
 }

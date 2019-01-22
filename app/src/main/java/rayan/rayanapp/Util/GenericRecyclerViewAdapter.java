@@ -28,7 +28,7 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
     @Override
     public void onBindViewHolder(VH holder, int position) {
         T item = items.get(position);
-        holder.onBind(item, listener, null);
+        holder.onBind(item, listener);
     }
     public void setItems(List<T> items) {
         if (items == null) {
@@ -38,7 +38,6 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
         this.items.addAll(items);
         notifyDataSetChanged();
     }
-
     public List<T> getItems() {
         return items;
     }
@@ -58,9 +57,6 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
     }
     public void setListener(L listener) {
         this.listener = listener;
-    }
-    public L getListener() {
-        return listener;
     }
     @Override
     public void setHasStableIds(boolean hasStableIds) {
