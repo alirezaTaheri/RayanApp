@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="5dp"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:background="#ffffff"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="7dp">
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.varunest.sparkbutton.SparkButton
+                android:id="@+id/pin1"
+                android:layout_alignParentTop="true"
+                android:layout_width="0dp"
+                android:layout_height="65dp"
+                android:layout_weight="1"
+                app:sparkbutton_activeImage="@drawable/ic_lamp_on"
+                app:sparkbutton_inActiveImage="@drawable/ic_lamp_off"
+                app:sparkbutton_iconSize="50dp"
+                app:sparkbutton_primaryColor="@color/baseColor"
+                app:sparkbutton_secondaryColor="@color/primary_dark2" />
+            <com.varunest.sparkbutton.SparkButton
+                android:id="@+id/pin2"
+                android:layout_alignParentTop="true"
+                android:layout_width="0dp"
+                android:layout_height="65dp"
+                android:layout_weight="1"
+                app:sparkbutton_activeImage="@drawable/ic_lamp_on"
+                app:sparkbutton_inActiveImage="@drawable/ic_lamp_off"
+                app:sparkbutton_iconSize="50dp"
+                app:sparkbutton_primaryColor="@color/baseColor"
+                app:sparkbutton_secondaryColor="@color/primary_dark2" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/name"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Name" />
+
+            <TextView
+                android:id="@+id/name2_2"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Name 2" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_height="5dp">
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="50"
+            android:layout_height="5dp">
+        <View
+            android:id="@+id/offBottomStrip2_1"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/grey_light_1"/>
+        <View
+            android:id="@+id/onBottomStrip2_1"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/baseColor"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="50"
+            android:layout_gravity="bottom"
+            android:layout_height="5dp">
+        <View
+            android:id="@+id/offBottomStrip2_2"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/grey_light_1"/>
+        <View
+            android:id="@+id/onBottomStrip2_2"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/baseColor"/>
+        </RelativeLayout>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/aliveIndicator"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/ic_circle"
+            android:tint="#4CAF50"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_gravity="top|left"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:contentDescription="Alive Indicator" />
+    </FrameLayout>
+
+</android.support.v7.widget.CardView>
