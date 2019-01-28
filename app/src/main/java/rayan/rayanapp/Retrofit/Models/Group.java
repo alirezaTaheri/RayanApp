@@ -1,5 +1,6 @@
 package rayan.rayanapp.Retrofit.Models;
 
+import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
@@ -14,6 +15,7 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Util.DeviceDataConverter;
 import rayan.rayanapp.Util.UserDataConverter;
 
+@Entity
 public class Group {
     @PrimaryKey
     @NonNull

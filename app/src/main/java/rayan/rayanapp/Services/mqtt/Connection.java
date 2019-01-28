@@ -30,6 +30,7 @@ import rayan.rayanapp.Services.mqtt.model.Subscription;
 
 @Entity
 public class Connection {
+    private final String TAG = Connection.class.getSimpleName();
     @Ignore
     private static final String activityClass = "org.eclipse.paho.android.sample.activity.MainActivity";
 
@@ -368,7 +369,7 @@ public class Connection {
 
     public void messageArrived(String topic, MqttMessage message){
         ReceivedMessage msg = new ReceivedMessage(topic, message);
-        Log.e("Connection","Message Arrived: " + message.toString());
+        Log.e(TAG,"Message Arrived: " + message.toString());
         messageHistory.add(0, msg);
         if(subscriptions.containsKey(topic)){
             subscriptions.get(topic).setLastMessage(new String(message.getPayload()));

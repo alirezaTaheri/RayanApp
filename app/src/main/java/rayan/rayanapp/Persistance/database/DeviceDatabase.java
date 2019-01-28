@@ -10,8 +10,8 @@ import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.dao.DevicesDAO;
 
 public class DeviceDatabase {
-    AppDatabase appDatabase;
-    DevicesDAO deviceDAO;
+    private AppDatabase appDatabase;
+    private DevicesDAO deviceDAO;
     public DeviceDatabase(Context context){
         appDatabase = AppDatabase.getInstance(context);
         deviceDAO = appDatabase.getDeviceDAO();
@@ -19,24 +19,31 @@ public class DeviceDatabase {
     public Device getDevice(String chipId){
         return deviceDAO.getDevice(chipId);
     }
+
     public LiveData<List<Device>> getAllDevicesLive(){
         return deviceDAO.getAllLive();
     }
+
     public List<Device> getAllDevices(){
         return deviceDAO.getAll();
     }
+
     public void addDevice(Device device){
         deviceDAO.add(device);
     }
+
     public void addDevices(List<Device> devices){
         deviceDAO.addAll(devices);
     }
+
     public void updateDevice(Device device){
         deviceDAO.updateDevice(device);
     }
+
     public List<String> getAllTopics(){
         return deviceDAO.getAllTopics();
     }
+
     public void deleteDevices(List<Device> devices){
         deviceDAO.deleteDevices(devices);
     }

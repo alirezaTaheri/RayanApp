@@ -8,4 +8,7 @@ public class AppConstants {
 
     //Messages
     public final static String TO_DEVICE_NODE = "NODE?";
+    public final static int MOBILE_DATA = 0;
+    public final static int WIFI_NETWORK = 1;
+
 }

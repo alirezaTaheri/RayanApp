@@ -67,7 +67,7 @@ public class UDPServerService extends Service {
                             pin2 = jsonMessage.getString("pin2");
                             device = deviceDatabase.getDevice(src);
                             if (device == null)
-                                Log.e("nnnnnnn", "nnnnull Couldn't find " + src);
+                                Log.e(TAG, "Couldn't find this Device: " + src);
                             else{
                                 device.setPin1(pin1);
                                 device.setPin2(pin2);

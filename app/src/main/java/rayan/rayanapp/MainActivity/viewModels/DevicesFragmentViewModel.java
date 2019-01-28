@@ -32,8 +32,8 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.MainActivity.MainActivity;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
+import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.BaseResponse;
@@ -46,11 +46,13 @@ import rayan.rayanapp.Util.DevicesDiffCallBack;
 
 public class DevicesFragmentViewModel extends AndroidViewModel {
     private DeviceDatabase deviceDatabase;
+    private GroupDatabase groupDatabase;
     private ExecutorService executorService;
     private SendUDPMessage sendUDPMessage;
     public DevicesFragmentViewModel(@NonNull Application application) {
         super(application);
         deviceDatabase = new DeviceDatabase(application);
+        groupDatabase = new GroupDatabase(application);
         sendUDPMessage = new SendUDPMessage();
         executorService= Executors.newSingleThreadExecutor();
     }
@@ -189,29 +191,25 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             diffResult.dispatchUpdatesTo(new ListUpdateCallback() {
                 @Override
                 public void onInserted(int i, int i1) {
-                    Log.e("11111111111111", "OnInserted: i: "+i+"\ti1: "+i1);
                     addDevices(newDevices.subList(i, i+i1));
                 }
 
                 @Override
                 public void onRemoved(int i, int i1) {
-                    Log.e("11111111111111", "onRemoved: i: "+i+"\ti1: "+i1);
                     deviceDatabase.deleteDevices(database.subList(i, i + i1));
                 }
 
                 @Override
                 public void onMoved(int i, int i1) {
-                    Log.e("11111111111111", "onMoved: i: "+i+"/ti1: "+i1);
                 }
 
                 @Override
                 public void onChanged(int i, int i1, @Nullable Object o) {
-                    Log.e("11111111111111", "onChanged: i: "+i+"\ti1: "+i1 + "\nObject: " + o);
                     deviceDatabase.updateDevices(database.subList(i, i + i1));
                 }
             });
+            groupDatabase.addGroups(newGroups);
 //            myViewModel.addUsers(newUsers);
-//            myViewModel.addGroups(newGroups);
             return null;
         }
     }
@@ -262,5 +260,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
 
     }
+
+
 }
 
