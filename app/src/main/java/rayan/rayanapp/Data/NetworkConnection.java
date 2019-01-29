@@ -3,6 +3,8 @@ package rayan.rayanapp.Data;
 public class NetworkConnection  {
     private int type;
     private boolean isConnected;
+    private boolean mqttConnected;
+    private boolean udpServerStabled;
 
     public NetworkConnection(int type, boolean isConnected) {
         this.type = type;
@@ -13,7 +15,7 @@ public class NetworkConnection  {
         return type;
     }
 
-    public boolean getIsConnected() {
+    public boolean isConnected() {
         return isConnected;
     }
 
@@ -22,6 +24,8 @@ public class NetworkConnection  {
         return "NetworkConnection{" +
                 "type=" + type +
                 ", isConnected=" + isConnected +
+                ", mqttConnected=" + mqttConnected +
+                ", udpServerStabled=" + udpServerStabled +
                 '}';
     }
 }

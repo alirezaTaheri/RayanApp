@@ -47,6 +47,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable NetworkConnection networkConnection) {
                 Log.e(TAG, "Network Connection: " + networkConnection);
+                if (!networkConnection.isConnected()){
+                    PROTOCOL = AppConstants.UDP;
+                    mainActivityViewModel.disconnectMQTT();
+                    RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+                    accessModeSwitch.setInactiveTintIconLeft();
+                }
+
             }
         });
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
