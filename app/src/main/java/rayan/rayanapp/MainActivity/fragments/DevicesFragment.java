@@ -48,7 +48,6 @@ public class DevicesFragment extends Fragment implements OnStatusIconClickListen
         devicesFragmentViewModel.getAllDevices().observe(this, devices -> {
          devicesRecyclerViewAdapter.updateItems(devices);
         });
-        devicesFragmentViewModel.getGroups();
     }
 
     @Override
@@ -71,5 +70,11 @@ public class DevicesFragment extends Fragment implements OnStatusIconClickListen
     @Override
     public void onPin2Clicked(Object Item) {
         devicesFragmentViewModel.togglePin2((Device) Item, MainActivity.PROTOCOL.equals(AppConstants.UDP));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        devicesFragmentViewModel.getGroups();
     }
 }

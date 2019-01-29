@@ -45,7 +45,7 @@ import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.DevicesDiffCallBack;
 
 public class DevicesFragmentViewModel extends AndroidViewModel {
-    private DeviceDatabase deviceDatabase;
+    protected DeviceDatabase deviceDatabase;
     private GroupDatabase groupDatabase;
     private ExecutorService executorService;
     private SendUDPMessage sendUDPMessage;
@@ -176,6 +176,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         Device deviceUser = new Device(u.getChip_id(), u.getDevice_name(), u.getId(), u.getDevice_type(), u.getUsername(), u.getTopic(), g.getId());
                         deviceUser.setPin1("off");
                         deviceUser.setPin2("off");
+                        deviceUser.setFavorite(b % 2 == 0);
                         devices.add(deviceUser);
                     }
                 }

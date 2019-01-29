@@ -191,7 +191,7 @@ public class Device {
 //                ", ip='" + ip + '\'' +
 //                ", password='" + password + '\'' +
 //                ", ready4Mqtt=" + ready4Mqtt +
-//                ", favorite=" + favorite +
+                ", favorite=" + favorite +
                 '}';
     }
 }

@@ -50,4 +50,7 @@ public class DeviceDatabase {
     public void updateDevices(List<Device> devices){
         deviceDAO.updateDevices(devices);
     }
+    public LiveData<List<Device>> getFavoriteDevices(){
+        return deviceDAO.getAllFavoritesLive();
+    }
 }

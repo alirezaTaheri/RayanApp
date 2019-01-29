@@ -1,17 +1,39 @@
 package rayan.rayanapp.MainActivity.fragments;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import rayan.rayanapp.R;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FavoritesFragment extends Fragment {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.MainActivity.MainActivity;
+import rayan.rayanapp.MainActivity.OnStatusIconClickListener;
+import rayan.rayanapp.MainActivity.adapters.DevicesRecyclerViewAdapter;
+import rayan.rayanapp.MainActivity.viewModels.FavoritesFragmentViewModel;
+import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
+
+public class FavoritesFragment extends Fragment implements OnStatusIconClickListener {
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    List<Device> devices = new ArrayList<>();
+    FavoritesFragmentViewModel favoritesFragmentViewModel;
+    DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     public FavoritesFragment() {
     }
 
@@ -25,13 +47,35 @@ public class FavoritesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+        favoritesFragmentViewModel = ViewModelProviders.of(getActivity()).get(FavoritesFragmentViewModel.class);
+        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices);
+        devicesRecyclerViewAdapter.setListener(this);
+        favoritesFragmentViewModel.getAllDevices().observe(this, new Observer<List<Device>>() {
+            @Override
+            public void onChanged(@Nullable List<Device> devices) {
+                Log.e("//////////////", "////////: " + devices);
+                devicesRecyclerViewAdapter.updateItems(devices);
+            }
+        });
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_favorites, container, false);
+        View view = inflater.inflate(R.layout.fragment_favorites, container, false);
+        ButterKnife.bind(this, view);
+        recyclerView.setAdapter(devicesRecyclerViewAdapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        return view;
+    }
+
+    @Override
+    public void onPin1Clicked(Object Item) {
+        favoritesFragmentViewModel.togglePin1((Device) Item, MainActivity.PROTOCOL.equals(AppConstants.UDP));
+    }
+
+    @Override
+    public void onPin2Clicked(Object Item) {
+        favoritesFragmentViewModel.togglePin2((Device) Item, MainActivity.PROTOCOL.equals(AppConstants.UDP));
     }
 }
