@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     PROTOCOL = AppConstants.UDP;
                     mainActivityViewModel.disconnectMQTT();
                     RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-                    accessModeSwitch.setInactiveTintIconLeft();
+//                    accessModeSwitch.setInactiveTintIconLeft();
                 }
 
             }
