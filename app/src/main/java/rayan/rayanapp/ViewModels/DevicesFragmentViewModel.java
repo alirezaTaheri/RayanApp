@@ -1,11 +1,8 @@
-package rayan.rayanapp.MainActivity.viewModels;
+package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,7 +10,6 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -42,7 +38,7 @@ import rayan.rayanapp.Retrofit.Models.ResponseUser;
 import rayan.rayanapp.Retrofit.Models.User;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
-import rayan.rayanapp.Util.DevicesDiffCallBack;
+import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 
 public class DevicesFragmentViewModel extends AndroidViewModel {
     protected DeviceDatabase deviceDatabase;

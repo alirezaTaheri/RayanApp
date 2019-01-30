@@ -1,11 +1,11 @@
-package rayan.rayanapp.MainActivity;
+package rayan.rayanapp.Adapters.viewPager;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import rayan.rayanapp.MainActivity.fragments.DevicesFragment;
-import rayan.rayanapp.MainActivity.fragments.FavoritesFragment;
-import rayan.rayanapp.MainActivity.fragments.ScenariosFragment;
+import rayan.rayanapp.Fragments.DevicesFragment;
+import rayan.rayanapp.Fragments.FavoritesFragment;
+import rayan.rayanapp.Fragments.ScenariosFragment;
 
 /**
  * Created by alireza321 on 24/01/2018.

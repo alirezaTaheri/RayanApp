@@ -6,13 +6,12 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
-import rayan.rayanapp.MainActivity.viewModels.MainActivityViewModel;
+import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.mqtt.internal.Connections;
 import rayan.rayanapp.Services.mqtt.model.Subscription;

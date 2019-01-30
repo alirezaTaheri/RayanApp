@@ -1,6 +1,4 @@
-package rayan.rayanapp.MainActivity;
-
-import rayan.rayanapp.Util.BaseRecyclerListener;
+package rayan.rayanapp.Listeners;
 
 public interface OnStatusIconClickListener<T> extends BaseRecyclerListener {
     void onPin1Clicked(T Item);

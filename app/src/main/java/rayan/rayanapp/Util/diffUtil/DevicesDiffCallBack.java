@@ -1,4 +1,4 @@
-package rayan.rayanapp.Util;
+package rayan.rayanapp.Util.diffUtil;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

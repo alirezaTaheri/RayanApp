@@ -1,8 +1,10 @@
-package rayan.rayanapp.Util;
+package rayan.rayanapp.ViewHolders;
 
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import rayan.rayanapp.Listeners.BaseRecyclerListener;
 
 public abstract class BaseViewHolder<T, L extends BaseRecyclerListener> extends RecyclerView.ViewHolder {
 

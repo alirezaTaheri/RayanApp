@@ -1,9 +1,7 @@
-package rayan.rayanapp.MainActivity.fragments;
+package rayan.rayanapp.Fragments;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,10 +19,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.MainActivity.MainActivity;
-import rayan.rayanapp.MainActivity.OnStatusIconClickListener;
-import rayan.rayanapp.MainActivity.adapters.DevicesRecyclerViewAdapter;
-import rayan.rayanapp.MainActivity.viewModels.FavoritesFragmentViewModel;
+import rayan.rayanapp.Activities.MainActivity;
+import rayan.rayanapp.Listeners.OnStatusIconClickListener;
+import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
+import rayan.rayanapp.ViewModels.FavoritesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 

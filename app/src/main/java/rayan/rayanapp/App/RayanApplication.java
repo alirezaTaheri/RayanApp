@@ -3,13 +3,9 @@ package rayan.rayanapp.App;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
-import rayan.rayanapp.Login.LoginActivity;
-import rayan.rayanapp.Login.viewModel.LoginViewModel;
-import rayan.rayanapp.MainActivity.MainActivity;
+import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Persistance.PrefManager;
-import rayan.rayanapp.R;
 
 public class RayanApplication extends Application {
     private static Context context;

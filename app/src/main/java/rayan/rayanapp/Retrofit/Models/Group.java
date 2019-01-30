@@ -12,8 +12,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Util.DeviceDataConverter;
-import rayan.rayanapp.Util.UserDataConverter;
+import rayan.rayanapp.Util.dataConverter.DeviceDataConverter;
+import rayan.rayanapp.Util.dataConverter.UserDataConverter;
 
 @Entity
 public class Group {

@@ -1,4 +1,4 @@
-package rayan.rayanapp.Util;
+package rayan.rayanapp.Listeners;
 
 public interface BaseRecyclerListener {
 

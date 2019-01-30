@@ -1,4 +1,4 @@
-package rayan.rayanapp.MainActivity;
+package rayan.rayanapp.Activities;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -18,8 +18,8 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.NetworkConnection;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
-import rayan.rayanapp.MainActivity.viewModels.DevicesFragmentViewModel;
-import rayan.rayanapp.MainActivity.viewModels.MainActivityViewModel;
+import rayan.rayanapp.Adapters.viewPager.ViewPagerAdapter;
+import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
                     PROTOCOL = AppConstants.UDP;
                     mainActivityViewModel.disconnectMQTT();
                     RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-                    accessModeSwitch.setInactiveTintIconLeft();
                 }
 
             }

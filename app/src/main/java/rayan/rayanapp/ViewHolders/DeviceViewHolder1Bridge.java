@@ -1,4 +1,4 @@
-package rayan.rayanapp.MainActivity.viewHolders;
+package rayan.rayanapp.ViewHolders;
 
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -8,9 +8,8 @@ import com.varunest.sparkbutton.SparkButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.MainActivity.OnStatusIconClickListener;
+import rayan.rayanapp.Listeners.OnStatusIconClickListener;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Util.BaseViewHolder;
 
 public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnStatusIconClickListener<Device>> {
     private final String TAG = DeviceViewHolder1Bridge.class.getSimpleName();

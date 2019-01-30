@@ -1,4 +1,4 @@
-package rayan.rayanapp.Util;
+package rayan.rayanapp.Adapters.recyclerView;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rayan.rayanapp.Listeners.BaseRecyclerListener;
+import rayan.rayanapp.ViewHolders.BaseViewHolder;
 
 public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListener, VH extends BaseViewHolder<T,L>>
         extends RecyclerView.Adapter<VH> {

@@ -1,14 +1,11 @@
-package rayan.rayanapp.MainActivity.fragments;
+package rayan.rayanapp.Fragments;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +16,11 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.MainActivity.MainActivity;
-import rayan.rayanapp.MainActivity.OnStatusIconClickListener;
-import rayan.rayanapp.MainActivity.adapters.DevicesRecyclerViewAdapter;
-import rayan.rayanapp.MainActivity.viewModels.DevicesFragmentViewModel;
+import rayan.rayanapp.Activities.MainActivity;
+import rayan.rayanapp.Listeners.OnStatusIconClickListener;
+import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
+import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 

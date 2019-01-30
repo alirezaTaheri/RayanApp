@@ -12,7 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.MainActivity.viewModels.MainActivityViewModel;
+import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 
 

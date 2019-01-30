@@ -1,22 +1,18 @@
-package rayan.rayanapp.MainActivity.adapters;
+package rayan.rayanapp.Adapters.recyclerView;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.util.ListUpdateCallback;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.MainActivity.OnStatusIconClickListener;
-import rayan.rayanapp.MainActivity.viewHolders.DeviceViewHolder1Bridge;
-import rayan.rayanapp.MainActivity.viewHolders.DeviceViewHolder2Bridges;
+import rayan.rayanapp.Listeners.OnStatusIconClickListener;
+import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
+import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Util.DevicesDiffCallBack;
-import rayan.rayanapp.Util.GenericRecyclerViewAdapter;
+import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 
 public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnStatusIconClickListener<Device>, DeviceViewHolder1Bridge> {
 

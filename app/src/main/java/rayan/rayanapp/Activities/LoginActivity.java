@@ -1,4 +1,4 @@
-package rayan.rayanapp.Login;
+package rayan.rayanapp.Activities;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -11,11 +11,9 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.disposables.Disposable;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.MainActivity.MainActivity;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Login.viewModel.LoginViewModel;
+import rayan.rayanapp.ViewModels.LoginViewModel;
 
 
 public class LoginActivity extends AppCompatActivity {
