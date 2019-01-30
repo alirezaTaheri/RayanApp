@@ -100,5 +100,8 @@ public class MainActivity extends AppCompatActivity {
         mainActivityViewModel.sendNodeToAll();
     }
 
-
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, DeviceManagementActivity.class));
+    }
 }
