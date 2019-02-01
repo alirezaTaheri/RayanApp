@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".Activities.DeviceManagementListActivity">
+    <android.support.design.widget.TextInputLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_height="wrap_content">
+        <EditText
+            android:hint="نام دستگاه"
+            android:id="@+id/name"
+            android:inputType="text"
+            android:textDirection="rtl"
+            android:maxLength="15"
+            android:textSize="14.5sp"
+            android:imeOptions="actionDone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </android.support.design.widget.TextInputLayout>
+    <LinearLayout
+        android:layoutDirection="rtl"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:transitionName="accessLevelTitle"
+            android:layout_alignParentRight="true"
+            android:text="قابلیت دسترسی"
+            android:gravity="center_vertical"
+            android:textSize="14.5sp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:layout_gravity="center"
+            android:layoutDirection="ltr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:transitionName="localAccessTitle"
+                android:text="محلی"
+                android:layout_marginRight="4dp"
+                android:textSize="11sp"
+                android:drawableLeft="@drawable/ic_home"
+                android:background="@drawable/background_local_access_title"
+                android:textColor="@color/white"
+                android:id="@+id/localAccessTitle"
+                android:gravity="center"
+                android:padding="1dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:transitionName="onlineAccessTitle"
+                android:text="اینترنتی"
+                android:drawableTint="@color/white"
+                android:drawableLeft="@drawable/ic_cloud"
+                android:layout_marginRight="2dp"
+                android:textSize="11sp"
+                android:gravity="center"
+                android:id="@+id/onlineAccessTextView"
+                android:background="@drawable/background_online_access_title"
+                android:textColor="@color/white"
+                android:padding="1dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+</LinearLayout>
+    <TextView
+        android:id="@+id/register"
+        android:drawableRight="@drawable/ic_cloud"
+        android:text="ایجاد دسترسی اینترنتی"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/background_base_color_button"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:paddingLeft="23dp"
+        android:paddingRight="23dp"
+        android:paddingTop="10dp"
+        android:textColor="@color/grey_dark_2"
+        android:textSize="14sp" />
+    <TextView
+        android:layout_margin="20dp"
+        android:id="@+id/reset"
+        android:drawableRight="@drawable/ic_reset"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/background_reset_device_button"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:paddingLeft="23dp"
+        android:paddingRight="23dp"
+        android:paddingTop="10dp"
+        android:text="ریست کردن دستگاه"
+        android:textColor="@color/grey_light_3"
+        android:textSize="14sp" />
+</LinearLayout>

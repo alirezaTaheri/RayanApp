@@ -6,7 +6,14 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@color/baseColor</item>
+        <item name="android:statusBarColor">@color/baseColor2</item>
+    </style>
+    <style name="CustomTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/baseColor2</item>
+        <item name="colorPrimaryDark">@color/baseColor2</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@color/baseColor2</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

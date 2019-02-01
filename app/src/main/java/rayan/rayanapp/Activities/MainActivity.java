@@ -13,12 +13,14 @@ import android.util.Log;
 
 import com.polyak.iconswitch.IconSwitch;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.NetworkConnection;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
-import rayan.rayanapp.Adapters.viewPager.ViewPagerAdapter;
+import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         ButterKnife.bind(this);
+
         networkConnectionLiveData = new NetworkConnectionLiveData(getApplicationContext());
         networkConnectionLiveData.observe(this, new Observer<NetworkConnection>() {
             @Override
@@ -56,10 +59,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        MainActivityViewPagerAdapter viewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(1);
-        startService(new Intent(this, UDPServerService.class));
         toolbar.setNavigationIcon(null);
         setSupportActionBar(toolbar);
         mainActivityViewModel.getConnection().observe(this, connection -> {
@@ -102,6 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(this, DeviceManagementActivity.class));
+        startActivity(new Intent(this, DeviceManagementListActivity.class));
     }
 }

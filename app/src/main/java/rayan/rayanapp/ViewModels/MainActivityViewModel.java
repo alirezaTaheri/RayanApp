@@ -83,6 +83,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public void disconnectMQTT(){
+        if (connection.getValue()!= null)
         try {
             connection.getValue().getClient().unregisterResources();
             connection.getValue().getClient().close();

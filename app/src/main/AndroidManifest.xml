@@ -38,7 +38,9 @@
         <service android:name=".Services.udp.UDPServerService" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
-        <activity android:name=".Activities.DeviceManagementActivity"></activity>
+        <activity android:name=".Activities.DeviceManagementListActivity"
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/CustomTheme"></activity>
     </application>
 
 </manifest>
