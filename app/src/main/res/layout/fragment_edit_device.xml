@@ -76,10 +76,12 @@
         </LinearLayout>
 </LinearLayout>
     <TextView
-        android:id="@+id/register"
+        android:id="@+id/setTopic"
         android:drawableRight="@drawable/ic_cloud"
         android:text="ایجاد دسترسی اینترنتی"
-        android:layout_margin="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -94,7 +96,29 @@
         android:textColor="@color/grey_dark_2"
         android:textSize="14sp" />
     <TextView
-        android:layout_margin="20dp"
+        android:id="@+id/unsetTopic"
+        android:drawableRight="@drawable/ic_cloud"
+        android:text="لغو دسترسی اینترنتی"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/background_base_color_button"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:paddingLeft="23dp"
+        android:paddingRight="23dp"
+        android:paddingTop="10dp"
+        android:textColor="@color/grey_dark_2"
+        android:textSize="14sp" />
+    <TextView
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/reset"
         android:drawableRight="@drawable/ic_reset"
         android:layout_width="match_parent"

@@ -14,14 +14,26 @@ import rayan.rayanapp.Retrofit.Models.Topic;
 public class Device {
     @PrimaryKey
     @NonNull
+    @SerializedName("chip_id")
+    @Expose
     private String chipId;
+    @SerializedName("device_name")
+    @Expose
     private String name1;
     private String name2;
-    private String pin1;
-    private String pin2;
+    private String pin1 = "off";
+    private String pin2 = "off";
+    @SerializedName("_id")
+    @Expose
     private String id;
+    @SerializedName("device_type")
+    @Expose
     private String type;
+    @SerializedName("username")
+    @Expose
     private String username;
+    @SerializedName("topic")
+    @Expose
     @Embedded(prefix = "topic_")
     private Topic topic;
     private String groupId;
@@ -42,6 +54,9 @@ public class Device {
         this.username = username;
         this.topic = topic;
         this.groupId = groupId;
+        this.favorite = false;
+        this.setPin1("off");
+        this.setPin2("off");
     }
 
     @NonNull

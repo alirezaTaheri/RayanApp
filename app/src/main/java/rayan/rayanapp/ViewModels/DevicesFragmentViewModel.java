@@ -151,7 +151,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     private class SyncGroups extends AsyncTask<Void, Void, Void>{
         private List<Group> serverGroups = new ArrayList<>();
         public SyncGroups(List<Group> groups){
-            this.serverGroups = groups;
+            this.serverGroups.addAll(groups);
         }
         @Override
         protected Void doInBackground(Void... voids) {
@@ -162,19 +162,14 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 Group g = serverGroups.get(a);
                 List<Device> devices = new ArrayList<>();
                 List<User> users = new ArrayList<>();
-                for (int b = 0;b<g.getAllUsers().size();b++){
-                    ResponseUser u = g.getAllUsers().get(b);
-                    if (u.getType().equals("human")){
-                        User humanUser = new User(u.getId(), u.getUsername(), u.getRegistered(), u.getUserInfo(), g.getId(), u.getRole());
-                        users.add(humanUser);
-                    }
-                    else{
-                        Device deviceUser = new Device(u.getChip_id(), u.getDevice_name(), u.getId(), u.getDevice_type(), u.getUsername(), u.getTopic(), g.getId());
-                        deviceUser.setPin1("off");
-                        deviceUser.setPin2("off");
-                        deviceUser.setFavorite(b % 2 == 0);
-                        devices.add(deviceUser);
-                    }
+//                if (g.getDevices() != null)
+//                devices.addAll(g.getDevices());
+                if (g.getHumanUsers() != null)
+                users.addAll(g.getHumanUsers());
+                for (int b = 0;b<g.getDevices().size();b++){
+                    Device u = g.getDevices().get(b);
+                    Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId());
+                    devices.add(deviceUser);
                 }
                 g.setDevices(devices);
                 g.setHumanUsers(users);

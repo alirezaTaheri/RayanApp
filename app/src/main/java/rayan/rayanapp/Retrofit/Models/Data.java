@@ -14,7 +14,12 @@ public class Data {
     @SerializedName("user")
     @Expose
     private User user;
-    @SerializedName("groups")
+
+    @SerializedName("message")
+    @Expose
+    private String message;
+
+    @SerializedName("group")
     @Expose
     private List<Group> groups;
     @SerializedName("token")
@@ -49,6 +54,7 @@ public class Data {
     public String toString() {
         return "Data{" +
                 "user=" + user +
+                ", message='" + message + '\'' +
                 ", groups=" + groups +
                 ", token='" + token + '\'' +
                 '}';

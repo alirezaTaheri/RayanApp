@@ -29,12 +29,17 @@ public class Group {
     @Expose
     @Ignore
     private List<ResponseUser> admins;
+//    @SerializedName("users")
+//    @Expose
+//    @Ignore
+//    private List<ResponseUser> allUsers;
+
     @SerializedName("users")
     @Expose
-    @Ignore
-    private List<ResponseUser> allUsers;
     @TypeConverters(UserDataConverter.class)
     private List<User> humanUsers;
+    @SerializedName("devices")
+    @Expose
     @TypeConverters(DeviceDataConverter.class)
     private List<Device> devices;
 
@@ -63,14 +68,6 @@ public class Group {
         this.admins = admins;
     }
 
-    public List<ResponseUser> getAllUsers() {
-        return allUsers;
-    }
-
-    public void setAllUsers(List<ResponseUser> allUsers) {
-        this.allUsers = allUsers;
-    }
-
     public List<User> getHumanUsers() {
         return humanUsers;
     }
@@ -93,7 +90,6 @@ public class Group {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", admins=" + admins +
-                ", allUsers=" + allUsers +
                 ", humanUsers=" + humanUsers +
                 ", devices=" + devices +
                 '}';

@@ -22,6 +22,6 @@ public interface ApiService {
     @FormUrlEncoded
     Observable<BaseResponse> login(@Field("username") String username, @Field("password") String password);
 
-    @GET("api/v1/groups/")
+    @GET("api/v2/groups/")
     Observable<BaseResponse> getGroups(@Header("Authorization") String token);
 }

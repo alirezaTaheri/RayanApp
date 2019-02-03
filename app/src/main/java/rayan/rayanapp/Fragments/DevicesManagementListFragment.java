@@ -32,6 +32,7 @@ import rayan.rayanapp.Listeners.OnStatusIconClickListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.DevicesManagementActivityViewModel;
+import rayan.rayanapp.ViewModels.DevicesManagementListFragmentViewModel;
 import rayan.rayanapp.ViewModels.FavoritesFragmentViewModel;
 
 public class DevicesManagementListFragment extends Fragment implements OnDeviceClickListenerManagement<Device> {
@@ -39,7 +40,7 @@ public class DevicesManagementListFragment extends Fragment implements OnDeviceC
     RecyclerView recyclerView;
     DevicesRecyclerViewAdapterManagement devicesRecyclerViewAdapterManagement;
     List<Device> devices = new ArrayList<>();
-    DevicesManagementActivityViewModel devicesManagementActivityViewModel;
+    DevicesManagementListFragmentViewModel devicesManagementListFragmentViewModel;
     SendDevice sendDevice;
     public DevicesManagementListFragment() {
     }
@@ -53,8 +54,8 @@ public class DevicesManagementListFragment extends Fragment implements OnDeviceC
         super.onCreate(savedInstanceState);
         devicesRecyclerViewAdapterManagement = new DevicesRecyclerViewAdapterManagement(getActivity(), devices);
         devicesRecyclerViewAdapterManagement.setListener(this);
-        devicesManagementActivityViewModel = ViewModelProviders.of(this).get(DevicesManagementActivityViewModel.class);
-        devicesManagementActivityViewModel.getAllDevices().observe(this, devices -> devicesRecyclerViewAdapterManagement.updateItems(devices));
+        devicesManagementListFragmentViewModel = ViewModelProviders.of(this).get(DevicesManagementListFragmentViewModel.class);
+        devicesManagementListFragmentViewModel.getAllDevices().observe(this, devices -> devicesRecyclerViewAdapterManagement.updateItems(devices));
     }
 
     @Override

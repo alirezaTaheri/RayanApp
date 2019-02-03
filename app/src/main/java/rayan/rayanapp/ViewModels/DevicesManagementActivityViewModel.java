@@ -14,9 +14,5 @@ public class DevicesManagementActivityViewModel extends DevicesFragmentViewModel
 
     }
 
-    @Override
-    public LiveData<List<Device>> getAllDevices() {
-        return deviceDatabase.getAllDevicesLive();
-    }
 }
 
