@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.Models;
+package rayan.rayanapp.Retrofit.Models.Responses;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

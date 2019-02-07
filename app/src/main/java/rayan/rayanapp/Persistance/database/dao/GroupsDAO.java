@@ -8,7 +8,7 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
-import rayan.rayanapp.Retrofit.Models.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.Group;
 
 @Dao
 public interface GroupsDAO extends BaseDAO<Group> {
@@ -23,12 +23,13 @@ public interface GroupsDAO extends BaseDAO<Group> {
     Group getGroup(String id);
 
     @Update
-    void updateGroup(Group device);
+    void updateGroup(Group group);
 
     @Update
-    void updateGroups(List<Group> devices);
+    void updateGroups(List<Group> groups);
 
     @Delete
-    void deleteGroups(List<Group> devices);
+    void deleteGroups(List<Group> groups);
+
 
 }

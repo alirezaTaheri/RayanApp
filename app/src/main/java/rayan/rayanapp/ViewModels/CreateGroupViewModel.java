@@ -1,57 +1,61 @@
 package rayan.rayanapp.ViewModels;
 
+import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.util.Log;
+
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
+import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
 
-public class LoginViewModel extends ViewModel {
-    private final String TAG = LoginViewModel.class.getSimpleName();
-    private final MutableLiveData<BaseResponse> loginResponse = new MutableLiveData<>();
-    public boolean isConnected(Context context){
-        ConnectivityManager CManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo NInfo = CManager.getActiveNetworkInfo();
-        return NInfo != null && NInfo.isConnectedOrConnecting();
+public class CreateGroupViewModel extends DevicesFragmentViewModel {
+    private final String TAG = CreateGroupFragment.class.getSimpleName();
+
+    public CreateGroupViewModel(@NonNull Application application) {
+        super(application);
     }
 
-    public void login(String username, String password){
-        loginObservable(username, password).subscribe(loginObserver());
+    public LiveData<BaseResponse> createGroup(String name, List<String> mobiles){
+        final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
+        createGroupObservable(new CreateGroupRequest(name, mobiles)).subscribe(createGroupObserver(results));
+        return results;
     }
 
-    private Observable<BaseResponse> loginObservable(String username, String password){
+    private Observable<BaseResponse> createGroupObservable(CreateGroupRequest createGroupRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .login(username, password)
+                .createGroup(RayanApplication.getPref().getToken(), createGroupRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private DisposableObserver<BaseResponse> loginObserver(){
+    private DisposableObserver<BaseResponse> createGroupObserver(MutableLiveData<BaseResponse> results){
         return new DisposableObserver<BaseResponse>() {
+
             @Override
             public void onNext(@NonNull BaseResponse baseResponse) {
-                Log.d(TAG,"OnNext "+baseResponse);
-                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
-                    loginResponse.setValue(baseResponse);
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse);
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
                 Log.d(TAG,"Error"+e);
                 e.printStackTrace();
+                if (e.toString().contains("Unauthorized"))
+                    login();
             }
 
             @Override
@@ -61,7 +65,4 @@ public class LoginViewModel extends ViewModel {
         };
     }
 
-    public LiveData<BaseResponse> getLoginResponse(){
-        return loginResponse;
-    }
 }

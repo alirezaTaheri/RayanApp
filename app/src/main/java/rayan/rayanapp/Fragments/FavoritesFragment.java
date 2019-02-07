@@ -51,7 +51,6 @@ public class FavoritesFragment extends Fragment implements OnStatusIconClickList
         favoritesFragmentViewModel.getAllDevices().observe(this, new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {
-                Log.e("//////////////", "////////: " + devices);
                 devicesRecyclerViewAdapter.updateItems(devices);
             }
         });

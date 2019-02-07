@@ -1,9 +1,7 @@
 package rayan.rayanapp.Activities;
 
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.Objects;
@@ -12,7 +10,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Adapters.viewPager.DevicesManagementActivityViewPagerAdapter;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Fragments.DeviceListDialogFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
 import rayan.rayanapp.R;

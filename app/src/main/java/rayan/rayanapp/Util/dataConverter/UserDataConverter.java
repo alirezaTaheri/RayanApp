@@ -8,7 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import rayan.rayanapp.Retrofit.Models.User;
+import rayan.rayanapp.Retrofit.Models.Responses.User;
 
 
 /**

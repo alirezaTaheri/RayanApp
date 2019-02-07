@@ -22,7 +22,7 @@ import java.net.DatagramSocket;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
-import rayan.rayanapp.Retrofit.Models.Topic;
+import rayan.rayanapp.Retrofit.Models.Responses.Topic;
 import rayan.rayanapp.Util.AppConstants;
 
 public class UDPServerService extends Service {

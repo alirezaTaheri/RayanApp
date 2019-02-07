@@ -1,8 +1,11 @@
-package rayan.rayanapp.Retrofit.Models;
+package rayan.rayanapp.Retrofit.Models.Responses;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Topic {
+public class Topic implements Parcelable {
     @SerializedName("topic")
     private String topic;
     @SerializedName("type")
@@ -13,6 +16,26 @@ public class Topic {
     private String name;
     @SerializedName("_id")
     private String id;
+    public Topic(){}
+    protected Topic(Parcel in) {
+        topic = in.readString();
+        type = in.readString();
+        domain = in.readString();
+        name = in.readString();
+        id = in.readString();
+    }
+
+    public static final Creator<Topic> CREATOR = new Creator<Topic>() {
+        @Override
+        public Topic createFromParcel(Parcel in) {
+            return new Topic(in);
+        }
+
+        @Override
+        public Topic[] newArray(int size) {
+            return new Topic[size];
+        }
+    };
 
     public String getTopic() {
         return topic;
@@ -63,5 +86,19 @@ public class Topic {
                 ", name='" + name + '\'' +
                 ", id='" + id + '\'' +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(topic);
+        dest.writeString(type);
+        dest.writeString(domain);
+        dest.writeString(name);
+        dest.writeString(id);
     }
 }

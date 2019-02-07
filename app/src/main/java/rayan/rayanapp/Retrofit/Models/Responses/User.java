@@ -1,12 +1,14 @@
-package rayan.rayanapp.Retrofit.Models;
+package rayan.rayanapp.Retrofit.Models.Responses;
 
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class User {
+public class User implements Parcelable {
     @PrimaryKey
     @NonNull
     @SerializedName("_id")
@@ -15,7 +17,8 @@ public class User {
     @SerializedName("username")
     @Expose
     private String username;
-
+    private String contactName;
+    private boolean selected;
     @SerializedName("registered")
     @Expose
     private String registered;
@@ -32,6 +35,37 @@ public class User {
     @Expose
     private String role;
 
+    protected User(Parcel in) {
+        id = in.readString();
+        username = in.readString();
+        contactName = in.readString();
+        selected = in.readByte() != 0;
+        registered = in.readString();
+        groupId = in.readString();
+        type = in.readString();
+        role = in.readString();
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+    public User(){}
     public User(@NonNull String id, String username, String registered, UserInfo userInfo, String groupId, String role) {
         this.id = id;
         this.username = username;
@@ -48,6 +82,14 @@ public class User {
 
     public void setId(@NonNull String id) {
         this.id = id;
+    }
+
+    public String getContactName() {
+        return contactName;
+    }
+
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
     }
 
     public String getUsername() {
@@ -95,7 +137,33 @@ public class User {
         return "User{" +
                 "id='" + id + '\'' +
                 ", username='" + username + '\'' +
+                ", contactName='" + contactName + '\'' +
                 ", type='" + type + '\'' +
                 '}';
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(username);
+        dest.writeString(contactName);
+        dest.writeByte((byte) (selected ? 1 : 0));
+        dest.writeString(registered);
+        dest.writeString(groupId);
+        dest.writeString(type);
+        dest.writeString(role);
     }
 }

@@ -3,15 +3,17 @@ package rayan.rayanapp.Data;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import rayan.rayanapp.Retrofit.Models.Topic;
+import rayan.rayanapp.Retrofit.Models.Responses.Topic;
 
 @Entity
-public class Device {
+public class Device implements Parcelable {
     @PrimaryKey
     @NonNull
     @SerializedName("chip_id")
@@ -58,6 +60,37 @@ public class Device {
         this.setPin1("off");
         this.setPin2("off");
     }
+
+    protected Device(Parcel in) {
+        chipId = in.readString();
+        name1 = in.readString();
+        name2 = in.readString();
+        pin1 = in.readString();
+        pin2 = in.readString();
+        id = in.readString();
+        type = in.readString();
+        username = in.readString();
+        topic = in.readParcelable(Topic.class.getClassLoader());
+        groupId = in.readString();
+        style = in.readString();
+        ssid = in.readString();
+        ip = in.readString();
+        password = in.readString();
+        ready4Mqtt = in.readByte() != 0;
+        favorite = in.readByte() != 0;
+    }
+
+    public static final Creator<Device> CREATOR = new Creator<Device>() {
+        @Override
+        public Device createFromParcel(Parcel in) {
+            return new Device(in);
+        }
+
+        @Override
+        public Device[] newArray(int size) {
+            return new Device[size];
+        }
+    };
 
     @NonNull
     public String getChipId() {
@@ -208,5 +241,30 @@ public class Device {
 //                ", ready4Mqtt=" + ready4Mqtt +
                 ", favorite=" + favorite +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(chipId);
+        dest.writeString(name1);
+        dest.writeString(name2);
+        dest.writeString(pin1);
+        dest.writeString(pin2);
+        dest.writeString(id);
+        dest.writeString(type);
+        dest.writeString(username);
+        dest.writeParcelable(topic, flags);
+        dest.writeString(groupId);
+        dest.writeString(style);
+        dest.writeString(ssid);
+        dest.writeString(ip);
+        dest.writeString(password);
+        dest.writeByte((byte) (ready4Mqtt ? 1 : 0));
+        dest.writeByte((byte) (favorite ? 1 : 0));
     }
 }

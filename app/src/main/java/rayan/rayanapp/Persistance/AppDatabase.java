@@ -8,7 +8,7 @@ import android.content.Context;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Persistance.database.dao.DevicesDAO;
 import rayan.rayanapp.Persistance.database.dao.GroupsDAO;
-import rayan.rayanapp.Retrofit.Models.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.Group;
 
 @Database(entities = {Device.class, Group.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {

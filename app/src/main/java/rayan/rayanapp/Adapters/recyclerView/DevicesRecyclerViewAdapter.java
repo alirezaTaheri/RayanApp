@@ -32,7 +32,6 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
         this.items.clear();
         this.items.addAll(items);
         diffResult.dispatchUpdatesTo(this);
-
     }
 
     @NonNull

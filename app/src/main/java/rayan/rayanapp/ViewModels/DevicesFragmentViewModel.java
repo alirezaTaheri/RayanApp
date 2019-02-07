@@ -32,13 +32,14 @@ import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Group;
-import rayan.rayanapp.Retrofit.Models.ResponseUser;
-import rayan.rayanapp.Retrofit.Models.User;
+import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.User;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
+import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
 
 public class DevicesFragmentViewModel extends AndroidViewModel {
     protected DeviceDatabase deviceDatabase;
@@ -68,6 +69,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         return null;
     }
 
+
     private class GetAllDevices extends AsyncTask<Void, Void,LiveData<List<Device>>> {
         @Override
         protected LiveData<List<Device>> doInBackground(Void... voids) {
@@ -85,7 +87,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         loginObservable().subscribe(loginObserver());
     }
 
-    private Observable<BaseResponse> getGroupObservable(){
+    private Observable<GroupsResponse> getGroupObservable(){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .getGroups(RayanApplication.getPref().getToken())
@@ -93,11 +95,11 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private DisposableObserver<BaseResponse> getGroupObserver(){
-        return new DisposableObserver<BaseResponse>() {
+    private DisposableObserver<GroupsResponse> getGroupObserver(){
+        return new DisposableObserver<GroupsResponse>() {
 
             @Override
-            public void onNext(@NonNull BaseResponse baseResponse) {
+            public void onNext(@NonNull GroupsResponse baseResponse) {
                 Log.d(TAG,"OnNext "+baseResponse);
                 new SyncGroups(baseResponse.getData().getGroups()).execute();
             }
@@ -155,7 +157,6 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         }
         @Override
         protected Void doInBackground(Void... voids) {
-            List<Group> newGroups = new ArrayList<>();
             List<Device> newDevices = new ArrayList<>();
             List<User> newUsers = new ArrayList<>();
             for (int a = 0;a<serverGroups.size();a++){
@@ -175,32 +176,63 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 g.setHumanUsers(users);
                 newDevices.addAll(devices);
                 newUsers.addAll(users);
-                newGroups.add(g);
             }
-            List<Device> database = deviceDatabase.getAllDevices();
-            DevicesDiffCallBack devicesDiffCallBack = new DevicesDiffCallBack(newDevices, database);
+            List<Device> oldDevices = deviceDatabase.getAllDevices();
+            List<Group> oldGroups = groupDatabase.getAllGroups();
+            DevicesDiffCallBack devicesDiffCallBack = new DevicesDiffCallBack(newDevices, oldDevices);
             DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack);
             diffResult.dispatchUpdatesTo(new ListUpdateCallback() {
                 @Override
                 public void onInserted(int i, int i1) {
+//                    Log.e("ABC", "OnInserted: from: "+i+" To: " + i+i1 + " Count: " + i1);
                     addDevices(newDevices.subList(i, i+i1));
                 }
 
                 @Override
                 public void onRemoved(int i, int i1) {
-                    deviceDatabase.deleteDevices(database.subList(i, i + i1));
+//                    Log.e("ABC", "OnRemoved: from: "+i+" To: " + (i1 +i) + " Count: " + i1);
+                    deviceDatabase.deleteDevices(oldDevices.subList(i, i + i1));
                 }
 
                 @Override
                 public void onMoved(int i, int i1) {
+//                    Log.e("ABC", "onMoved: from: "+i+" To: " + i1);
                 }
 
                 @Override
                 public void onChanged(int i, int i1, @Nullable Object o) {
-                    deviceDatabase.updateDevices(database.subList(i, i + i1));
+//                    Log.e("ABC", "onChanged: from: "+i+" To: " + i1 +1 +"Count: " + i1);
+                    deviceDatabase.updateDevices(newDevices.subList(i, i + i1));
                 }
             });
-            groupDatabase.addGroups(newGroups);
+            GroupsDiffCallBack groupsDiffCallBack = new GroupsDiffCallBack(serverGroups, oldGroups);
+            DiffUtil.DiffResult diffResult1 = DiffUtil.calculateDiff(groupsDiffCallBack);
+            diffResult1.dispatchUpdatesTo(new ListUpdateCallback() {
+                @Override
+                public void onInserted(int i, int i1) {
+                    groupDatabase.addGroups(serverGroups.subList(i, i+i1));
+//                    Log.e("DEF", "OnInserted: from: "+i+" To: " + i+i1 + " Count: " + i1);
+                }
+
+                @Override
+                public void onRemoved(int i, int i1) {
+//                    Log.e("DEF", "OnRemoved: from: "+i+" To: " + (i1 +i) + " Count: " + i1);
+                    groupDatabase.deleteGroups(oldGroups.subList(i, i+1));
+                }
+
+                @Override
+                public void onMoved(int i, int i1) {
+//                    Log.e("DEF", "onMoved: from: "+i+" To: " + i1);
+
+                }
+
+                @Override
+                public void onChanged(int i, int i1, @Nullable Object o) {
+//                    Log.e("DEF", "onChanged: from: "+i+" To: " + (i1+i) +"Count: " + i1);
+                    groupDatabase.updateGroups(serverGroups.subList(i, i+1));
+                }
+            });
+//            groupDatabase.addGroups(newGroups);
 //            myViewModel.addUsers(newUsers);
             return null;
         }
@@ -248,9 +280,6 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             sendUDPMessage.sendUdpMessage(device.getIp(),jsonObject.toString());
         else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected())
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), jsonObject.toString(), 0, false);
-
-
-
     }
 
 

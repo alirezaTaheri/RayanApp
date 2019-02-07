@@ -104,6 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(this, DeviceManagementListActivity.class));
+        startActivity(new Intent(this, GroupsActivity.class));
     }
 }

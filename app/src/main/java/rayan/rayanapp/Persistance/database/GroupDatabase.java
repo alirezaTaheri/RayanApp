@@ -6,7 +6,7 @@ import android.content.Context;
 import java.util.List;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.dao.GroupsDAO;
-import rayan.rayanapp.Retrofit.Models.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.Group;
 
 public class GroupDatabase {
     private AppDatabase appDatabase;
@@ -39,4 +39,5 @@ public class GroupDatabase {
     public void updateGroups(List<Group> devices){
         groupsDAO.updateGroups(devices);
     }
+
 }

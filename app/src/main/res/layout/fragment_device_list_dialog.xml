@@ -1,12 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#c4b7c4"
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="تایید"
+            android:id="@+id/confirm"
+            android:background="?attr/selectableItemBackground"
+            android:layout_alignParentRight="true"
+            android:textSize="17sp"
+            android:layout_margin="8dp"
+            android:padding="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:background="?attr/selectableItemBackground"
+            android:text="لغو"
+            android:layout_margin="8dp"
+            android:id="@+id/cancel"
+            android:padding="3dp"
+            android:textSize="17sp"
+            android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+<android.support.v7.widget.RecyclerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#ffffff"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
+    android:id="@+id/recyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:paddingTop="@dimen/list_item_spacing_half"
     android:paddingBottom="@dimen/list_item_spacing_half"
-    tools:context=".Fragments.DeviceListDialogFragment"
-    tools:listitem="@layout/fragment_device_list_dialog_item" />
+    tools:context=".Fragments.UsersListDialogFragment"
+    tools:listitem="@layout/item_contact" />
+</LinearLayout>

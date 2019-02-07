@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.Models;
+package rayan.rayanapp.Retrofit.Models.Responses;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -10,7 +10,7 @@ import java.util.List;
  * Created by alireza321 on 21/12/2018.
  */
 
-public class Data {
+public class GroupsData {
     @SerializedName("user")
     @Expose
     private User user;
@@ -25,6 +25,14 @@ public class Data {
     @SerializedName("token")
     @Expose
     private String token;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public User getUser() {
         return user;

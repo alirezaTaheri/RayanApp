@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="5dp"
+    android:id="@+id/cardView"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="7dp">
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/wholeLayout1"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/clickableLayout"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:foregroundGravity="top"
+                    app:srcCompat="@drawable/ic_group" />
+
+                <TextView
+                    android:text="Name"
+                    android:background="#00ffffff"
+                    android:id="@+id/name"
+                    android:layout_below="@+id/icon"
+                    android:gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+        </LinearLayout>
+        <View
+            android:id="@+id/offBottomStrip"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@color/grey_light_1"/>
+        <View
+            android:id="@+id/onBottomStrip"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@drawable/background_group_view"/>
+        <ImageView
+            android:visibility="invisible"
+            android:id="@+id/aliveIndicator"
+            app:srcCompat="@drawable/ic_circle"
+            android:tint="#4CAF50"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_gravity="top|left"
+            android:layout_width="10dp"
+            android:layout_height="10dp" />
+    </FrameLayout>
+</android.support.v7.widget.CardView>

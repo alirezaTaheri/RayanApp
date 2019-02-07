@@ -12,9 +12,9 @@ import rayan.rayanapp.R;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewHolders.DeviceViewHolderManagement;
 
-public class DevicesRecyclerViewAdapterManagement extends GenericRecyclerViewAdapter<Device,OnDeviceClickListenerManagement<Device>, DeviceViewHolderManagement>  {
+public class DevicesManagementRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnDeviceClickListenerManagement<Device>, DeviceViewHolderManagement>  {
 
-    public DevicesRecyclerViewAdapterManagement(Context context, List<Device> devices) {
+    public DevicesManagementRecyclerViewAdapter(Context context, List<Device> devices) {
         super(context);
         this.items = devices;
     }
