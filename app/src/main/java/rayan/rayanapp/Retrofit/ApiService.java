@@ -6,6 +6,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.AddUserByMobileRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.EditUserRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.DeleteUserRequest;
@@ -60,6 +61,8 @@ public interface ApiService {
     @POST("api/v2/groups/addtopic")
     Observable<DeviceResponse> createTopic(@Header("Authorization") String token, @Body CreateTopicRequest createTopicRequest);
 
+    @POST("api/v2/users/edit")
+    Observable<BaseResponse> editUser(@Header("Authorization") String str, @Body EditUserRequest editUserRequest);
 
 
 

@@ -246,4 +246,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: ERROR");
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(this, ProfileActivity.class));
+    }
 }
