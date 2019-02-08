@@ -3,6 +3,7 @@ package rayan.rayanapp.Retrofit;
 import io.reactivex.Observable;
 import rayan.rayanapp.Retrofit.Models.Requests.AddAdminRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.AddUserByMobileRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.ChangePasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.EditDeviceRequest;
@@ -62,7 +63,10 @@ public interface ApiService {
     Observable<DeviceResponse> createTopic(@Header("Authorization") String token, @Body CreateTopicRequest createTopicRequest);
 
     @POST("api/v2/users/edit")
-    Observable<BaseResponse> editUser(@Header("Authorization") String str, @Body EditUserRequest editUserRequest);
+    Observable<BaseResponse> editUser(@Header("Authorization") String token, @Body EditUserRequest editUserRequest);
+
+    @POST("api/v2/users/changepass")
+    Observable<BaseResponse> changePassword(@Header("Authorization") String token, @Body ChangePasswordRequest changePasswordRequest);
 
 
 
