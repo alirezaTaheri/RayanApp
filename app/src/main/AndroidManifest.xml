@@ -47,6 +47,10 @@
             android:name=".Activities.GroupsActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".Activities.ProfileActivity"
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/CustomTheme" />
     </application>
 
 </manifest>

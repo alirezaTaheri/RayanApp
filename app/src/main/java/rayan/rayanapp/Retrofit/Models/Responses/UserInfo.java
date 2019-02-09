@@ -9,9 +9,19 @@ import com.google.gson.annotations.SerializedName;
 
 public class UserInfo {
 
+
+    public UserInfo(String name) {
+        this.name = name;
+    }
+
     @SerializedName("name")
     @Expose
     private String name;
+
+    @SerializedName("password")
+    @Expose
+    private String password;
+
     @SerializedName("_id")
     @Expose
     private String id;
@@ -52,5 +62,12 @@ public class UserInfo {
 
     public void setCreateAt(String createAt) {
         this.createAt = createAt;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
