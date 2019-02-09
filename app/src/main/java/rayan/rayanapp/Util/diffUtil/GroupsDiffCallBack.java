@@ -30,6 +30,9 @@ public class GroupsDiffCallBack extends DiffUtil.Callback {
 
     @Override
     public boolean areContentsTheSame(int i, int i1) {
-        return oldGroups.get(i).getName().equals(newGroups.get(i1).getName());
+        return oldGroups.get(i).getName().equals(newGroups.get(i1).getName()) &&
+                oldGroups.get(i).getHumanUsers().size() == newGroups.get(i1).getHumanUsers().size() &&
+                oldGroups.get(i).getAdmins().size() == newGroups.get(i1).getAdmins().size() &&
+                oldGroups.get(i).getDevices().size() == newGroups.get(i1).getDevices().size();
     }
 }

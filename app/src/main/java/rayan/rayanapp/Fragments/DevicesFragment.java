@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.Listeners.OnStatusIconClickListener;
@@ -52,6 +54,7 @@ public class DevicesFragment extends Fragment implements OnStatusIconClickListen
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         return view;
     }
@@ -59,13 +62,13 @@ public class DevicesFragment extends Fragment implements OnStatusIconClickListen
 
     @Override
     public void onPin1Clicked(Object Item) {
-            devicesFragmentViewModel.togglePin1((Device) Item, MainActivity.PROTOCOL.equals(AppConstants.UDP));
+            devicesFragmentViewModel.togglePin1((Device) Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
 
     }
 
     @Override
     public void onPin2Clicked(Object Item) {
-        devicesFragmentViewModel.togglePin2((Device) Item, MainActivity.PROTOCOL.equals(AppConstants.UDP));
+        devicesFragmentViewModel.togglePin2((Device) Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
 
     @Override

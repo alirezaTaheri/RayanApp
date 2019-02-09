@@ -38,7 +38,7 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         // Required empty public constructor
     }
 
-    public static GroupsListFragment newInstance(String param1, String param2) {
+    public static GroupsListFragment newInstance() {
         GroupsListFragment fragment = new GroupsListFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);

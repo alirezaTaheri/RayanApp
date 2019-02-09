@@ -1,6 +1,7 @@
 package rayan.rayanapp.Services.mqtt;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -33,7 +34,16 @@ public class ActionListener implements IMqttActionListener {
     private final Connection connection;
     private final String clientHandle;
     private final Context context;
-
+    private MutableLiveData<Connection> updateConnection;
+    public ActionListener(Context context, Action action,
+                          Connection connection, MutableLiveData<Connection> updateConnection, String... additionalArgs) {
+        this.context = context;
+        this.action = action;
+        this.connection = connection;
+        this.clientHandle = connection.handle();
+        this.additionalArgs = additionalArgs;
+        this.updateConnection = updateConnection;
+    }
     public ActionListener(Context context, Action action,
                           Connection connection, String... additionalArgs) {
         this.context = context;
@@ -97,7 +107,8 @@ public class ActionListener implements IMqttActionListener {
         c.changeConnectionStatus(Connection.ConnectionStatus.DISCONNECTED);
         String actionTaken = context.getString(R.string.toast_disconnected);
         c.addAction(actionTaken);
-        MainActivityViewModel.connection.setValue(c);
+        updateConnection.postValue(c);
+//        MainActivityViewModel.connection.setValue(c);
         Log.i(TAG, c.handle() + " disconnected.");
         //build intent
         Intent intent = new Intent();
@@ -123,7 +134,8 @@ public class ActionListener implements IMqttActionListener {
         } catch (MqttException ex){
             Log.e(TAG, "Failed to Auto-Subscribe: " + ex.getMessage());
         }
-        MainActivityViewModel.connection.setValue(connection);
+        updateConnection.postValue(connection);
+//        MainActivityViewModel.connection.setValue(connection);
 
     }
 
@@ -181,12 +193,15 @@ public class ActionListener implements IMqttActionListener {
     private void connect(Throwable exception) {
         Toast.makeText(context, "Can't Connect", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "In Connect Method 2" + exception);
-        Connection c = MainActivityViewModel.connection.getValue();
-        if (c == null)
-            c = connection;
-        c.changeConnectionStatus(Connection.ConnectionStatus.ERROR);
-        c.addAction("Client failed to connect");
-        MainActivityViewModel.connection.setValue(c);
+//        Connection c = MainActivityViewModel.connection.getValue();
+//        if (c == null)
+//            c = connection;
+//        c.changeConnectionStatus(Connection.ConnectionStatus.ERROR);
+//        c.addAction("Client failed to connect");
+//        MainActivityViewModel.connection.setValue(c);
+        connection.changeConnectionStatus(Connection.ConnectionStatus.ERROR);
+        connection.addAction("Client failed to connect");
+        updateConnection.postValue(connection);
         System.out.println("Client failed to connect");
     }
 

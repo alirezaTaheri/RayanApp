@@ -155,7 +155,9 @@ public class Connection {
     public boolean isConnected() {
         return status == ConnectionStatus.CONNECTED;
     }
-
+    public ConnectionStatus getStatus(){
+        return status;
+    }
     /**
      * Changes the connection status of the client
      * @param connectionStatus The connection status of this connection

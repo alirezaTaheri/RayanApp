@@ -44,6 +44,7 @@ import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
 
     static final int PICK_CONTACT=1;
+    private final String TAG = EditGroupFragment.class.getSimpleName();
     String cNumber;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     @BindView(R.id.managersRecyclerView)
@@ -79,6 +80,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
         super.onCreate(savedInstanceState);
         if (getArguments() != null)
             this.group = getArguments().getParcelable("group");
+        Log.e(TAG , "Group Is : " + group);
         groupName = group.getName();
         usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
         usersRecyclerViewAdapter.setListener(this);
@@ -124,22 +126,19 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
                             Contact contact = new Contact();
                             contact.setName(name);
                             contact.setNumbers(cNumber);
-                            editGroupFragmentViewModel.addUserByMobile(cNumber, group.getId()).observe(getActivity(), new Observer<BaseResponse>() {
-                                @Override
-                                public void onChanged(@Nullable BaseResponse baseResponse) {
-                                    if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
-                                        Toast.makeText(getActivity(), "کاربری با این شماره وجود ندارد", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")){
-                                        Toast.makeText(getActivity(), "این کاربر هم‌اکنون عضو گروه است", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else if (baseResponse.getStatus().getCode().equals("200")){
-                                        Toast.makeText(getActivity(), "کاربر با موفقیت اضافه شد", Toast.LENGTH_SHORT).show();
-                                        editGroupFragmentViewModel.getGroups();
-                                    }
-                                    else
-                                        Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                            editGroupFragmentViewModel.addUserByMobile(cNumber, group.getId()).observe(getActivity(), baseResponse -> {
+                                if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
+                                    Toast.makeText(getActivity(), "کاربری با این شماره وجود ندارد", Toast.LENGTH_SHORT).show();
                                 }
+                                else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")){
+                                    Toast.makeText(getActivity(), "این کاربر هم‌اکنون عضو گروه است", Toast.LENGTH_SHORT).show();
+                                }
+                                else if (baseResponse.getStatus().getCode().equals("200")){
+                                    Toast.makeText(getActivity(), "کاربر با موفقیت اضافه شد", Toast.LENGTH_SHORT).show();
+                                    editGroupFragmentViewModel.getGroups();
+                                }
+                                else
+                                    Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
                             });
                         }
                     }
@@ -164,15 +163,10 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
         name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                Log.e("beforeTextChanged" ,"String: " + s);
-                Log.e("beforeTextChanged" ,"name: " + groupName);
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.e("onTextChanged" ,"String: " + s);
-                Log.e("onTextChanged" ,"name: " + groupName);
-                Log.e("onTextChanged" ,"Equality: " + name.getText().toString().equals(groupName));
                 if (name.getText().toString().equals(groupName)){
                     saveGroupName.setVisibility(View.INVISIBLE);
                 }

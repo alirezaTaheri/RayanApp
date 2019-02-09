@@ -12,6 +12,8 @@ import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.gson.JsonObject;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +21,7 @@ import org.json.JSONObject;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
@@ -81,6 +84,7 @@ public class UDPServerService extends Service {
                             name = jsonMessage.getString("name");
                             decodedName = Base64.decode(name, Base64.DEFAULT);
                             device = deviceDatabase.getDevice(src);
+                            Log.d(TAG, "TLMSDONETLMSDONE: " + device);
                             if (device != null){
                                 device.setIp(senderIP);
                                 device.setName1(new String(decodedName, "UTF-8"));
@@ -89,7 +93,10 @@ public class UDPServerService extends Service {
                                 deviceDatabase.updateDevice(device);
                             }
                             else{
-                                sendUDPMessage.sendUdpMessage(senderIP, AppConstants.TO_DEVICE_NODE);
+                                JsonObject jsonObject = new JsonObject();
+                                jsonObject.addProperty("cmd",AppConstants.TO_DEVICE_NODE);
+                                jsonObject.addProperty("src",RayanApplication.getPref().getId());
+                                sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
                             }
                             break;
                         case "YES":
@@ -100,6 +107,7 @@ public class UDPServerService extends Service {
                             type = jsonMessage.getString("type");
                             decodedName = Base64.decode(name, Base64.DEFAULT);
                             device = deviceDatabase.getDevice(src);
+                            Log.d(TAG, "YESYESYES: " + device);
                             if (device != null){
                                 device.setIp(senderIP);
                                 device.setName1(new String(decodedName, "UTF-8"));
@@ -112,7 +120,12 @@ public class UDPServerService extends Service {
                                 device.setSsid(ssid);
                                 device.setStyle(style);
                                 device.setIp(senderIP);
+                                deviceDatabase.addDevice(device);
                             }
+                            JsonObject jsonObject = new JsonObject();
+                            jsonObject.addProperty("cmd",AppConstants.TO_DEVICE_TLMS);
+                            jsonObject.addProperty("src",RayanApplication.getPref().getId());
+                            sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
                             break;
 
                     }

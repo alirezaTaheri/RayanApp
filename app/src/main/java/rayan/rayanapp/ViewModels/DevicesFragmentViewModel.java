@@ -3,6 +3,7 @@ package rayan.rayanapp.ViewModels;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -169,8 +170,13 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 users.addAll(g.getHumanUsers());
                 for (int b = 0;b<g.getDevices().size();b++){
                     Device u = g.getDevices().get(b);
-                    Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId());
-                    devices.add(deviceUser);
+                    Device existing = deviceDatabase.getDevice(u.getChipId());
+                    if (existing == null){
+                        Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId());
+                        devices.add(deviceUser);
+                    }
+                    else devices.add(existing);
+
                 }
                 g.setDevices(devices);
                 g.setHumanUsers(users);

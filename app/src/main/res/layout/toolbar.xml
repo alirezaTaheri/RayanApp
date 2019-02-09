@@ -5,6 +5,14 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    <ProgressBar
+        android:visibility="invisible"
+        android:id="@+id/progress_bar"
+        android:layout_marginLeft="35dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_width="35dp"
+        android:layout_height="35dp" />
     <com.polyak.iconswitch.IconSwitch
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"

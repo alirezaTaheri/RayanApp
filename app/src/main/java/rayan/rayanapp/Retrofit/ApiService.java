@@ -4,10 +4,13 @@ import io.reactivex.Observable;
 import rayan.rayanapp.Retrofit.Models.Requests.AddAdminRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.AddUserByMobileRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.CreateTopicRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.EditGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.GroupsResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -48,8 +51,15 @@ public interface ApiService {
     @POST("api/v2/groups/edit")
     Observable<BaseResponse> editGroup(@Header("Authorization") String token, @Body EditGroupRequest editGroupRequest);
 
-    @POST("api/v1/groups")
+    @POST("api/v2/groups")
     Observable<BaseResponse> createGroup(@Header("Authorization") String token, @Body CreateGroupRequest createGroupRequest);
+
+    @POST("api/v2/groups/editusertopic")
+    Observable<DeviceResponse> editDevice(@Header("Authorization") String token, @Body EditDeviceRequest editDeviceRequest);
+
+    @POST("api/v2/groups/addtopic")
+    Observable<DeviceResponse> createTopic(@Header("Authorization") String token, @Body CreateTopicRequest createTopicRequest);
+
 
 
 

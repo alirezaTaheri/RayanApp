@@ -21,7 +21,7 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
         setContentView(R.layout.activity_groups);
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
-        GroupsListFragment groupsListFragment = GroupsListFragment.newInstance("Hello", "Alireza");
+        GroupsListFragment groupsListFragment = GroupsListFragment.newInstance();
         transaction.replace(R.id.frameLayout, groupsListFragment);
         transaction.commit();
 

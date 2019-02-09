@@ -18,6 +18,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.Listeners.OnStatusIconClickListener;
@@ -68,11 +69,11 @@ public class FavoritesFragment extends Fragment implements OnStatusIconClickList
 
     @Override
     public void onPin1Clicked(Object Item) {
-        favoritesFragmentViewModel.togglePin1((Device) Item, MainActivity.PROTOCOL.equals(AppConstants.UDP));
+        favoritesFragmentViewModel.togglePin1((Device) Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
 
     @Override
     public void onPin2Clicked(Object Item) {
-        favoritesFragmentViewModel.togglePin2((Device) Item, MainActivity.PROTOCOL.equals(AppConstants.UDP));
+        favoritesFragmentViewModel.togglePin2((Device) Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
 }

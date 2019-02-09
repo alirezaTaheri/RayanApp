@@ -30,7 +30,7 @@ public class DevicesManagementListFragment extends Fragment implements OnDeviceC
     DevicesManagementRecyclerViewAdapter devicesRecyclerViewAdapterManagement;
     List<Device> devices = new ArrayList<>();
     DevicesManagementListFragmentViewModel devicesManagementListFragmentViewModel;
-    SendDevice sendDevice;
+    ClickOnDevice sendDevice;
     public DevicesManagementListFragment() {
     }
 
@@ -62,15 +62,15 @@ public class DevicesManagementListFragment extends Fragment implements OnDeviceC
 //        UsersListDialogFragment deviceListDialogFragment = UsersListDialogFragment.newInstance(3);
 //        deviceListDialogFragment.show(getActivity().getSupportFragmentManager(), "Custom Button Sheet");
         ((DeviceManagementListActivity)Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
-        sendDevice.sendDevice(item);
+        sendDevice.clickOnDevice(item);
     }
-    public interface SendDevice {
-        void sendDevice(Device device);
+    public interface ClickOnDevice {
+        void clickOnDevice(Device device);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        sendDevice = (SendDevice) getActivity();
+        sendDevice = (ClickOnDevice) getActivity();
     }
 }

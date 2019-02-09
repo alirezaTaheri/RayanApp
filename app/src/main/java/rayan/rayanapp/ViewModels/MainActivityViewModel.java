@@ -34,11 +34,11 @@ import rayan.rayanapp.Util.AppConstants;
 
 public class MainActivityViewModel extends AndroidViewModel {
 
-    public static MutableLiveData<Connection> connection = new MutableLiveData<>();
     private final String TAG = MainActivityViewModel.class.getSimpleName();
     private ExecutorService executorService;
     private DeviceDatabase deviceDatabase;
     private SendUDPMessage sendUDPMessage;
+    public static MutableLiveData<Connection> connection = new MutableLiveData<>();
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         executorService = Executors.newSingleThreadExecutor();
@@ -49,22 +49,25 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
 
-    public void connectToMqtt(Context context){
+    public MutableLiveData<Connection> connectToMqtt(Context context){
+        MutableLiveData<Connection> updateConnection = new MutableLiveData<>();
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
                 mqttConnectOptions.setAutomaticReconnect(true);
                 mqttConnectOptions.setCleanSession(false);
-                mqttConnectOptions.setConnectionTimeout(30);
+                mqttConnectOptions.setConnectionTimeout(5);
                 mqttConnectOptions.setKeepAliveInterval(10);
                 Connection connection = Connection.createConnection("ClientHandle" + System.currentTimeMillis(),"ClientId"+ System.currentTimeMillis(),"api.rayansmarthome.ir",1883,context,false);
+                connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTING);
                 connection.setSubscriptions(getSubscriptions(connection));
                 connection.addConnectionOptions(mqttConnectOptions);
+                updateConnection.postValue(connection);
                 String[] actionArgs = new String[1];
                 actionArgs[0] = connection.getId();
                 final ActionListener callback = new ActionListener(context,
-                        ActionListener.Action.CONNECT, connection, actionArgs);
+                        ActionListener.Action.CONNECT,connection, updateConnection, actionArgs);
 //        connection.getClient().setCallback(new MqttCallbackHandler(this, connection.handle()));
                 connection.getClient().setCallback(new MyMqttCallbackHandler(context));
                 try {
@@ -76,22 +79,22 @@ public class MainActivityViewModel extends AndroidViewModel {
                 }
             }
         });
+        return updateConnection;
     }
 
-    public LiveData<Connection> getConnection(){
-        return connection;
-    }
-
-    public void disconnectMQTT(){
+    public LiveData<Connection> disconnectMQTT(LiveData<Connection> connection){
+        MutableLiveData<Connection> updateConnection = new MutableLiveData<>();
         if (connection.getValue()!= null)
         try {
             connection.getValue().getClient().unregisterResources();
             connection.getValue().getClient().close();
             connection.getValue().getClient().disconnect();
             connection.getValue().changeConnectionStatus(Connection.ConnectionStatus.DISCONNECTED);
+            updateConnection.postValue(connection.getValue());
         } catch( MqttException | IllegalArgumentException ex){
             Log.e(TAG, "Exception occurred during disconnect: " + ex.getMessage());
         }
+        return updateConnection;
     }
 
     private ArrayList<Subscription> getSubscriptions(Connection connection){

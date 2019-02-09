@@ -109,6 +109,4 @@
     <string name="placeholder_example">Example application</string>
 
 
-    <!-- Message List Item -->
-    <string name="message_topic">Topic: </string>
 </resources>

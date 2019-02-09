@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/groupsActivity"
+        android:icon="@drawable/ic_group"
+        android:title="گروه‌ها"/>
+    <item android:id="@+id/devicesManagementActivity"
+        android:icon="@drawable/ic_device"
+        android:title="مدیریت دستگاه‌ها"/>
+
+</menu>
