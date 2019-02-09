@@ -2,8 +2,12 @@ package rayan.rayanapp.Activities;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +26,7 @@ import android.widget.Toast;
 
 import com.polyak.iconswitch.IconSwitch;
 
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -36,6 +41,9 @@ import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Wifi.WifiCypherType;
+import rayan.rayanapp.Wifi.WifiHandler;
+import rayan.rayanapp.Wifi.WifiHelper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus {
 
@@ -245,5 +253,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         RayanApplication.getPref().saveProtocol(AppConstants.UDP);
         Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: ERROR");
+    }
+
+    @Override
+    public void onBackPressed() {
+        WifiManager wifiManager;
+        wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = String.format("\"%s\"", "Rayan_switch_1_9204376");
+        conf.preSharedKey = String.format("\"%s\"", "12345678");
+        int netId = wifiManager.addNetwork(conf);
+        wifiManager.disconnect();
+        wifiManager.enableNetwork(netId, true);
+        wifiManager.reconnect();
     }
 }
