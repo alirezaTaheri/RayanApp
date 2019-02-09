@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.Observable;
 import rayan.rayanapp.App.RayanApplication;
 
 import static com.mikepenz.iconics.Iconics.TAG;
@@ -480,5 +481,18 @@ public class WifiHandler implements WifiHelper{
         Log.e(TAG,Thread.currentThread().toString() + "##connect(ssid=[" + ssid + "],type=[" + type + "],isSsidHidden=["
                 + isSsidHidden + "],password=[" + (password.length == 0 ? "null" : password[0]) + "]): " + connect);
         return connect;
+    }
+
+    public static void connectToSSID(Context context, String ssid, String password){
+        WifiManager wifiManager;
+        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = String.format("\"%s\"", ssid);
+        conf.preSharedKey = String.format("\"%s\"", password);
+        int netId = wifiManager.addNetwork(conf);
+        wifiManager.disconnect();
+        wifiManager.enableNetwork(netId, true);
+        wifiManager.reconnect();
+        Log.d("MainActivity"," on thread " + Thread.currentThread().getName());
     }
 }

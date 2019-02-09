@@ -254,17 +254,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: ERROR");
     }
-
-    @Override
-    public void onBackPressed() {
-        WifiManager wifiManager;
-        wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiConfiguration conf = new WifiConfiguration();
-        conf.SSID = String.format("\"%s\"", "Rayan_switch_1_9204376");
-        conf.preSharedKey = String.format("\"%s\"", "12345678");
-        int netId = wifiManager.addNetwork(conf);
-        wifiManager.disconnect();
-        wifiManager.enableNetwork(netId, true);
-        wifiManager.reconnect();
-    }
 }
