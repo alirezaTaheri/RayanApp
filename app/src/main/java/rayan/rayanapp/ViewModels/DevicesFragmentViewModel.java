@@ -109,8 +109,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             public void onError(@NonNull Throwable e) {
                 Log.d(TAG,"Error"+e);
                 e.printStackTrace();
-                if (e.toString().contains("Unauthorized"))
-                    login();
+//                if (e.toString().contains("Unauthorized"))
+//                    login();
 
             }
 

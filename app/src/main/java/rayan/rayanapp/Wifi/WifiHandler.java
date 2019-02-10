@@ -335,34 +335,27 @@ public class WifiHandler implements WifiHelper{
     }
 
     @Override
-    public List<ScanResult> scan()
-    {
+    public List<ScanResult> scan() {
         Context context = RayanApplication.getContext();
         WifiManager mWifiManager = (WifiManager)context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mWifiManager.startScan();
         List<ScanResult> wifiList;
         long start = System.currentTimeMillis();
         long runtime;
-        do
-        {
-            try
-            {
+        do {
+            try {
                 Thread.sleep(SCAN_CHECK_INTERVAL);
             }
-            catch (InterruptedException e)
-            {
+            catch (InterruptedException e) {
                 Log.e(TAG,Thread.currentThread().toString() + "##scan(): is interrupted, return empty list");
                 return Collections.emptyList();
             }
 
             wifiList = mWifiManager.getScanResults();
-            if (wifiList != null)
-            {
+            if (wifiList != null) {
                 List<ScanResult> result = new ArrayList<>();
-                for (ScanResult scan : wifiList)
-                {
-                    if (!TextUtils.isEmpty(scan.SSID))
-                    {
+                for (ScanResult scan : wifiList) {
+                    if (!TextUtils.isEmpty(scan.SSID)) {
                         addScanResult(result, scan);
                     }
                 }

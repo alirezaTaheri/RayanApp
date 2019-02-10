@@ -212,6 +212,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.devicesManagementActivity:
                 startActivity(new Intent(this, DeviceManagementListActivity.class));
                 break;
+            case R.id.profileActivity:
+                startActivity(new Intent(this, ProfileActivity.class));
+                break;
+            case R.id.addNewDeviceActivity:
+                startActivity(new Intent(this, AddNewDeviceActivity.class));
+                break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;

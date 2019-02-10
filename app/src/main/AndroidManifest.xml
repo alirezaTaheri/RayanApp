@@ -51,6 +51,9 @@
             android:name=".Activities.ProfileActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/CustomTheme" />
+        <activity android:name=".Activities.AddNewDeviceActivity"
+            android:theme="@style/CustomTheme"
+            android:parentActivityName=".Activities.MainActivity"></activity>
     </application>
 
 </manifest>

@@ -8,4 +8,12 @@
         android:icon="@drawable/ic_device"
         android:title="مدیریت دستگاه‌ها"/>
 
+    <item android:id="@+id/profileActivity"
+        android:icon="@drawable/ic_device"
+        android:title="پروفایل"/>
+
+    <item android:id="@+id/addNewDeviceActivity"
+        android:icon="@drawable/ic_device"
+        android:title="افزودن دستگاه"/>
+
 </menu>
