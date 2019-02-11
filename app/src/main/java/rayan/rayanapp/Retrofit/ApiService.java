@@ -4,10 +4,12 @@ import io.reactivex.Observable;
 import rayan.rayanapp.Retrofit.Models.Requests.AddAdminRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.AddUserByMobileRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.ChangePasswordRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.ConfirmCodeRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.EditUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.RegisterUserRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.DeleteUserRequest;
@@ -69,5 +71,10 @@ public interface ApiService {
     Observable<BaseResponse> changePassword(@Header("Authorization") String token, @Body ChangePasswordRequest changePasswordRequest);
 
 
+    @POST("api/v2/users/register")
+    Observable<BaseResponse> registerUser(@Header("Authorization") String token, @Body RegisterUserRequest registerUserRequest);
+
+    @POST("api/v2/users/code")
+    Observable<BaseResponse> confirmCode(@Header("Authorization") String token, @Body ConfirmCodeRequest confirmCodeRequest);
 
 }

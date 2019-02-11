@@ -15,7 +15,6 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.LoginViewModel;
 
-
 public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = LoginActivity.class.getSimpleName();
@@ -42,6 +41,10 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         });
+    }
+    @OnClick(R.id.signUpTextView)
+    void clickOnSignUp(){
+        startActivity(new Intent(this, SignUpUserActivity.class));
     }
 
     @OnClick(R.id.signInButton)
