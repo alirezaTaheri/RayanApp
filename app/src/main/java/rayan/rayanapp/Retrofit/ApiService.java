@@ -9,6 +9,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.EditUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.ForgetPasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.RegisterUserRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.DeleteGroupRequest;
@@ -76,5 +77,8 @@ public interface ApiService {
 
     @POST("api/v2/users/code")
     Observable<BaseResponse> confirmCode(@Header("Authorization") String token, @Body ConfirmCodeRequest confirmCodeRequest);
+
+    @POST("api/v2/users/forgetpass")
+    Observable<BaseResponse> forgetPassword(@Header("Authorization") String token, @Body ForgetPasswordRequest forgetPasswordRequest);
 
 }
