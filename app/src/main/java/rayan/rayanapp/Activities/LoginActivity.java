@@ -24,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText phoneEditText;
     @BindView(R.id.passwordEditText)
     EditText passwordInput;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         loginViewModel.getLoginResponse().observe(this, baseResponse -> {
-            if (baseResponse.getData().getUser().getRegistered().equals("true")){
+            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
                 RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
                 RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo());
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -45,16 +46,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.signInButton)
-    public void checkForm(){
-        if (loginViewModel.isConnected(this)){
+    public void checkForm() {
+        if (loginViewModel.isConnected(this)) {
             String phoneNumber = phoneEditText.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
-            if(phoneNumber.length() == 0 | password.length() == 0) {
-                Toast.makeText(getApplicationContext(),"لطفا اطلاعات خود را کامل وارد کنید",Toast.LENGTH_SHORT).show();
-            }
-            else loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString());
-        }
-        else{
+            if (phoneNumber.length() == 0 | password.length() == 0) {
+                Toast.makeText(getApplicationContext(), "لطفا اطلاعات خود را کامل وارد کنید", Toast.LENGTH_SHORT).show();
+            } else
+                loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString());
+        } else {
             Toast.makeText(this, "لطفا اتصال خود به اینترنت را چک کنید", Toast.LENGTH_SHORT).show();
         }
     }
