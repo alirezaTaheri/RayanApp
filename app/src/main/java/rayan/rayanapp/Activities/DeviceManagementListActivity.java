@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import java.util.Objects;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
@@ -33,8 +34,8 @@ public class DeviceManagementListActivity extends AppCompatActivity implements D
     DevicesManagementActivityViewModel viewModel;
     BackHandledFragment currentFragment;
     Device device;
+    Disposable disposable;
 
-    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +48,7 @@ public class DeviceManagementListActivity extends AppCompatActivity implements D
         DevicesManagementListFragment devicesManagementListFragment = DevicesManagementListFragment.newInstance();
         transaction.replace(R.id.frameLayout, devicesManagementListFragment);
         transaction.commit();
-        ((RayanApplication)getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
+        disposable = ((RayanApplication)getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
             if (o.getString("cmd").equals(AppConstants.SETTINGS) && !(currentFragment instanceof EditDeviceFragment)){
                 Toast.makeText(this, "Message: " + o, Toast.LENGTH_SHORT).show();
                 transaction = fragmentManager.beginTransaction();
@@ -98,5 +99,11 @@ public class DeviceManagementListActivity extends AppCompatActivity implements D
     }
     public void setActionBarTitle(){
         getSupportActionBar().setTitle(R.string.title_deviceManagementActivity);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        disposable.dispose();
     }
 }

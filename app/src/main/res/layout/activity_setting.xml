@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:layoutDirection="rtl"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp"
+        android:layoutDirection="rtl"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+    <Switch
+        android:id="@+id/notification_setting_switch"
+        android:layout_width="164dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="@string/setting_notification_switch" />
+
+    <TextView
+        android:id="@+id/notificationHint_setting_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="hint" />
+
+        <Button
+            android:id="@+id/choseThemebutton"
+            android:layout_width="match_parent"
+            android:background="@color/baseColor"
+            android:layout_height="wrap_content"
+            android:text="@string/setting_theme_btn" />
+    </LinearLayout>
+
+    <include layout="@layout/setting_theme_bottom_sheet" />
+
+</android.support.design.widget.CoordinatorLayout>

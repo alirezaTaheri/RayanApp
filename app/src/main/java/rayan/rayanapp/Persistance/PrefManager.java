@@ -11,6 +11,8 @@ public class PrefManager {
     private  final String PREF_NAME = "RayanSmartHome";
     private  int PRIVATE_MODE = 0;
     private  PrefManager prefManager;
+    private final String KEY_NOTIFICATION = "KEY_NOTIFICATION";
+    private final String KEY_THEME = "KEY_THEME";
     private final String KEY_PROTOCOL = "KEY_PROTOCOL";
     private final String KEY_TOKEN = "KEY_TOKEN";
     private final String KEY_IS_LOGGED_IN = "isLoggedIn";
@@ -69,6 +71,7 @@ public class PrefManager {
         editor.commit();
     }
 
+
     public void saveLocalBroadcastAddress(String localBroadcastAddress){
         editor.putString(KEY_LOCAL_BROADCAST_ADDRESS, localBroadcastAddress);
         editor.commit();
@@ -76,5 +79,21 @@ public class PrefManager {
 
     public String getLocalBroadcastAddress(){
         return pref.getString(KEY_LOCAL_BROADCAST_ADDRESS,null);
+    }
+
+    public void showNotification(String notificationKey){
+        editor.putString(KEY_NOTIFICATION,notificationKey);
+        editor.commit();
+    }
+    public String getShowNotification(){
+        return pref.getString(KEY_NOTIFICATION,"ON");
+    }
+
+    public void setThemeKey(String themeKey){
+        editor.putString(KEY_THEME,themeKey);
+        editor.commit();
+    }
+    public String getThemeKey(){
+        return pref.getString(KEY_THEME,"1");
     }
 }

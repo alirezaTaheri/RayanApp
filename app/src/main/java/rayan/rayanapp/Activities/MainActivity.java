@@ -262,4 +262,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.e(TAG, "Mqtt Status: ERROR");
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+         startActivity( new Intent(this, SettingActivity.class));
+    }
 }

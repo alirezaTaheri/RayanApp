@@ -47,15 +47,6 @@ public class EditUserFragment extends Fragment {
         return fragment;
     }
 
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        editUserViewModel = ViewModelProviders.of(this).get(EditUserViewModel.class);
-
-        genderList.add("انتخاب جنسیت");
-        genderList.add("مرد");
-        genderList.add("زن");
-    }
-
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_user, container, false);
         ButterKnife.bind(this, view);
@@ -72,7 +63,9 @@ public class EditUserFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         editUserViewModel = ViewModelProviders.of(this).get(EditUserViewModel.class);
-
+        genderList.add("انتخاب جنسیت");
+        genderList.add("مرد");
+        genderList.add("زن");
     }
 
 
