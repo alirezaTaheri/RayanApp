@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +22,8 @@ import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.ContactsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnContactClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.User;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class UsersListDialogFragment extends BottomSheetDialogFragment implements OnContactClicked<User> {
@@ -49,8 +48,21 @@ public class UsersListDialogFragment extends BottomSheetDialogFragment implement
     }
     @OnClick(R.id.confirm)
     void confirm(){
-        Log.e("ffffffffff:" ,"ffff:  "+ candidates);
-        editGroupFragmentViewModel.addAdmin(candidates,group.getId());
+        editGroupFragmentViewModel.addAdmin(candidates,group.getId()).observe(this, baseResponse -> {
+            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
+                Toast.makeText(getActivity(), "کاربری با این شماره وجود ندارد", Toast.LENGTH_SHORT).show();
+            }
+            else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")){
+                Toast.makeText(getActivity(), "این کاربر هم‌اکنون عضو گروه است", Toast.LENGTH_SHORT).show();
+            }
+            else if (baseResponse.getStatus().getCode().equals("200")){
+                Toast.makeText(getActivity(), "مدیران گروه با موفقیت اصلاح شدند", Toast.LENGTH_SHORT).show();
+                editGroupFragmentViewModel.getGroups();
+                dismiss();
+            }
+            else
+                Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+        });
     }
     @Nullable
     @Override

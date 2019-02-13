@@ -3,7 +3,7 @@ package rayan.rayanapp.Persistance;
 import android.content.SharedPreferences;
 
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Retrofit.Models.Responses.UserInfo;
+import rayan.rayanapp.Retrofit.Models.Responses.api.UserInfo;
 
 public class PrefManager {
     private SharedPreferences pref;

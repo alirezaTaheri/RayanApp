@@ -12,29 +12,28 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.ChangePasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.UserInfo;
 
-public class EditUserViewModel extends DevicesFragmentViewModel {
-    private final String TAG = EditUserViewModel.class.getSimpleName();
 
-    public EditUserViewModel(@NonNull Application application) {
+public class ChangePasswordViewModel extends DevicesFragmentViewModel {
+    private final String TAG = ChangePasswordViewModel.class.getSimpleName();
+
+    public ChangePasswordViewModel(@NonNull Application application) {
         super(application);
     }
 
-    public LiveData<BaseResponse> editUser(String name, String gender) {
+    public LiveData<BaseResponse> changePassword(String currentPass, String newPass, String newPassReapet) {
         MutableLiveData<BaseResponse> results = new MutableLiveData();
-        //inja alan pass ro pas midim.dar ayande gender pas dade khahad shod
-        editUserObservable(new EditUserRequest(new UserInfo(name),gender)).subscribe(editUserObserver(results));
+        changePasswordObservable(new ChangePasswordRequest(currentPass, newPass, newPassReapet)).subscribe(changePasswordObserver(results));
         return results;
     }
 
-    private Observable<BaseResponse> editUserObservable(EditUserRequest EditUserRequest) {
-        return ApiUtils.getApiService().editUser(RayanApplication.getPref().getToken(), EditUserRequest).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    private Observable<BaseResponse> changePasswordObservable(ChangePasswordRequest changePasswordRequest) {
+        return ApiUtils.getApiService().changePassword(RayanApplication.getPref().getToken(), changePasswordRequest).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    private DisposableObserver<BaseResponse> editUserObserver(final MutableLiveData<BaseResponse> results) {
+    private DisposableObserver<BaseResponse> changePasswordObserver(final MutableLiveData<BaseResponse> results) {
         return new DisposableObserver<BaseResponse>() {
             public void onNext(@NonNull BaseResponse baseResponse) {
 

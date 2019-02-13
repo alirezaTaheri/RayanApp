@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import rayan.rayanapp.Retrofit.Models.Responses.Topic;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 
 @Entity
 public class Device implements Parcelable {

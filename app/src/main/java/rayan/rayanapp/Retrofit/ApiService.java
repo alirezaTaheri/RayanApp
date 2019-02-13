@@ -1,18 +1,23 @@
 package rayan.rayanapp.Retrofit;
 
 import io.reactivex.Observable;
-import rayan.rayanapp.Retrofit.Models.Requests.AddAdminRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.AddUserByMobileRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.CreateTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.EditDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.EditUserRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Requests.DeleteGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.EditGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.DeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.ChangePasswordRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.CreateGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -20,6 +25,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Url;
 
 /**
  * Created by alireza321 on 20/12/2018.
@@ -62,8 +68,13 @@ public interface ApiService {
     Observable<DeviceResponse> createTopic(@Header("Authorization") String token, @Body CreateTopicRequest createTopicRequest);
 
     @POST("api/v2/users/edit")
-    Observable<BaseResponse> editUser(@Header("Authorization") String str, @Body EditUserRequest editUserRequest);
+    Observable<BaseResponse> editUser(@Header("Authorization") String token, @Body EditUserRequest editUserRequest);
 
+    @POST("api/v2/users/changepass")
+    Observable<BaseResponse> changePassword(@Header("Authorization") String token, @Body ChangePasswordRequest changePasswordRequest);
 
-
+    @POST
+    Observable<ChangeNameResponse> changeName(@Url String url, @Body ChangeNameRequest changeNameRequest);
+    @POST
+    Observable<DeviceBaseResponse> endSettings(@Url String url, @Body BaseRequest baseRequest);
 }

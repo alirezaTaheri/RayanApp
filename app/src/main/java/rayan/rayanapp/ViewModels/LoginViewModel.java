@@ -16,7 +16,7 @@ import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 
 public class LoginViewModel extends ViewModel {
     private final String TAG = LoginViewModel.class.getSimpleName();

@@ -23,7 +23,7 @@ import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.GroupsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 public class GroupsListFragment extends Fragment implements OnGroupClicked<Group> {
@@ -64,7 +64,6 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setAdapter(groupsRecyclerViewAdapter);
-
         return view;
     }
 

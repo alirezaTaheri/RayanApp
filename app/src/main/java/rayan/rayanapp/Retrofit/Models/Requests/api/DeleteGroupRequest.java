@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.Models.Requests;
+package rayan.rayanapp.Retrofit.Models.Requests.api;
 
 public class DeleteGroupRequest {
     private String group_id;

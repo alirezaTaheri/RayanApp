@@ -1,19 +1,19 @@
-package rayan.rayanapp.Retrofit.Models.Responses;
+package rayan.rayanapp.Retrofit.Models.Responses.api;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import rayan.rayanapp.Data.Device;
+import java.util.List;
 
 
 /**
  * Created by alireza321 on 21/12/2018.
  */
 
-public class DeviceData {
+public class GroupsData {
     @SerializedName("user")
     @Expose
-    private Device device;
+    private User user;
 
     @SerializedName("message")
     @Expose
@@ -21,18 +21,10 @@ public class DeviceData {
 
     @SerializedName("group")
     @Expose
-    private Group group;
+    private List<Group> groups;
     @SerializedName("token")
     @Expose
     private String token;
-
-    public Device getDevice() {
-        return device;
-    }
-
-    public void setDevice(Device device) {
-        this.device = device;
-    }
 
     public String getMessage() {
         return message;
@@ -42,12 +34,20 @@ public class DeviceData {
         this.message = message;
     }
 
-    public Group getGroup() {
-        return group;
+    public User getUser() {
+        return user;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 
     public String getToken() {
@@ -60,10 +60,10 @@ public class DeviceData {
 
     @Override
     public String toString() {
-        return "DeviceData{" +
-                "device=" + device +
+        return "Data{" +
+                "user=" + user +
                 ", message='" + message + '\'' +
-                ", group=" + group +
+                ", groups=" + groups +
                 ", token='" + token + '\'' +
                 '}';
     }

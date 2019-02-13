@@ -9,7 +9,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 public class GroupViewHolder  extends BaseViewHolder<Group, OnGroupClicked<Group>> {
 

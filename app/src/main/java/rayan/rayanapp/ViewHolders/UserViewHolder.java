@@ -9,7 +9,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.User;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 
 public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
     private final String TAG = UserViewHolder.class.getSimpleName();

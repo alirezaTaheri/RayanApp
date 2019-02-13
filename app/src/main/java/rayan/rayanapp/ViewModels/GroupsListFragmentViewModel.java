@@ -16,10 +16,9 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Requests.DeleteGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 public class GroupsListFragmentViewModel extends DevicesFragmentViewModel {
 

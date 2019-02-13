@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.Models.Requests;
+package rayan.rayanapp.Retrofit.Models.Requests.api;
 
 import java.util.List;
 

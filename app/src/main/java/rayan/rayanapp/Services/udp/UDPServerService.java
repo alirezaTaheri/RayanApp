@@ -25,7 +25,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
-import rayan.rayanapp.Retrofit.Models.Responses.Topic;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Util.AppConstants;
 
 public class UDPServerService extends Service {
@@ -59,6 +59,7 @@ public class UDPServerService extends Service {
                 senderIP = senderIP.replace("/","");
                 if (isJSONValid(message)){
                     JSONObject jsonMessage = new JSONObject(message);
+                    ((RayanApplication)getApplication()).getBus().send(jsonMessage);
                     String cmd = jsonMessage.getString("cmd");
                     String src = jsonMessage.getString("src");
                     String pin1, pin2, name, ssid, style, type;

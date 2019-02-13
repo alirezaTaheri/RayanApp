@@ -8,7 +8,7 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 @Dao
 public interface GroupsDAO extends BaseDAO<Group> {
@@ -21,6 +21,9 @@ public interface GroupsDAO extends BaseDAO<Group> {
 
     @Query("SELECT * FROM `Group` WHERE id = :id")
     Group getGroup(String id);
+
+    @Query("SELECT * FROM `Group` WHERE id = :id")
+    LiveData<Group> getGroupLive(String id);
 
     @Update
     void updateGroup(Group group);

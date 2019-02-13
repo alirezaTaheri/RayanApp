@@ -41,8 +41,7 @@ public class SendUDPMessage {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    if (ds != null)
-                    {
+                    if (ds != null) {
                         ds.close();
                     }
                 }

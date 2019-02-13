@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.Models.Responses;
+package rayan.rayanapp.Retrofit.Models.Responses.api;
 
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;

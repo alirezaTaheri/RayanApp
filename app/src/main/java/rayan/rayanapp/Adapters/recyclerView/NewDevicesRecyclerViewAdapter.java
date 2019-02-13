@@ -5,11 +5,8 @@ import android.view.ViewGroup;
 
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
-import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.User;
 import rayan.rayanapp.ViewHolders.NewDevicesViewHolder;
-import rayan.rayanapp.ViewHolders.UserViewHolder;
 
 public class NewDevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<NewDevice,OnNewDeviceClicked<NewDevice>, NewDevicesViewHolder>  {
 

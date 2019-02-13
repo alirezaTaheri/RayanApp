@@ -9,7 +9,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Listeners.OnContactClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.User;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 
 public class ContactViewHolder  extends BaseViewHolder<User, OnContactClicked<User>> {
 

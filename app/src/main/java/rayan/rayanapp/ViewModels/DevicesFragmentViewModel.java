@@ -3,7 +3,6 @@ package rayan.rayanapp.ViewModels;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,10 +32,10 @@ import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.GroupsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.User;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
@@ -109,8 +108,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             public void onError(@NonNull Throwable e) {
                 Log.d(TAG,"Error"+e);
                 e.printStackTrace();
-//                if (e.toString().contains("Unauthorized"))
-//                    login();
+                if (e.toString().contains("Unauthorized"))
+                    login();
 
             }
 
@@ -175,7 +174,13 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId());
                         devices.add(deviceUser);
                     }
-                    else devices.add(existing);
+                    else {
+                        existing.setName1(u.getName1());
+                        existing.setType(u.getType());
+                        existing.setTopic(u.getTopic());
+                        existing.setGroupId(g.getId());
+                        devices.add(existing);
+                    }
 
                 }
                 g.setDevices(devices);

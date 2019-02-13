@@ -4,7 +4,7 @@ import android.support.v7.util.DiffUtil;
 
 import java.util.List;
 
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 public class GroupsDiffCallBack extends DiffUtil.Callback {
     private List<Group> newGroups;

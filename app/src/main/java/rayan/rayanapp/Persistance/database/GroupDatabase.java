@@ -6,7 +6,7 @@ import android.content.Context;
 import java.util.List;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.dao.GroupsDAO;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 public class GroupDatabase {
     private AppDatabase appDatabase;
@@ -20,6 +20,9 @@ public class GroupDatabase {
     }
     public Group getGroup(String id){
         return groupsDAO.getGroup(id);
+    }
+    public LiveData<Group> getGroupLive(String id){
+        return groupsDAO.getGroupLive(id);
     }
     public LiveData<List<Group>> getAllGroupsLive(){
         return groupsDAO.getAllLive();

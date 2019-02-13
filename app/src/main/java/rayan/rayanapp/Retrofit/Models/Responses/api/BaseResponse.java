@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.Models.Responses;
+package rayan.rayanapp.Retrofit.Models.Responses.api;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -7,21 +7,21 @@ import com.google.gson.annotations.SerializedName;
  * Created by alireza321 on 21/12/2018.
  */
 
-public class DeviceResponse {
+public class BaseResponse {
 
     @SerializedName("data")
     @Expose
-    private DeviceData data;
+    private Data data;
 
     @SerializedName("status")
     @Expose
     private Status status;
 
-    public DeviceData getData() {
+    public Data getData() {
         return data;
     }
 
-    public void setData(DeviceData data) {
+    public void setData(Data data) {
         this.data = data;
     }
 
@@ -33,9 +33,10 @@ public class DeviceResponse {
         this.status = status;
     }
 
+
     @Override
     public String toString() {
-        return "BaseResponse{" +
+        return "DeviceBaseResponse{" +
                 "data=" + data +
                 ", status=" + status +
                 '}';

@@ -2,7 +2,6 @@ package rayan.rayanapp.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,8 +30,7 @@ import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.Data.Contact;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.User;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.ViewModels.CreateGroupViewModel;
 
 public class CreateGroupFragment extends Fragment {

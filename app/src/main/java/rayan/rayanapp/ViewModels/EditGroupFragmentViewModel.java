@@ -18,12 +18,13 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.AddAdminRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.AddUserByMobileRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Requests.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.EditGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.User;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 
 public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
     GroupDatabase groupDatabase;
@@ -31,6 +32,14 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
     public EditGroupFragmentViewModel(@NonNull Application application) {
         super(application);
         groupDatabase = new GroupDatabase(application);
+    }
+
+    public LiveData<Group> getGroupLive(String id){
+        return groupDatabase.getGroupLive(id);
+    }
+
+    public Group getGroup(String id){
+        return groupDatabase.getGroup(id);
     }
 
     public List<User> getUsers(String id){

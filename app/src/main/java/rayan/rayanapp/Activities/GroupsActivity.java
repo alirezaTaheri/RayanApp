@@ -9,7 +9,7 @@ import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Fragments.EditGroupFragment;
 import rayan.rayanapp.Fragments.GroupsListFragment;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 public class GroupsActivity extends AppCompatActivity implements GroupsListFragment.ClickOnGroup {
 

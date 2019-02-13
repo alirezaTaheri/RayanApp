@@ -24,7 +24,7 @@ import rayan.rayanapp.Listeners.OnDeviceClickListenerManagement;
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.DevicesManagementListFragmentViewModel;
 
-public class DevicesManagementListFragment extends Fragment implements OnDeviceClickListenerManagement<Device> {
+public class DevicesManagementListFragment extends BackHandledFragment implements OnDeviceClickListenerManagement<Device> {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     DevicesManagementRecyclerViewAdapter devicesRecyclerViewAdapterManagement;
@@ -36,6 +36,11 @@ public class DevicesManagementListFragment extends Fragment implements OnDeviceC
 
     public static DevicesManagementListFragment newInstance() {
         return new DevicesManagementListFragment();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
     @Override

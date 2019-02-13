@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.Models.Requests;
+package rayan.rayanapp.Retrofit.Models.Requests.api;
 
 public class CreateTopicRequest {
     private String user_id;

@@ -3,7 +3,6 @@ package rayan.rayanapp.Fragments;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,9 +34,8 @@ import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.Data.Contact;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.User;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
@@ -70,7 +67,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
     public static EditGroupFragment newInstance(Group group) {
         EditGroupFragment fragment = new EditGroupFragment();
         Bundle args = new Bundle();
-        args.putParcelable("group", group);
+        args.putString("id", group.getId());
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,15 +75,22 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
-            this.group = getArguments().getParcelable("group");
+        editGroupFragmentViewModel = ViewModelProviders.of(this).get(EditGroupFragmentViewModel.class);
+        if (getArguments() != null) {
+            this.group = editGroupFragmentViewModel.getGroup(getArguments().getString("id"));
+            editGroupFragmentViewModel.getGroupLive(getArguments().getString("id")).observe(this, group1 -> {
+                this.group = group1;
+                usersRecyclerViewAdapter.setItems(group1.getHumanUsers());
+                managersRecyclerViewAdapter.setItems(group1.getAdmins());
+                devicesRecyclerViewAdapter.setItems(group1.getDevices());
+            });
+        }
         Log.e(TAG , "Group Is : " + group);
         groupName = group.getName();
         usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
         usersRecyclerViewAdapter.setListener(this);
         managersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
         devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(getActivity(), new ArrayList<>());
-        editGroupFragmentViewModel = ViewModelProviders.of(this).get(EditGroupFragmentViewModel.class);
 
     }
 
@@ -204,9 +208,10 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
         usersRecyclerViewAdapter.setItems(group.getHumanUsers());
         managersRecyclerViewAdapter.setItems(group.getAdmins());
     }
-public void getContactPermission(){
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-        requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+
+    public void getContactPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
     }
 }
 

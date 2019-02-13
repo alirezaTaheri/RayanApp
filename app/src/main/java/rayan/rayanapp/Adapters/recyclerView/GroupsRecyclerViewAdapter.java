@@ -8,7 +8,7 @@ import java.util.List;
 
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
 import rayan.rayanapp.ViewHolders.GroupViewHolder;
 

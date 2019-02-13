@@ -9,10 +9,12 @@ import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 
 import rayan.rayanapp.Activities.LoginActivity;
+import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
 
 public class RayanApplication extends Application {
     private static Context context;
+    private UDPMessageRxBus bus;
     private static PrefManager pref;
     @Override
     public void onCreate() {
@@ -23,12 +25,16 @@ public class RayanApplication extends Application {
 //                .build()
 //        );
         context = this;
+        bus = new UDPMessageRxBus();
         pref = new PrefManager();
         if (!pref.isLoggedIn()){
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
+    }
+    public UDPMessageRxBus getBus(){
+        return bus;
     }
 
     public int getVersionCode() {

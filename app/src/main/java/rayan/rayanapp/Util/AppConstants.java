@@ -9,6 +9,17 @@ public class AppConstants {
     //Messages
     public final static String TO_DEVICE_NODE = "NODE?";
     public final static String TO_DEVICE_TLMS = "TLMS";
+    public final static String OPERATION_DONE = "Done";
+    public final static String ERROR = "error";
+    public final static String FORBIDDEN = "Forbidden";
     public final static int MOBILE_DATA = 0;
     public final static int WIFI_NETWORK = 1;
+
+    /**
+     * Device Settings
+     */
+    public final static String CHANGE_NAME_FALSE = "change_hname_false";
+    public final static String SOCKET_TIME_OUT = "SocketTimeoutException";
+    public final static String SETTINGS = "settings";
+    public final static String END_SETTINGS = "end_settings";
 }

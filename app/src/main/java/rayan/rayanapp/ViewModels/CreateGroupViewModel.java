@@ -3,7 +3,6 @@ package rayan.rayanapp.ViewModels;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -17,8 +16,8 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.CreateGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.BaseResponse;
+import rayan.rayanapp.Retrofit.Models.Requests.api.CreateGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 
 public class CreateGroupViewModel extends DevicesFragmentViewModel {
     private final String TAG = CreateGroupFragment.class.getSimpleName();

@@ -31,6 +31,8 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.NetworkConnection;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
@@ -75,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
-
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         networkConnectionLiveData = new NetworkConnectionLiveData(getApplicationContext());
         MainActivityViewModel.connection.observe(this, connection -> {
@@ -228,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         accessModeSwitch.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
         Toast.makeText(this, "CONNECTING", Toast.LENGTH_SHORT).show();
-        Log.e(TAG, "Mqt Status: CONNECTING");
+        Log.e(TAG, "Mqtt Status: CONNECTING");
     }
 
     @Override
@@ -261,9 +262,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.e(TAG, "Mqtt Status: ERROR");
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(this, ProfileActivity.class));
-    }
 }

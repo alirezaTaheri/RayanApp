@@ -1,6 +1,6 @@
-package rayan.rayanapp.Retrofit.Models.Requests;
+package rayan.rayanapp.Retrofit.Models.Requests.api;
 
-import rayan.rayanapp.Retrofit.Models.Responses.UserInfo;
+import rayan.rayanapp.Retrofit.Models.Responses.api.UserInfo;
 
 public class EditUserRequest {
 
