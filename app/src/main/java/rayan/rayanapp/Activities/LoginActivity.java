@@ -2,6 +2,8 @@ package rayan.rayanapp.Activities;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -15,10 +17,11 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.LoginViewModel;
 
-
 public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = LoginActivity.class.getSimpleName();
+    FragmentManager fragmentManager;
+    FragmentTransaction transaction;
     LoginViewModel loginViewModel;
     @BindView(R.id.phoneNumberEditText)
     EditText phoneEditText;
@@ -42,6 +45,14 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         });
+    }
+    @OnClick(R.id.signUpTextView)
+    void clickOnSignUp(){
+        startActivity(new Intent(this, SignUpUserActivity.class));
+    }
+    @OnClick(R.id.forgotPasswordTextView)
+    void clickOnforgetPass(){
+        startActivity(new Intent(this, ForgetPasswordActivity.class));
     }
 
     @OnClick(R.id.signInButton)

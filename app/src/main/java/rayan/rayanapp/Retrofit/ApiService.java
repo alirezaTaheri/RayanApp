@@ -18,6 +18,9 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
+import rayan.rayanapp.Retrofit.Models.Requests.ConfirmCodeRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.ForgetPasswordRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.RegisterUserRequest;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -77,4 +80,14 @@ public interface ApiService {
     Observable<ChangeNameResponse> changeName(@Url String url, @Body ChangeNameRequest changeNameRequest);
     @POST
     Observable<DeviceBaseResponse> endSettings(@Url String url, @Body BaseRequest baseRequest);
+
+    @POST("api/v2/users/register")
+    Observable<BaseResponse> registerUser(@Header("Authorization") String token, @Body RegisterUserRequest registerUserRequest);
+
+    @POST("api/v2/users/code")
+    Observable<BaseResponse> confirmCode(@Header("Authorization") String token, @Body ConfirmCodeRequest confirmCodeRequest);
+
+    @POST("api/v2/users/forgetpass")
+    Observable<BaseResponse> forgetPassword(@Header("Authorization") String token, @Body ForgetPasswordRequest forgetPasswordRequest);
+
 }
