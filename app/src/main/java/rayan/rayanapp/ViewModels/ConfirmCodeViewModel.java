@@ -12,7 +12,7 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.ConfirmCodeRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 
 public class ConfirmCodeViewModel extends DevicesFragmentViewModel {

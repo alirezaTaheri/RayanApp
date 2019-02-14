@@ -23,8 +23,20 @@
     <string name="text_forgot_pass_hint">فراموشی رمز عبور</string>
     <string name="text_sign_up_button">ثبت نام</string>
     <string name="title_deviceManagementActivity">مدیریت دستگاه‌ها</string>
+
+
+    <string name="setting_notification_switch">دریافت نوتیفیکیشن</string>
+    <string name="setting_theme_select">انتخاب تم برنامه</string>
+    <string name="setting_theme1">تم اولیه</string>
+    <string name="setting_theme2">تم دوم</string>
+    <string name="setting_theme_btn">تغییر تم</string>
+
+
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
 
     <string-array name="qos_options">

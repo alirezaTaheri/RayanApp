@@ -16,4 +16,8 @@
         android:icon="@drawable/ic_device"
         android:title="افزودن دستگاه"/>
 
+    <item android:id="@+id/settingsActivity"
+        android:icon="@drawable/ic_device"
+        android:title="تنظیمات"/>
+
 </menu>

@@ -72,7 +72,9 @@ public class ChangePasswordFragment extends Fragment {
                             RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
                             RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(),  newPassword_EditText.getText().toString(), baseResponse.getData().getUser().getUserInfo());
                         }
-                            startActivity(new Intent(getActivity(), MainActivity.class));
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
                     } else if (baseResponse.getStatus().getCode().equals("404")) {
                         Toast.makeText(getActivity(), "رمز وارد شده اشتباه است", Toast.LENGTH_SHORT).show();
                     } else if (baseResponse.getStatus().getCode().equals("422")) {
@@ -87,7 +89,9 @@ public class ChangePasswordFragment extends Fragment {
                     newPassword_EditText.getText().toString(), RayanApplication.getPref().getUsername()).observe(this, baseResponse -> {
                 if (baseResponse.getStatus().getCode().equals("200")) {
                     Toast.makeText(getActivity(), "تغییر رمز با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getActivity(), MainActivity.class));
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 } else if (baseResponse.getStatus().getCode().equals("404")) {
                     Toast.makeText(getActivity(), "رمز وارد شده اشتباه است", Toast.LENGTH_SHORT).show();
                 } else if (baseResponse.getStatus().getCode().equals("422")) {

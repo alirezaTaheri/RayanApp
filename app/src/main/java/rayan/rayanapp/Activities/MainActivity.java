@@ -230,6 +230,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.addNewDeviceActivity:
                 startActivity(new Intent(this, AddNewDeviceActivity.class));
                 break;
+            case R.id.settingsActivity:
+                startActivity(new Intent(this, SettingActivity.class));
+                break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -320,8 +323,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if ( Environment.MEDIA_MOUNTED.equals( state ) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals( state ) ) {
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             return true;
         }
         return false;

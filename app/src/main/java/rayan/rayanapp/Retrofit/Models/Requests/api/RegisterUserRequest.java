@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.Models.Requests;
+package rayan.rayanapp.Retrofit.Models.Requests.api;
 
 public class RegisterUserRequest {
     private String username;

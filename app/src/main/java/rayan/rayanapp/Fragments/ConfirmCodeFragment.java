@@ -51,7 +51,9 @@ public class ConfirmCodeFragment extends Fragment {
             confirmCodeViewModel.confirmCode(code_confirm_EditText.getText().toString()).observe(this, baseResponse ->{
                 if (baseResponse.getStatus().getCode().equals("200")) {
                     Toast.makeText(getActivity(), "با موفقیت وارد شدید", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getActivity(), MainActivity.class));
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
 
                 } else if (baseResponse.getStatus().getCode().equals("400")) {
                     Toast.makeText(getActivity(), "کد وارد شده صحیح نیست", Toast.LENGTH_SHORT).show();

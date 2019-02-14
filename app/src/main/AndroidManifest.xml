@@ -31,7 +31,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".Activities.ForgetPasswordActivity"></activity>
+        <activity android:name=".Activities.SettingActivity"></activity>
+        <activity android:name=".Activities.ForgetPasswordActivity" />
         <activity android:name=".Activities.SignUpUserActivity" />
         <activity android:name=".Activities.MainActivity">
             <intent-filter>
@@ -57,9 +58,10 @@
             android:name=".Activities.ProfileActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/CustomTheme" />
-        <activity android:name=".Activities.AddNewDeviceActivity"
-            android:theme="@style/CustomTheme"
-            android:parentActivityName=".Activities.MainActivity"></activity>
+        <activity
+            android:name=".Activities.AddNewDeviceActivity"
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/CustomTheme" />
     </application>
 
 </manifest>
