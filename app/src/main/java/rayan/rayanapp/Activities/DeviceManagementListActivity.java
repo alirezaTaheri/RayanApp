@@ -9,11 +9,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import com.google.gson.JsonObject;
-
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -34,7 +34,6 @@ public class DeviceManagementListActivity extends AppCompatActivity implements D
     DevicesManagementActivityViewModel viewModel;
     BackHandledFragment currentFragment;
     Device device;
-    Disposable disposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,28 +47,13 @@ public class DeviceManagementListActivity extends AppCompatActivity implements D
         DevicesManagementListFragment devicesManagementListFragment = DevicesManagementListFragment.newInstance();
         transaction.replace(R.id.frameLayout, devicesManagementListFragment);
         transaction.commit();
-        disposable = ((RayanApplication)getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
-            if (o.getString("cmd").equals(AppConstants.SETTINGS) && !(currentFragment instanceof EditDeviceFragment)){
-                Toast.makeText(this, "Message: " + o, Toast.LENGTH_SHORT).show();
-                transaction = fragmentManager.beginTransaction();
-                transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-                EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
-                transaction.replace(R.id.frameLayout, editGroupFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-            }
-        });
+
     }
 
     @SuppressLint("CheckResult")
     @Override
     public void clickOnDevice(Device device) {
-        this.device = device;
-        if (device.getIp() == null)
-            Toast.makeText(this, "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
-        else {
-            viewModel.setReadyForSettings(device.getIp());
-        }
+
 
     }
 
@@ -93,17 +77,21 @@ public class DeviceManagementListActivity extends AppCompatActivity implements D
 
     @Override
     public void onBackPressed() {
-        if(currentFragment == null || !currentFragment.onBackPressed()) {
-            super.onBackPressed();
+        device = viewModel.getDevice("137067");
+        if (device != null){
+        transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+        EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
+        transaction.replace(R.id.frameLayout, editGroupFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
         }
+//        if(currentFragment == null || !currentFragment.onBackPressed()) {
+//            super.onBackPressed();
+//        }
     }
     public void setActionBarTitle(){
         getSupportActionBar().setTitle(R.string.title_deviceManagementActivity);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        disposable.dispose();
-    }
 }

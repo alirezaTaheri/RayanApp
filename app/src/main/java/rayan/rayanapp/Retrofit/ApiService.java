@@ -10,6 +10,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
@@ -54,6 +55,9 @@ public interface ApiService {
     @POST("api/v2/groups/deleteuser")
     Observable<BaseResponse> deleteUser(@Header("Authorization") String token, @Body DeleteUserRequest deleteUserRequest);
 
+    @POST("api/v2/groups/deleteadmin")
+    Observable<BaseResponse> deleteAdmin(@Header("Authorization") String token, @Body DeleteUserRequest deleteUserRequest);
+
 
     @POST("api/v2/groups/delete")
     Observable<BaseResponse> deleteGroup(@Header("Authorization") String token, @Body DeleteGroupRequest deleteGroupRequest);
@@ -78,6 +82,10 @@ public interface ApiService {
 
     @POST
     Observable<ChangeNameResponse> changeName(@Url String url, @Body ChangeNameRequest changeNameRequest);
+    @POST
+    Observable<DeviceBaseResponse> factoryReset(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<DeviceBaseResponse> sendMqtt(@Url String url, @Body MqttTopicRequest mqttTopicRequest);
     @POST
     Observable<DeviceBaseResponse> endSettings(@Url String url, @Body BaseRequest baseRequest);
 

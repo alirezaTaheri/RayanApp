@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/background_img_tiled"
+    android:background="@color/grey_light_4"
     tools:context=".Activities.LoginActivity"
     android:layoutDirection="rtl"
     android:layout_width="match_parent"
@@ -156,7 +156,7 @@
                         android:gravity="center"
                         android:text="@string/text_forgot_pass_hint"
                         android:textAlignment="center"
-                        android:textColor="#ffffff"
+                        android:textColor="@color/grey_dark_1"
                         android:textSize="20dp" />
                 </RelativeLayout>
                 <RelativeLayout
@@ -191,7 +191,7 @@
                         android:textSize="20dp"
                         android:foregroundGravity="center"
                         android:textAlignment="center"
-                        android:textColor="#ffffff"
+                        android:textColor="@color/grey_dark_1"
                         android:gravity="right"
                         android:layout_gravity="center"
                         android:layout_alignParentTop="true"

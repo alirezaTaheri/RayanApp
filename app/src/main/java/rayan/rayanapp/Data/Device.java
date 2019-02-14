@@ -45,7 +45,6 @@ public class Device implements Parcelable {
     private String ssid;
     private String ip;
     private String password;
-    private boolean ready4Mqtt;
     private boolean favorite;
 
     public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId) {
@@ -76,7 +75,6 @@ public class Device implements Parcelable {
         ssid = in.readString();
         ip = in.readString();
         password = in.readString();
-        ready4Mqtt = in.readByte() != 0;
         favorite = in.readByte() != 0;
     }
 
@@ -205,14 +203,6 @@ public class Device implements Parcelable {
         this.password = password;
     }
 
-    public boolean isReady4Mqtt() {
-        return ready4Mqtt;
-    }
-
-    public void setReady4Mqtt(boolean ready4Mqtt) {
-        this.ready4Mqtt = ready4Mqtt;
-    }
-
     public boolean isFavorite() {
         return favorite;
     }
@@ -264,7 +254,10 @@ public class Device implements Parcelable {
         dest.writeString(ssid);
         dest.writeString(ip);
         dest.writeString(password);
-        dest.writeByte((byte) (ready4Mqtt ? 1 : 0));
         dest.writeByte((byte) (favorite ? 1 : 0));
+    }
+
+    public boolean isReady4Mqtt(){
+        return topic.getTopic() != null;
     }
 }

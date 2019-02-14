@@ -7,18 +7,28 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.os.Environment;
+
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
+import rayan.rayanapp.Util.JsonMaker;
 
 public class RayanApplication extends Application {
     private static Context context;
     private UDPMessageRxBus bus;
+    private JsonMaker jsonMaker;
     private static PrefManager pref;
     @Override
     public void onCreate() {
         super.onCreate();
+
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
 //                .setDefaultFontPath("fonts/Dosis_Regular.ttf")
 //                .setFontAttrId(R.attr.fontPath)
@@ -27,12 +37,21 @@ public class RayanApplication extends Application {
         context = this;
         bus = new UDPMessageRxBus();
         pref = new PrefManager();
+        jsonMaker = new JsonMaker();
         if (!pref.isLoggedIn()){
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
+
+
+
     }
+
+    public JSONObject getJson(String cmd, List<String> values){
+        return jsonMaker.getJson(cmd, values);
+    }
+
     public UDPMessageRxBus getBus(){
         return bus;
     }
@@ -82,4 +101,8 @@ public class RayanApplication extends Application {
     public static PrefManager getPref(){
         return pref;
     }
+
+
+
+
 }

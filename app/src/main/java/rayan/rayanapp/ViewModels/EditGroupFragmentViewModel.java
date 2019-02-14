@@ -53,7 +53,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         addUserByMobileObservable(new AddUserByMobileRequest(phones, groupId)).subscribe(addUserByMobileObserver(results));
         return results;
     }
-
     private Observable<BaseResponse> addUserByMobileObservable(AddUserByMobileRequest addUserByMobileRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
@@ -61,7 +60,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
     private DisposableObserver<BaseResponse> addUserByMobileObserver(MutableLiveData<BaseResponse> results){
         return new DisposableObserver<BaseResponse>() {
 
@@ -73,7 +71,7 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
+                Log.e(TAG,"Error"+e);
                 e.printStackTrace();
                 if (e.toString().contains("Unauthorized"))
                     login();
@@ -82,7 +80,7 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
 
             @Override
             public void onComplete() {
-                Log.d(TAG,"Completed");
+                Log.e(TAG,"Completed");
             }
         };
     }
@@ -94,7 +92,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         addAdminObservable(new AddAdminRequest(id_s, groupId)).subscribe(addAdminObserver(results));
         return results;
     }
-
     private Observable<BaseResponse> addAdminObservable(AddAdminRequest addAdminRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
@@ -102,7 +99,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
     private DisposableObserver<BaseResponse> addAdminObserver(MutableLiveData<BaseResponse> results){
         return new DisposableObserver<BaseResponse>() {
 
@@ -114,7 +110,7 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
+                Log.e(TAG,"Error"+e);
                 e.printStackTrace();
                 if (e.toString().contains("Unauthorized"))
                     login();
@@ -123,7 +119,7 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
 
             @Override
             public void onComplete() {
-                Log.d(TAG,"Completed");
+                Log.e(TAG,"Completed");
             }
         };
     }
@@ -133,7 +129,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         deleteUserObservable(new DeleteUserRequest(id, groupId)).subscribe(deleteUserObserver(results));
         return results;
     }
-
     private Observable<BaseResponse> deleteUserObservable(DeleteUserRequest deleteUserRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
@@ -141,7 +136,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
     private DisposableObserver<BaseResponse> deleteUserObserver(MutableLiveData<BaseResponse> results){
         return new DisposableObserver<BaseResponse>() {
 
@@ -153,7 +147,7 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
+                Log.e(TAG,"Error"+e);
                 e.printStackTrace();
                 if (e.toString().contains("Unauthorized"))
                     login();
@@ -167,13 +161,48 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
+    public LiveData<BaseResponse> deleteAdmin(String id, String groupId){
+        final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
+        deleteAdminObservable(new DeleteUserRequest(id, groupId)).subscribe(deleteAdminObserver(results));
+        return results;
+    }
+    private Observable<BaseResponse> deleteAdminObservable(DeleteUserRequest deleteUserRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deleteAdmin(RayanApplication.getPref().getToken(), deleteUserRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<BaseResponse> deleteAdminObserver(MutableLiveData<BaseResponse> results){
+        return new DisposableObserver<BaseResponse>() {
+
+            @Override
+            public void onNext(@NonNull BaseResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.e(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e.toString().contains("Unauthorized"))
+                    login();
+
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
 
     public LiveData<BaseResponse> editGroup(String id, String groupId){
         final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
         editGroupObservable(new EditGroupRequest(id, groupId)).subscribe(editGroupObserver(results));
         return results;
     }
-
     private Observable<BaseResponse> editGroupObservable(EditGroupRequest editGroupRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
@@ -181,7 +210,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
     private DisposableObserver<BaseResponse> editGroupObserver(MutableLiveData<BaseResponse> results){
         return new DisposableObserver<BaseResponse>() {
 
@@ -193,7 +221,7 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
+                Log.e(TAG,"Error"+e);
                 e.printStackTrace();
                 if (e.toString().contains("Unauthorized"))
                     login();
@@ -202,7 +230,7 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
 
             @Override
             public void onComplete() {
-                Log.d(TAG,"Completed");
+                Log.e(TAG,"Completed");
             }
         };
     }
