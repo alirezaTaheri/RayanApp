@@ -10,13 +10,18 @@ import com.google.gson.annotations.SerializedName;
 public class UserInfo {
 
 
-    public UserInfo(String name) {
+    public UserInfo(String name,String gender) {
         this.name = name;
+        this.gender=gender;
     }
 
     @SerializedName("name")
     @Expose
     private String name;
+
+    @SerializedName("gender")
+    @Expose
+    private String gender;
 
     @SerializedName("password")
     @Expose

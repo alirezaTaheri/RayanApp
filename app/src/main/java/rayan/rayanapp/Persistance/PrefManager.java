@@ -14,6 +14,8 @@ public class PrefManager {
     private final String KEY_NOTIFICATION = "KEY_NOTIFICATION";
     private final String KEY_THEME = "KEY_THEME";
     private final String KEY_PROTOCOL = "KEY_PROTOCOL";
+    private final String KEY_NAME = "KEY_NAME";
+    private final String KEY_GENDER = "KEY_GENDER";
     private final String KEY_TOKEN = "KEY_TOKEN";
     private final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private final String KEY_ID = "KEY_ID";
@@ -95,5 +97,20 @@ public class PrefManager {
     }
     public String getThemeKey(){
         return pref.getString(KEY_THEME,"1");
+    }
+
+    public void setNameKey(String name){
+        editor.putString(KEY_NAME,name);
+        editor.commit();
+    }
+    public void setGenderKey(String gender){
+        editor.putString(KEY_GENDER,gender);
+        editor.commit();
+    }
+    public String getNameKey(){
+        return pref.getString(KEY_NAME,null);
+    }
+    public String getGenderKey(){
+        return pref.getString(KEY_GENDER,"chose");
     }
 }

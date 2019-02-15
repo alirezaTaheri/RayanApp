@@ -58,6 +58,11 @@
             android:name=".Activities.AddNewDeviceActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/CustomTheme" />
+        <receiver android:name="Util.MySMSBroadCastReceiver" >
+            <intent-filter android:priority="999" >
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
