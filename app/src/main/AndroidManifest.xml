@@ -27,7 +27,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".Activities.SettingActivity"></activity>
         <activity android:name=".Activities.ForgetPasswordActivity" />
         <activity android:name=".Activities.SignUpUserActivity" />
         <activity android:name=".Activities.MainActivity">
@@ -58,8 +57,11 @@
             android:name=".Activities.AddNewDeviceActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/CustomTheme" />
-        <receiver android:name="Util.MySMSBroadCastReceiver" >
-            <intent-filter android:priority="999" >
+        <activity android:name=".Activities.SettingsActivity"
+            android:theme="@style/PreferenceScreen"
+            android:supportsRtl="true"></activity>
+        <receiver android:name="Util.MySMSBroadCastReceiver">
+            <intent-filter android:priority="999">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>

@@ -19,10 +19,10 @@ public class SettingViewModel extends DevicesFragmentViewModel {
     public String getNotificationState(){
         return RayanApplication.getPref().getShowNotification();
     }
-    public void setThemeKey(String key){
-        RayanApplication.getPref().setThemeKey(key);
-    }
-    public String getThemeKey(){
-        return RayanApplication.getPref().getThemeKey();
-    }
+  //  public void setThemeKey(String key){
+      //  RayanApplication.getPref().setThemeKey(key);
+ //   }
+  //  public String getThemeKey(){
+      //  return RayanApplication.getPref().getThemeKey();
+   // }
 }

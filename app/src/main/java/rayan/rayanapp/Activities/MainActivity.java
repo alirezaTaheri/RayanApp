@@ -4,11 +4,13 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -22,6 +24,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.polyak.iconswitch.IconSwitch;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+        Log.e("setting",RayanApplication.getPref().getThemeKey()+ " "+ RayanApplication.getPref().getShowNotification());
         navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         networkConnectionLiveData = new NetworkConnectionLiveData(getApplicationContext());
@@ -265,6 +269,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-         startActivity( new Intent(this, SettingActivity.class));
+         startActivity( new Intent(this, SettingsActivity.class));
     }
 }

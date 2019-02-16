@@ -88,15 +88,15 @@ public class PrefManager {
         editor.commit();
     }
     public String getShowNotification(){
-        return pref.getString(KEY_NOTIFICATION,"ON");
+        return pref.getString(KEY_NOTIFICATION,"true");
     }
 
-    public void setThemeKey(String themeKey){
-        editor.putString(KEY_THEME,themeKey);
+    public void setThemeKey(Integer themeKey){
+        editor.putInt(KEY_THEME,themeKey);
         editor.commit();
     }
-    public String getThemeKey(){
-        return pref.getString(KEY_THEME,"1");
+    public Integer getThemeKey(){
+        return pref.getInt(KEY_THEME,0);
     }
 
     public void setNameKey(String name){
