@@ -3,14 +3,14 @@ package rayan.rayanapp.Fragments;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +31,12 @@ public class EditDeviceFragment extends BackHandledFragment{
     TextView onlineAccess;
     @BindView(R.id.editDevice)
     TextView editDevice;
+    @BindView(R.id.progressBar)
+    ProgressBar editDeviceProgressBar;
+    @BindView(R.id.setTopicProgressBar)
+    ProgressBar setTopicProgressBar;
+    @BindView(R.id.setTopicIcon)
+    ImageView setTopicIcon;
     @BindView(R.id.setTopic)
     TextView setTopic;
     EditDeviceFragmentViewModel editDeviceFragmentViewModel;
@@ -47,7 +53,7 @@ public class EditDeviceFragment extends BackHandledFragment{
     }
     @Override
     public boolean onBackPressed() {
-        editDeviceFragmentViewModel.toDeviceEndSettings();
+        editDeviceFragmentViewModel.toDeviceEndSettings(device.getIp());
         ((DeviceManagementListActivity)getActivity()).setActionBarTitle();
         getActivity().getSupportFragmentManager().popBackStack();
         return true;
@@ -95,83 +101,106 @@ public class EditDeviceFragment extends BackHandledFragment{
         onlineAccess.setVisibility(device.isReady4Mqtt()? View.VISIBLE : View.INVISIBLE);
     }
 
-    void editDevice(){
-        editDeviceFragmentViewModel.editDevice(device.getId(), name.getText().toString(), device.getType(), device.getGroupId()).observe(this, deviceResponse -> {
-            if (deviceResponse.getStatus().getCode().equals("404") && deviceResponse.getData().getMessage().equals("User not found")){
-                Toast.makeText(getActivity(), "دستگاه با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
-            }
-            else if (deviceResponse.getStatus().getCode().equals("403") && deviceResponse.getData().getMessage().equals("Repeated")){
-                Toast.makeText(getActivity(), "شما قادر به اصلاح دستگاه نیستید", Toast.LENGTH_SHORT).show();
-            }
-            else if (deviceResponse.getStatus().getCode().equals("200")){
-                Toast.makeText(getActivity(), "دسترسی با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
-                device.setName1(name.getText().toString());
-                editDevice.setVisibility(View.INVISIBLE);
-                editDeviceFragmentViewModel.updateDevice(device);
-            }
-            else
-                Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
-        });
-    }
-
     @OnClick(R.id.setTopic)
     void createTopic(){
-        editDeviceFragmentViewModel.createTopic(device.getId(), device.getChipId(), AppConstants.MQTT_HOST, device.getGroupId()).observe(this, deviceResponse ->{
-            if (deviceResponse.getStatus().getCode().equals("404") && deviceResponse.getData().getMessage().equals("User not found")){
-                Toast.makeText(getActivity(), "دستگاه با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
+        setDeviceTopicStatus(TopicStatus.CHANGING);
+        editDeviceFragmentViewModel.flatMqtt(device).observe(this, s -> {
+            assert s != null;
+            switch (s){
+                case AppConstants.SET_TOPIC_MQTT_Response:
+                    Toast.makeText(getActivity(), "دسترسی اینترنتی با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
+                    setDeviceTopicStatus(TopicStatus.CHANGED);
+                    break;
+                case AppConstants.SOCKET_TIME_OUT:
+                    setDeviceTopicStatus(TopicStatus.CHANGED);
+                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                    break;
             }
-            else if (deviceResponse.getStatus().getCode().equals("403") && deviceResponse.getData().getMessage().equals("Repeated")){
-                Toast.makeText(getActivity(), "شما قادر به ایجاد دسترسی نیستید", Toast.LENGTH_SHORT).show();
-            }
-            else if (deviceResponse.getStatus().getCode().equals("200")){
-                Toast.makeText(getActivity(), "دستگاه با موفقیت اصلاح شد", Toast.LENGTH_SHORT).show();
-                device.setName1(name.getText().toString());
-                editDevice.setVisibility(View.INVISIBLE);
-                editDeviceFragmentViewModel.updateDevice(device);
-            }
-            else
-                Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
         });
     }
 
     @OnClick(R.id.editDevice)
     void toDeviceChangeName(){
-        editDeviceFragmentViewModel.zip(device.getId(), name.getText().toString(), device.getType(), device.getGroupId()).observe(this, s -> {
+        setDeviceNameStatus(NameStatus.CHANGING);
+        editDeviceFragmentViewModel.zipChangeName(device.getId(), name.getText().toString(), device.getType(), device.getGroupId(), device.getIp()).observe(this, s -> {
             switch (s){
                 case AppConstants.FORBIDDEN:
-                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1());
+                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(), device.getIp());
                     Toast.makeText(getActivity(), "شما دسترسی لازم برای تغییر نام را ندارید", Toast.LENGTH_SHORT).show();
                     name.setText(device.getName1());
-                    editDevice.setVisibility(View.INVISIBLE);
+                    setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.CHANGE_NAME_FALSE:
                     editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId());
                     Toast.makeText(getActivity(), "امکان ویرایش نام وجود ندارد", Toast.LENGTH_SHORT).show();
                     name.setText(device.getName1());
-                    editDevice.setVisibility(View.INVISIBLE);
+                    setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.OPERATION_DONE:
-                    editDevice.setVisibility(View.INVISIBLE);
+                    setDeviceNameStatus(NameStatus.CHANGED);
                     Toast.makeText(getActivity(), "ویرایش نام با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
                     editDeviceFragmentViewModel.getGroups();
                     break;
                 case AppConstants.SOCKET_TIME_OUT:
                     Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
-                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1());
+                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(),device.getIp());
                     editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId());
                     name.setText(device.getName1());
-                    editDevice.setVisibility(View.INVISIBLE);
+                    setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.ERROR:
                     Toast.makeText(getActivity(), "خطایی رخ داد", Toast.LENGTH_SHORT).show();
                     name.setText(device.getName1());
-                    editDevice.setVisibility(View.INVISIBLE);
+                    setDeviceNameStatus(NameStatus.CHANGED);
                     break;
             }
         });
     }
 
-    void toDeviceEndSettings(){
-        editDeviceFragmentViewModel.toDeviceEndSettings();
+    @OnClick(R.id.factoryReset)
+    void toDeviceFactoryReset(){
+        editDeviceFragmentViewModel.toDeviceFactoryReset(device.getIp()).observe(this, s -> {
+            assert s != null;
+                switch (s){
+                    case AppConstants.FACTORY_RESET_DONE:
+                        Toast.makeText(getActivity(), "دسترسی اینترنتی با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
+                        setDeviceTopicStatus(TopicStatus.CHANGED);
+                        break;
+                    case AppConstants.SOCKET_TIME_OUT:
+                        setDeviceTopicStatus(TopicStatus.CHANGED);
+                        Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+        });
+    }
+
+    public enum TopicStatus{
+        CHANGING,
+        CHANGED
+    }
+    public enum NameStatus {
+        CHANGING,
+        CHANGED
+    }
+
+    public void setDeviceNameStatus(NameStatus nameStatus){
+        if (nameStatus.equals(NameStatus.CHANGING)){
+            editDeviceProgressBar.setVisibility(View.VISIBLE);
+            editDevice.setVisibility(View.INVISIBLE);
+        }else{
+            editDeviceProgressBar.setVisibility(View.INVISIBLE);
+            editDevice.setVisibility(View.INVISIBLE);
+        }
+    }
+    public void setDeviceTopicStatus(TopicStatus topicStatus){
+        if (topicStatus.equals(TopicStatus.CHANGING)){
+            setTopicIcon.setVisibility(View.INVISIBLE);
+            setTopicProgressBar.setVisibility(View.VISIBLE);
+            setTopic.setEnabled(false);
+        } else{
+            setTopic.setEnabled(true);
+            setTopicProgressBar.setVisibility(View.INVISIBLE);
+            setTopicIcon.setVisibility(View.VISIBLE);
+        }
     }
 }

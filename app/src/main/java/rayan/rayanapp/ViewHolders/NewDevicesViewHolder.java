@@ -22,6 +22,6 @@ public class NewDevicesViewHolder extends BaseViewHolder<NewDevice, OnNewDeviceC
     @Override
     public void onBind(NewDevice item, @Nullable OnNewDeviceClicked<NewDevice> listener) {
         name.setText(item.getSSID());
-//        name.setOnClickListener(v -> listener.onItemClicked(item));
+        name.setOnClickListener(v -> listener.onItemClicked(item));
     }
 }

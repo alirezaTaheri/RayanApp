@@ -29,16 +29,18 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.GroupDevicesRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.Data.Contact;
+import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
-public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
+public class EditGroupFragment extends Fragment implements OnUserClicked<User>, OnAdminClicked<User> {
 
     static final int PICK_CONTACT=1;
     private final String TAG = EditGroupFragment.class.getSimpleName();
@@ -52,7 +54,8 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
     RecyclerView devicesRecyclerView;
     @BindView(R.id.name)
     EditText name;
-    UsersRecyclerViewAdapter usersRecyclerViewAdapter, managersRecyclerViewAdapter;
+    UsersRecyclerViewAdapter usersRecyclerViewAdapter;
+    AdminsRecyclerViewAdapter managersRecyclerViewAdapter;
     GroupDevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     EditGroupFragmentViewModel editGroupFragmentViewModel;
     private Group group;
@@ -89,7 +92,8 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
         groupName = group.getName();
         usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
         usersRecyclerViewAdapter.setListener(this);
-        managersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
+        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity());
+        managersRecyclerViewAdapter.setListener(this);
         devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(getActivity(), new ArrayList<>());
 
     }
@@ -201,6 +205,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
         UsersListDialogFragment usersListDialogFragment = UsersListDialogFragment.newInstance(group);
         usersListDialogFragment.show(getActivity().getSupportFragmentManager(), "usersList");
     }
+
     public void init(Group group){
         name.setText(group.getName());
         groupName = group.getName();
@@ -216,7 +221,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
 }
 
     @Override
-    public void onRemoveClicked(User user) {
+    public void onRemoveUserClicked(User user) {
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert);
@@ -243,6 +248,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
                 })
                 .show();
     }
+
     @OnClick(R.id.saveGroupName)
     void saveGroupName(){
         editGroupFragmentViewModel.editGroup(name.getText().toString(),group.getId()).observe(this, baseResponse -> {
@@ -260,5 +266,34 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User> {
             else
                 Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    @Override
+    public void onRemoveAdminClicked(User user) {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(getActivity());
+        }
+        builder
+                .setMessage("آیا مایل به حذف این مدیر هستید؟")
+                .setPositiveButton("بله", (dialog, which) -> {
+                    editGroupFragmentViewModel.deleteAdmin(user.getId(), group.getId()).observe(EditGroupFragment.this, baseResponse -> {
+                        if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
+                            Toast.makeText(getActivity(), "این گروه وجود ندارد", Toast.LENGTH_SHORT).show();
+                        }
+                        else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().equals("Repeated")){
+                            Toast.makeText(getActivity(), "شما قادر به حذف این مدیر نیستید", Toast.LENGTH_SHORT).show();
+                        }
+                        else if (baseResponse.getStatus().getCode().equals("200")){
+                            Toast.makeText(getActivity(), "مدیر با موفقیت حذف شد", Toast.LENGTH_SHORT).show();
+                            editGroupFragmentViewModel.getGroups();
+                        }
+                        else
+                            Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .show();
     }
 }

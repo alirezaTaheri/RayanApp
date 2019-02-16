@@ -5,11 +5,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +20,16 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.DeviceManagementListActivity;
 import rayan.rayanapp.Adapters.recyclerView.DevicesManagementRecyclerViewAdapter;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnDeviceClickListenerManagement;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.DevicesManagementListFragmentViewModel;
 
 public class DevicesManagementListFragment extends BackHandledFragment implements OnDeviceClickListenerManagement<Device> {
@@ -31,6 +39,8 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     List<Device> devices = new ArrayList<>();
     DevicesManagementListFragmentViewModel devicesManagementListFragmentViewModel;
     ClickOnDevice sendDevice;
+    List<String> waiting = new ArrayList<>();
+    Device device;
     public DevicesManagementListFragment() {
     }
 
@@ -43,13 +53,18 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         return false;
     }
 
+    Disposable disposable;
+    FragmentManager fragmentManager;
+    FragmentTransaction transaction;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        devicesRecyclerViewAdapterManagement = new DevicesManagementRecyclerViewAdapter(getActivity(), devices);
+        devicesRecyclerViewAdapterManagement = new DevicesManagementRecyclerViewAdapter(getActivity(), devices, waiting);
         devicesRecyclerViewAdapterManagement.setListener(this);
         devicesManagementListFragmentViewModel = ViewModelProviders.of(this).get(DevicesManagementListFragmentViewModel.class);
         devicesManagementListFragmentViewModel.getAllDevices().observe(this, devices -> devicesRecyclerViewAdapterManagement.updateItems(devices));
+        fragmentManager = getActivity().getSupportFragmentManager();
+        transaction = fragmentManager.beginTransaction();
     }
 
     @Override
@@ -64,10 +79,36 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
 
     @Override
     public void onItemClick(Device item) {
-//        UsersListDialogFragment deviceListDialogFragment = UsersListDialogFragment.newInstance(3);
-//        deviceListDialogFragment.show(getActivity().getSupportFragmentManager(), "Custom Button Sheet");
-        ((DeviceManagementListActivity)Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
-        sendDevice.clickOnDevice(item);
+        if (disposable != null)
+            disposable.dispose();
+        disposable = ((RayanApplication)getActivity().getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
+            if (o.getString("cmd").equals(AppConstants.SETTINGS)){
+                Toast.makeText(getActivity(), "Message: " + o, Toast.LENGTH_SHORT).show();
+                waiting.remove(device.getChipId());
+                transaction = fragmentManager.beginTransaction();
+                transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+                EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
+                ((DeviceManagementListActivity)Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
+                transaction.replace(R.id.frameLayout, editGroupFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+                disposable.dispose();
+            }
+        });
+        this.device = item;
+        if (device.getIp() == null)
+            Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+        else {
+            waiting.add(item.getChipId());
+            devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+            devicesManagementListFragmentViewModel.setReadyForSettings(device).observe(this, s -> {
+                if (waiting.contains(s)){
+                    waiting.remove(s);
+                    Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+                }
+                devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+            });
+        }
     }
     public interface ClickOnDevice {
         void clickOnDevice(Device device);

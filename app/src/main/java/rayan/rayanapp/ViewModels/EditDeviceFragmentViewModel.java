@@ -1,5 +1,6 @@
 package rayan.rayanapp.ViewModels;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -11,7 +12,9 @@ import android.widget.Toast;
 import java.net.SocketTimeoutException;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -23,6 +26,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
@@ -108,10 +112,10 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
-    public MutableLiveData<String> zip(String id , String name, String type, String groupId){
+    public MutableLiveData<String> zipChangeName(String id , String name, String type, String groupId, String ip){
         MutableLiveData<String> response = new MutableLiveData<>();
         Observable.zip(
-                toDeviceChangeNameObservable(new ChangeNameRequest(name)).subscribeOn(Schedulers.io()).doOnNext(changeNameResponse -> {
+                toDeviceChangeNameObservable(new ChangeNameRequest(name),ip).subscribeOn(Schedulers.io()).doOnNext(changeNameResponse -> {
                     Log.e(TAG, " 00000000 ChangeNameResponse: " + changeNameResponse);
                 }),
                 editDeviceObservable(new EditDeviceRequest(id, groupId, name, type)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
@@ -154,15 +158,54 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return response;
     }
 
-    public LiveData<ChangeNameResponse> toDeviceChangeName(String name){
+    @SuppressLint("CheckResult")
+    public MutableLiveData<String> flatMqtt(Device device){
+        MutableLiveData<String> result = new MutableLiveData<>();
+        createTopicObservable(new CreateTopicRequest(device.getId(), device.getGroupId(),device.getChipId(), AppConstants.MQTT_HOST))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .flatMap(deviceResponse -> toDeviceMqttObservable(new MqttTopicRequest(AppConstants.MQTT_HOST,
+                        deviceResponse.getData().getDevice().getUsername(),
+                        ((deviceResponse.getData().getDevice().getPassword() != null) ? deviceResponse.getData().getDevice().getPassword():"Password Not Set"),
+                        deviceResponse.getData().getDevice().getTopic().getTopic(),
+                        AppConstants.MQTT_PORT
+                        ),device.getIp()))
+        .subscribe(new Observer<DeviceBaseResponse>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+            }
+
+            @Override
+            public void onNext(DeviceBaseResponse deviceBaseResponse) {
+                Log.e(TAG, "onNext"+deviceBaseResponse);
+                result.postValue(deviceBaseResponse.getCmd());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(TAG, "onError" + e);
+                if (e instanceof SocketTimeoutException){
+                    result.postValue(AppConstants.SOCKET_TIME_OUT);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.e(TAG, "onComplete Mqtt Sent To Device");
+            }
+        });
+        return result;
+    }
+
+    public LiveData<ChangeNameResponse> toDeviceChangeName(String name, String ip){
         final MutableLiveData<ChangeNameResponse> results = new MutableLiveData<>();
-        toDeviceChangeNameObservable(new ChangeNameRequest(name)).subscribe(toDeviceChangeNameObserver(results));
+        toDeviceChangeNameObservable(new ChangeNameRequest(name),ip).subscribe(toDeviceChangeNameObserver(results));
         return results;
     }
-    private Observable<ChangeNameResponse> toDeviceChangeNameObservable(ChangeNameRequest changeNameRequest){
+    private Observable<ChangeNameResponse> toDeviceChangeNameObservable(ChangeNameRequest changeNameRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .changeName("http://192.168.1.102/test.php", changeNameRequest)
+                .changeName(getDeviceAddress(ip), changeNameRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -190,16 +233,89 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
-
-    public LiveData<String> toDeviceEndSettings(){
+    public LiveData<String> toDeviceFactoryReset(String ip){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        toDeviceEndSettingsObservable(new BaseRequest(AppConstants.END_SETTINGS)).subscribe(toDeviceEndSettingsObserver(results));
+        toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
         return results;
     }
-    private Observable<DeviceBaseResponse> toDeviceEndSettingsObservable(BaseRequest baseRequest){
+    private Observable<DeviceBaseResponse> toDeviceFactoryResetObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .endSettings("http://192.168.1.102/test.php", baseRequest)
+                .factoryReset(getDeviceAddress(ip), baseRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<DeviceBaseResponse> toDeviceFactoryResetObserver(MutableLiveData<String> results){
+        return new DisposableObserver<DeviceBaseResponse>() {
+
+            @Override
+            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse.getCmd());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e instanceof SocketTimeoutException){
+                    results.postValue(AppConstants.SOCKET_TIME_OUT);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+    public LiveData<DeviceBaseResponse> toDeviceMqtt(String host, String user, String pass, String topic, String port, String ip){
+        final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();
+        toDeviceMqttObservable(new MqttTopicRequest(host,user,pass,topic,port),ip).subscribe(toDeviceMqttObserver(results));
+        return results;
+    }
+    public Observable<DeviceBaseResponse> toDeviceMqttObservable(MqttTopicRequest mqttTopicRequest, String ip){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .sendMqtt(getDeviceAddress(ip), mqttTopicRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<DeviceBaseResponse> toDeviceMqttObserver(MutableLiveData<DeviceBaseResponse> results){
+        return new DisposableObserver<DeviceBaseResponse>() {
+
+            @Override
+            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e.toString().contains("Unauthorized"))
+                    login();
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+
+    public LiveData<String> toDeviceEndSettings(String ip){
+        final MutableLiveData<String> results = new MutableLiveData<>();
+        toDeviceEndSettingsObservable(new BaseRequest(AppConstants.END_SETTINGS), ip).subscribe(toDeviceEndSettingsObserver(results));
+        return results;
+    }
+    private Observable<DeviceBaseResponse> toDeviceEndSettingsObservable(BaseRequest baseRequest, String ip){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .endSettings(getDeviceAddress(ip), baseRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -230,5 +346,8 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     public void updateDevice(Device device){
         deviceDatabase.updateDevice(device);
     }
-}
 
+    public String getDeviceAddress(String ip){
+        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+    }
+}

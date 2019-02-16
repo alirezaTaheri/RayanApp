@@ -1,31 +1,59 @@
 package rayan.rayanapp.Fragments;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Adapters.recyclerView.NewDevicesRecyclerViewAdapter;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Listeners.ConnectingToTarget;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Services.mqtt.Connection;
+import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
+import rayan.rayanapp.Wifi.WifiCypherType;
 import rayan.rayanapp.Wifi.WifiHandler;
 
-public class NewDevicesListFragment extends Fragment implements OnNewDeviceClicked<NewDevice> {
+public class NewDevicesListFragment extends Fragment implements OnNewDeviceClicked<NewDevice>, ConnectingToTarget , View.OnClickListener{
 
+    private final String TAG = NewDevicesListFragment.class.getSimpleName();
     private NewDevicesListViewModel viewModel;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     NewDevicesRecyclerViewAdapter newDevicesRecyclerViewAdapter;
+    ConnectingToTarget connection;
+    ConnectionStatus connectionStatus;
+    WifiManager wifiManager;
+    WifiInfo wifiInfo;
+    private String targetSSID;
+    private String currentSSID;
     public static NewDevicesListFragment newInstance() {
         return new NewDevicesListFragment();
     }
@@ -33,10 +61,26 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        wifiManager = (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         newDevicesRecyclerViewAdapter = new NewDevicesRecyclerViewAdapter(getActivity());
         newDevicesRecyclerViewAdapter.setListener(this);
+        connection = this;
+        this.searching();
+        ((RayanApplication)this.getActivity().getApplication()).getNetworkStatus().observe(this, networkConnection -> {
+            String status = NetworkUtil.getConnectivityStatusString(getActivity());
+            if (status.equals(AppConstants.WIFI) && connectionStatus.equals(ConnectionStatus.CONNECTING)){
+                currentSSID = getCurrentSSID();
+                if (currentSSID.equals(targetSSID)){
+                    this.successful();
+                }else{
+                    this.failure();
+                }
+
+            }
+        });
     }
 
+    @SuppressLint("CheckResult")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -45,7 +89,16 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         viewModel = ViewModelProviders.of(this).get(NewDevicesListViewModel.class);
+        ((AddNewDeviceActivity)getActivity()).getWifiBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(scanResults -> {
+                    this.idle();
+                    List<NewDevice> newDevices = new ArrayList<>();
+                    for (int a = 0;a<scanResults.size();a++)
+                        newDevices.add(new NewDevice(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities,scanResults.get(a).level));
+                    newDevicesRecyclerViewAdapter.setItems(newDevices);
+                });
         viewModel.scan();
+        connectionStatus = ConnectionStatus.SEARCHING;
         newDevicesRecyclerViewAdapter.setItems(viewModel.getSSIDs());
         recyclerView.setAdapter(newDevicesRecyclerViewAdapter);
         return view;
@@ -58,6 +111,77 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
 
     @Override
     public void onItemClicked(NewDevice item) {
-        WifiHandler.connectToSSID(getActivity(),item.getSSID(), "12345678");
+        currentSSID = getCurrentSSID();
+        Log.e(TAG, "Item: " + item + "\nCurrent SSID: " + currentSSID);
+        if (!currentSSID.equals(item.getSSID())){
+            this.connecting(item.getSSID());
+        }
+        else this.connectToSame();
+    }
+
+    @Override
+    public void connecting(String targetSSID) {
+        this.targetSSID = targetSSID;
+        WifiHandler.connectToSSID(getActivity(),targetSSID, "12345678");
+        connectionStatus = ConnectionStatus.CONNECTING;
+    }
+
+    @Override
+    public void successful() {
+        connectionStatus = ConnectionStatus.SUCCESSFUL;
+        Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void failure() {
+        connectionStatus = ConnectionStatus.FAILURE;
+        Toast.makeText(getActivity(), "اتصال ناموفق بود لطفا دوباره تلاش کنید", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void searching() {
+        connectionStatus = ConnectionStatus.SEARCHING;
+        ((AddNewDeviceActivity)Objects.requireNonNull(getActivity())).setActionBarTitle("در حال جستجو");
+    }
+
+    @Override
+    public void idle() {
+        ((AddNewDeviceActivity)Objects.requireNonNull(getActivity())).setActionBarTitle("افزود دستگاه جدید");
+    }
+
+    @Override
+    public void connectToSame() {
+        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fab:
+                break;
+        }
+    }
+
+    @OnClick(R.id.fab)
+    void search(){
+        viewModel.scan();
+        this.searching();
+    }
+
+    private enum ConnectionStatus{
+        IDLE,
+        SEARCHING,
+        CONNECTING,
+        SUCCESSFUL,
+        FAILURE
+    }
+
+    private String getCurrentSSID(){
+        wifiInfo = wifiManager.getConnectionInfo();
+        String currentSSID  = wifiInfo.getSSID();
+        if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
+            currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
+        }
+        return currentSSID;
     }
 }

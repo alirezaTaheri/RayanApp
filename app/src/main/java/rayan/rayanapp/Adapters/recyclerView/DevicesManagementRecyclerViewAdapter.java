@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.util.DiffUtil;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rayan.rayanapp.Data.Device;
@@ -13,10 +14,11 @@ import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewHolders.DeviceViewHolderManagement;
 
 public class DevicesManagementRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnDeviceClickListenerManagement<Device>, DeviceViewHolderManagement>  {
-
-    public DevicesManagementRecyclerViewAdapter(Context context, List<Device> devices) {
+    private List<String> waiting;
+    public DevicesManagementRecyclerViewAdapter(Context context, List<Device> devices, List<String> waiting) {
         super(context);
         this.items = devices;
+        this.waiting = waiting;
     }
 
     public void updateItems(List<Device> items){
@@ -33,6 +35,6 @@ public class DevicesManagementRecyclerViewAdapter extends GenericRecyclerViewAda
 
     @Override
     public DeviceViewHolderManagement onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new DeviceViewHolderManagement(inflate(R.layout.item_device_management, parent));
+        return new DeviceViewHolderManagement(inflate(R.layout.item_device_management, parent), waiting);
     }
 }

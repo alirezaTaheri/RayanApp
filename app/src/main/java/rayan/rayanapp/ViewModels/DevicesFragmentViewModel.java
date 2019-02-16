@@ -38,6 +38,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
 
@@ -56,6 +57,10 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
     public void addDevices(List<Device> devices){
         executorService.execute( () -> deviceDatabase.addDevices(devices));
+    }
+
+    public Device getDevice(String id){
+        return deviceDatabase.getDevice(id);
     }
 
     public LiveData<List<Device>> getAllDevices(){
@@ -274,23 +279,17 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
 
     public void togglePin1(Device device, boolean local){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("cmd",device.getPin1().equals("on")? "turn_off_1" : "turn_on_1");
-        jsonObject.addProperty("src",RayanApplication.getPref().getId());
         if (local)
-            sendUDPMessage.sendUdpMessage(device.getIp(),jsonObject.toString());
-        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected())
-            publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), jsonObject.toString(), 0, false);
+            sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString());
+        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null)
+            publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString(), 0, false);
     }
 
     public void togglePin2(Device device, boolean local){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("cmd",device.getPin2().equals("on")? "turn_off_2" : "turn_on_2");
-        jsonObject.addProperty("src",RayanApplication.getPref().getId());
         if (local)
-            sendUDPMessage.sendUdpMessage(device.getIp(),jsonObject.toString());
+            sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString());
         else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected())
-            publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), jsonObject.toString(), 0, false);
+            publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString(), 0, false);
     }
 
 

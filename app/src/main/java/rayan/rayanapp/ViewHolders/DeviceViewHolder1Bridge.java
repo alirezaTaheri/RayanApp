@@ -10,6 +10,7 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnStatusIconClickListener;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
 
 public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnStatusIconClickListener<Device>> {
     private final String TAG = DeviceViewHolder1Bridge.class.getSimpleName();
@@ -28,7 +29,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnStatusIcon
     public void onBind(Device item, @Nullable OnStatusIconClickListener<Device> listener) {
         Log.e(TAG, "Processing this Device: " + item);
         name.setText(item.getName1());
-        if (item.getPin1().equals("on")){
+        if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setChecked(true);
         }
         else {

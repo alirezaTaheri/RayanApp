@@ -14,19 +14,21 @@ public class NewDevicesListViewModel extends DevicesFragmentViewModel {
     public NewDevicesListViewModel(@NonNull Application application) {
         super(application);
     }
+    WifiHandler wifiHandler;
     public List<NewDevice> getSSIDs(){
         List<NewDevice> newDevices = new ArrayList<>();
         List<ScanResult> scanResults = new ArrayList<>();
-        WifiHandler wifiHandler = new WifiHandler();
+        wifiHandler = new WifiHandler();
         scanResults = wifiHandler.scan();
         for (int a = 0; a<scanResults.size();a++){
+            if (scanResults.get(a).SSID.trim().length()>0)
             newDevices.add(new NewDevice(scanResults.get(a).SSID, scanResults.get(a).BSSID,scanResults.get(a).capabilities,scanResults.get(a).level));
         }
         return newDevices;
     }
 
     public void scan(){
-        WifiHandler wifiHandler = new WifiHandler();
+        wifiHandler = new WifiHandler();
         wifiHandler.scan();
     }
 
