@@ -1,13 +1,16 @@
 package rayan.rayanapp.App;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
+import android.speech.RecognizerIntent;
 
 import org.json.JSONObject;
 
@@ -16,6 +19,9 @@ import java.io.IOException;
 import java.util.List;
 
 import rayan.rayanapp.Activities.LoginActivity;
+import rayan.rayanapp.Data.NetworkConnectionLiveData;
+import rayan.rayanapp.Receivers.LanguageDetailsChecker;
+import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.Util.JsonMaker;
@@ -25,6 +31,7 @@ public class RayanApplication extends Application {
     private UDPMessageRxBus bus;
     private JsonMaker jsonMaker;
     private static PrefManager pref;
+    private NetworkConnectionLiveData networkConnectionLiveData;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -34,6 +41,12 @@ public class RayanApplication extends Application {
 //                .setFontAttrId(R.attr.fontPath)
 //                .build()
 //        );
+//        networkReceiver = new NetworkStateChangeReceiver();
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+//        intentFilter.addAction("android.net.wifi.WIFI_STATE_CHANGED");
+//        registerReceiver(networkReceiver,intentFilter);
+        networkConnectionLiveData = new NetworkConnectionLiveData(this);
         context = this;
         bus = new UDPMessageRxBus();
         pref = new PrefManager();
@@ -44,9 +57,12 @@ public class RayanApplication extends Application {
             startActivity(intent);
         }
 
-
+//        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
+//        sendOrderedBroadcast(
+//                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
 
     }
+
 
     public JSONObject getJson(String cmd, List<String> values){
         return jsonMaker.getJson(cmd, values);
@@ -54,6 +70,10 @@ public class RayanApplication extends Application {
 
     public UDPMessageRxBus getBus(){
         return bus;
+    }
+
+    public NetworkConnectionLiveData getNetworkStatus(){
+        return networkConnectionLiveData;
     }
 
     public int getVersionCode() {

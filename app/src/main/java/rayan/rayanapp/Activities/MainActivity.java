@@ -1,7 +1,10 @@
 package rayan.rayanapp.Activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -12,6 +15,10 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -32,7 +39,9 @@ import com.polyak.iconswitch.IconSwitch;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -44,7 +53,9 @@ import rayan.rayanapp.Data.NetworkConnection;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.Listeners.MqttStatus;
+import rayan.rayanapp.Receivers.LanguageDetailsChecker;
 import rayan.rayanapp.Services.mqtt.Connection;
+import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
@@ -70,17 +81,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle actionBarDrawerToggle;
     @BindView(R.id.navigationView)
     NavigationView navigationView;
-    public NetworkConnectionLiveData networkConnectionLiveData;
     MqttStatus mqttStatus;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-            }
-        }
+        requestRecordAudioPermission();
         ButterKnife.bind(this);
         mqttStatus = this;
 //        setSupportActionBar(toolbar);
@@ -89,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
-        networkConnectionLiveData = new NetworkConnectionLiveData(getApplicationContext());
         MainActivityViewModel.connection.observe(this, connection -> {
             switch (connection.getStatus()){
                 case NONE:
@@ -110,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
             }
         });
-        networkConnectionLiveData.observe(this, networkConnection -> {
+        ((RayanApplication)getApplication()).getNetworkStatus().observe(this, networkConnection -> {
             Log.e(TAG, "Network Connection: " + networkConnection);
             if (!networkConnection.isConnected()){
                 mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection).observe(this, connection -> {
@@ -193,6 +198,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         initialize();
+        if ( isExternalStorageWritable() ) {
+
+            File appDirectory = new File( Environment.getExternalStorageDirectory() + "/RayanAppFolder" );
+            File logDirectory = new File( appDirectory + "/log" );
+            File logFile = new File( logDirectory, "logcat" + System.currentTimeMillis() + ".txt" );
+            File logFile2 = new File( logDirectory, "logcat" + System.currentTimeMillis() + "2.txt" );
+
+            // create app folder
+            if ( !appDirectory.exists() ) {
+                appDirectory.mkdir();
+            }
+
+            // create log folder
+            if ( !logDirectory.exists() ) {
+                logDirectory.mkdir();
+            }
+
+            // clear the previous logcat and then write the new one to the file
+            try {
+                Process process = Runtime.getRuntime().exec("logcat -c");
+                process = Runtime.getRuntime().exec("logcat -f " + logFile);
+                process = Runtime.getRuntime().exec("logcat -f " + logFile2 + " *:S EditDeviceFragment:E UDPServerService:E EditGroupFragmentViewModel:E");
+            } catch ( IOException e ) {
+                e.printStackTrace();
+            }
+
+        } else if ( isExternalStorageReadable() ) {
+            // only readable
+        } else {
+            // not accessible
+        }
     }
 
     public void initialize(){
@@ -276,42 +312,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.e(TAG, "Mqtt Status: ERROR");
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if ( isExternalStorageWritable() ) {
-
-            File appDirectory = new File( Environment.getExternalStorageDirectory() + "/RayanAppFolder" );
-            File logDirectory = new File( appDirectory + "/log" );
-            File logFile = new File( logDirectory, "logcat" + System.currentTimeMillis() + ".txt" );
-            File logFile2 = new File( logDirectory, "logcat" + System.currentTimeMillis() + "2.txt" );
-
-            // create app folder
-            if ( !appDirectory.exists() ) {
-                appDirectory.mkdir();
-            }
-
-            // create log folder
-            if ( !logDirectory.exists() ) {
-                logDirectory.mkdir();
-            }
-
-            // clear the previous logcat and then write the new one to the file
-            try {
-                Process process = Runtime.getRuntime().exec("logcat -c");
-                process = Runtime.getRuntime().exec("logcat -f " + logFile);
-                process = Runtime.getRuntime().exec("logcat -f " + logFile2 + " *:S EditDeviceFragment:E UDPServerService:E EditGroupFragmentViewModel:E");
-            } catch ( IOException e ) {
-                e.printStackTrace();
-            }
-
-        } else if ( isExternalStorageReadable() ) {
-            // only readable
-        } else {
-            // not accessible
-        }
-
-    }
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if ( Environment.MEDIA_MOUNTED.equals( state ) ) {
@@ -328,5 +328,132 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
         return false;
+    }
+    protected static final int RESULT_SPEECH = 1;
+
+    private void requestRecordAudioPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            String requiredPermission = Manifest.permission.RECORD_AUDIO;
+
+            // If the user previously denied this permission then show a message explaining why
+            // this permission is needed
+            if (checkCallingOrSelfPermission(requiredPermission) == PackageManager.PERMISSION_DENIED) {
+                requestPermissions(new String[]{requiredPermission}, 101);
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case RESULT_SPEECH: {
+                if (resultCode == RESULT_OK && null != data) {
+
+                    ArrayList<String> text = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                    Log.e(TAG+ "/////////", "Text is: " + text.get(0));
+
+                }
+                break;
+            }
+
+        }
+    }
+
+    private void reco(){
+
+//        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
+//        sendOrderedBroadcast(
+//                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
+//        Intent intent = new Intent(
+//                RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+//
+//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "fa-IR");
+//
+//        try {
+//            startActivityForResult(intent, RESULT_SPEECH);
+//        } catch (ActivityNotFoundException a) {
+//            Toast t = Toast.makeText(getApplicationContext(),
+//                    "Opps! Your device doesn't support Speech to Text",
+//                    Toast.LENGTH_SHORT);
+//            t.show();
+//        }
+//        Locale persianLocale = new Locale("fa","IR");
+
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
+                "rayan.rayanapp");
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fa-IR");
+
+        SpeechRecognizer recognizer = SpeechRecognizer
+                .createSpeechRecognizer(this.getApplicationContext());
+        RecognitionListener listener = new RecognitionListener() {
+            @Override
+            public void onResults(Bundle results) {
+                ArrayList<String> voiceResults = results
+                        .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                if (voiceResults == null) {
+                    Log.e(TAG, "No voice results");
+                } else {
+                    Log.d(TAG, "Printing matches: ");
+                    for (String match : voiceResults) {
+                        Log.d(TAG, match);
+                    }
+                }
+            }
+
+            @Override
+            public void onReadyForSpeech(Bundle params) {
+                Log.d(TAG, "Ready for speech");
+            }
+
+            @Override
+            public void onError(int error) {
+                Log.d(TAG,
+                        "Error listening for speech: " + error);
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+                Log.d(TAG, "Speech starting");
+            }
+
+            @Override
+            public void onBufferReceived(byte[] buffer) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onEvent(int eventType, Bundle params) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onPartialResults(Bundle partialResults) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onRmsChanged(float rmsdB) {
+                // TODO Auto-generated method stub
+
+            }
+        };
+        recognizer.setRecognitionListener(listener);
+        recognizer.startListening(intent);
     }
 }

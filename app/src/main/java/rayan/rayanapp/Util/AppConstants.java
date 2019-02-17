@@ -16,6 +16,9 @@ public class AppConstants {
     public final static String FORBIDDEN = "Forbidden";
     public final static int MOBILE_DATA = 0;
     public final static int WIFI_NETWORK = 1;
+    public final static String MOBILE = "MOBILE";
+    public final static String WIFI = "WIFI";
+    public final static String NOT_CONNECTED = "NOT_CONNECTED";
 
     //Operations
     public final static String ON_1 = "turn_on_1";

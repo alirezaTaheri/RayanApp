@@ -14,13 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Observable;
 import rayan.rayanapp.App.RayanApplication;
 
-import static com.mikepenz.iconics.Iconics.TAG;
 
 public class WifiHandler implements WifiHelper{
 
+    private final String TAG = WifiHandler.class.getSimpleName();
     private WifiCypherType.WifiCipherType getWifiCipherType(WifiConfiguration wifiConfiguration) {
         String wifiConfigurationStr = wifiConfiguration.toString();
         boolean isWEP = wifiConfigurationStr.contains("SHARED");
@@ -376,19 +375,15 @@ public class WifiHandler implements WifiHelper{
     {
         WifiInfo mWifiInfo = getConnectionInfo();
         String ssid = null;
-        if (mWifiInfo != null && mWifiInfo.getSSID() != null && isWifiConnected())
-        {
+        if (mWifiInfo != null && mWifiInfo.getSSID() != null && isWifiConnected()) {
             int len = mWifiInfo.getSSID().length();
             // mWifiInfo.getBSSID() = "\"" + ssid + "\"";
-            if (mWifiInfo.getSSID().startsWith("\"") && mWifiInfo.getSSID().endsWith("\""))
-            {
+            if (mWifiInfo.getSSID().startsWith("\"") && mWifiInfo.getSSID().endsWith("\"")) {
                 ssid = mWifiInfo.getSSID().substring(1, len - 1);
             }
-            else
-            {
+            else {
                 ssid = mWifiInfo.getSSID();
             }
-
         }
         Log.e(TAG,Thread.currentThread().toString() + "##getWifiConnectedSsid(): " + ssid);
         return ssid;
