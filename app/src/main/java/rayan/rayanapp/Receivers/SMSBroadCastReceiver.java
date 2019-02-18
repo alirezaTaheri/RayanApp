@@ -1,4 +1,4 @@
-package rayan.rayanapp.Util;
+package rayan.rayanapp.Receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import android.util.Log;
 
 import java.util.Arrays;
 
-public class MySMSBroadCastReceiver extends BroadcastReceiver
+public class SMSBroadCastReceiver extends BroadcastReceiver
 {
 
     @Override

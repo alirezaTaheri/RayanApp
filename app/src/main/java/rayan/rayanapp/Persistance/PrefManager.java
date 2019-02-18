@@ -69,6 +69,8 @@ public class PrefManager {
         editor.putString(KEY_ID, id);
         editor.putString(KEY_USERNAME, username);
         editor.putString(KEY_PASSWORD, password);
+        editor.putString(KEY_NAME,userInfo.getName());
+        editor.putString(KEY_GENDER,userInfo.getGender());
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.commit();
     }

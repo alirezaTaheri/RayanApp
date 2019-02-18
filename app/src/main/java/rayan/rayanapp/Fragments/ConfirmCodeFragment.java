@@ -29,6 +29,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Receivers.SMSBroadCastReceiver;
 import rayan.rayanapp.ViewModels.ConfirmCodeViewModel;
 
 public class ConfirmCodeFragment extends Fragment {
@@ -55,6 +56,9 @@ public class ConfirmCodeFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         confirmCodeViewModel = ViewModelProviders.of(this).get(ConfirmCodeViewModel.class);
+        SMSBroadCastReceiver SMSBroadCastReceiver=new SMSBroadCastReceiver();
+        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+        getActivity().registerReceiver(SMSBroadCastReceiver, filter);
         if (checkAndRequestPermissions()) {
             // carry on the normal flow, as the case of  permissions  granted.
         }

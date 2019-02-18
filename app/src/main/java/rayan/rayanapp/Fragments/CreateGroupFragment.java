@@ -6,27 +6,19 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,17 +42,9 @@ public class CreateGroupFragment extends Fragment {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
 
-    @BindView(R.id.confirm_create_group)
-    CoordinatorLayout confirm_create_group;
-    @BindView(R.id.submitBtn)
-    AppCompatButton submitBtn;
-    @BindView(R.id.cancelBtn)
-    AppCompatButton cancelBtn;
-    BottomSheetBehavior sheetBehavior;
-
     UsersRecyclerViewAdapter usersRecyclerViewAdapter;
     private List<User> users = new ArrayList<>();
-    private List<String> numbers = new ArrayList<>();
+    private ArrayList<String> numbers = new ArrayList<>();
     public static CreateGroupFragment newInstance() {
         return new CreateGroupFragment();
     }
@@ -74,34 +58,6 @@ public class CreateGroupFragment extends Fragment {
         usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
         usersRecyclerViewAdapter.setItems(users);
         recyclerView.setAdapter(usersRecyclerViewAdapter);
-        sheetBehavior = BottomSheetBehavior.from(confirm_create_group);
-        submitBtn.setText(R.string.creategroup_submit_btn);
-        cancelBtn.setText(R.string.creategroup_cancel_btn);
-        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View view, int state) {
-                switch (state) {
-                    case BottomSheetBehavior.STATE_HIDDEN:
-                        break;
-                    case BottomSheetBehavior.STATE_EXPANDED: {
-                        // btnBottomSheet.setText("Close Sheet");
-                    }
-                    break;
-                    case BottomSheetBehavior.STATE_COLLAPSED: {
-                        // btnBottomSheet.setText("Expand Sheet");
-                    }
-                    break;
-                    case BottomSheetBehavior.STATE_DRAGGING:
-                        break;
-                    case BottomSheetBehavior.STATE_SETTLING:
-                        break;
-                }
-            }
-            @Override
-            public void onSlide(@NonNull View view, float v) {
-            }
-        });
-
         return view;
     }
 
@@ -160,22 +116,10 @@ public class CreateGroupFragment extends Fragment {
         else getContactPermission();
 
     }
-    @OnClick(R.id.submitBtn)
+    @OnClick(R.id.createGroup)
     public void createGroup(){
-        createGroupViewModel.createGroup(name.getText().toString(), numbers).observe(this, baseResponse -> {
-            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
-                Toast.makeText(getActivity(), "کاربری با این شماره وجود ندارد", Toast.LENGTH_SHORT).show();
-            }
-            else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")){
-                Toast.makeText(getActivity(), "این کاربر هم‌اکنون عضو گروه است", Toast.LENGTH_SHORT).show();
-            }
-            else if (baseResponse.getStatus().getCode().equals("200")){
-                Toast.makeText(getActivity(), "گروه با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
-                getActivity().onBackPressed();
-            }
-            else
-                Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
-        });
+        CreateGroupButtomSheetFragment bottomSheetFragment = new CreateGroupButtomSheetFragment().newInstance(name.getText().toString(), numbers);
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     public void getContactPermission(){
@@ -184,21 +128,4 @@ public class CreateGroupFragment extends Fragment {
         }
     }
 
-    @OnClick(R.id.createGroup)
-    public void createeGroup(){
-        if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        } else {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
-    }
-    @OnClick(R.id.cancelBtn)
-   public void setCancelBtn() {
-        if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        } else {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
-        }
-         }
 }

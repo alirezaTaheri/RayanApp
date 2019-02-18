@@ -106,7 +106,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             @Override
             public void onNext(@NonNull GroupsResponse baseResponse) {
                 Log.d(TAG,"OnNext "+baseResponse);
+		if(baseResponse.getData().getGroups() != null){
                 new SyncGroups(baseResponse.getData().getGroups()).execute();
+		}
             }
 
             @Override

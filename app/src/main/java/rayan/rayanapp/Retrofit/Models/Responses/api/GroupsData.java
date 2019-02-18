@@ -19,7 +19,7 @@ public class GroupsData {
     @Expose
     private String message;
 
-    @SerializedName("group")
+    @SerializedName("groups")
     @Expose
     private List<Group> groups;
     @SerializedName("token")

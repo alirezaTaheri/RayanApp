@@ -74,7 +74,5 @@
         android:layout_height="wrap_content" />
 </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
-    <include layout="@layout/confirm_create_group_bottomsheet"
-       />
 
 </android.support.design.widget.CoordinatorLayout>

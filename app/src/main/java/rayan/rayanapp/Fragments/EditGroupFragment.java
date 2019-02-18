@@ -219,34 +219,10 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
     }
 }
-
     @Override
     public void onRemoveUserClicked(User user) {
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(getActivity());
-        }
-        builder
-                .setMessage("آیا مایل به حذف این کاربر هستید؟")
-                .setPositiveButton("بله", (dialog, which) -> {
-                    editGroupFragmentViewModel.deleteUser(user.getId(), group.getId()).observe(EditGroupFragment.this, baseResponse -> {
-                        if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
-                            Toast.makeText(getActivity(), "این گروه وجود ندارد", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().equals("Repeated")){
-                            Toast.makeText(getActivity(), "شما قادر به حذف این کاربر نیستید", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (baseResponse.getStatus().getCode().equals("200")){
-                            Toast.makeText(getActivity(), "کاربر با موفقیت حذف شد", Toast.LENGTH_SHORT).show();
-                            editGroupFragmentViewModel.getGroups();
-                        }
-                        else
-                            Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
-                    });
-                })
-                .show();
+        RemoveUserButtomSheetFragment bottomSheetFragment = new RemoveUserButtomSheetFragment().newInstance(user.getId(), group.getId());
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     @OnClick(R.id.saveGroupName)
@@ -270,30 +246,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
     @Override
     public void onRemoveAdminClicked(User user) {
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(getActivity());
-        }
-        builder
-                .setMessage("آیا مایل به حذف این مدیر هستید؟")
-                .setPositiveButton("بله", (dialog, which) -> {
-                    editGroupFragmentViewModel.deleteAdmin(user.getId(), group.getId()).observe(EditGroupFragment.this, baseResponse -> {
-                        if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
-                            Toast.makeText(getActivity(), "این گروه وجود ندارد", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().equals("Repeated")){
-                            Toast.makeText(getActivity(), "شما قادر به حذف این مدیر نیستید", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (baseResponse.getStatus().getCode().equals("200")){
-                            Toast.makeText(getActivity(), "مدیر با موفقیت حذف شد", Toast.LENGTH_SHORT).show();
-                            editGroupFragmentViewModel.getGroups();
-                        }
-                        else
-                            Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
-                    });
-                })
-                .show();
+        RemoveAdminButtomSheetFragment bottomSheetFragment = new RemoveAdminButtomSheetFragment().newInstance(user.getId(), group.getId());
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 }
