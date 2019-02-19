@@ -69,7 +69,7 @@ public class RegisterUserFragment extends Fragment {
                     password_register_EditText.getText().toString(),email_register_EditText.getText().toString() ).observe(this, baseResponse -> {
                 if (baseResponse.getStatus().getCode().equals("200")) {
                     Toast.makeText(getActivity(), "ثبت نام با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
-                    RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(),  password_register_EditText.getText().toString(), baseResponse.getData().getUser().getUserInfo());
+                    RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(),  password_register_EditText.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
 
                     registerUserViewModel.login();
                     ConfirmCodeFragment confirmCodeFragment= new ConfirmCodeFragment();

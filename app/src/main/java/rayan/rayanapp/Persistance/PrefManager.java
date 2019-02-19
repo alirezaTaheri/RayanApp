@@ -14,6 +14,7 @@ public class PrefManager {
     private final String KEY_NOTIFICATION = "KEY_NOTIFICATION";
     private final String KEY_THEME = "KEY_THEME";
     private final String KEY_PROTOCOL = "KEY_PROTOCOL";
+    private final String KEY_EMAIL = "KEY_EMAIL";
     private final String KEY_NAME = "KEY_NAME";
     private final String KEY_GENDER = "KEY_GENDER";
     private final String KEY_TOKEN = "KEY_TOKEN";
@@ -65,13 +66,14 @@ public class PrefManager {
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
     }
 
-    public void createSession(String id,String username, String password, UserInfo userInfo){
+    public void createSession(String id,String username, String password, UserInfo userInfo,String email){
         editor.putString(KEY_ID, id);
         editor.putString(KEY_USERNAME, username);
         editor.putString(KEY_PASSWORD, password);
         editor.putString(KEY_NAME,userInfo.getName());
         editor.putString(KEY_GENDER,userInfo.getGender());
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
+        editor.putString(KEY_EMAIL,email);
         editor.commit();
     }
 
@@ -114,5 +116,13 @@ public class PrefManager {
     }
     public String getGenderKey(){
         return pref.getString(KEY_GENDER,"chose");
+    }
+
+    public void setEmailKey(String email){
+        editor.putString(KEY_EMAIL,email);
+        editor.commit();
+    }
+    public String getEmailKey(){
+        return pref.getString(KEY_EMAIL,null);
     }
 }

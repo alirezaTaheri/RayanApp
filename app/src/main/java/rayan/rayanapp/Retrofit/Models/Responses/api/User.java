@@ -23,6 +23,10 @@ public class User implements Parcelable {
     @Expose
     private String registered;
 
+    @SerializedName("email")
+    @Expose
+    private String email;
+
     @SerializedName("info")
     @Expose
     private UserInfo userInfo;
@@ -44,6 +48,7 @@ public class User implements Parcelable {
         groupId = in.readString();
         type = in.readString();
         role = in.readString();
+        email= in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -66,13 +71,14 @@ public class User implements Parcelable {
         this.role = role;
     }
     public User(){}
-    public User(@NonNull String id, String username, String registered, UserInfo userInfo, String groupId, String role) {
+    public User(@NonNull String id, String username, String registered, UserInfo userInfo, String groupId, String role, String email) {
         this.id = id;
         this.username = username;
         this.registered = registered;
         this.userInfo = userInfo;
         this.groupId = groupId;
         this.role = role;
+        this.email=email;
     }
 
     @NonNull
@@ -127,6 +133,14 @@ public class User implements Parcelable {
     public UserInfo getUserInfo() {
         return userInfo;
     }
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
@@ -165,5 +179,6 @@ public class User implements Parcelable {
         dest.writeString(groupId);
         dest.writeString(type);
         dest.writeString(role);
+        dest.writeString(email);
     }
 }

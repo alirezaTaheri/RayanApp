@@ -144,8 +144,14 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
         phoneEditText.setText(RayanApplication.getPref().getUsername());
         Log.e("geeeeettt",RayanApplication.getPref().getGenderKey()+" "+RayanApplication.getPref().getNameKey());
         phoneEditText.setFocusable(false);
-        nameEditText.setText(RayanApplication.getPref().getNameKey());
         emailEditText.setFocusable(false);
-        emailEditText.setText(RayanApplication.getPref().getUsername());
+        nameEditText.setText(RayanApplication.getPref().getNameKey());
+        if(RayanApplication.getPref().getEmailKey() != null && !RayanApplication.getPref().getEmailKey().equals("")) {
+            emailEditText.setText(RayanApplication.getPref().getEmailKey());
+        }else {
+            emailEditText.setText("ایمیل خود را ثبت نکرده اید!");
+        }
+
+
     }
 }
