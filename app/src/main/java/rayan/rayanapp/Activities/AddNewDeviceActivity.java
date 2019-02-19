@@ -38,7 +38,6 @@ public class AddNewDeviceActivity extends AppCompatActivity {
     private final String TAG = AddNewDeviceActivity.class.getSimpleName();
     private WifiHandler wifiHandler;
     WifiScanReceiver wifiReceiver;
-    WifiScanResultsBus wifiBus;
     @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +46,6 @@ public class AddNewDeviceActivity extends AppCompatActivity {
         setActionBarTitle("افزودن دستگاه جدید");
         wifiReceiver = new WifiScanReceiver();
         wifiHandler = new WifiHandler();
-        wifiBus = new WifiScanResultsBus();
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, NewDevicesListFragment.newInstance())
@@ -134,10 +132,6 @@ public class AddNewDeviceActivity extends AppCompatActivity {
             }
         }
         return true;
-    }
-
-    public WifiScanResultsBus getWifiBus() {
-        return wifiBus;
     }
 
     public void setActionBarTitle(String title){

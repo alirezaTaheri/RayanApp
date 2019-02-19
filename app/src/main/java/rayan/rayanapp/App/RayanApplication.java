@@ -24,11 +24,13 @@ import rayan.rayanapp.Receivers.LanguageDetailsChecker;
 import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
+import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.JsonMaker;
 
 public class RayanApplication extends Application {
     private static Context context;
     private UDPMessageRxBus bus;
+    private WifiScanResultsBus wifiBus;
     private JsonMaker jsonMaker;
     private static PrefManager pref;
     private NetworkConnectionLiveData networkConnectionLiveData;
@@ -36,6 +38,7 @@ public class RayanApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        wifiBus = new WifiScanResultsBus();
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
 //                .setDefaultFontPath("fonts/Dosis_Regular.ttf")
 //                .setFontAttrId(R.attr.fontPath)
@@ -63,6 +66,9 @@ public class RayanApplication extends Application {
 
     }
 
+    public WifiScanResultsBus getWifiBus() {
+        return wifiBus;
+    }
 
     public JSONObject getJson(String cmd, List<String> values){
         return jsonMaker.getJson(cmd, values);

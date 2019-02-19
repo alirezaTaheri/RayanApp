@@ -38,7 +38,10 @@ public class AppConstants {
     public final static String SETTINGS = "settings";
     public final static String END_SETTINGS = "end_settings";
     public final static String SET_TOPIC_MQTT = "MQTT";
+    public final static String CHANGE_WIFI = "change_wifi";
     public final static String SET_TOPIC_MQTT_Response = "MQTTR";
+    public final static String DEVICE_CONNECTED_STYLE = "connected";
+    public final static String DEVICE_STANDALONE_STYLE = "standalone";
     public final static String FACTORY_RESET = "factory_reset";
     public final static String FACTORY_RESET_DONE = "factory_reseted";
 }

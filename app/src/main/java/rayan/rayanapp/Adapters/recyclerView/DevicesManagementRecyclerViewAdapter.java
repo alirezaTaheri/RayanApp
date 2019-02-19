@@ -2,6 +2,7 @@ package rayan.rayanapp.Adapters.recyclerView;
 
 import android.content.Context;
 import android.support.v7.util.DiffUtil;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;

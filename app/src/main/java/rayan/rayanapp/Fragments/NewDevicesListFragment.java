@@ -3,7 +3,6 @@ package rayan.rayanapp.Fragments;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -34,11 +33,9 @@ import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Listeners.ConnectingToTarget;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
-import rayan.rayanapp.Wifi.WifiCypherType;
 import rayan.rayanapp.Wifi.WifiHandler;
 
 public class NewDevicesListFragment extends Fragment implements OnNewDeviceClicked<NewDevice>, ConnectingToTarget , View.OnClickListener{
@@ -89,7 +86,7 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         viewModel = ViewModelProviders.of(this).get(NewDevicesListViewModel.class);
-        ((AddNewDeviceActivity)getActivity()).getWifiBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        ((RayanApplication)getActivity().getApplication()).getWifiBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(scanResults -> {
                     this.idle();
                     List<NewDevice> newDevices = new ArrayList<>();
