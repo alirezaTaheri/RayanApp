@@ -19,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +41,10 @@ public class CreateGroupFragment extends Fragment {
     EditText name;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+
     UsersRecyclerViewAdapter usersRecyclerViewAdapter;
     private List<User> users = new ArrayList<>();
-    private List<String> numbers = new ArrayList<>();
+    private ArrayList<String> numbers = new ArrayList<>();
     public static CreateGroupFragment newInstance() {
         return new CreateGroupFragment();
     }
@@ -118,20 +118,8 @@ public class CreateGroupFragment extends Fragment {
     }
     @OnClick(R.id.createGroup)
     public void createGroup(){
-        createGroupViewModel.createGroup(name.getText().toString(), numbers).observe(this, baseResponse -> {
-            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
-                Toast.makeText(getActivity(), "کاربری با این شماره وجود ندارد", Toast.LENGTH_SHORT).show();
-            }
-            else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")){
-                Toast.makeText(getActivity(), "این کاربر هم‌اکنون عضو گروه است", Toast.LENGTH_SHORT).show();
-            }
-            else if (baseResponse.getStatus().getCode().equals("200")){
-                Toast.makeText(getActivity(), "گروه با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
-                getActivity().onBackPressed();
-            }
-            else
-                Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
-        });
+        CreateGroupButtomSheetFragment bottomSheetFragment = new CreateGroupButtomSheetFragment().newInstance(name.getText().toString(), numbers);
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     public void getContactPermission(){
@@ -139,4 +127,5 @@ public class CreateGroupFragment extends Fragment {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
         }
     }
+
 }

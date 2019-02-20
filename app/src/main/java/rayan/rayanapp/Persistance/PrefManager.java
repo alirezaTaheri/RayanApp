@@ -14,6 +14,9 @@ public class PrefManager {
     private final String KEY_NOTIFICATION = "KEY_NOTIFICATION";
     private final String KEY_THEME = "KEY_THEME";
     private final String KEY_PROTOCOL = "KEY_PROTOCOL";
+    private final String KEY_EMAIL = "KEY_EMAIL";
+    private final String KEY_NAME = "KEY_NAME";
+    private final String KEY_GENDER = "KEY_GENDER";
     private final String KEY_TOKEN = "KEY_TOKEN";
     private final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private final String KEY_ID = "KEY_ID";
@@ -63,11 +66,14 @@ public class PrefManager {
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
     }
 
-    public void createSession(String id,String username, String password, UserInfo userInfo){
+    public void createSession(String id,String username, String password, UserInfo userInfo,String email){
         editor.putString(KEY_ID, id);
         editor.putString(KEY_USERNAME, username);
         editor.putString(KEY_PASSWORD, password);
+        editor.putString(KEY_NAME,userInfo.getName());
+        editor.putString(KEY_GENDER,userInfo.getGender());
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
+        editor.putString(KEY_EMAIL,email);
         editor.commit();
     }
 
@@ -86,14 +92,37 @@ public class PrefManager {
         editor.commit();
     }
     public String getShowNotification(){
-        return pref.getString(KEY_NOTIFICATION,"ON");
+        return pref.getString(KEY_NOTIFICATION,"true");
     }
 
-    public void setThemeKey(String themeKey){
-        editor.putString(KEY_THEME,themeKey);
+    public void setThemeKey(Integer themeKey){
+        editor.putInt(KEY_THEME,themeKey);
         editor.commit();
     }
-    public String getThemeKey(){
-        return pref.getString(KEY_THEME,"1");
+    public Integer getThemeKey(){
+        return pref.getInt(KEY_THEME,0);
+    }
+
+    public void setNameKey(String name){
+        editor.putString(KEY_NAME,name);
+        editor.commit();
+    }
+    public void setGenderKey(String gender){
+        editor.putString(KEY_GENDER,gender);
+        editor.commit();
+    }
+    public String getNameKey(){
+        return pref.getString(KEY_NAME,null);
+    }
+    public String getGenderKey(){
+        return pref.getString(KEY_GENDER,"chose");
+    }
+
+    public void setEmailKey(String email){
+        editor.putString(KEY_EMAIL,email);
+        editor.commit();
+    }
+    public String getEmailKey(){
+        return pref.getString(KEY_EMAIL,null);
     }
 }

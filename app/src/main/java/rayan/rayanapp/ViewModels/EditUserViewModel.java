@@ -23,10 +23,10 @@ public class EditUserViewModel extends DevicesFragmentViewModel {
         super(application);
     }
 
-    public LiveData<BaseResponse> editUser(String name, String gender) {
+    public LiveData<BaseResponse> editUser(String name, String gender, String password) {
         MutableLiveData<BaseResponse> results = new MutableLiveData();
         //inja alan pass ro pas midim.dar ayande gender pas dade khahad shod
-        editUserObservable(new EditUserRequest(new UserInfo(name),gender)).subscribe(editUserObserver(results));
+        editUserObservable(new EditUserRequest(new UserInfo(name,gender),password)).subscribe(editUserObserver(results));
         return results;
     }
 

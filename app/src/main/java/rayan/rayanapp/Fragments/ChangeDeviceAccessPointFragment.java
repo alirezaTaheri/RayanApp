@@ -70,7 +70,6 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
                 });
     }
 
-
     @Override
     public void onItemClicked(NewDevice item) {
         newDevicesRecyclerViewAdapter.selectedSSID = item;

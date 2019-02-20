@@ -70,7 +70,7 @@ public class ChangePasswordFragment extends Fragment {
                         Toast.makeText(getActivity(), "تغییر رمز با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
                         if (baseResponse.getData().getUser().getRegistered().equals("true")) {
                             RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
-                            RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(),  newPassword_EditText.getText().toString(), baseResponse.getData().getUser().getUserInfo());
+                            RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(),  newPassword_EditText.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
                         }
                         Intent intent = new Intent(getActivity(), MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);

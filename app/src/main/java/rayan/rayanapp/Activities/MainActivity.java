@@ -1,28 +1,18 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
-import android.app.Activity;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -40,29 +30,16 @@ import com.polyak.iconswitch.IconSwitch;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Data.NetworkConnection;
-import rayan.rayanapp.Data.NetworkConnectionLiveData;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.MqttStatus;
-import rayan.rayanapp.Receivers.LanguageDetailsChecker;
-import rayan.rayanapp.Services.mqtt.Connection;
-import rayan.rayanapp.Util.NetworkUtil;
-import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.Wifi.WifiCypherType;
-import rayan.rayanapp.Wifi.WifiHandler;
-import rayan.rayanapp.Wifi.WifiHelper;
+import rayan.rayanapp.ViewModels.MainActivityViewModel;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus {
 
@@ -93,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+        Log.e("setting",RayanApplication.getPref().getThemeKey()+ " "+ RayanApplication.getPref().getShowNotification());
         navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
@@ -267,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(this, AddNewDeviceActivity.class));
                 break;
             case R.id.settingsActivity:
-                startActivity(new Intent(this, SettingActivity.class));
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -343,7 +321,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -461,5 +438,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         recognizer.setRecognitionListener(listener);
         recognizer.startListening(intent);
+
     }
 }

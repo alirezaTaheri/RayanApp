@@ -33,4 +33,8 @@
 
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="PreferenceScreen" parent="CustomTheme">
+        <item name="android:textColor">@color/baseColor</item>
+    </style>
+
 </resources>
