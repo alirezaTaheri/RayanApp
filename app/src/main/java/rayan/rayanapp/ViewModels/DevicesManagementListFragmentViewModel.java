@@ -62,4 +62,8 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
                 });
         return result;
     }
+
+    public void updateDevice(Device device){
+        deviceDatabase.updateDevice(device);
+    }
 }

@@ -3,6 +3,7 @@ package rayan.rayanapp.ViewHolders;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -21,6 +22,8 @@ public class DeviceViewHolderManagement extends BaseViewHolder<Device, OnDeviceC
     private final String TAG = DeviceViewHolderManagement.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;
+    @BindView(R.id.favoriteIcon)
+    SparkButton favoriteIcon;
     private List<String> waiting = new ArrayList<>();
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
@@ -32,12 +35,16 @@ public class DeviceViewHolderManagement extends BaseViewHolder<Device, OnDeviceC
 
     @Override
     public void onBind(Device item, @Nullable OnDeviceClickListenerManagement<Device> listener) {
+        Log.e("////////:" ,"This Device: " + item + "\n"+item.isFavorite());
         name.setText(item.getName1());
+        favoriteIcon.setChecked(item.isFavorite());
         if (waiting.contains(item.getChipId()))
             progressBar.setVisibility(View.VISIBLE);
         else progressBar.setVisibility(View.INVISIBLE);
         itemView.setOnClickListener(v -> {
             listener.onItemClick(item);
         });
+        favoriteIcon.setOnClickListener(v -> {
+            listener.onFavoriteIconClicked(item);});
     }
 }

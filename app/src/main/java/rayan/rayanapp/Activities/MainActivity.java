@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             try {
                 Process process = Runtime.getRuntime().exec("logcat -c");
                 process = Runtime.getRuntime().exec("logcat -f " + logFile);
-                process = Runtime.getRuntime().exec("logcat -f " + logFile2 + " *:S EditDeviceFragment:E UDPServerService:E EditGroupFragmentViewModel:E");
+//                process = Runtime.getRuntime().exec("logcat -f " + logFile2 + " *:S EditDeviceFragment:E UDPServerService:E EditGroupFragmentViewModel:E");
             } catch ( IOException e ) {
                 e.printStackTrace();
             }
@@ -363,6 +363,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        reco();
+    }
+
     private void reco(){
 
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
@@ -400,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (voiceResults == null) {
                     Log.e(TAG, "No voice results");
                 } else {
+                    Toast.makeText(MainActivity.this,voiceResults.get(0), Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Printing matches: ");
                     for (String match : voiceResults) {
                         Log.d(TAG, match);

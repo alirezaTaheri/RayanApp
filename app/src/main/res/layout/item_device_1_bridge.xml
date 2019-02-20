@@ -36,7 +36,8 @@
                     app:sparkbutton_inActiveImage="@drawable/ic_lamp_off"
                     app:sparkbutton_iconSize="50dp"
                     app:sparkbutton_primaryColor="@color/baseColor"
-                    app:sparkbutton_secondaryColor="@color/primary_dark2" />
+                    app:sparkbutton_secondaryColor="@color/primary_dark2"
+                    />
 
                 <TextView
                     android:text="Name"

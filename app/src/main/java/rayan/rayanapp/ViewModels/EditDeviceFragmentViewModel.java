@@ -5,10 +5,12 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
+import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 
+import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 
 import io.reactivex.Observable;
@@ -25,6 +27,7 @@ import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
@@ -114,8 +117,10 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     public MutableLiveData<String> zipChangeName(String id , String name, String type, String groupId, String ip){
         MutableLiveData<String> response = new MutableLiveData<>();
+        byte[] data = name.getBytes();
+        String baseName = Base64.encodeToString(data, Base64.DEFAULT);
         Observable.zip(
-                toDeviceChangeNameObservable(new ChangeNameRequest(name),ip).subscribeOn(Schedulers.io()).doOnNext(changeNameResponse -> {
+                toDeviceChangeNameObservable(new ChangeNameRequest(baseName),ip).subscribeOn(Schedulers.io()).doOnNext(changeNameResponse -> {
                     Log.e(TAG, " 00000000 ChangeNameResponse: " + changeNameResponse);
                 }),
                 editDeviceObservable(new EditDeviceRequest(id, groupId, name, type)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
@@ -238,6 +243,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
         return results;
     }
+
     private Observable<DeviceBaseResponse> toDeviceFactoryResetObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
@@ -245,7 +251,45 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
+
     private DisposableObserver<DeviceBaseResponse> toDeviceFactoryResetObserver(MutableLiveData<String> results){
+        return new DisposableObserver<DeviceBaseResponse>() {
+
+            @Override
+            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse.getCmd());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e instanceof SocketTimeoutException){
+                    results.postValue(AppConstants.SOCKET_TIME_OUT);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+    public LiveData<String> toDeviceChangeAccessPoint(String hname, String pwd, String ssid, String style, String ip){
+        final MutableLiveData<String> results = new MutableLiveData<>();
+        toDeviceChangeAccessPointObservable(new ChangeAccessPointRequest(hname, pwd, ssid, style),ip).subscribe(toDeviceChangeAccessPointObserver(results));
+        return results;
+    }
+    private Observable<DeviceBaseResponse> toDeviceChangeAccessPointObservable(ChangeAccessPointRequest changeAccessPointRequest, String ip){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .changeAccessPoint(getDeviceAddress(ip), changeAccessPointRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<DeviceBaseResponse> toDeviceChangeAccessPointObserver(MutableLiveData<String> results){
         return new DisposableObserver<DeviceBaseResponse>() {
 
             @Override
