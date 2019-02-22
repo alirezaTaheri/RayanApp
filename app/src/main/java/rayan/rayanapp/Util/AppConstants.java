@@ -44,4 +44,11 @@ public class AppConstants {
     public final static String DEVICE_STANDALONE_STYLE = "standalone";
     public final static String FACTORY_RESET = "factory_reset";
     public final static String FACTORY_RESET_DONE = "factory_reseted";
+
+    public final static String DEVICE_IS_READY_FOR_UPDATE = "ready4update?";
+    public final static String DEVICE_READY_FOR_UPDATE = "ready4update";
+    public final static String DEVICE_UPDATE_CODE_WROTE = "codes_wrote";
+    public final static String DEVICE_UPDATE_END = "update_end";
+    public final static String DEVICE_UPDATE_DONE = "updating_done";
+    public final static String DEVICE_DO_UPDATE = "update";
 }

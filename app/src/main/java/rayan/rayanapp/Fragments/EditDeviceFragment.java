@@ -1,16 +1,21 @@
 package rayan.rayanapp.Fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.databinding.ObservableInt;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,19 +25,29 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.Semaphore;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Activities.DeviceManagementListActivity;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.R;
-import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
+
 public class EditDeviceFragment extends BackHandledFragment{
-
-
+    int i=0;
+    private ArrayList<String> codeList= new ArrayList<>();
+    int startIndex=0, packetSize =150;
+    private Boolean isFirstPartSend=true;
+    String nodeResponse="";
     @BindView(R.id.name)
     EditText name;
     @BindView(R.id.onlineAccessTextView)
@@ -172,12 +187,12 @@ public class EditDeviceFragment extends BackHandledFragment{
     }
     @OnClick(R.id.factoryReset)
     void toDeviceFactoryReset(){
+        setDeviceTopicStatus(TopicStatus.CHANGING);
         editDeviceFragmentViewModel.toDeviceFactoryReset(device.getIp()).observe(this, s -> {
             assert s != null;
                 switch (s){
-                    case AppConstants.FACTORY_RESET_DONE:
-                        Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
-                        setDeviceTopicStatus(TopicStatus.CHANGED);
+                    case AppConstants.DEVICE_READY_FOR_UPDATE:
+
                         break;
                     case AppConstants.SOCKET_TIME_OUT:
                         setDeviceTopicStatus(TopicStatus.CHANGED);
@@ -186,6 +201,67 @@ public class EditDeviceFragment extends BackHandledFragment{
                 }
         });
     }
+
+    @OnClick(R.id.deviceUpdate)
+    void toDeviceUpdate(){
+        String result=  editDeviceFragmentViewModel.readFromFile();
+       convertCodeStringToList(result);
+//
+//        while(!(i > codeList.size() - 1 && !(isFirstPartSend || nodeResponse.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)))){
+            editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, codeList, device.getIp()).observe(this, res ->{
+                Log.e("response",res.toString());
+//            if (res.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
+//                                    isFirstPartSend=false;
+//                                    nodeResponse=res.toString();
+//                                    Log.e("senttttt","sent packet= "+ i+" response= "+res);
+//                                    i=i+1;
+//                                }else{
+//                                    Log.e("inner if","code not wrote truly.the response is= "+res);
+//                                    i=codeList.size()-1;
+//                                }
+           });
+//
+//        }
+
+
+//        editDeviceFragmentViewModel.toDeviceUpdate(device.getIp()).observe(this, s -> {
+//            assert s != null;
+//            switch (s){
+//                case AppConstants.DEVICE_READY_FOR_UPDATE:
+
+//                    for (int i=0; i<=codeList.size()-1 ;i++){
+//                        int sent=i;
+//                        if (isFirstPartSend || nodeResponse.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
+//                            editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, codeList.get(i), device.getIp()).observe(this, res ->{
+//                                assert res != null;
+//                                if (res.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
+//                                    isFirstPartSend=false;
+//                                    nodeResponse=res.toString();
+//                                    Log.e("senttttt","sent packet= "+ sent+" response= "+res);
+//                                }else{
+//                                    Log.e("inner if","code not wrote truly.the response is= "+res);
+//                                }
+//                 });
+//                        }else{
+//                            Log.e("outer if","conditions are not correct to work, isFirstPartSend= "+ isFirstPartSend+" nodeResponse= "+nodeResponse);
+//                        }
+//
+//                    }
+
+//                    editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, convertCodeStringToList(result), device.getIp()).observe(this, res ->{
+//                   Log.e("response",res.toString());
+//                    });
+
+//                    break;
+//                case AppConstants.SOCKET_TIME_OUT:
+//                    setDeviceTopicStatus(TopicStatus.CHANGED);
+//                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+//                    break;
+//            }
+//        });
+
+    }
+
     @OnClick(R.id.changeAccessPoint)
     void toDeviceChangeAccessPoint(){
         int PERMISSION_ALL = 1;
@@ -226,6 +302,10 @@ public class EditDeviceFragment extends BackHandledFragment{
     public enum ChangeAccessPointStatus {
         CHANGING,
         CHANGED
+    }
+    public enum UpdateStatus {
+        UPDATING,
+        UPDATED
     }
 
     public void setDeviceNameStatus(NameStatus nameStatus){
@@ -290,5 +370,23 @@ public class EditDeviceFragment extends BackHandledFragment{
                 .setNegativeButton("No", (dialog, id) -> dialog.cancel());
         final AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    public ArrayList<String> convertCodeStringToList(String result){
+        codeList.clear();
+        int j=result.length()/150;
+        Log.e("String Length/150",""+j);
+        for (int i=0;i<=j;i++){
+            if(!(result.length()-startIndex >=150)){
+                codeList.add(result.substring(startIndex, result.length()));
+            }else {
+                codeList.add(result.substring(startIndex, packetSize));
+                startIndex += 150;
+                packetSize += 150;
+            }
+        }
+        Log.e("codeList",""+codeList.toString());
+        Log.e("codeListsize",""+codeList.size());
+        return codeList;
     }
 }

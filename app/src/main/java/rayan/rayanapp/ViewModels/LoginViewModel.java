@@ -6,8 +6,13 @@ import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.TextView;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -60,7 +65,19 @@ public class LoginViewModel extends ViewModel {
             }
         };
     }
-
+    public void snackBarSetup(View view, String text){
+        Snackbar mSnackBar = Snackbar.make(view, text, Snackbar.LENGTH_SHORT);
+        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout)mSnackBar.getView();
+        layout.setPadding(0, 0, 0, 0);
+        layout.setMinimumWidth(view.getWidth());
+        TextView mainTextView = (mSnackBar.getView()).findViewById(android.support.design.R.id.snackbar_text);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+            mainTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        else
+            mainTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        mainTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        mSnackBar.show();
+    }
     public LiveData<BaseResponse> getLoginResponse(){
         return loginResponse;
     }

@@ -4,13 +4,17 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.BindView;
@@ -70,11 +74,12 @@ public class LoginActivity extends AppCompatActivity {
             String phoneNumber = phoneEditText.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
             if (phoneNumber.length() == 0 | password.length() == 0) {
-                Toast.makeText(getApplicationContext(), "لطفا اطلاعات خود را کامل وارد کنید", Toast.LENGTH_SHORT).show();
+                loginViewModel.snackBarSetup(findViewById(android.R.id.content),"لطفا اطلاعات خود را کامل وارد کنید");
             } else
                 loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString());
         } else {
             Toast.makeText(this, "لطفا اتصال خود به اینترنت را چک کنید", Toast.LENGTH_SHORT).show();
         }
     }
+
 }
