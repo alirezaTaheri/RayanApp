@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,6 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
@@ -55,6 +57,8 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+            }else {
+                Log.e("login msg",baseResponse.getData().getMessage());
             }
 
         });
@@ -74,11 +78,10 @@ public class LoginActivity extends AppCompatActivity {
             String phoneNumber = phoneEditText.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
             if (phoneNumber.length() == 0 | password.length() == 0) {
-                loginViewModel.snackBarSetup(findViewById(android.R.id.content),"لطفا اطلاعات خود را کامل وارد کنید");
-            } else
-                loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString());
-        } else {
-            Toast.makeText(this, "لطفا اتصال خود به اینترنت را چک کنید", Toast.LENGTH_SHORT).show();
+                SnackBarSetup.snackBarSetup(findViewById(android.R.id.content),"لطفا اطلاعات خود را کامل وارد کنید");
+            } else {
+                loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString());}} else {
+            SnackBarSetup.snackBarSetup(findViewById(android.R.id.content),"لطفا اتصال خود به اینترنت را چک کنید");
         }
     }
 

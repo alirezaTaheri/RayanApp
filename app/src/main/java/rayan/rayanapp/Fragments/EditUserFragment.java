@@ -26,6 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.ViewModels.EditUserViewModel;
 
@@ -42,7 +43,7 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
     EditText phoneEditText;
     EditUserViewModel editUserViewModel;
     String gender;
-
+    String name;
     public static EditUserFragment newInstance(String param1, String param2) {
         EditUserFragment fragment = new EditUserFragment();
         fragment.setArguments(new Bundle());
@@ -66,7 +67,8 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
     public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
         switch(position) {
             case 0:
-                Toast.makeText(getActivity(), "لطفا یک مورد را انتخاب کنید", Toast.LENGTH_SHORT).show();
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مورد را انتخاب کنید");
+                gender=null;
                 break;
             case 1:
                 gender="Male";
@@ -92,21 +94,25 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
 
     @OnClick(R.id.edituser_submitbtn)
     void clickOnSubmit() {
-       if ((nameEditText.getText().toString() != null && !nameEditText.getText().toString().isEmpty())&& (gender != null && !gender.isEmpty())) {
-        editUserViewModel.editUser(nameEditText.getText().toString(), gender , RayanApplication.getPref().getPassword()).observe(this, baseResponse -> {
+        name=nameEditText.getText().toString();
+       if ((name != null && !name.isEmpty())&& (gender != null && !gender.isEmpty())) {
+        editUserViewModel.editUser(name, gender , RayanApplication.getPref().getPassword()).observe(this, baseResponse -> {
              if (baseResponse.getStatus().getCode().equals("200")){
-                Toast.makeText(getActivity(), "تغییر اطلاعات با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
-                RayanApplication.getPref().setNameKey(nameEditText.getText().toString());
+                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"تغییر اطلاعات با موفقیت انجام شد");
+                RayanApplication.getPref().setNameKey(name);
                 RayanApplication.getPref().setGenderKey(gender);
-                Log.e("settttt",nameEditText.getText().toString()+" "+gender);
+                Log.e("settttt",name+" "+gender);
             }
             else {
                  Log.e(TAG, "edit user problem: " + baseResponse.getStatus().getCode());
-                 Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
              }
-        });}else {
-            Toast.makeText(getActivity(), "جنسیت و نام را مشخص کنید", Toast.LENGTH_SHORT).show();
-        }
+        });}else if (name != null && !name.isEmpty()) {
+           SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا جنسیت خود را وارد کنید");
+           }else if (gender != null && !gender.isEmpty()) {
+           SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام خود را انتخاب کنید");
+       }
+
            }
 
     @Override
@@ -128,6 +134,13 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
     public void setDefaultValues(){
         genderSpinner.setItems("جنسیت","مرد", "زن");
         genderSpinner.setOnItemSelectedListener(this);
+
+        if (!RayanApplication.getPref().getGenderKey().equals("close")){
+            gender=RayanApplication.getPref().getGenderKey();
+        }
+        if (RayanApplication.getPref().getNameKey()!=null){
+            name=RayanApplication.getPref().getNameKey();
+        }
         switch(RayanApplication.getPref().getGenderKey()) {
             case "Male":
                 genderSpinner.setSelectedIndex(1);

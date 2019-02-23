@@ -39,6 +39,7 @@ import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
@@ -138,12 +139,12 @@ public class EditDeviceFragment extends BackHandledFragment{
             assert s != null;
             switch (s){
                 case AppConstants.SET_TOPIC_MQTT_Response:
-                    Toast.makeText(getActivity(), "دسترسی اینترنتی با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دسترسی اینترنتی با موفقیت ایجاد شد");
                     setDeviceTopicStatus(TopicStatus.CHANGED);
                     break;
                 case AppConstants.SOCKET_TIME_OUT:
                     setDeviceTopicStatus(TopicStatus.CHANGED);
-                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
                     break;
             }
         });
@@ -156,30 +157,30 @@ public class EditDeviceFragment extends BackHandledFragment{
             switch (s){
                 case AppConstants.FORBIDDEN:
                     editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(), device.getIp());
-                    Toast.makeText(getActivity(), "شما دسترسی لازم برای تغییر نام را ندارید", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما دسترسی لازم برای تغییر نام را ندارید");
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.CHANGE_NAME_FALSE:
                     editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId());
-                    Toast.makeText(getActivity(), "امکان ویرایش نام وجود ندارد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"امکان ویرایش نام وجود ندارد");
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.OPERATION_DONE:
                     setDeviceNameStatus(NameStatus.CHANGED);
-                    Toast.makeText(getActivity(), "ویرایش نام با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"ویرایش نام با موفقیت انجام شد");
                     editDeviceFragmentViewModel.getGroups();
                     break;
                 case AppConstants.SOCKET_TIME_OUT:
-                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
                     editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(),device.getIp());
                     editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId());
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.ERROR:
-                    Toast.makeText(getActivity(), "خطایی رخ داد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطایی رخ داد");
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
@@ -196,8 +197,7 @@ public class EditDeviceFragment extends BackHandledFragment{
 
                         break;
                     case AppConstants.SOCKET_TIME_OUT:
-                        setDeviceTopicStatus(TopicStatus.CHANGED);
-                        Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                        setDeviceTopicStatus(TopicStatus.CHANGED); SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
                         break;
                 }
         });
@@ -205,69 +205,21 @@ public class EditDeviceFragment extends BackHandledFragment{
 
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
-        String result=  editDeviceFragmentViewModel.readFromFile();
-       convertCodeStringToList(result);
-        List<String> codes = new ArrayList<>();
-        codes.add("1111111111");
-        codes.add("22222222222");
-        codes.add("3333333333");
-        codes.add("444444444444");
-        codes.add("55555555555");
-//
-//        while(!(i > codeList.size() - 1 && !(isFirstPartSend || nodeResponse.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)))){
-            editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, codes, device.getIp()).observe(this, res ->{
-                Log.e("response",res.toString());
-//            if (res.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
-//                                    isFirstPartSend=false;
-//                                    nodeResponse=res.toString();
-//                                    Log.e("senttttt","sent packet= "+ i+" response= "+res);
-//                                    i=i+1;
-//                                }else{
-//                                    Log.e("inner if","code not wrote truly.the response is= "+res);
-//                                    i=codeList.size()-1;
-//                                }
-           });
-//
-//        }
-
-
-//        editDeviceFragmentViewModel.toDeviceUpdate(device.getIp()).observe(this, s -> {
-//            assert s != null;
-//            switch (s){
-//                case AppConstants.DEVICE_READY_FOR_UPDATE:
-
-//                    for (int i=0; i<=codeList.size()-1 ;i++){
-//
-//                        int sent=i;
-//                        if (isFirstPartSend || nodeResponse.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
-//                            editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, codeList.get(i), device.getIp()).observe(this, res ->{
-//                                assert res != null;
-//                                if (res.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
-//                                    isFirstPartSend=false;
-//                                    nodeResponse=res.toString();
-//                                    Log.e("senttttt","sent packet= "+ sent+" response= "+res);
-//                                }else{
-//                                    Log.e("inner if","code not wrote truly.the response is= "+res);
-//                                }
-//                            });
-//                        }else{
-//                            Log.e("outer if","conditions are not correct to work, isFirstPartSend= "+ isFirstPartSend+" nodeResponse= "+nodeResponse);
-//                        }
-//
-//
-//                    }
-
-//                    editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, convertCodeStringToList(result), device.getIp()).observe(this, res ->{
-//                   Log.e("response",res.toString());
-//                    });
-
-//                    break;
-//                case AppConstants.SOCKET_TIME_OUT:
-//                    setDeviceTopicStatus(TopicStatus.CHANGED);
-//                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
-//                    break;
-//            }
-//        });
+        editDeviceFragmentViewModel.toDeviceUpdate(device.getIp()).observe(this, s -> {
+            assert s != null;
+            switch (s){
+                case AppConstants.DEVICE_READY_FOR_UPDATE:
+                    String result=  editDeviceFragmentViewModel.readFromFile();
+                    convertCodeStringToList(result);
+                    editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, convertCodeStringToList(result), device.getIp()).observe(this, res ->{
+                    Log.e("response",res.toString());
+                    });
+                    break;
+                case AppConstants.SOCKET_TIME_OUT:
+                    setDeviceTopicStatus(TopicStatus.CHANGED); SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
+                    break;
+            }
+        });
 
     }
     @OnClick(R.id.changeAccessPoint)

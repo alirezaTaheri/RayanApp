@@ -38,6 +38,7 @@ import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.NetworkUtil;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 
@@ -135,13 +136,13 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     @Override
     public void successful() {
         connectionStatus = ConnectionStatus.SUCCESSFUL;
-        Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"باموفقیت متصل شد");
     }
 
     @Override
     public void failure() {
         connectionStatus = ConnectionStatus.FAILURE;
-        Toast.makeText(getActivity(), "اتصال ناموفق بود لطفا دوباره تلاش کنید", Toast.LENGTH_SHORT).show();
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"اتصال ناموفق بود. لطفا دوباره تلاش کنید");
     }
 
     @Override
@@ -157,7 +158,7 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
 
     @Override
     public void connectToSame() {
-        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"در حال حاضر به این دستگاه متصل هستید");
     }
 
     @Override

@@ -22,6 +22,7 @@
     <string name="text_sign_in_button">ورود</string>
     <string name="text_forgot_pass_hint">فراموشی رمز عبور</string>
     <string name="text_sign_up_button">ثبت نام</string>
+    <string name="leave_group_button">ترک گروه</string>
     <string name="title_deviceManagementActivity">مدیریت دستگاه‌ها</string>
 
 

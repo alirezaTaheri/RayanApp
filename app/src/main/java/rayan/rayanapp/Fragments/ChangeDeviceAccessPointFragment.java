@@ -29,6 +29,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.ChangeDeviceAccessPointFragmentViewModel;
 
 public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment implements OnNewDeviceClicked<AccessPoint> {
@@ -88,10 +89,12 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
     @OnClick(R.id.confirm)
     void confirm(){
         if (TextUtils.isEmpty(password.getText().toString())){
-            Toast.makeText(getActivity(), "لطفا رمزعبور را وارد کنید", Toast.LENGTH_SHORT).show();
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا رمزعبور را وارد کنید");
+
         }
         else if (selectedAccessPoint == null){
-            Toast.makeText(getActivity(), "لطفا یک مودم را انتخاب کنید", Toast.LENGTH_SHORT).show();
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مودم را انتخاب کنید");
+
         } else {
             if (getActivity() instanceof AddNewDeviceActivity){
                 ((AddNewDeviceActivity) getActivity()).getNewDevice().setSsid(selectedAccessPoint.getSSID());

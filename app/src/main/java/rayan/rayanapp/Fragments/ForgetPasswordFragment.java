@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.ForgetPasswordViewModel;
 
 public class ForgetPasswordFragment extends Fragment {
@@ -50,13 +51,10 @@ public class ForgetPasswordFragment extends Fragment {
             forgetPasswordViewModel.forgetPassword(phone_forgetpass_EditText.getText().toString(),
                     email_forgetpass_EditText.getText().toString()).observe(this, baseResponse -> {
                 if (baseResponse.getStatus().getCode().equals("200")) {
-                    Toast.makeText(getActivity(), "با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
-
                    // RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(),  password_register_EditText.getText().toString(), baseResponse.getData().getUser().getUserInfo());
                   //  forgetPasswordViewModel.login();
                     Bundle bundle = new Bundle();
                     bundle.putString("user",phone_forgetpass_EditText.getText().toString());
-
                     ChangePasswordFragment changePasswordFragment= new ChangePasswordFragment();
                     changePasswordFragment.setArguments(bundle);
                     getActivity().getSupportFragmentManager().beginTransaction()
@@ -64,12 +62,17 @@ public class ForgetPasswordFragment extends Fragment {
                             .addToBackStack(null)
                             .commit();
                 } else if (baseResponse.getStatus().getCode().equals("404")) {
-                    Toast.makeText(getActivity(), "شما باید ثبت نام کنید", Toast.LENGTH_SHORT).show();
-                } else if (baseResponse.getStatus().getCode().equals("422")) {
-                    Toast.makeText(getActivity(), "برای بازیابی رمز فیلد ها را پر کنید", Toast.LENGTH_SHORT).show();
-                } else {
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما باید ثبت نام کنید");
+                }
+                else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter mobile number")) {
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شماره تلفن خود را وارد کنید");
+                }
+                else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter email")) {
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"ایمیل خود را وارد کنید");
+                }
+                else {
                     Log.e(TAG, "edit user problem: " + baseResponse.getStatus().getCode());
-                    Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
                 }
             });
     }
