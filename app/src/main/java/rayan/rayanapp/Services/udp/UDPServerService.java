@@ -178,7 +178,7 @@ public class UDPServerService extends Service {
         };
         thread.start();
         sendUDPMessage = new SendUDPMessage();
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override

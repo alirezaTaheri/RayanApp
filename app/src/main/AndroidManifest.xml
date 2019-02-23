@@ -47,7 +47,7 @@
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
         <activity
-            android:name=".Activities.DeviceManagementListActivity"
+            android:name=".Activities.DeviceManagementActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/CustomTheme" />
         <activity

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/RayanApp.iml" filepath="$PROJECT_DIR$/RayanApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/rayanv2.iml" filepath="$PROJECT_DIR$/rayanv2.iml" />
     </modules>

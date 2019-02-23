@@ -2,6 +2,7 @@ package rayan.rayanapp.Retrofit;
 
 import io.reactivex.Observable;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ChangePasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateGroupRequest;
@@ -12,6 +13,8 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
@@ -82,8 +85,16 @@ public interface ApiService {
     @POST("api/v2/users/changepass")
     Observable<BaseResponse> changePassword(@Header("Authorization") String token, @Body ChangePasswordRequest changePasswordRequest);
 
+    @POST("api/v2/users")
+    Observable<DeviceResponse> registerDevice(@Header("Authorization") String token, @Body RegisterDeviceRequest registerDeviceRequest);
+
+    @POST("api/v2/groups/adduser")
+    Observable<BaseResponse> addDeviceToGroup(@Header("Authorization") String token, @Body AddDeviceToGroupRequest addDeviceToGroupRequest);
+
     @POST
     Observable<ChangeNameResponse> changeName(@Url String url, @Body ChangeNameRequest changeNameRequest);
+    @POST
+    Observable<DeviceBaseResponse> ITET(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST
     Observable<DeviceBaseResponse> factoryReset(@Url String url, @Body BaseRequest baseRequest);
     //

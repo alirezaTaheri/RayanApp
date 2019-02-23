@@ -27,6 +27,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -249,6 +250,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
+    @SuppressLint("CheckResult")
     public LiveData<String> toDeviceFactoryReset(String ip){
         final MutableLiveData<String> results = new MutableLiveData<>();
         toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
@@ -262,7 +264,6 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
     private DisposableObserver<DeviceBaseResponse> toDeviceFactoryResetObserver(MutableLiveData<String> results){
         return new DisposableObserver<DeviceBaseResponse>() {
 
@@ -497,10 +498,21 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
 
     @SuppressLint("CheckResult")
-    public LiveData<String> toDeviceDoUpdate(String cmd, ArrayList<String> codeList, String ip){
+    public LiveData<String> toDeviceDoUpdate(String cmd, List<String> codeList, String ip){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        Observable.fromIterable(codeList).switchMap(s -> toDeviceDoUpdateObservable(new UpdateDeviceRequest(cmd,s),ip))
-                .takeWhile(deviceBaseResponse -> deviceBaseResponse.getCmd().equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)).subscribe(toDeviceDoUpdateObserver(results));
+
+       // Observable.fromIterable(codeList).switchMap(s -> toDeviceDoUpdateObservable(new UpdateDeviceRequest(cmd,s),ip))
+         //       .takeWhile(deviceBaseResponse -> deviceBaseResponse.getCmd().equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)).subscribe(toDeviceDoUpdateObserver(results));
+
+        Observable.fromIterable(codeList)
+                .concatMap(s -> toDeviceDoUpdateObservable(new UpdateDeviceRequest(cmd,s),ip))
+                .takeWhile(deviceBaseResponse -> {
+                    Log.e("////////////" ," ////////: "+ deviceBaseResponse);
+                    if(deviceBaseResponse.getCmd().equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
+                        return true;
+                    }
+                    return false;
+                }).subscribe(toDeviceDoUpdateObserver(results));
         return results;
     }
 

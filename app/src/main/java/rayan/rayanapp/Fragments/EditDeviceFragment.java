@@ -29,12 +29,13 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rayan.rayanapp.Activities.DeviceManagementListActivity;
+import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -83,7 +84,7 @@ public class EditDeviceFragment extends BackHandledFragment{
     @Override
     public boolean onBackPressed() {
         editDeviceFragmentViewModel.toDeviceEndSettings(device.getIp());
-        ((DeviceManagementListActivity)getActivity()).setActionBarTitle();
+        ((DeviceManagementActivity)getActivity()).setActionBarTitle();
         getActivity().getSupportFragmentManager().popBackStack();
         return true;
     }
@@ -206,9 +207,15 @@ public class EditDeviceFragment extends BackHandledFragment{
     void toDeviceUpdate(){
         String result=  editDeviceFragmentViewModel.readFromFile();
        convertCodeStringToList(result);
+        List<String> codes = new ArrayList<>();
+        codes.add("1111111111");
+        codes.add("22222222222");
+        codes.add("3333333333");
+        codes.add("444444444444");
+        codes.add("55555555555");
 //
 //        while(!(i > codeList.size() - 1 && !(isFirstPartSend || nodeResponse.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)))){
-            editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, codeList, device.getIp()).observe(this, res ->{
+            editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, codes, device.getIp()).observe(this, res ->{
                 Log.e("response",res.toString());
 //            if (res.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
 //                                    isFirstPartSend=false;

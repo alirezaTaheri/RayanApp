@@ -8,6 +8,16 @@ public class AppConstants {
     public final static int HTTP_TO_DEVICE_PORT = 3000;
     public final static String MQTT_HOST = "api.rayansmarthome.ir";
     public final static String MQTT_PORT = "1883";
+    //New Devices
+    public final static String NEW_DEVICE_TYPE_SWITCH = "switch";
+    public final static String NEW_DEVICE_TYPE_PLUG = "plug";
+    public final static String NEW_DEVICE_ITET = "ITET";
+    public final static String NEW_DEVICE_config = "config";
+    public final static String PRIMARY_CONFIG_TRUE = "primary_config_true";
+    public final static String PRIMARY_CONFIG_FALSE = "primary_config_false";
+    public final static String EXPIRED = "EXPIRED";
+    public final static String NEW_DEVICE_IP = "192.168.137.1";
+
     //Messages
     public final static String TO_DEVICE_NODE = "NODE?";
     public final static String TO_DEVICE_TLMS = "TLMS";

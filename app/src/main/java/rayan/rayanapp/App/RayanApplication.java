@@ -22,6 +22,7 @@ import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
 import rayan.rayanapp.Receivers.LanguageDetailsChecker;
 import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
+import rayan.rayanapp.RxBus.NetworkConnectionBus;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.RxBus.WifiScanResultsBus;
@@ -34,6 +35,7 @@ public class RayanApplication extends Application {
     private JsonMaker jsonMaker;
     private static PrefManager pref;
     private NetworkConnectionLiveData networkConnectionLiveData;
+    private NetworkConnectionBus networkBus;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -50,6 +52,7 @@ public class RayanApplication extends Application {
 //        intentFilter.addAction("android.net.wifi.WIFI_STATE_CHANGED");
 //        registerReceiver(networkReceiver,intentFilter);
         networkConnectionLiveData = new NetworkConnectionLiveData(this);
+        networkBus = new NetworkConnectionBus();
         context = this;
         bus = new UDPMessageRxBus();
         pref = new PrefManager();
@@ -64,6 +67,10 @@ public class RayanApplication extends Application {
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
 
+    }
+
+    public NetworkConnectionBus getNetworkBus() {
+        return networkBus;
     }
 
     public WifiScanResultsBus getWifiBus() {

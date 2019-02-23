@@ -5,36 +5,39 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Activities.AddNewDeviceActivity;
+import rayan.rayanapp.Adapters.recyclerView.AccessPointsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.NewDevicesRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.ChangeDeviceAccessPointFragmentViewModel;
 
-public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment implements OnNewDeviceClicked<NewDevice> {
-    private NewDevice selectedSSID;
+public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment implements OnNewDeviceClicked<AccessPoint> {
+    public AccessPoint selectedAccessPoint;
     @BindView(R.id.password)
     EditText password;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    NewDevicesRecyclerViewAdapter newDevicesRecyclerViewAdapter;
+    AccessPointsRecyclerViewAdapter accessPointsRecyclerViewAdapter;
     ChangeDeviceAccessPointFragmentViewModel viewModel;
 
     public static ChangeDeviceAccessPointFragment newInstance() {
@@ -57,23 +60,50 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
         ButterKnife.bind(this, view);
         viewModel = ViewModelProviders.of(this).get(ChangeDeviceAccessPointFragmentViewModel.class);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        newDevicesRecyclerViewAdapter = new NewDevicesRecyclerViewAdapter(getActivity());
-        recyclerView.setAdapter(newDevicesRecyclerViewAdapter);
-        newDevicesRecyclerViewAdapter.setItems(viewModel.getSSIDs());
-        newDevicesRecyclerViewAdapter.setListener(this);
+        accessPointsRecyclerViewAdapter = new AccessPointsRecyclerViewAdapter(getActivity(), (ChangeDeviceAccessPointFragment)this);
+        recyclerView.setAdapter(accessPointsRecyclerViewAdapter);
+        accessPointsRecyclerViewAdapter.setItems(viewModel.getSSIDs());
+        accessPointsRecyclerViewAdapter.setListener(this);
         ((RayanApplication) getActivity().getApplication()).getWifiBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(scanResults -> {
-                    List<NewDevice> newDevices = new ArrayList<>();
+                    List<AccessPoint> newDevices = new ArrayList<>();
                     for (int a = 0; a < scanResults.size(); a++)
-                        newDevices.add(new NewDevice(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities, scanResults.get(a).level));
-                    newDevicesRecyclerViewAdapter.setItems(newDevices);
+                        newDevices.add(new AccessPoint(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities, scanResults.get(a).level));
+                    accessPointsRecyclerViewAdapter.setItems(newDevices);
                 });
     }
 
+    @Override
+    public void onItemClicked(AccessPoint item) {
+            selectedAccessPoint = item;
+            accessPointsRecyclerViewAdapter.notifyDataSetChanged();
+
+    }
 
     @Override
-    public void onItemClicked(NewDevice item) {
-        newDevicesRecyclerViewAdapter.selectedSSID = item;
-        newDevicesRecyclerViewAdapter.notifyDataSetChanged();
+    public void onTestDeviceClicked(AccessPoint item) {
+
+    }
+
+    @OnClick(R.id.confirm)
+    void confirm(){
+        if (TextUtils.isEmpty(password.getText().toString())){
+            Toast.makeText(getActivity(), "لطفا رمزعبور را وارد کنید", Toast.LENGTH_SHORT).show();
+        }
+        else if (selectedAccessPoint == null){
+            Toast.makeText(getActivity(), "لطفا یک مودم را انتخاب کنید", Toast.LENGTH_SHORT).show();
+        } else {
+            if (getActivity() instanceof AddNewDeviceActivity){
+                ((AddNewDeviceActivity) getActivity()).getNewDevice().setSsid(selectedAccessPoint.getSSID());
+                ((AddNewDeviceActivity) getActivity()).getNewDevice().setPwd(password.getText().toString());
+            }
+            dismiss();
+        }
+
+    }
+
+    @OnClick(R.id.cancel)
+    void cancel(){
+        dismiss();
     }
 }

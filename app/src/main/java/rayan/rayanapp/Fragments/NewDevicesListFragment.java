@@ -17,6 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.stepstone.stepper.Step;
+import com.stepstone.stepper.VerificationError;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +32,7 @@ import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Adapters.recyclerView.NewDevicesRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Listeners.ConnectingToTarget;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
@@ -38,7 +41,7 @@ import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 
-public class NewDevicesListFragment extends Fragment implements OnNewDeviceClicked<NewDevice>, ConnectingToTarget , View.OnClickListener{
+public class NewDevicesListFragment extends Fragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, Step {
 
     private final String TAG = NewDevicesListFragment.class.getSimpleName();
     private NewDevicesListViewModel viewModel;
@@ -89,9 +92,9 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
         ((RayanApplication)getActivity().getApplication()).getWifiBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(scanResults -> {
                     this.idle();
-                    List<NewDevice> newDevices = new ArrayList<>();
+                    List<AccessPoint> newDevices = new ArrayList<>();
                     for (int a = 0;a<scanResults.size();a++)
-                        newDevices.add(new NewDevice(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities,scanResults.get(a).level));
+                        newDevices.add(new AccessPoint(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities,scanResults.get(a).level));
                     newDevicesRecyclerViewAdapter.setItems(newDevices);
                 });
         viewModel.scan();
@@ -107,7 +110,13 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     }
 
     @Override
-    public void onItemClicked(NewDevice item) {
+    public void onItemClicked(AccessPoint item) {
+        ((AddNewDeviceActivity)getActivity()).selectedNewDevice = item;
+        newDevicesRecyclerViewAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onTestDeviceClicked(AccessPoint item) {
         currentSSID = getCurrentSSID();
         Log.e(TAG, "Item: " + item + "\nCurrent SSID: " + currentSSID);
         if (!currentSSID.equals(item.getSSID())){
@@ -163,6 +172,22 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     void search(){
         viewModel.scan();
         this.searching();
+    }
+
+    @Nullable
+    @Override
+    public VerificationError verifyStep() {
+        return null;
+    }
+
+    @Override
+    public void onSelected() {
+
+    }
+
+    @Override
+    public void onError(@NonNull VerificationError error) {
+
     }
 
     private enum ConnectionStatus{

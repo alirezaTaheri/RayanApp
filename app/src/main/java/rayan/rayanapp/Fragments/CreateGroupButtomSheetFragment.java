@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.CreateGroupViewModel;
 
@@ -74,8 +75,9 @@ public class CreateGroupButtomSheetFragment extends BottomSheetDialogFragment {
             }
             else if (baseResponse.getStatus().getCode().equals("200")){
                 Toast.makeText(getActivity(), "گروه با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
-                getActivity().onBackPressed();
+//                getActivity().onBackPressed();
                 dismiss();
+                ((DoneWithFragment)getActivity()).operationDone();
             }
             else
                 Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
