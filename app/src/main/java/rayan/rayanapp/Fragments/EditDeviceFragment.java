@@ -230,6 +230,7 @@ public class EditDeviceFragment extends BackHandledFragment{
 //                case AppConstants.DEVICE_READY_FOR_UPDATE:
 
 //                    for (int i=0; i<=codeList.size()-1 ;i++){
+//
 //                        int sent=i;
 //                        if (isFirstPartSend || nodeResponse.equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
 //                            editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, codeList.get(i), device.getIp()).observe(this, res ->{
@@ -241,10 +242,11 @@ public class EditDeviceFragment extends BackHandledFragment{
 //                                }else{
 //                                    Log.e("inner if","code not wrote truly.the response is= "+res);
 //                                }
-//                 });
+//                            });
 //                        }else{
 //                            Log.e("outer if","conditions are not correct to work, isFirstPartSend= "+ isFirstPartSend+" nodeResponse= "+nodeResponse);
 //                        }
+//
 //
 //                    }
 
@@ -261,7 +263,6 @@ public class EditDeviceFragment extends BackHandledFragment{
 //        });
 
     }
-
     @OnClick(R.id.changeAccessPoint)
     void toDeviceChangeAccessPoint(){
         int PERMISSION_ALL = 1;

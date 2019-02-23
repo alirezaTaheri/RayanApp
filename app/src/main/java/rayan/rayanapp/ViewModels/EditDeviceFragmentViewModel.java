@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -498,12 +499,8 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     @SuppressLint("CheckResult")
     public LiveData<String> toDeviceDoUpdate(String cmd, ArrayList<String> codeList, String ip){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        Observable.fromIterable(codeList).flatMap(s -> toDeviceDoUpdateObservable(new UpdateDeviceRequest(cmd,s),ip))
-                .takeWhile(deviceBaseResponse -> {
-                    if(!(deviceBaseResponse.getCmd().equals(AppConstants.DEVICE_UPDATE_CODE_WROTE))){
-                        return false;}
-                    return false;
-                }).subscribe(toDeviceDoUpdateObserver(results));
+        Observable.fromIterable(codeList).switchMap(s -> toDeviceDoUpdateObservable(new UpdateDeviceRequest(cmd,s),ip))
+                .takeWhile(deviceBaseResponse -> deviceBaseResponse.getCmd().equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)).subscribe(toDeviceDoUpdateObserver(results));
         return results;
     }
 
@@ -512,8 +509,8 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 //    toDeviceDoUpdateObservable(new UpdateDeviceRequest(cmd,code),ip).subscribe(toDeviceDoUpdateObserver(results));
 //    return results;
 //}
-
-
+//
+//
 //@SuppressLint("CheckResult")
 //public LiveData<String> toDeviceDoUpdate(String cmd, ArrayList<String> codeList, String ip ){
 //    final MutableLiveData<String> results = new MutableLiveData<>();
@@ -542,6 +539,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 //            .concatMap(s -> toDeviceDoUpdateObservable(new UpdateDeviceRequest(cmd,s),ip)).subscribe(toDeviceDoUpdateObserver(results));
 //    return results;
 //}
+
     private Observable<DeviceBaseResponse> toDeviceDoUpdateObservable(UpdateDeviceRequest updateDeviceRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService.factoryDoUpdate("http://10.0.3.2/doit.php", updateDeviceRequest)
