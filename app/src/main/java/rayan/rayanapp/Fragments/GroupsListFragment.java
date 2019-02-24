@@ -74,31 +74,8 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
 
     @Override
     public void onGroupLongPress(Group Item) {
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(getActivity());
-        }
-        builder
-                .setMessage("آیا میخواهید این گروه را حذف کنید؟")
-                .setPositiveButton("بله", (dialog, which) -> {
-                    groupsListFragmentViewModel.deleteGroup(Item.getId()).observe(this, baseResponse -> {
-                        if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
-                            Toast.makeText(getActivity(), "این گروه وجود ندارد", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().equals("Repeated")){
-                            Toast.makeText(getActivity(), "شما قادر به حذف این گروه نیستید", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (baseResponse.getStatus().getCode().equals("204")){
-                            Toast.makeText(getActivity(), "گروه با موفقیت حذف شد", Toast.LENGTH_SHORT).show();
-                            groupsListFragmentViewModel.getGroups();
-                        }
-                        else
-                            Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
-                    });
-                })
-                .show();
+        RemoveGroupButtomSheetFragment bottomSheetFragment = new RemoveGroupButtomSheetFragment().newInstance(Item.getId());
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
     @OnClick(R.id.createGroup)
     void createGroup(){

@@ -15,6 +15,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
@@ -96,6 +97,11 @@ public interface ApiService {
     Observable<DeviceBaseResponse> ITET(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST
     Observable<DeviceBaseResponse> factoryReset(@Url String url, @Body BaseRequest baseRequest);
+    //
+    @POST
+    Observable<DeviceBaseResponse> deviceUpdate(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<DeviceBaseResponse> factoryDoUpdate(@Url String url, @Body UpdateDeviceRequest updateDeviceRequest);
     @POST
     Observable<DeviceBaseResponse> changeAccessPoint(@Url String url, @Body ChangeAccessPointRequest changeAccessPointRequest);
     @POST
