@@ -1,5 +1,7 @@
 package rayan.rayanapp.Data;
 
+import android.app.Activity;
+import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,14 +9,24 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 
+import java.util.Objects;
+
+import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Fragments.NewDevicesListFragment;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.NetworkUtil;
 
 public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
     private Context context;
 
+    WifiManager wifiManager;
+    WifiInfo wifiInfo;
     public NetworkConnectionLiveData(Context context) {
         this.context = context;
+        wifiManager = (WifiManager) Objects.requireNonNull(context).getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
     @Override
@@ -41,6 +53,9 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
                 if(isConnected) {
                     switch (activeNetwork.getType()){
                         case ConnectivityManager.TYPE_WIFI:
+                            String status = NetworkUtil.getConnectivityStatusString(context);
+                            if (status.equals(AppConstants.WIFI))
+                                ((RayanApplication)((Application)context)).getNetworkBus().send(getCurrentSSID());
                             postValue(new NetworkConnection(AppConstants.WIFI_NETWORK,true));
                             break;
                         case ConnectivityManager.TYPE_MOBILE:
@@ -53,4 +68,12 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
             }
         }
     };
+        private String getCurrentSSID(){
+            wifiInfo = wifiManager.getConnectionInfo();
+            String currentSSID  = wifiInfo.getSSID();
+            if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
+                currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
+            }
+            return currentSSID;
+        }
 }

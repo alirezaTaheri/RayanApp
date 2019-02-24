@@ -6,7 +6,7 @@
     android:paddingTop="10dp"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context=".Activities.DeviceManagementListActivity">
+    tools:context=".Activities.DeviceManagementActivity">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_marginRight="20dp"

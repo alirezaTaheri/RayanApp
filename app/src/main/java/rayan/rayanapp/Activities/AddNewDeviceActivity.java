@@ -1,6 +1,5 @@
 package rayan.rayanapp.Activities;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,49 +7,76 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.stepstone.stepper.StepperLayout;
+
 import java.util.Objects;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Fragments.NewDevicesListFragment;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import rayan.rayanapp.Adapters.viewPager.AddNewDeviceStepperAdapter;
+import rayan.rayanapp.Data.AccessPoint;
+import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Fragments.BackHandledFragment;
+import rayan.rayanapp.Fragments.NewDeviceSetConfigurationFragment;
+import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.WifiScanReceiver;
-import rayan.rayanapp.RxBus.WifiScanResultsBus;
+import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Wifi.WifiHandler;
 
-public class AddNewDeviceActivity extends AppCompatActivity {
+public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment {
     private final String TAG = AddNewDeviceActivity.class.getSimpleName();
     private WifiHandler wifiHandler;
     WifiScanReceiver wifiReceiver;
+    @BindView(R.id.stepperLayout)
+    StepperLayout stepperLayout;
+    AddNewDeviceStepperAdapter stepperAdapter;
+    public FragmentTransaction fragmentTransaction;
+    private FragmentManager fragmentManager;
+    public AccessPoint selectedNewDevice, selectedAccessPoint;
+    public Group selectedGroup;
+    BackHandledFragment currentFragment;
+    private SetPrimaryConfigRequest setPrimaryConfigRequest;
+    private NewDevice newDevice;
     @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_device);
+        newDevice = new NewDevice();
+        newDevice.setSsid("testSSID");
+        newDevice.setChip_id("132465");
+        Topic t = new Topic();
+        t.setTopic("THIS IS THE TEST TOPIC");
+        newDevice.setTopic(t);
+        setPrimaryConfigRequest = new SetPrimaryConfigRequest();
+        ButterKnife.bind(this);
+        stepperAdapter = new AddNewDeviceStepperAdapter(getSupportFragmentManager(), this);
+        stepperLayout.setAdapter(stepperAdapter);
+
+        fragmentManager = getSupportFragmentManager();
+        fragmentTransaction = fragmentManager.beginTransaction();
+
         setActionBarTitle("افزودن دستگاه جدید");
         wifiReceiver = new WifiScanReceiver();
         wifiHandler = new WifiHandler();
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, NewDevicesListFragment.newInstance())
-                    .commitNow();
-        }
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.container, NewDevicesListFragment.newInstance())
+//                    .commitNow();
+//        }
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
                 android.Manifest.permission.CHANGE_WIFI_STATE,
@@ -136,5 +162,31 @@ public class AddNewDeviceActivity extends AppCompatActivity {
 
     public void setActionBarTitle(String title){
         Objects.requireNonNull(getSupportActionBar()).setTitle(title);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(currentFragment == null || !currentFragment.onBackPressed()) {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void setSelectedFragment(BackHandledFragment backHandledFragment) {
+        this.currentFragment = backHandledFragment;
+    }
+
+    @Override
+    public void operationDone() {
+        NewDeviceSetConfigurationFragment setConfigFragment =(NewDeviceSetConfigurationFragment) getSupportFragmentManager().findFragmentByTag("configFragment");
+        setConfigFragment.groupCreated();
+    }
+
+    public SetPrimaryConfigRequest getSetPrimaryConfigRequest() {
+        return setPrimaryConfigRequest;
+    }
+
+    public NewDevice getNewDevice(){
+        return newDevice;
     }
 }

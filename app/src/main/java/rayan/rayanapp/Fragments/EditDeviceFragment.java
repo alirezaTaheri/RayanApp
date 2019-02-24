@@ -23,10 +23,9 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rayan.rayanapp.Activities.DeviceManagementListActivity;
+import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.R;
-import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
@@ -68,7 +67,7 @@ public class EditDeviceFragment extends BackHandledFragment{
     @Override
     public boolean onBackPressed() {
         editDeviceFragmentViewModel.toDeviceEndSettings(device.getIp());
-        ((DeviceManagementListActivity)getActivity()).setActionBarTitle();
+        ((DeviceManagementActivity)getActivity()).setActionBarTitle();
         getActivity().getSupportFragmentManager().popBackStack();
         return true;
     }

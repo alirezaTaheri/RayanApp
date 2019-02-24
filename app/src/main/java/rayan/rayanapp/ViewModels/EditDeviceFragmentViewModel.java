@@ -18,6 +18,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
@@ -238,6 +239,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
+    @SuppressLint("CheckResult")
     public LiveData<String> toDeviceFactoryReset(String ip){
         final MutableLiveData<String> results = new MutableLiveData<>();
         toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
@@ -251,7 +253,6 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
     private DisposableObserver<DeviceBaseResponse> toDeviceFactoryResetObserver(MutableLiveData<String> results){
         return new DisposableObserver<DeviceBaseResponse>() {
 

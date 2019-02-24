@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -33,6 +34,11 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.MqttStatus;
@@ -66,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         requestRecordAudioPermission();
         ButterKnife.bind(this);
         mqttStatus = this;
-//        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar_main);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
@@ -236,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(this, GroupsActivity.class));
                 break;
             case R.id.devicesManagementActivity:
-                startActivity(new Intent(this, DeviceManagementListActivity.class));
+                startActivity(new Intent(this, DeviceManagementActivity.class));
                 break;
             case R.id.profileActivity:
                 startActivity(new Intent(this, ProfileActivity.class));
@@ -343,6 +349,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
         reco();
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(this, UDPServerService.class));
+        super.onDestroy();
     }
 
     private void reco(){
