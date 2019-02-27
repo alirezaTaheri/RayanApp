@@ -6,7 +6,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.databinding.ObservableInt;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,11 +44,9 @@ import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 import static android.content.Context.CLIPBOARD_SERVICE;
 
 public class EditDeviceFragment extends BackHandledFragment{
-    int i=0;
+    private static EditDeviceFragment instance = null;
     private ArrayList<String> codeList= new ArrayList<>();
     int startIndex=0, packetSize =150;
-    private Boolean isFirstPartSend=true;
-    String nodeResponse="";
     @BindView(R.id.name)
     EditText name;
     @BindView(R.id.onlineAccessTextView)
@@ -94,6 +91,7 @@ public class EditDeviceFragment extends BackHandledFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         device = getArguments().getParcelable("device");
+        instance=this;
     }
 
     @Override
@@ -205,14 +203,17 @@ public class EditDeviceFragment extends BackHandledFragment{
 
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
-        editDeviceFragmentViewModel.toDeviceUpdate(device.getIp()).observe(this, s -> {
+        String result=  editDeviceFragmentViewModel.readFromFile();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().editDeviceInstance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟",convertCodeStringToList(result), AppConstants.DEVICE_DO_UPDATE, device.getIp());
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+    }
+    public void clickOnDeviceUpdateSubmit(ArrayList<String> codelist, String cmd, String deviceIp){
+        editDeviceFragmentViewModel.toDeviceUpdate(deviceIp).observe(this, s -> {
             assert s != null;
             switch (s){
                 case AppConstants.DEVICE_READY_FOR_UPDATE:
-                    String result=  editDeviceFragmentViewModel.readFromFile();
-                    convertCodeStringToList(result);
-                    editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, convertCodeStringToList(result), device.getIp()).observe(this, res ->{
-                    Log.e("response",res.toString());
+                    editDeviceFragmentViewModel.toDeviceDoUpdate(cmd, codelist, deviceIp).observe(this, res ->{
+                        Log.e("response",res.toString());
                     });
                     break;
                 case AppConstants.SOCKET_TIME_OUT:
@@ -348,5 +349,8 @@ public class EditDeviceFragment extends BackHandledFragment{
         Log.e("codeList",""+codeList.toString());
         Log.e("codeListsize",""+codeList.size());
         return codeList;
+    }
+    public static EditDeviceFragment getInstance() {
+        return instance;
     }
 }

@@ -18,6 +18,7 @@ public class PrefManager {
     private final String KEY_NAME = "KEY_NAME";
     private final String KEY_GENDER = "KEY_GENDER";
     private final String KEY_TOKEN = "KEY_TOKEN";
+    private final String KEY_IS_GROUP_ADMIN = "KEY_IS_GROUP_ADMIN";
     private final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private final String KEY_ID = "KEY_ID";
     private final String KEY_USERNAME = "KEY_USERNAME";
@@ -124,5 +125,13 @@ public class PrefManager {
     }
     public String getEmailKey(){
         return pref.getString(KEY_EMAIL,null);
+    }
+
+    public void setIsGroupAdminKey(boolean isGroupAdminKey){
+        editor.putBoolean(KEY_IS_GROUP_ADMIN,isGroupAdminKey);
+        editor.commit();
+    }
+    public Boolean getIsGroupAdminKey(){
+        return pref.getBoolean(KEY_IS_GROUP_ADMIN,false);
     }
 }

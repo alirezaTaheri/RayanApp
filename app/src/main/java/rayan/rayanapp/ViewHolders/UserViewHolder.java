@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -25,6 +26,13 @@ public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
     @Override
     public void onBind(User item, @Nullable OnUserClicked<User> listener) {
         name.setText(item.getUsername());
+        if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
+            delete.setVisibility(View.INVISIBLE);
+        }
+        if (RayanApplication.getPref().getIsGroupAdminKey()){
+        }else{
+            delete.setVisibility(View.INVISIBLE);
+        }
         delete.setOnClickListener(v -> {
             listener.onRemoveUserClicked(item);
         });
