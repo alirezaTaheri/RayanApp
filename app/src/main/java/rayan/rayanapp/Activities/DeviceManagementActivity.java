@@ -6,28 +6,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
+
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
+import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.DevicesManagementActivityViewModel;
 
-public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface {
+public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, DoneWithSelectAccessPointFragment {
 
 
     FragmentManager fragmentManager;
@@ -94,4 +86,8 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         getSupportActionBar().setTitle(R.string.title_deviceManagementActivity);
     }
 
+    @Override
+    public void accessPointSelected(String ssid, String pass) {
+
+    }
 }

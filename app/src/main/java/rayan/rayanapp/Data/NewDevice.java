@@ -1,14 +1,12 @@
 package rayan.rayanapp.Data;
 
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 
 public class NewDevice {
 
-    private String id;
-    private String type;
-    private String name;
+    private String id,type,name,ssid,accessPointName;
     private int toggleCount;
-    private String ssid;
     private String pwd;
     private Topic topic;
     private String mqttUser;
@@ -16,8 +14,34 @@ public class NewDevice {
     private String hpwd;
     private String username;
     private String password;
-    private String groupId;
+    private Group group;
     private String chip_id;
+    private String pin1;
+    private String pin2;
+
+    public String getAccessPointName() {
+        return accessPointName;
+    }
+
+    public void setAccessPointName(String accessPointName) {
+        this.accessPointName = accessPointName;
+    }
+
+    public String getPin1() {
+        return pin1;
+    }
+
+    public void setPin1(String pin1) {
+        this.pin1 = pin1;
+    }
+
+    public String getPin2() {
+        return pin2;
+    }
+
+    public void setPin2(String pin2) {
+        this.pin2 = pin2;
+    }
 
     public String getChip_id() {
         return chip_id;
@@ -27,12 +51,12 @@ public class NewDevice {
         this.chip_id = chip_id;
     }
 
-    public String getGroupId() {
-        return groupId;
+    public Group getGroup() {
+        return group;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     public String getUsername() {
@@ -130,4 +154,5 @@ public class NewDevice {
     public void setHpwd(String hpwd) {
         this.hpwd = hpwd;
     }
+
 }

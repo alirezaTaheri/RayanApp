@@ -3,20 +3,12 @@ package rayan.rayanapp.Retrofit.Models.Requests.device;
 import rayan.rayanapp.Util.AppConstants;
 
 public class SetPrimaryConfigRequest extends BaseRequest{
-    private String ssid;
-    private String pwd;
-    private String hostname;
-    private String mqtthost;
-    private String mqttport;
-    private String mqtttopic;
-    private String mqttuser;
-    private String mqttpass;
-    private String hpwd;
+    private String ssid,pwd,hostname,mqtthost,mqttport,mqttuser,mqttpass,mqtttopic,hpwd, style;
 
     public SetPrimaryConfigRequest() {
     }
 
-    public SetPrimaryConfigRequest(String ssid, String pwd, String hostname, String mqtthost, String mqttport, String mqtttopic, String mqttuser, String mqttpass, String hpwd) {
+    public SetPrimaryConfigRequest(String ssid, String pwd, String hostname, String mqtthost, String mqttport, String mqtttopic, String mqttuser, String mqttpass, String hpwd, String style) {
         this.ssid = ssid;
         this.pwd = pwd;
         this.hostname = hostname;
@@ -26,6 +18,7 @@ public class SetPrimaryConfigRequest extends BaseRequest{
         this.mqttuser = mqttuser;
         this.mqttpass = mqttpass;
         this.hpwd = hpwd;
+        this.style = style;
         this.setCmd(AppConstants.NEW_DEVICE_config);
     }
 }

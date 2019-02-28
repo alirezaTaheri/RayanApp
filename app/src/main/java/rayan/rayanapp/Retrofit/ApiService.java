@@ -26,6 +26,8 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ForgetPasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.RegisterUserRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -89,11 +91,14 @@ public interface ApiService {
 
     @POST("api/v2/groups/adduser")
     Observable<BaseResponse> addDeviceToGroup(@Header("Authorization") String token, @Body AddDeviceToGroupRequest addDeviceToGroupRequest);
-
     @POST
     Observable<ChangeNameResponse> changeName(@Url String url, @Body ChangeNameRequest changeNameRequest);
     @POST
-    Observable<DeviceBaseResponse> ITET(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
+    Observable<DeviceBaseResponse> ITET(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<ToggleDeviceResponse> toggle(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<SetPrimaryConfigResponse> sendFirstConfig(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST
     Observable<DeviceBaseResponse> factoryReset(@Url String url, @Body BaseRequest baseRequest);
     @POST

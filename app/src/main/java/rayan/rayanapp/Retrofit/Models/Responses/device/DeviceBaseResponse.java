@@ -8,6 +8,10 @@ public class DeviceBaseResponse {
         return nid;
     }
 
+    public void setCmd(String cmd) {
+        this.cmd = cmd;
+    }
+
     public String getCmd() {
         return cmd;
     }

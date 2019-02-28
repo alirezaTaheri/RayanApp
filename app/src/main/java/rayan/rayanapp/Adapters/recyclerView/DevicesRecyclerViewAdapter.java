@@ -9,6 +9,7 @@ import java.util.List;
 
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnStatusIconClickListener;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.R;
@@ -47,9 +48,9 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
 
     @Override
     public int getItemViewType(int position) {
-        if (items.get(position).getType().equals("switch_1"))
+        if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1))
             return 1;
-        else if (items.get(position).getType().equals("switch_2"))
+        else if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2))
             return 2;
         else return 3;
     }

@@ -28,9 +28,14 @@ public class GroupsListFragmentViewModel extends DevicesFragmentViewModel {
         super(application);
         groupDatabase = new GroupDatabase(application);
     }
-    public LiveData<List<Group>> getAllGroups(){
+    public LiveData<List<Group>> getAllGroupsLive(){
         return groupDatabase.getAllGroupsLive();
     }
+
+    public List<Group> getAllGroups(){
+        return groupDatabase.getAllGroups();
+    }
+
 
     public LiveData<BaseResponse> deleteGroup(String groupId){
         final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
