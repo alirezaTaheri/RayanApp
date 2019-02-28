@@ -50,18 +50,17 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
-        loginViewModel.getLoginResponse().observe(this, baseResponse -> {
-            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
-                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
-                RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            }else {
-                Log.e("login msg",baseResponse.getData().getMessage());
-            }
-
-        });
+//        loginViewModel.getLoginResponse().observe(this, baseResponse -> {
+//            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
+//                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
+//                RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
+//                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(intent);
+//            }else {
+//                Log.e("login msg",baseResponse.getData().getMessage());
+//            }
+//        });
     }
     @OnClick(R.id.signUpTextView)
     void clickOnSignUp(){
@@ -80,7 +79,32 @@ public class LoginActivity extends AppCompatActivity {
             if (phoneNumber.length() == 0 | password.length() == 0) {
                 SnackBarSetup.snackBarSetup(findViewById(android.R.id.content),"لطفا اطلاعات خود را کامل وارد کنید");
             } else {
-                loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString());}} else {
+                loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString()).observe(this,baseResponse -> {
+                    Log.e("message", baseResponse.getData().getMessage()+" "+ baseResponse.getStatus().getCode());
+                    if (baseResponse.getStatus().getCode().equals("200")) {
+                        Toast.makeText(this, "با موفقیت وارد شدید", Toast.LENGTH_SHORT).show();
+                        RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
+                        RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    } else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().equals("You must change your password")) {
+                        SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content),"برای ورود باید رمز خود را تغییر دهید");
+                    } else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().contains("Please try")) {
+                        String msj=baseResponse.getData().getMessage().replaceAll("\\D+","");
+                        int min = Integer.parseInt(msj);
+                        SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content)," دقیقه دیگر دوباره امتحان کنید"+min+"لطفا ");
+                    }else if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")) {
+                        SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content),"کاربری با این شماره وجود ندارد");
+                    }else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().equals("Wrong password")) {
+                        SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content),"رمز وارد شده اشتباه است");
+                    } else {
+                        Log.e(TAG, "edit user problem: " + baseResponse.getStatus().getCode());
+                        Log.e("message", baseResponse.getData().getMessage());
+                        SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content),"مشکلی وجود دارد");
+                    }
+                });
+            }} else {
             SnackBarSetup.snackBarSetup(findViewById(android.R.id.content),"لطفا اتصال خود به اینترنت را چک کنید");
         }
     }

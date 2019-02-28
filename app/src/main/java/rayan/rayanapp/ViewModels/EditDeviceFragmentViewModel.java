@@ -19,17 +19,13 @@ import java.io.InputStreamReader;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
@@ -37,12 +33,15 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Util.AppConstants;
@@ -512,7 +511,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     private Observable<DeviceBaseResponse> toDeviceDoUpdateObservable(UpdateDeviceRequest updateDeviceRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
-        return apiService.factoryDoUpdate(getDeviceAddress(ip), updateDeviceRequest)
+        return apiService.deviceDoUpdate(getDeviceAddress(ip), updateDeviceRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -543,6 +542,82 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
+    public LiveData<ArrayList<String>> toDeviceAllFilesList(String cmd,String ip){
+        final MutableLiveData<ArrayList<String>> results = new MutableLiveData<>();
+        toDeviceAllFilesListObservable(new BaseRequest(cmd),ip).subscribe(toDeviceAllFilesListObserver(results));
+        return results;
+    }
+    private Observable<AllFilesListResponse> toDeviceAllFilesListObservable(BaseRequest baseRequest, String ip){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deviceFileList("http://10.0.3.2/DeviceGetFileList.php", baseRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<AllFilesListResponse> toDeviceAllFilesListObserver(MutableLiveData<ArrayList<String>> results){
+        return new DisposableObserver<AllFilesListResponse>() {
+
+            @Override
+            public void onNext(@NonNull AllFilesListResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse.getFiles());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e instanceof SocketTimeoutException){
+                    ArrayList<String> res=new ArrayList<>();
+                    res.add(AppConstants.SOCKET_TIME_OUT);
+                    results.postValue(res);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+
+    public LiveData<String> sendFilesToDevicePermit(String request){
+        final MutableLiveData<String> results = new MutableLiveData<>();
+        SendFilesToDevicePermitObservable(new SendFilesToDevicePermitRequest(request)).subscribe(SendFilesToDevicePermitObserver(results));
+        return results;
+    }
+    private Observable<SendFilesToDevicePermitResponse> SendFilesToDevicePermitObservable(SendFilesToDevicePermitRequest sendFilesToDevicePermitRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deviceSendFilePermit("http://10.0.3.2/YesNoApi.php", sendFilesToDevicePermitRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<SendFilesToDevicePermitResponse> SendFilesToDevicePermitObserver(MutableLiveData<String> results){
+        return new DisposableObserver<SendFilesToDevicePermitResponse>() {
+
+            @Override
+            public void onNext(@NonNull SendFilesToDevicePermitResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse.getPermit());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e instanceof SocketTimeoutException){
+                    results.postValue(AppConstants.SOCKET_TIME_OUT);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
 
 
 }

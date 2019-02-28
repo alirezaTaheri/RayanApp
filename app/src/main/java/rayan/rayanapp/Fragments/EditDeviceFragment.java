@@ -46,6 +46,7 @@ import static android.content.Context.CLIPBOARD_SERVICE;
 public class EditDeviceFragment extends BackHandledFragment{
     private static EditDeviceFragment instance = null;
     private ArrayList<String> codeList= new ArrayList<>();
+    private ArrayList<String> deviceFileList= new ArrayList<>();
     int startIndex=0, packetSize =150;
     @BindView(R.id.name)
     EditText name;
@@ -207,22 +208,36 @@ public class EditDeviceFragment extends BackHandledFragment{
         YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().editDeviceInstance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟",convertCodeStringToList(result), AppConstants.DEVICE_DO_UPDATE, device.getIp());
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
-    public void clickOnDeviceUpdateSubmit(ArrayList<String> codelist, String cmd, String deviceIp){
-        editDeviceFragmentViewModel.toDeviceUpdate(deviceIp).observe(this, s -> {
-            assert s != null;
-            switch (s){
-                case AppConstants.DEVICE_READY_FOR_UPDATE:
-                    editDeviceFragmentViewModel.toDeviceDoUpdate(cmd, codelist, deviceIp).observe(this, res ->{
-                        Log.e("response",res.toString());
-                    });
-                    break;
-                case AppConstants.SOCKET_TIME_OUT:
-                    setDeviceTopicStatus(TopicStatus.CHANGED); SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
-                    break;
-            }
-        });
 
+
+    public void clickOnDeviceUpdateSubmit(ArrayList<String> codelist, String cmd, String deviceIp){
+        getDeviceFileList(AppConstants.DEVICE_ALL_FILES_LIST,deviceIp);
+        if (permitToSendFiles()) {
+            Toast.makeText(getActivity(), "trueeeee", Toast.LENGTH_SHORT).show();
+            for (int i=0;i<=deviceFileList.size()-1;i++){
+                Log.e("codelist items",deviceFileList.get(i));
+                Toast.makeText(getActivity(), "codelist items"+deviceFileList.get(i), Toast.LENGTH_SHORT).show();
+            }
+            // TODO: 2/28/2019 uncomment below lines in the last adit of code(when connected to real device)
+
+//            editDeviceFragmentViewModel.toDeviceUpdate(deviceIp).observe(this, s -> {
+//                assert s != null;
+//                switch (s) {
+//                    case AppConstants.DEVICE_READY_FOR_UPDATE:
+//                        editDeviceFragmentViewModel.toDeviceDoUpdate(cmd, codelist, deviceIp).observe(this, res -> {
+//                            Log.e("response", res.toString());
+//                        });
+//                        break;
+//                    case AppConstants.SOCKET_TIME_OUT:
+//                        setDeviceTopicStatus(TopicStatus.CHANGED);
+//                        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "خطای اتصال");
+//                        break;
+//                }
+//            });
+        }
     }
+
+
     @OnClick(R.id.changeAccessPoint)
     void toDeviceChangeAccessPoint(){
         int PERMISSION_ALL = 1;
@@ -333,6 +348,8 @@ public class EditDeviceFragment extends BackHandledFragment{
         alert.show();
     }
 
+
+
     public ArrayList<String> convertCodeStringToList(String result){
         codeList.clear();
         int j=result.length()/150;
@@ -352,5 +369,32 @@ public class EditDeviceFragment extends BackHandledFragment{
     }
     public static EditDeviceFragment getInstance() {
         return instance;
+    }
+
+    public void getDeviceFileList(String cmd, String deviceip){
+        editDeviceFragmentViewModel.toDeviceAllFilesList(cmd, deviceip ).observe(this,res->{
+            deviceFileList=res;
+            Log.e("file listsss",deviceFileList.get(0));
+            Toast.makeText(getActivity(), "file listsss"+deviceFileList.get(0), Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    boolean value=false;
+    private boolean permitToSendFiles() {
+        editDeviceFragmentViewModel.sendFilesToDevicePermit(AppConstants.DEVICE_SEND_FILES_PERMIT).observe(this,per->{
+            Log.e("permitttttt",per);
+            Toast.makeText(getActivity(), "permitttttt"+per, Toast.LENGTH_SHORT).show();
+            switch (per){
+                case "yes":
+                    value=true;
+                    break;
+                case "no":
+                    value=false;
+                    break;
+                default:
+                    break;
+            }
+        });
+        return value;
     }
 }

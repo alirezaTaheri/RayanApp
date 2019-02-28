@@ -145,4 +145,5 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         super.onAttach(context);
         sendDevice = (ClickOnDevice) getActivity();
     }
+
 }

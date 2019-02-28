@@ -25,13 +25,15 @@ public class EditUserViewModel extends DevicesFragmentViewModel {
 
     public LiveData<BaseResponse> editUser(String name, String gender, String password) {
         MutableLiveData<BaseResponse> results = new MutableLiveData();
-        //inja alan pass ro pas midim.dar ayande gender pas dade khahad shod
         editUserObservable(new EditUserRequest(new UserInfo(name,gender),password)).subscribe(editUserObserver(results));
         return results;
     }
 
     private Observable<BaseResponse> editUserObservable(EditUserRequest EditUserRequest) {
-        return ApiUtils.getApiService().editUser(RayanApplication.getPref().getToken(), EditUserRequest).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return ApiUtils.getApiService()
+                .editUser(RayanApplication.getPref().getToken(), EditUserRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     private DisposableObserver<BaseResponse> editUserObserver(final MutableLiveData<BaseResponse> results) {

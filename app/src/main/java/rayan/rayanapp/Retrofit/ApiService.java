@@ -9,6 +9,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.CreateGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
@@ -22,6 +23,8 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
@@ -101,7 +104,11 @@ public interface ApiService {
     @POST
     Observable<DeviceBaseResponse> deviceUpdate(@Url String url, @Body BaseRequest baseRequest);
     @POST
-    Observable<DeviceBaseResponse> factoryDoUpdate(@Url String url, @Body UpdateDeviceRequest updateDeviceRequest);
+    Observable<DeviceBaseResponse> deviceDoUpdate(@Url String url, @Body UpdateDeviceRequest updateDeviceRequest);
+    @POST
+    Observable<AllFilesListResponse> deviceFileList(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<SendFilesToDevicePermitResponse> deviceSendFilePermit(@Url String url, @Body SendFilesToDevicePermitRequest sendFilesToDevicePermitRequest);
     @POST
     Observable<DeviceBaseResponse> changeAccessPoint(@Url String url, @Body ChangeAccessPointRequest changeAccessPointRequest);
     @POST

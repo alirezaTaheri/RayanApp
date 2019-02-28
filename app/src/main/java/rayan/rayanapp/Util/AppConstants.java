@@ -61,4 +61,7 @@ public class AppConstants {
     public final static String DEVICE_UPDATE_END = "update_end";
     public final static String DEVICE_UPDATE_DONE = "updating_done";
     public final static String DEVICE_DO_UPDATE = "update";
+    public final static String DEVICE_ALL_FILES_LIST = "all_files_list";
+    public final static String DEVICE_SEND_FILES_PERMIT = "send_files_to_device?";
+
 }
