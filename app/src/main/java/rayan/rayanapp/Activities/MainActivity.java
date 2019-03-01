@@ -1,7 +1,6 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -13,6 +12,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -34,13 +34,12 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
+import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Fragments.DevicesFragment;
+import rayan.rayanapp.Fragments.FavoritesFragment;
+import rayan.rayanapp.Fragments.ScenariosFragment;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
@@ -64,6 +63,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle actionBarDrawerToggle;
     @BindView(R.id.navigationView)
     NavigationView navigationView;
+    @BindView(R.id.bottom_navigation_view)
+    BottomNavigationView bottomNavigationView;
+    @BindView(R.id.bottom_navigation_viewpager)
+    ViewPager bottom_navigation_viewpager;
+    MenuItem prevMenuItem;
     MqttStatus mqttStatus;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,7 +217,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             // not accessible
         }
+
+
+        initializeBottomNavigation();
     }
+
 
     public void initialize(){
         if (RayanApplication.getPref().getProtocol() == null){
@@ -450,6 +458,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         recognizer.setRecognitionListener(listener);
         recognizer.startListening(intent);
+
+    }
+
+    public void initializeBottomNavigation(){
+        setupBottomNavigationViewPager(viewPager);
+        viewPager.setCurrentItem(2);
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_device:
+                                viewPager.setCurrentItem(2);
+                                break;
+                            case R.id.action_senario:
+                                viewPager.setCurrentItem(1);
+                                break;
+                            case R.id.action_favorite:
+                                viewPager.setCurrentItem(0);
+                                break;
+                        }
+                        return false;
+                    }
+                });
+        bottomNavigationView.getMenu().getItem(2).setChecked(true);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+            @Override
+            public void onPageSelected(int position) {
+                if (prevMenuItem != null) {
+                    prevMenuItem.setChecked(false);
+                }
+                else
+                {
+                    bottomNavigationView.getMenu().getItem(0).setChecked(false);
+                }
+                Log.d("page", "onPageSelected: "+position);
+                bottomNavigationView.getMenu().getItem(position).setChecked(true);
+                prevMenuItem = bottomNavigationView.getMenu().getItem(position);
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+
+    }
+    private void setupBottomNavigationViewPager(ViewPager viewPager) {
+        BottomNavigationViewPagerAdapter adapter = new BottomNavigationViewPagerAdapter(getSupportFragmentManager());
+        FavoritesFragment favoritesFragment=new FavoritesFragment();
+        ScenariosFragment scenariosFragment=new ScenariosFragment();
+        DevicesFragment devicesFragment=new DevicesFragment();
+        adapter.addFragment(favoritesFragment);
+        adapter.addFragment(scenariosFragment);
+        adapter.addFragment(devicesFragment);
+        viewPager.setAdapter(adapter);
 
     }
 }

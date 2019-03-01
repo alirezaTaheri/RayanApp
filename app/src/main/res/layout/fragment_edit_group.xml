@@ -6,11 +6,13 @@
     android:orientation="vertical"
     android:focusableInTouchMode="true"
     android:paddingTop="10dp"
-    android:paddingBottom="10dp"
     android:layout_height="match_parent">
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/nestedscrolview"
+        android:layout_marginBottom="5dp"
+        android:layout_above="@id/leaveGroup_btn"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
@@ -196,6 +198,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/leaveGroup_btn"
         android:layout_width="match_parent"
@@ -204,7 +207,7 @@
         android:background="@color/baseColor"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:text="@string/leave_group_button"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="260dp" />
+        android:text="@string/leave_group_button" />
+
+
 </RelativeLayout>
