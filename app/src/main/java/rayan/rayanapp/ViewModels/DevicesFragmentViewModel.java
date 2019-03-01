@@ -287,17 +287,25 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
 
     public void togglePin1(Device device, boolean local){
-        if (local)
+        if (local){
             sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString());
-        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null)
+
+        }
+        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null){
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString(), 0, false);
+
+        }
     }
 
     public void togglePin2(Device device, boolean local){
-        if (local)
+        if (local){
             sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString());
-        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected())
+
+        }
+        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString(), 0, false);
+
+        }
     }
 
     public Single<Boolean> internetProvied(){
@@ -314,5 +322,10 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         });
     }
 
+
+    public String getDeviceAddress(String ip){
+        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+//        return "http://192.168.137.1/test.php";
+    }
 }
 

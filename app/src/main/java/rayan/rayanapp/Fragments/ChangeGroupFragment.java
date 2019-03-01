@@ -67,7 +67,7 @@ public class ChangeGroupFragment extends BottomSheetDialogFragment implements On
         groupsRecyclerViewAdapter.setListener(this);
         createGroup.setOnClickListener(this);
         if (((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup() != null)
-        selectedGroupTitle.setText(((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getName());
+            selectedGroupTitle.setText(((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getName());
     }
 
     @Override

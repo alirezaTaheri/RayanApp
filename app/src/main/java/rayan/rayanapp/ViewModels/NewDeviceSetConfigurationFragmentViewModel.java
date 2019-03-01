@@ -194,11 +194,6 @@ Log.d(TAG,"Completed");
 
     }
 
-    public String getDeviceAddress(String ip){
-        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-//        return "http://192.168.137.1/test.php";
-    }
-
     private String getCurrentSSID(WifiManager wifiManager){
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         String currentSSID  = wifiInfo.getSSID();

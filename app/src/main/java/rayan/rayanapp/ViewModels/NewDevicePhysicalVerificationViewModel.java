@@ -29,7 +29,7 @@ public class NewDevicePhysicalVerificationViewModel extends NewDevicesListViewMo
 
     public LiveData<DeviceBaseResponse> toDeviceITET(){
         final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();
-        toDeviceITETObservable(new BaseRequest(AppConstants.NEW_DEVICE_ITET), getDeviceAddress(AppConstants.NEW_DEVICE_IP)).subscribe(toDeviceITETObserver(results));
+        toDeviceITETObservable(new BaseRequest(AppConstants.NEW_DEVICE_ITET), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceITETObserver(results));
         return results;
     }
     private Observable<DeviceBaseResponse> toDeviceITETObservable(BaseRequest baseRequest, String ip){
@@ -63,7 +63,7 @@ public class NewDevicePhysicalVerificationViewModel extends NewDevicesListViewMo
 
     public LiveData<DeviceBaseResponse> toDeviceStatus(String status){
         final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();
-        toDeviceStatusObservable(new BaseRequest(status), getDeviceAddress(AppConstants.NEW_DEVICE_IP)).subscribe(toDeviceStatusObserver(results));
+        toDeviceStatusObservable(new BaseRequest(status), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceStatusObserver(results));
         return results;
     }
     private Observable<DeviceBaseResponse> toDeviceStatusObservable(BaseRequest baseRequest, String ip){
@@ -96,7 +96,4 @@ public class NewDevicePhysicalVerificationViewModel extends NewDevicesListViewMo
     }
 
 
-    public String getDeviceAddress(String ip){
-        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-    }
 }

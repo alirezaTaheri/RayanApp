@@ -1,15 +1,13 @@
 package rayan.rayanapp.Activities;
 
-import android.support.v4.app.Fragment;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Fragments.EditGroupFragment;
 import rayan.rayanapp.Fragments.GroupsListFragment;
-import rayan.rayanapp.Fragments.NewDeviceSetConfigurationFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;

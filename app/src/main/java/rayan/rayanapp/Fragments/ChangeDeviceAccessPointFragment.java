@@ -64,6 +64,7 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
+        selectedAccessPoint = new AccessPoint("","","",0);
         viewModel = ViewModelProviders.of(this).get(ChangeDeviceAccessPointFragmentViewModel.class);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         accessPointsRecyclerViewAdapter = new AccessPointsRecyclerViewAdapter(getActivity(),this);
@@ -79,6 +80,8 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
                 });
         if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() != null)
             selectedAccessPointTitle.setText(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid());
+        selectedAccessPoint.setSSID(((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid() != null? ((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid():"");
+        password.setText(((AddNewDeviceActivity) getActivity()).getNewDevice().getPwd());
     }
 
     @Override

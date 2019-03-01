@@ -35,7 +35,6 @@ import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.WifiScanReceiver;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 

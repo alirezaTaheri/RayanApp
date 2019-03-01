@@ -30,6 +30,7 @@ public class AccessPointViewHolder extends BaseViewHolder<AccessPoint, OnNewDevi
 
     @Override
     public void onBind(AccessPoint item, @Nullable OnNewDeviceClicked<AccessPoint> listener) {
+        Log.e("nnnnnnnnnnn" ,"nnnnnnn: " + fragment.selectedAccessPoint);
         if (fragment.selectedAccessPoint != null && fragment.selectedAccessPoint.getSSID().equals(item.getSSID()))
             itemView.setBackground(ContextCompat.getDrawable(itemView.getContext(),R.drawable.background_selected_item_base_color));
         else itemView.setBackground(null);
