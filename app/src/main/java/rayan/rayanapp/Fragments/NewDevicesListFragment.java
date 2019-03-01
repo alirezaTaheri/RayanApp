@@ -202,6 +202,8 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
             Toast.makeText(getContext(), "لطفا یک دستگاه را انتخاب کنید", Toast.LENGTH_SHORT).show();
         else{
             ((AddNewDeviceActivity)getActivity()).getNewDevice().setAccessPointName(selectedAccessPoint.getSSID());
+            ((AddNewDeviceActivity)getActivity()).getNewDevice().setAccessPointName(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-1]);
+
             if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_1);
 
