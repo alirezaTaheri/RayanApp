@@ -25,7 +25,8 @@ import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 public class GroupsListFragment extends Fragment implements OnGroupClicked<Group> {
-   // YesNoButtomSheetFragment yesNoButtomSheetFragment;
+    private final String TAG = CreateGroupFragment.class.getSimpleName();
+
     GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     GroupsListFragmentViewModel groupsListFragmentViewModel;
     String groupId;
@@ -75,7 +76,8 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
 
     @Override
     public void onGroupLongPress(Group Item) {
-       YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().groupListInstance("GroupsListFragment","حذف گروه", "بازگشت", "آیا مایل به حذف این گروه هستید؟",Item.getId());
+        groupId=Item.getId();
+       YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("GroupsListFragment","حذف گروه", "بازگشت", "آیا مایل به حذف این گروه هستید؟");
        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
@@ -111,7 +113,7 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         groupsListFragmentViewModel.getGroups();
     }
 
-    public void clickOnSubmit(String groupId) {
+    public void clickOnSubmit() {
         Log.e("itemid",groupId);
             groupsListFragmentViewModel.deleteGroup(groupId).observe(this, baseResponse -> {
                 Log.e("baseResponse",baseResponse.getStatus().getCode());

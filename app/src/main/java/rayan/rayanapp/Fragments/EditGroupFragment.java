@@ -46,6 +46,7 @@ import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 public class EditGroupFragment extends Fragment implements OnUserClicked<User>, OnAdminClicked<User>{
     static final int PICK_CONTACT=1;
     private Group group;
+    private String userId;
     private final String TAG = EditGroupFragment.class.getSimpleName();
     String cNumber;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
@@ -246,7 +247,8 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     }
     @Override
     public void onRemoveUserClicked(User user) {
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().editGroupInstance("EditGroupFragment1","حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر هستید؟",group.getId(),user.getId());
+        userId=user.getId();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment1","حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
@@ -271,18 +273,20 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
     @OnClick(R.id.leaveGroup_btn)
     void clickOnLeaveGroup(){
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().editGroupInstance("EditGroupFragment1","ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟",group.getId(), RayanApplication.getPref().getId());
+        userId=RayanApplication.getPref().getId();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment1","ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟" );
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     @Override
     public void onRemoveAdminClicked(User user) {
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().editGroupInstance("EditGroupFragment2","حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟",group.getId(),user.getId());
+        userId=user.getId();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment2","حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
-    public void clickOnRemoveUserSubmit(String userId, String groupId) {
-        editGroupFragmentViewModel.deleteUser(userId, groupId).observe(this, baseResponse -> {
+    public void clickOnRemoveUserSubmit() {
+        editGroupFragmentViewModel.deleteUser(userId, group.getId()).observe(this, baseResponse -> {
             Log.e("remove user code",baseResponse.getStatus().getCode());
             Toast.makeText(getActivity(), "remove user code"+baseResponse.getStatus().getCode()+" "+ baseResponse.getData().getMessage(), Toast.LENGTH_SHORT).show();
             if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")){
@@ -304,8 +308,8 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
         });
     }
 
-    public void clickOnRemoveAdminSubmit(String userId, String groupId) {
-        editGroupFragmentViewModel.deleteAdmin(userId, groupId).observe(this, baseResponse -> {
+    public void clickOnRemoveAdminSubmit() {
+        editGroupFragmentViewModel.deleteAdmin(userId, group.getId()).observe(this, baseResponse -> {
             Log.e("remove admin code",baseResponse.getStatus().getCode());
             if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")){
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"این کاربر وجود ندارد");

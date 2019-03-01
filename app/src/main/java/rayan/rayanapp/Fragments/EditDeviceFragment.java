@@ -45,6 +45,7 @@ import static android.content.Context.CLIPBOARD_SERVICE;
 
 public class EditDeviceFragment extends BackHandledFragment{
     private static EditDeviceFragment instance = null;
+    String readFromFileResult;
     private ArrayList<String> codeList= new ArrayList<>();
     private ArrayList<String> deviceFileList= new ArrayList<>();
     int startIndex=0, packetSize =150;
@@ -204,14 +205,14 @@ public class EditDeviceFragment extends BackHandledFragment{
 
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
-        String result=  editDeviceFragmentViewModel.readFromFile();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().editDeviceInstance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟",convertCodeStringToList(result), AppConstants.DEVICE_DO_UPDATE, device.getIp());
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
 
-    public void clickOnDeviceUpdateSubmit(ArrayList<String> codelist, String cmd, String deviceIp){
-        getDeviceFileList(AppConstants.DEVICE_ALL_FILES_LIST,deviceIp);
+    public void clickOnDeviceUpdateSubmit(){
+         readFromFileResult=  editDeviceFragmentViewModel.readFromFile();
+        getDeviceFileList(AppConstants.DEVICE_ALL_FILES_LIST,device.getIp());
         if (permitToSendFiles()) {
             Toast.makeText(getActivity(), "trueeeee", Toast.LENGTH_SHORT).show();
             for (int i=0;i<=deviceFileList.size()-1;i++){
@@ -220,11 +221,11 @@ public class EditDeviceFragment extends BackHandledFragment{
             }
             // TODO: 2/28/2019 uncomment below lines in the last adit of code(when connected to real device)
 
-//            editDeviceFragmentViewModel.toDeviceUpdate(deviceIp).observe(this, s -> {
+//            editDeviceFragmentViewModel.toDeviceUpdate(device.getIp()).observe(this, s -> {
 //                assert s != null;
 //                switch (s) {
 //                    case AppConstants.DEVICE_READY_FOR_UPDATE:
-//                        editDeviceFragmentViewModel.toDeviceDoUpdate(cmd, codelist, deviceIp).observe(this, res -> {
+//                        editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, convertCodeStringToList(readFromFileResult), device.getIp()).observe(this, res -> {
 //                            Log.e("response", res.toString());
 //                        });
 //                        break;

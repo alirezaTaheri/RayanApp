@@ -42,9 +42,9 @@ public class CreateGroupFragment extends Fragment {
     private static CreateGroupFragment instance = null;
     @BindView(R.id.groupNameEditText)
     EditText name;
+    String nameTxt;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-
     UsersRecyclerViewAdapter usersRecyclerViewAdapter;
     private List<User> users = new ArrayList<>();
     private ArrayList<String> numbers = new ArrayList<>();
@@ -122,7 +122,8 @@ public class CreateGroupFragment extends Fragment {
     }
     @OnClick(R.id.createGroup)
     public void createGroup(){
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().createGroupInstance("CreateGroupFragment","ایجاد گروه", "بازگشت", "آیا مایل به ایجاد گروه هستید؟",name.getText().toString(),numbers);
+        nameTxt=name.getText().toString();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("CreateGroupFragment","ایجاد گروه", "بازگشت", "آیا مایل به ایجاد گروه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
@@ -133,8 +134,8 @@ public class CreateGroupFragment extends Fragment {
     }
 
 
-    public void clickOnSubmit(String name,ArrayList<String> numbers) {
-        createGroupViewModel.createGroup(name, numbers).observe(this, baseResponse -> {
+    public void clickOnSubmit() {
+        createGroupViewModel.createGroup(nameTxt, numbers).observe(this, baseResponse -> {
             if (baseResponse.getStatus().getCode().equals("422")){
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام گروه را وارد کنید");
             }

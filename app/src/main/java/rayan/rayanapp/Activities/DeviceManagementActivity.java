@@ -23,13 +23,15 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
+import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
+import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.DevicesManagementActivityViewModel;
 
-public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface {
-
-
+public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, OnBottomSheetSubmitClicked {
+    EditDeviceFragment editDeviceFragment;
+    YesNoButtomSheetFragment yesNoButtomSheetFragment;
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
     DevicesManagementActivityViewModel viewModel;
@@ -41,6 +43,8 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         setContentView(R.layout.activity_device_management);
         viewModel = ViewModelProviders.of(this).get(DevicesManagementActivityViewModel.class);
         ButterKnife.bind(this);
+        yesNoButtomSheetFragment=new YesNoButtomSheetFragment();
+        yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.title_deviceManagementActivity);
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
@@ -52,10 +56,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 
     @SuppressLint("CheckResult")
     @Override
-    public void clickOnDevice(Device device) {
-
-
-    }
+    public void clickOnDevice(Device device) {}
 
     public void setActionBarTitle(String title) {
         Objects.requireNonNull(getSupportActionBar()).setTitle(title);
@@ -81,8 +82,8 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         if (device != null){
         transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-        EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
-        transaction.replace(R.id.frameLayout, editGroupFragment);
+        editDeviceFragment = EditDeviceFragment.newInstance(device);
+        transaction.replace(R.id.frameLayout, editDeviceFragment);
         transaction.addToBackStack(null);
         transaction.commit();
         }
@@ -94,4 +95,16 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         getSupportActionBar().setTitle(R.string.title_deviceManagementActivity);
     }
 
+    @Override
+    public void submitClicked(String tag) {
+        Log.e("tag of fragment",tag);
+        switch (tag){
+            case "EditDeviceFragment":
+                editDeviceFragment.clickOnDeviceUpdateSubmit();
+                break;
+            default:
+                break;
+        }
+
+    }
 }
