@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.Step;
+import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 
 import java.util.ArrayList;
@@ -42,9 +44,10 @@ import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 
-public class NewDevicesListFragment extends Fragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, Step {
+public class NewDevicesListFragment extends Fragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, BlockingStep {
 
     private final String TAG = NewDevicesListFragment.class.getSimpleName();
+    public AccessPoint selectedAccessPoint;
     private NewDevicesListViewModel viewModel;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -63,7 +66,7 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         wifiManager = (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        newDevicesRecyclerViewAdapter = new NewDevicesRecyclerViewAdapter(getActivity());
+        newDevicesRecyclerViewAdapter = new NewDevicesRecyclerViewAdapter(getActivity(), this);
         newDevicesRecyclerViewAdapter.setListener(this);
         connection = this;
         this.searching();
@@ -90,7 +93,7 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         viewModel = ViewModelProviders.of(this).get(NewDevicesListViewModel.class);
-        ((RayanApplication)getActivity().getApplication()).getWifiBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        ((RayanApplication)getActivity().getApplication()).getWifiBus().toObservable().subscribeOn(Schedulers.io())
                 .subscribe(scanResults -> {
                     this.idle();
                     List<AccessPoint> newDevices = new ArrayList<>();
@@ -112,7 +115,7 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
 
     @Override
     public void onItemClicked(AccessPoint item) {
-        ((AddNewDeviceActivity)getActivity()).selectedNewDevice = item;
+        selectedAccessPoint = item;
         newDevicesRecyclerViewAdapter.notifyDataSetChanged();
     }
 
@@ -137,6 +140,9 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     public void successful() {
         connectionStatus = ConnectionStatus.SUCCESSFUL;
         SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"باموفقیت متصل شد");
+        Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
+        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
+
     }
 
     @Override
@@ -153,12 +159,15 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
 
     @Override
     public void idle() {
-        ((AddNewDeviceActivity)Objects.requireNonNull(getActivity())).setActionBarTitle("افزود دستگاه جدید");
+        if (getActivity() != null)
+            ((AddNewDeviceActivity)(getActivity())).setActionBarTitle("افزود دستگاه جدید");
     }
 
     @Override
     public void connectToSame() {
         SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"در حال حاضر به این دستگاه متصل هستید");
+        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
+        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
     }
 
     @Override
@@ -188,6 +197,37 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
 
     @Override
     public void onError(@NonNull VerificationError error) {
+
+    }
+
+    @Override
+    public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
+        if (selectedAccessPoint == null)
+            Toast.makeText(getContext(), "لطفا یک دستگاه را انتخاب کنید", Toast.LENGTH_SHORT).show();
+        else{
+            ((AddNewDeviceActivity)getActivity()).getNewDevice().setAccessPointName(selectedAccessPoint.getSSID());
+            ((AddNewDeviceActivity)getActivity()).getNewDevice().setAccessPointName(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-1]);
+
+            if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
+                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_1);
+
+            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
+                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_2);
+
+            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_PLUG))
+                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_1);
+
+            callback.goToNextStep();
+        }
+    }
+
+    @Override
+    public void onCompleteClicked(StepperLayout.OnCompleteClickedCallback callback) {
+
+    }
+
+    @Override
+    public void onBackClicked(StepperLayout.OnBackClickedCallback callback) {
 
     }
 

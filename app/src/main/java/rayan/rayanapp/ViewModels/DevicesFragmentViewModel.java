@@ -16,6 +16,10 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -180,7 +185,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     Device existing = deviceDatabase.getDevice(u.getChipId());
                     if (existing == null){
                         Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId());
-                        devices.add(deviceUser);
+                        if (deviceUser.getType()!= null && deviceUser.getName1() != null)
+                            devices.add(deviceUser);
                     }
                     else {
                         existing.setName1(u.getName1());
@@ -189,7 +195,6 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         existing.setGroupId(g.getId());
                         devices.add(existing);
                     }
-
                 }
                 g.setDevices(devices);
                 g.setHumanUsers(users);
@@ -282,19 +287,45 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
 
     public void togglePin1(Device device, boolean local){
-        if (local)
+        if (local){
             sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString());
-        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null)
+
+        }
+        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null){
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString(), 0, false);
+
+        }
     }
 
     public void togglePin2(Device device, boolean local){
-        if (local)
+        if (local){
             sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString());
-        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected())
+
+        }
+        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString(), 0, false);
+
+        }
+    }
+
+    public Single<Boolean> internetProvied(){
+        return Single.fromCallable(() -> {
+            try {
+                Socket sock = new Socket();
+                SocketAddress address = new InetSocketAddress("8.8.8.8", 53);
+                sock.connect(address, 1000);
+                sock.close();
+                return true;
+            }catch (IOException e){
+                return false;
+            }
+        });
     }
 
 
+    public String getDeviceAddress(String ip){
+        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+//        return "http://192.168.137.1/test.php";
+    }
 }
 

@@ -11,6 +11,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Data.AccessPoint;
+import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Fragments.NewDevicesListFragment;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
 
@@ -20,16 +22,17 @@ public class NewDevicesViewHolder extends BaseViewHolder<AccessPoint, OnNewDevic
     TextView name;
     @BindView(R.id.connect)
     TextView testDevice;
-
-    public NewDevicesViewHolder(View itemView) {
+    NewDevicesListFragment fragment;
+    public NewDevicesViewHolder(View itemView, NewDevicesListFragment fragment) {
         super(itemView);
         ButterKnife.bind(this,itemView);
+        this.fragment = fragment;
     }
 
     @Override
     public void onBind(AccessPoint item, @Nullable OnNewDeviceClicked<AccessPoint> listener) {
-        if (((AddNewDeviceActivity)itemView.getContext()).selectedNewDevice != null &&
-                ((AddNewDeviceActivity)itemView.getContext()).selectedNewDevice.getSSID().equals(item.getSSID()))
+        if (fragment.selectedAccessPoint != null &&
+                fragment.selectedAccessPoint.getSSID().equals(item.getSSID()))
             itemView.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.background_selected_item_base_color));
         else
             itemView.setBackground(null);

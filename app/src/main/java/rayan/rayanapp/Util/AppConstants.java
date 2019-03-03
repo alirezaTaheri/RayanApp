@@ -11,12 +11,20 @@ public class AppConstants {
     //New Devices
     public final static String NEW_DEVICE_TYPE_SWITCH = "switch";
     public final static String NEW_DEVICE_TYPE_PLUG = "plug";
+    public final static String NEW_DEVICE_TOGGLE_CMD = "toggle";
     public final static String NEW_DEVICE_ITET = "ITET";
+    public final static String NEW_DEVICE_ON_STATUS = "2";
+    public final static String NEW_DEVICE_OFF_STATUS = "1";
+    public final static String NEW_DEVICE_PHV_TRUE = "phv_true";
+    public final static String NEW_DEVICE_PHV_FALSE = "phv_false";
+    public final static String NEW_DEVICE_PHV_VERIFIED = "phv_verified";
+    public final static String NEW_DEVICE_PHV_START = "phv_start";
+    public final static String NEW_DEVICE_PHV_TIMEOUT = "phv_timeout";
     public final static String NEW_DEVICE_config = "config";
     public final static String PRIMARY_CONFIG_TRUE = "primary_config_true";
     public final static String PRIMARY_CONFIG_FALSE = "primary_config_false";
     public final static String EXPIRED = "EXPIRED";
-    public final static String NEW_DEVICE_IP = "192.168.137.1";
+    public final static String NEW_DEVICE_IP = "192.168.4.1";
 
     //Messages
     public final static String TO_DEVICE_NODE = "NODE?";
@@ -63,5 +71,11 @@ public class AppConstants {
     public final static String DEVICE_DO_UPDATE = "update";
     public final static String DEVICE_ALL_FILES_LIST = "all_files_list";
     public final static String DEVICE_SEND_FILES_PERMIT = "send_files_to_device?";
+
+    public final static String DEVICE_PRIMARY_PASSWORD = "12345678";
+    public final static String DEVICE_TYPE_SWITCH_1 = "switch_1";
+    public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";
+    public final static String DEVICE_TYPE_PLUG = "plug";
+
 
 }

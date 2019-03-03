@@ -61,6 +61,17 @@ public class LoginActivity extends AppCompatActivity {
 //                Log.e("login msg",baseResponse.getData().getMessage());
 //            }
 //        });
+
+        loginViewModel.getLoginResponse().observe(this, baseResponse -> {
+            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
+                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
+                RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
+        });
+
     }
     @OnClick(R.id.signUpTextView)
     void clickOnSignUp(){

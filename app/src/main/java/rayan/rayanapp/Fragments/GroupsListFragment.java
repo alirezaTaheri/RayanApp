@@ -54,7 +54,7 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(getActivity(), groups);
         groupsRecyclerViewAdapter.setListener(this);
         groupsListFragmentViewModel = ViewModelProviders.of(this).get(GroupsListFragmentViewModel.class);
-        groupsListFragmentViewModel.getAllGroups().observe(Objects.requireNonNull(getActivity()), groups -> {
+        groupsListFragmentViewModel.getAllGroupsLive().observe(Objects.requireNonNull(getActivity()), groups -> {
             groupsRecyclerViewAdapter.updateItems(groups);
         });
 

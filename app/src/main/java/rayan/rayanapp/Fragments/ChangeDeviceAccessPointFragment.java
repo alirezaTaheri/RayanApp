@@ -2,6 +2,7 @@ package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ import rayan.rayanapp.Adapters.recyclerView.AccessPointsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.NewDevicesRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.AccessPoint;
+import rayan.rayanapp.Listeners.DoneWithFragment;
+import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.SnackBarSetup;
@@ -40,6 +44,8 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
     RecyclerView recyclerView;
     AccessPointsRecyclerViewAdapter accessPointsRecyclerViewAdapter;
     ChangeDeviceAccessPointFragmentViewModel viewModel;
+    @BindView(R.id.selectedAccessPoint)
+    TextView selectedAccessPointTitle;
 
     public static ChangeDeviceAccessPointFragment newInstance() {
         final ChangeDeviceAccessPointFragment fragment = new ChangeDeviceAccessPointFragment();
@@ -59,9 +65,10 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
+        selectedAccessPoint = new AccessPoint("","","",0);
         viewModel = ViewModelProviders.of(this).get(ChangeDeviceAccessPointFragmentViewModel.class);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        accessPointsRecyclerViewAdapter = new AccessPointsRecyclerViewAdapter(getActivity(), (ChangeDeviceAccessPointFragment)this);
+        accessPointsRecyclerViewAdapter = new AccessPointsRecyclerViewAdapter(getActivity(),this);
         recyclerView.setAdapter(accessPointsRecyclerViewAdapter);
         accessPointsRecyclerViewAdapter.setItems(viewModel.getSSIDs());
         accessPointsRecyclerViewAdapter.setListener(this);
@@ -72,13 +79,17 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
                         newDevices.add(new AccessPoint(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities, scanResults.get(a).level));
                     accessPointsRecyclerViewAdapter.setItems(newDevices);
                 });
+        if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() != null)
+            selectedAccessPointTitle.setText(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid());
+        selectedAccessPoint.setSSID(((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid() != null? ((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid():"");
+        password.setText(((AddNewDeviceActivity) getActivity()).getNewDevice().getPwd());
     }
 
     @Override
     public void onItemClicked(AccessPoint item) {
             selectedAccessPoint = item;
             accessPointsRecyclerViewAdapter.notifyDataSetChanged();
-
+            selectedAccessPointTitle.setText(item.getSSID());
     }
 
     @Override
@@ -96,17 +107,27 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
             SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مودم را انتخاب کنید");
 
         } else {
-            if (getActivity() instanceof AddNewDeviceActivity){
-                ((AddNewDeviceActivity) getActivity()).getNewDevice().setSsid(selectedAccessPoint.getSSID());
-                ((AddNewDeviceActivity) getActivity()).getNewDevice().setPwd(password.getText().toString());
-            }
+            listener.accessPointSelected(selectedAccessPoint.getSSID(), password.getText().toString());
+            ((NewDeviceSetConfigurationFragment)((AddNewDeviceActivity)getActivity()).getStepperAdapter().findStep(1)).setAccessPointTitle(selectedAccessPoint.getSSID());
             dismiss();
         }
-
     }
 
     @OnClick(R.id.cancel)
     void cancel(){
         dismiss();
+    }
+
+    DoneWithSelectAccessPointFragment listener;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        listener = (DoneWithSelectAccessPointFragment) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
     }
 }

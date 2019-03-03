@@ -11,3 +11,4 @@
         android:layout_height="match_parent"/>
 
 </FrameLayout>
+        <!--android:layoutAnimation="@anim/animation_layout_fall_down"-->

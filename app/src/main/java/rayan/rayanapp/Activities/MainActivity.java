@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +38,7 @@ import com.polyak.iconswitch.IconSwitch;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -364,9 +366,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void onBackPressed() {
-        reco();
+//        Observable.range(0, 1).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+//                .
+//        reco();
     }
 
     @Override

@@ -39,4 +39,7 @@ public class AccessPoint {
                 '}';
     }
 
+    public void setSSID(String SSID) {
+        this.SSID = SSID;
+    }
 }
