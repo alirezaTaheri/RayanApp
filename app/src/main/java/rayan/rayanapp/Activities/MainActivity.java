@@ -2,9 +2,12 @@ package rayan.rayanapp.Activities;
 
 import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,8 +24,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -47,13 +53,14 @@ import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus {
-
+    int bottomNavigationHeight;
     @BindView(R.id.accessModeSwitch)
     IconSwitch accessModeSwitch;
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.viewPager)
     ViewPager viewPager;
     MainActivityViewModel mainActivityViewModel;
@@ -81,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         Log.e("setting",RayanApplication.getPref().getThemeKey()+ " "+ RayanApplication.getPref().getShowNotification());
+        navigationView.bringToFront();
+       navigationView.invalidate();
         navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
@@ -130,10 +139,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 RayanApplication.getPref().saveProtocol(AppConstants.UDP);
             }
         });
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+       // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         MainActivityViewPagerAdapter viewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(1);
+       // viewPager.setBackgroundColor(Color.GREEN);
         accessModeSwitch.setCheckedChangeListener(current -> {
             if (current.equals(IconSwitch.Checked.RIGHT)){
                 Log.e(TAG, "SET To Right");
@@ -463,26 +473,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void initializeBottomNavigation(){
         setupBottomNavigationViewPager(viewPager);
-        viewPager.setCurrentItem(2);
+
+        bottomNavigationView.getMenu().getItem(1).setChecked(true);
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.action_device:
-                                viewPager.setCurrentItem(2);
-                                break;
-                            case R.id.action_senario:
                                 viewPager.setCurrentItem(1);
                                 break;
-                            case R.id.action_favorite:
+                            case R.id.action_senario:
                                 viewPager.setCurrentItem(0);
+                                break;
+                            case R.id.action_favorite:
+                                viewPager.setCurrentItem(2);
                                 break;
                         }
                         return false;
                     }
                 });
-        bottomNavigationView.getMenu().getItem(2).setChecked(true);
+
+    }
+    int actionBarHeight;
+    private void setupBottomNavigationViewPager(ViewPager viewPager) {
+        BottomNavigationViewPagerAdapter adapter = new BottomNavigationViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        TypedValue tv = new TypedValue();
+        if (this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, this.getResources().getDisplayMetrics());
+        }
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
+        lp.bottomMargin += actionBarHeight+15;
+        viewPager.setCurrentItem(1);
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -494,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 else
                 {
-                    bottomNavigationView.getMenu().getItem(0).setChecked(false);
+                    bottomNavigationView.getMenu().getItem(1).setChecked(false);
                 }
                 Log.d("page", "onPageSelected: "+position);
                 bottomNavigationView.getMenu().getItem(position).setChecked(true);
@@ -504,17 +529,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onPageScrollStateChanged(int state) {
             }
         });
-
-    }
-    private void setupBottomNavigationViewPager(ViewPager viewPager) {
-        BottomNavigationViewPagerAdapter adapter = new BottomNavigationViewPagerAdapter(getSupportFragmentManager());
-        FavoritesFragment favoritesFragment=new FavoritesFragment();
-        ScenariosFragment scenariosFragment=new ScenariosFragment();
-        DevicesFragment devicesFragment=new DevicesFragment();
-        adapter.addFragment(favoritesFragment);
-        adapter.addFragment(scenariosFragment);
-        adapter.addFragment(devicesFragment);
-        viewPager.setAdapter(adapter);
 
     }
 }

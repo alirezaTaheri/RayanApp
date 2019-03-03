@@ -3,10 +3,12 @@ package rayan.rayanapp.Fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +66,12 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_groups_list, container, false);
         ButterKnife.bind(this, view);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+
+        if (isTablet(getActivity())) {
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),200)));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
+        }
         recyclerView.setAdapter(groupsRecyclerViewAdapter);
         return view;
     }
@@ -134,5 +141,15 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
     }
     public static GroupsListFragment getInstance() {
         return instance;
+    }
+    public static int calculateNoOfColumns(Context context, float columnWidthDp) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float screenWidthDp = displayMetrics.widthPixels / displayMetrics.density;
+        int noOfColumns = (int) (screenWidthDp / columnWidthDp + 0.5); // +0.5 for correct rounding to int.
+        return noOfColumns;
+    }
+
+    public static boolean isTablet(Context ctx){
+        return (ctx.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 }
