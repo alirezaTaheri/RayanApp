@@ -4,21 +4,27 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
-import android.util.Pair;
-import android.widget.Toast;
 
-import java.io.UnsupportedEncodingException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
@@ -28,12 +34,19 @@ import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
+//<<<<<<< HEAD
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
+//=======
+import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Util.AppConstants;
@@ -413,6 +426,221 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     public String getDeviceAddress(String ip){
-        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+       return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
     }
+
+    public void writeToFile(String mycode) {
+        try {
+            String rootPath = Environment.getExternalStorageDirectory()
+                    .getAbsolutePath() + "/.nodeUpdateFolder/";
+           // String hi="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum sagittis lacus, laoreet luctus ligula laoreet ut. Vestibulum ullamcorper accumsan velit vel vehicula. Proin tempor lacus arcu. Nunc at elit condimentum, semper nisi et, condimentum mi. In venenatis blandit nibh at sollicitudin. Vestibulum dapibus mauris at orci maximus pellentesque. Nullam id elementum ipsum. Suspendisse cursus lobortis viverra. Proin et erat at mauris tincidunt porttitor vitae ac dui.\n" +
+            //       "Fusce tincidunt dictum tempor. Mauris nec tellus posuere odio hendrerit sodales. Cras sit amet dapibus velit. Cras risus turpis, vehicula sed lobortis non, volutpat ut leo. Integer at efficitur risus, nec volutpat turpis. Phasellus in arcu sed nunc varius eleifend ut nec dui. Donec pharetra arcu eget dui consectetur, et semper elit rutrum. Integer quis ornare nisl, et scelerisque enim. In libero ligula, porttitor non enim a, scelerisque molestie nibh.\n" +
+              //      "Sed tristique auctor tellus id facilisis. Quisque laoreet auctor massa ut venenatis. Sed elementum quis neque non accumsan. Suspendisse eros justo, tempus dapibus facilisis eget, vehicula eu magna. Cras sodales mauris ac tincidunt pellentesque. Vestibulum hendrerit dictum lectus, quis tempor turpis. Morbi odio risus, ullamcorper ac quam vel, mattis dictum magna. Vivamus in dui diam. Nulla non tristique lectus, quis iaculis magna. Sed vel nisi a ante aliquet accumsan. Suspendisse dapibus lacus risus, at vulputate sapien faucibus non. Sed convallis nunc vel risus luctus maximus. Praesent a nulla tempus, varius enim non, aliquam tellus. Vestibulum non massa id diam aliquam suscipit non nec purus. Vivamus cursus dictum risus id vulputate. In commodo porta tellus, sed pharetra mauris vehicula vel.";
+            File root = new File(rootPath);
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+            File f = new File(rootPath + ".nodeUpdateFile.txt");
+            if (f.exists()) {
+                f.delete();
+            }
+            f.createNewFile();
+
+            FileOutputStream out = new FileOutputStream(f);
+
+            out.write(mycode.getBytes());
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public String readFromFile() {
+        String pathRoot =Environment.getExternalStorageDirectory()
+                .getAbsolutePath() + "/.nodeUpdateFolder/.nodeUpdateFile.txt";
+        String code = "";
+        try {
+            File myFile = new File(pathRoot);
+            FileInputStream fIn = new FileInputStream(myFile);
+            BufferedReader myReader = new BufferedReader(new InputStreamReader(fIn));
+            String aDataRow = "";
+            while ((aDataRow = myReader.readLine()) != null) {
+                code += aDataRow;
+            }
+            Log.e("it is code file",code);
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return code;
+    }
+
+    public LiveData<String> toDeviceUpdate(String ip ){
+        final MutableLiveData<String> results = new MutableLiveData<>();
+        toDeviceUpdateObservable(new BaseRequest(AppConstants.DEVICE_IS_READY_FOR_UPDATE),ip).subscribe(toDeviceUpdateObserver(results));
+        return results;
+    }
+
+    private Observable<DeviceBaseResponse> toDeviceUpdateObservable(BaseRequest baseRequest, String ip){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deviceUpdate(getDeviceAddress(ip), baseRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private DisposableObserver<DeviceBaseResponse> toDeviceUpdateObserver(MutableLiveData<String> results){
+        return new DisposableObserver<DeviceBaseResponse>() {
+
+            @Override
+            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse.getCmd());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e instanceof SocketTimeoutException){
+                    results.postValue(AppConstants.SOCKET_TIME_OUT);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+
+    @SuppressLint("CheckResult")
+    public LiveData<String> toDeviceDoUpdate(String cmd, List<String> codeList, String ip){
+        final MutableLiveData<String> results = new MutableLiveData<>();
+        Observable.fromIterable(codeList)
+                .concatMap(s -> toDeviceDoUpdateObservable(new UpdateDeviceRequest(cmd,s),ip))
+                .takeWhile(deviceBaseResponse -> {
+                    Log.e("////////////" ," ////////: "+ deviceBaseResponse);
+                    if(deviceBaseResponse.getCmd().equals(AppConstants.DEVICE_UPDATE_CODE_WROTE)){
+                        return true;
+                    }
+                    return false;
+                }).subscribe(toDeviceDoUpdateObserver(results));
+        return results;
+    }
+
+    private Observable<DeviceBaseResponse> toDeviceDoUpdateObservable(UpdateDeviceRequest updateDeviceRequest, String ip){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService.deviceDoUpdate(getDeviceAddress(ip), updateDeviceRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private DisposableObserver<DeviceBaseResponse> toDeviceDoUpdateObserver(MutableLiveData<String> results){
+        return new DisposableObserver<DeviceBaseResponse>() {
+
+            @Override
+            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse.getCmd());
+
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e instanceof SocketTimeoutException){
+                    results.postValue(AppConstants.SOCKET_TIME_OUT);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+    public LiveData<ArrayList<String>> toDeviceAllFilesList(String cmd,String ip){
+        final MutableLiveData<ArrayList<String>> results = new MutableLiveData<>();
+        toDeviceAllFilesListObservable(new BaseRequest(cmd),ip).subscribe(toDeviceAllFilesListObserver(results));
+        return results;
+    }
+    private Observable<AllFilesListResponse> toDeviceAllFilesListObservable(BaseRequest baseRequest, String ip){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deviceFileList("http://10.0.3.2/DeviceGetFileList.php", baseRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<AllFilesListResponse> toDeviceAllFilesListObserver(MutableLiveData<ArrayList<String>> results){
+        return new DisposableObserver<AllFilesListResponse>() {
+
+            @Override
+            public void onNext(@NonNull AllFilesListResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse.getFiles());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e instanceof SocketTimeoutException){
+                    ArrayList<String> res=new ArrayList<>();
+                    res.add(AppConstants.SOCKET_TIME_OUT);
+                    results.postValue(res);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+
+    public LiveData<String> sendFilesToDevicePermit(String request){
+        final MutableLiveData<String> results = new MutableLiveData<>();
+        SendFilesToDevicePermitObservable(new SendFilesToDevicePermitRequest(request)).subscribe(SendFilesToDevicePermitObserver(results));
+        return results;
+    }
+    private Observable<SendFilesToDevicePermitResponse> SendFilesToDevicePermitObservable(SendFilesToDevicePermitRequest sendFilesToDevicePermitRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deviceSendFilePermit("http://10.0.3.2/YesNoApi.php", sendFilesToDevicePermitRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<SendFilesToDevicePermitResponse> SendFilesToDevicePermitObserver(MutableLiveData<String> results){
+        return new DisposableObserver<SendFilesToDevicePermitResponse>() {
+
+            @Override
+            public void onNext(@NonNull SendFilesToDevicePermitResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse.getPermit());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e instanceof SocketTimeoutException){
+                    results.postValue(AppConstants.SOCKET_TIME_OUT);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+
 }

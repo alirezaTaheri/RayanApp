@@ -28,6 +28,11 @@ import rayan.rayanapp.Adapters.recyclerView.GroupsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+//<<<<<<< HEAD
+//=======
+import rayan.rayanapp.Util.SnackBarSetup;
+import rayan.rayanapp.ViewModels.ChangeDeviceAccessPointFragmentViewModel;
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 public class ChangeGroupFragment extends BottomSheetDialogFragment implements OnGroupClicked<Group> , View.OnClickListener {
@@ -83,7 +88,7 @@ public class ChangeGroupFragment extends BottomSheetDialogFragment implements On
         selectedGroupTitle.setText(item.getName());
         selectedGroupTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.blue));
         selectedGroup = item;
-        Toast.makeText(getActivity(), ""+item.getName(), Toast.LENGTH_SHORT).show();
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),""+item.getName());
     }
 
     @Override
@@ -107,7 +112,7 @@ public class ChangeGroupFragment extends BottomSheetDialogFragment implements On
             dismiss();
         }
         else
-            Toast.makeText(getActivity(), "لطفا یک گروه را انتخاب کنید", Toast.LENGTH_SHORT).show();
+          SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک گروه را انتخاب کنید");
     }
 
     @OnClick(R.id.cancel)

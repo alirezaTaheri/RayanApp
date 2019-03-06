@@ -40,6 +40,7 @@ import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.NetworkUtil;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 
@@ -138,14 +139,18 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     @Override
     public void successful() {
         connectionStatus = ConnectionStatus.SUCCESSFUL;
-        Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
+//<<<<<<< HEAD
+//        Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
         TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
+//=======
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"باموفقیت متصل شد");
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
     }
 
     @Override
     public void failure() {
         connectionStatus = ConnectionStatus.FAILURE;
-        Toast.makeText(getActivity(), "اتصال ناموفق بود لطفا دوباره تلاش کنید", Toast.LENGTH_SHORT).show();
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"اتصال ناموفق بود. لطفا دوباره تلاش کنید");
     }
 
     @Override
@@ -162,8 +167,12 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
 
     @Override
     public void connectToSame() {
-        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
+//<<<<<<< HEAD
+//        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
         TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
+//=======
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"در حال حاضر به این دستگاه متصل هستید");
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
     }
 
     @Override

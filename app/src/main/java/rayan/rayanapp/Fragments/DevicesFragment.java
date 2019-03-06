@@ -2,13 +2,19 @@ package rayan.rayanapp.Fragments;
 
 import android.animation.ValueAnimator;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
+//<<<<<<< HEAD
 import android.util.Log;
+//=======
+import android.util.DisplayMetrics;
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +36,7 @@ import rayan.rayanapp.Util.AppConstants;
 
 public class DevicesFragment extends Fragment implements OnToggleDeviceListener<Device>,ToggleDeviceAnimationProgress {
     DevicesFragmentViewModel devicesFragmentViewModel;
+
     public DevicesFragment() {}
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -56,7 +63,13 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
         ButterKnife.bind(this, view);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        if (isTablet(getActivity())) {
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
+        }
+
+
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         return view;
@@ -174,5 +187,16 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 ////        valueAnimator.setCurrentPlayTime(7000);
 ////        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
 //        });
+    }
+
+    public static int calculateNoOfColumns(Context context, float columnWidthDp) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float screenWidthDp = displayMetrics.widthPixels / displayMetrics.density;
+        int noOfColumns = (int) (screenWidthDp / columnWidthDp + 0.5); // +0.5 for correct rounding to int.
+        return noOfColumns;
+    }
+
+    public static boolean isTablet(Context ctx){
+        return (ctx.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 }

@@ -32,6 +32,7 @@ import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDeviceSetConfigurationFragmentViewModel;
 
 public class NewDeviceSetConfigurationFragment extends BackHandledFragment implements BlockingStep {
@@ -134,6 +135,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
         if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
+//<<<<<<< HEAD
             Toast.makeText(getContext(), "لطفا نام دستگاه را وارد کنید", Toast.LENGTH_SHORT).show();
         else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getId().trim().length()<1)
             Toast.makeText(getContext(), "لطفا یک گروه را انتخاب کنید", Toast.LENGTH_SHORT).show();
@@ -171,6 +173,15 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
             });
 
         }
+//=======
+//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام دستگاه را وارد کنید");
+//        else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getGroupId() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroupId().trim().length()<1)
+//          SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک گروه را انتخاب کنید");
+//        else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid().trim().length()<1)
+//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مودم را انتخاب کنید");
+//        else
+//        mViewModel.registerDeviceSendToDevice(((AddNewDeviceActivity)getActivity()),new RegisterDeviceRequest("someUsername", "DeviceName", "DeviceType") , new CreateTopicRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getId(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getGroupId(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), AppConstants.MQTT_HOST),new SetPrimaryConfigRequest("SSID", "pwd", "hostName", "mqttHost", "mqttPort", "mqttTopic", "mqttUser", "mqttPass", "hpwd"), "192.168.1.102");
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
     }
 
     @Override

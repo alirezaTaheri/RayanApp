@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,20 +30,22 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.Data.Contact;
+import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.CreateGroupViewModel;
 
 public class CreateGroupFragment extends Fragment {
-
     private CreateGroupViewModel createGroupViewModel;
     static final int PICK_CONTACT=1;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private static CreateGroupFragment instance = null;
     @BindView(R.id.groupNameEditText)
     EditText name;
+    String nameTxt;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-
     UsersRecyclerViewAdapter usersRecyclerViewAdapter;
     private List<User> users = new ArrayList<>();
     private ArrayList<String> numbers = new ArrayList<>();
@@ -105,6 +108,7 @@ public class CreateGroupFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        instance=this;
         createGroupViewModel = ViewModelProviders.of(this).get(CreateGroupViewModel.class);
 
     }
@@ -119,7 +123,8 @@ public class CreateGroupFragment extends Fragment {
     }
     @OnClick(R.id.createGroup)
     public void createGroup(){
-        CreateGroupButtomSheetFragment bottomSheetFragment = new CreateGroupButtomSheetFragment().newInstance(name.getText().toString(), numbers);
+        nameTxt=name.getText().toString();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("CreateGroupFragment","ایجاد گروه", "بازگشت", "آیا مایل به ایجاد گروه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
@@ -129,4 +134,21 @@ public class CreateGroupFragment extends Fragment {
         }
     }
 
+
+    public void clickOnSubmit() {
+        createGroupViewModel.createGroup(nameTxt, numbers).observe(this, baseResponse -> {
+            if (baseResponse.getStatus().getCode().equals("422")){
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام گروه را وارد کنید");
+            }
+            else if (baseResponse.getStatus().getCode().equals("200")){
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"گروه با موفقیت ایجاد شد");
+                ((DoneWithFragment)getActivity()).operationDone();
+            }
+            else
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
+        });
+    }
+    public static CreateGroupFragment getInstance() {
+        return instance;
+    }
 }

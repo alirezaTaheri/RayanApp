@@ -2,16 +2,20 @@ package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +24,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,11 +41,17 @@ import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
+
 public class EditDeviceFragment extends BackHandledFragment{
-
-
+    private static EditDeviceFragment instance = null;
+    String readFromFileResult;
+    private ArrayList<String> codeList= new ArrayList<>();
+    private ArrayList<String> deviceFileList= new ArrayList<>();
+    int startIndex=0, packetSize =150;
     @BindView(R.id.name)
     EditText name;
     @BindView(R.id.onlineAccessTextView)
@@ -79,6 +96,7 @@ public class EditDeviceFragment extends BackHandledFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         device = getArguments().getParcelable("device");
+        instance=this;
     }
 
     @Override
@@ -124,12 +142,12 @@ public class EditDeviceFragment extends BackHandledFragment{
             assert s != null;
             switch (s){
                 case AppConstants.SET_TOPIC_MQTT_Response:
-                    Toast.makeText(getActivity(), "دسترسی اینترنتی با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دسترسی اینترنتی با موفقیت ایجاد شد");
                     setDeviceTopicStatus(TopicStatus.CHANGED);
                     break;
                 case AppConstants.SOCKET_TIME_OUT:
                     setDeviceTopicStatus(TopicStatus.CHANGED);
-                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
                     break;
             }
         });
@@ -142,30 +160,30 @@ public class EditDeviceFragment extends BackHandledFragment{
             switch (s){
                 case AppConstants.FORBIDDEN:
                     editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(), device.getIp());
-                    Toast.makeText(getActivity(), "شما دسترسی لازم برای تغییر نام را ندارید", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما دسترسی لازم برای تغییر نام را ندارید");
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.CHANGE_NAME_FALSE:
                     editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId());
-                    Toast.makeText(getActivity(), "امکان ویرایش نام وجود ندارد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"امکان ویرایش نام وجود ندارد");
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.OPERATION_DONE:
                     setDeviceNameStatus(NameStatus.CHANGED);
-                    Toast.makeText(getActivity(), "ویرایش نام با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"ویرایش نام با موفقیت انجام شد");
                     editDeviceFragmentViewModel.getGroups();
                     break;
                 case AppConstants.SOCKET_TIME_OUT:
-                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
                     editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(),device.getIp());
                     editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId());
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.ERROR:
-                    Toast.makeText(getActivity(), "خطایی رخ داد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطایی رخ داد");
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
@@ -175,6 +193,7 @@ public class EditDeviceFragment extends BackHandledFragment{
     @SuppressLint("CheckResult")
     @OnClick(R.id.factoryReset)
     void toDeviceFactoryReset(){
+//<<<<<<< HEAD
         editDeviceFragmentViewModel.internetProvided().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe((aBoolean, throwable) -> {
                     if (aBoolean)
@@ -194,7 +213,58 @@ public class EditDeviceFragment extends BackHandledFragment{
                     else ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
                 });
 
+//=======
+//        setDeviceTopicStatus(TopicStatus.CHANGING);
+//        editDeviceFragmentViewModel.toDeviceFactoryReset(device.getIp()).observe(this, s -> {
+//            assert s != null;
+//                switch (s){
+//                    case AppConstants.DEVICE_READY_FOR_UPDATE:
+//
+//                        break;
+//                    case AppConstants.SOCKET_TIME_OUT:
+//                        setDeviceTopicStatus(TopicStatus.CHANGED); SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
+//                        break;
+//                }
+//        });
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
     }
+
+    @OnClick(R.id.deviceUpdate)
+    void toDeviceUpdate(){
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟");
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+    }
+
+
+    public void clickOnDeviceUpdateSubmit(){
+         readFromFileResult=  editDeviceFragmentViewModel.readFromFile();
+        getDeviceFileList(AppConstants.DEVICE_ALL_FILES_LIST,device.getIp());
+        if (permitToSendFiles()) {
+            Toast.makeText(getActivity(), "trueeeee", Toast.LENGTH_SHORT).show();
+            for (int i=0;i<=deviceFileList.size()-1;i++){
+                Log.e("codelist items",deviceFileList.get(i));
+                Toast.makeText(getActivity(), "codelist items"+deviceFileList.get(i), Toast.LENGTH_SHORT).show();
+            }
+            // TODO: 2/28/2019 uncomment below lines in the last adit of code(when connected to real device)
+
+//            editDeviceFragmentViewModel.toDeviceUpdate(device.getIp()).observe(this, s -> {
+//                assert s != null;
+//                switch (s) {
+//                    case AppConstants.DEVICE_READY_FOR_UPDATE:
+//                        editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, convertCodeStringToList(readFromFileResult), device.getIp()).observe(this, res -> {
+//                            Log.e("response", res.toString());
+//                        });
+//                        break;
+//                    case AppConstants.SOCKET_TIME_OUT:
+//                        setDeviceTopicStatus(TopicStatus.CHANGED);
+//                        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "خطای اتصال");
+//                        break;
+//                }
+//            });
+        }
+    }
+
+
     @OnClick(R.id.changeAccessPoint)
     void toDeviceChangeAccessPoint(){
         int PERMISSION_ALL = 1;
@@ -235,6 +305,10 @@ public class EditDeviceFragment extends BackHandledFragment{
     public enum ChangeAccessPointStatus {
         CHANGING,
         CHANGED
+    }
+    public enum UpdateStatus {
+        UPDATING,
+        UPDATED
     }
 
     public void setDeviceNameStatus(NameStatus nameStatus){
@@ -299,5 +373,55 @@ public class EditDeviceFragment extends BackHandledFragment{
                 .setNegativeButton("No", (dialog, id) -> dialog.cancel());
         final AlertDialog alert = builder.create();
         alert.show();
+    }
+
+
+
+    public ArrayList<String> convertCodeStringToList(String result){
+        codeList.clear();
+        int j=result.length()/150;
+        Log.e("String Length/150",""+j);
+        for (int i=0;i<=j;i++){
+            if(!(result.length()-startIndex >=150)){
+                codeList.add(result.substring(startIndex, result.length()));
+            }else {
+                codeList.add(result.substring(startIndex, packetSize));
+                startIndex += 150;
+                packetSize += 150;
+            }
+        }
+        Log.e("codeList",""+codeList.toString());
+        Log.e("codeListsize",""+codeList.size());
+        return codeList;
+    }
+    public static EditDeviceFragment getInstance() {
+        return instance;
+    }
+
+    public void getDeviceFileList(String cmd, String deviceip){
+        editDeviceFragmentViewModel.toDeviceAllFilesList(cmd, deviceip ).observe(this,res->{
+            deviceFileList=res;
+            Log.e("file listsss",deviceFileList.get(0));
+            Toast.makeText(getActivity(), "file listsss"+deviceFileList.get(0), Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    boolean value=false;
+    private boolean permitToSendFiles() {
+        editDeviceFragmentViewModel.sendFilesToDevicePermit(AppConstants.DEVICE_SEND_FILES_PERMIT).observe(this,per->{
+            Log.e("permitttttt",per);
+            Toast.makeText(getActivity(), "permitttttt"+per, Toast.LENGTH_SHORT).show();
+            switch (per){
+                case "yes":
+                    value=true;
+                    break;
+                case "no":
+                    value=false;
+                    break;
+                default:
+                    break;
+            }
+        });
+        return value;
     }
 }

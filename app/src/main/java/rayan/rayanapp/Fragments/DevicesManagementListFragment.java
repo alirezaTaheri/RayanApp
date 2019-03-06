@@ -31,6 +31,7 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnDeviceClickListenerManagement;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.DevicesManagementListFragmentViewModel;
 
 public class DevicesManagementListFragment extends BackHandledFragment implements OnDeviceClickListenerManagement<Device> {
@@ -87,7 +88,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
             disposable.dispose();
         disposable = ((RayanApplication)getActivity().getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
             if (o.getString("cmd").equals(AppConstants.SETTINGS)){
-                Toast.makeText(getActivity(), "Message: " + o, Toast.LENGTH_SHORT).show();
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"Message: " + o);
                 waiting.remove(device.getChipId());
                 transaction = fragmentManager.beginTransaction();
                 transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
@@ -101,14 +102,14 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         });
         this.device = item;
         if (device.getIp() == null)
-            Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
         else {
             waiting.add(item.getChipId());
             devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
             devicesManagementListFragmentViewModel.setReadyForSettings(device).observe(this, s -> {
                 if (waiting.contains(s)){
                     waiting.remove(s);
-                    Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
                 }
                 devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
             });
@@ -144,4 +145,5 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         super.onAttach(context);
         sendDevice = (ClickOnDevice) getActivity();
     }
+
 }

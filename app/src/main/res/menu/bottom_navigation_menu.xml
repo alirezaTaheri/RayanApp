@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="start"
+    android:layoutDirection="ltr"
+    android:layout_gravity="start">
+    <item
+        android:id="@+id/action_senario"
+        android:title="@string/bottom_navigation_item2"
+        android:icon="@drawable/ic_scenario"/>
+    <item
+        android:id="@+id/action_device"
+        android:title="@string/bottom_navigation_item3"
+        android:icon="@drawable/ic_devices"/>
+    <item
+        android:id="@+id/action_favorite"
+        android:title="@string/bottom_navigation_item1"
+        android:icon="@drawable/ic_favorite"/>
+</menu>

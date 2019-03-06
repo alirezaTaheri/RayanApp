@@ -20,6 +20,7 @@ import butterknife.OnClick;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.ChangePasswordViewModel;
 import rayan.rayanapp.ViewModels.LoginViewModel;
 
@@ -75,13 +76,16 @@ public class ChangePasswordFragment extends Fragment {
                         Intent intent = new Intent(getActivity(), MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
-                    } else if (baseResponse.getStatus().getCode().equals("404")) {
-                        Toast.makeText(getActivity(), "رمز وارد شده اشتباه است", Toast.LENGTH_SHORT).show();
-                    } else if (baseResponse.getStatus().getCode().equals("422")) {
-                        Toast.makeText(getActivity(), "برای تغییر رمز فیلد ها را پر کنید", Toast.LENGTH_SHORT).show();
+                    } else if (baseResponse.getStatus().getCode().equals("403")) {
+                        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"کد وارد شده اشتباه است");
+                    } else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter password")) {
+                        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content)," کد تغییر رمز را وارد کنید");
+                    }else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter new_password")) {
+                        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"رمز جدید خود را وارد کنید");
                     } else {
                         Log.e(TAG, "edit user problem: " + baseResponse.getStatus().getCode());
-                        Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                        Log.e("message", baseResponse.getData().getMessage());
+                        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
                     }
                 });
             }else {
@@ -92,17 +96,20 @@ public class ChangePasswordFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-                } else if (baseResponse.getStatus().getCode().equals("404")) {
-                    Toast.makeText(getActivity(), "رمز وارد شده اشتباه است", Toast.LENGTH_SHORT).show();
-                } else if (baseResponse.getStatus().getCode().equals("422")) {
-                    Toast.makeText(getActivity(), "برای تغییر رمز فیلد ها را پر کنید", Toast.LENGTH_SHORT).show();
-                } else {
+                } else if (baseResponse.getStatus().getCode().equals("403")&& baseResponse.getData().getMessage().equals("You must enter password")) {
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"رمز وارد شده اشتباه است");
+                }else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter password")) {
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"رمز فعلی را وارد کنید");
+                }else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter new_password")) {
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"رمز جدید خود را وارد کنید");
+                }else {
                     Log.e(TAG, "edit user problem: " + baseResponse.getStatus().getCode());
-                    Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                    Log.e("message", baseResponse.getData().getMessage());
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
                 }
             });}
         }else{
-            Toast.makeText(getActivity(),"رمزهای وارد شده برابر نیستند",Toast.LENGTH_SHORT).show();
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"رمزهای وارد شده برابر نیستند");
         }
     }
 

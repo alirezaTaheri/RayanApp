@@ -1,13 +1,17 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+//<<<<<<< HEAD
 import android.net.wifi.WifiManager;
+//=======
+import android.content.res.Resources;
+import android.graphics.Color;
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +19,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -23,8 +28,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -38,13 +46,12 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
+import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Fragments.DevicesFragment;
+import rayan.rayanapp.Fragments.FavoritesFragment;
+import rayan.rayanapp.Fragments.ScenariosFragment;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
@@ -52,13 +59,14 @@ import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus {
-
+    int bottomNavigationHeight;
     @BindView(R.id.accessModeSwitch)
     IconSwitch accessModeSwitch;
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.viewPager)
     ViewPager viewPager;
     MainActivityViewModel mainActivityViewModel;
@@ -68,6 +76,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle actionBarDrawerToggle;
     @BindView(R.id.navigationView)
     NavigationView navigationView;
+    @BindView(R.id.bottom_navigation_view)
+    BottomNavigationView bottomNavigationView;
+    @BindView(R.id.bottom_navigation_viewpager)
+    ViewPager bottom_navigation_viewpager;
+    MenuItem prevMenuItem;
     MqttStatus mqttStatus;
 
     @Override
@@ -83,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         Log.e("setting",RayanApplication.getPref().getThemeKey()+ " "+ RayanApplication.getPref().getShowNotification());
+        navigationView.bringToFront();
+       navigationView.invalidate();
         navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
@@ -132,10 +147,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 RayanApplication.getPref().saveProtocol(AppConstants.UDP);
             }
         });
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+       // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         MainActivityViewPagerAdapter viewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(1);
+       // viewPager.setBackgroundColor(Color.GREEN);
         accessModeSwitch.setCheckedChangeListener(current -> {
             if (current.equals(IconSwitch.Checked.RIGHT)){
                 Log.e(TAG, "SET To Right");
@@ -219,7 +235,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             // not accessible
         }
+
+
+        initializeBottomNavigation();
     }
+
 
     public void initialize(){
         if (RayanApplication.getPref().getProtocol() == null){
@@ -450,6 +470,67 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         recognizer.setRecognitionListener(listener);
         recognizer.startListening(intent);
+
+    }
+
+    public void initializeBottomNavigation(){
+        setupBottomNavigationViewPager(viewPager);
+
+        bottomNavigationView.getMenu().getItem(1).setChecked(true);
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_device:
+                                viewPager.setCurrentItem(1);
+                                break;
+                            case R.id.action_senario:
+                                viewPager.setCurrentItem(0);
+                                break;
+                            case R.id.action_favorite:
+                                viewPager.setCurrentItem(2);
+                                break;
+                        }
+                        return false;
+                    }
+                });
+
+    }
+    int actionBarHeight;
+    private void setupBottomNavigationViewPager(ViewPager viewPager) {
+        BottomNavigationViewPagerAdapter adapter = new BottomNavigationViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        TypedValue tv = new TypedValue();
+        if (this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, this.getResources().getDisplayMetrics());
+        }
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
+        lp.bottomMargin += actionBarHeight+15;
+        viewPager.setCurrentItem(1);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+            @Override
+            public void onPageSelected(int position) {
+                if (prevMenuItem != null) {
+                    prevMenuItem.setChecked(false);
+                }
+                else
+                {
+                    bottomNavigationView.getMenu().getItem(1).setChecked(false);
+                }
+                Log.d("page", "onPageSelected: "+position);
+                bottomNavigationView.getMenu().getItem(position).setChecked(true);
+                prevMenuItem = bottomNavigationView.getMenu().getItem(position);
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
 
     }
 }

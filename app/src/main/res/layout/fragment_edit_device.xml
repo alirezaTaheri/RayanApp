@@ -201,6 +201,28 @@
         android:paddingTop="10dp"
         android:textColor="@color/grey_dark_2"
         android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/deviceUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/background_base_color_button"
+        android:clickable="true"
+        android:drawableRight="@drawable/ic_cloud"
+        android:focusable="true"
+        android:gravity="center"
+        android:paddingLeft="23dp"
+        android:paddingTop="10dp"
+        android:paddingRight="23dp"
+        android:paddingBottom="10dp"
+        android:text="آپدیت دستگاه"
+        android:textColor="@color/grey_dark_2"
+        android:textSize="14sp" />
+
     <TextView
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"

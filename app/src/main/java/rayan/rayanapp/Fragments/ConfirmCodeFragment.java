@@ -30,6 +30,7 @@ import butterknife.OnClick;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.SMSBroadCastReceiver;
+import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.ConfirmCodeViewModel;
 
 public class ConfirmCodeFragment extends Fragment {
@@ -62,7 +63,6 @@ public class ConfirmCodeFragment extends Fragment {
         if (checkAndRequestPermissions()) {
             // carry on the normal flow, as the case of  permissions  granted.
         }
-        // TODO: Use the ViewModel
     }
     @OnClick(R.id.register_code_btn)
     void clickOnRegisterCodeBtn() {
@@ -74,15 +74,16 @@ public class ConfirmCodeFragment extends Fragment {
                     startActivity(intent);
 
                 } else if (baseResponse.getStatus().getCode().equals("400")) {
-                    Toast.makeText(getActivity(), "کد وارد شده صحیح نیست", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"کد وارد شده صحیح نیست");
                 } else if (baseResponse.getStatus().getCode().equals("404")) {
-                    Toast.makeText(getActivity(), "ابتدا باید ثبت نام کنید", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"ابتدا باید ثبت نام کنید");
                 }else if (baseResponse.getStatus().getCode().equals("422")) {
-                    Toast.makeText(getActivity(), "کد ارسال شده را وارد کنید", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"کد ارسال شده را وارد کنید");
                 }
                 else {
                     Log.e(TAG, "edit user problem: " + baseResponse.getStatus().getCode());
-                    Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
+
                 }
             });
 

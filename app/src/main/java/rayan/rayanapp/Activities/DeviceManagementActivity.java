@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.Objects;
@@ -15,13 +16,24 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
+//<<<<<<< HEAD
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
+//=======
+import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
+import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.DevicesManagementActivityViewModel;
 
-public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, DoneWithSelectAccessPointFragment {
+//<<<<<<< HEAD
+public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
 
 
+//=======
+//public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, OnBottomSheetSubmitClicked {
+    EditDeviceFragment editDeviceFragment;
+    YesNoButtomSheetFragment yesNoButtomSheetFragment;
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
     DevicesManagementActivityViewModel viewModel;
@@ -33,6 +45,8 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         setContentView(R.layout.activity_device_management);
         viewModel = ViewModelProviders.of(this).get(DevicesManagementActivityViewModel.class);
         ButterKnife.bind(this);
+        yesNoButtomSheetFragment=new YesNoButtomSheetFragment();
+        yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.title_deviceManagementActivity);
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
@@ -44,10 +58,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 
     @SuppressLint("CheckResult")
     @Override
-    public void clickOnDevice(Device device) {
-
-
-    }
+    public void clickOnDevice(Device device) {}
 
     public void setActionBarTitle(String title) {
         Objects.requireNonNull(getSupportActionBar()).setTitle(title);
@@ -69,6 +80,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 
     @Override
     public void onBackPressed() {
+//<<<<<<< HEAD
 //        device = viewModel.getDevice("111111");
 //        device.setIp("192.168.1.102");
 //        if (device != null){
@@ -78,6 +90,19 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 //        transaction.replace(R.id.frameLayout, editGroupFragment);
 //        transaction.addToBackStack(null);
 //        transaction.commit();
+//=======
+//        device = viewModel.getDevice("137067");
+//        if (device != null){
+//        transaction = fragmentManager.beginTransaction();
+//        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+//        editDeviceFragment = EditDeviceFragment.newInstance(device);
+//        transaction.replace(R.id.frameLayout, editDeviceFragment);
+//        transaction.addToBackStack(null);
+//        transaction.commit();
+//        }
+//        if(currentFragment == null || !currentFragment.onBackPressed()) {
+//            super.onBackPressed();
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 //        }
         if(currentFragment == null || !currentFragment.onBackPressed()) {
             super.onBackPressed();
@@ -88,7 +113,21 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
     }
 
     @Override
+//<<<<<<< HEAD
     public void accessPointSelected(String ssid, String pass) {
+
+    }
+//=======
+    public void submitClicked(String tag) {
+        Log.e("tag of fragment",tag);
+        switch (tag){
+            case "EditDeviceFragment":
+                editDeviceFragment.clickOnDeviceUpdateSubmit();
+                break;
+            default:
+                break;
+        }
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 
     }
 }
