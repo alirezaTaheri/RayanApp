@@ -93,6 +93,9 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
             case "EditGroupFragment2":
                 editGroupFragment.clickOnRemoveAdminSubmit();
                 break;
+            case "EditGroupFragment3":
+                editGroupFragment.clickOnLeaveGroupSubmit();
+                break;
             default:
                 break;
         }

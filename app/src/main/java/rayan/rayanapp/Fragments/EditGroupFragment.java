@@ -66,7 +66,6 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
     @BindView(R.id.addManagerButton)
     ImageView addManagerButton;
-    private String groupName;
     @BindView(R.id.saveGroupName)
     TextView saveGroupName;
     public EditGroupFragment() {
@@ -103,8 +102,6 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
                 devicesRecyclerViewAdapter.setItems(group1.getDevices());
             });
         }
-        Log.e(TAG , "Group Is : " + group );
-        groupName = group.getName();
         usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
         usersRecyclerViewAdapter.setListener(this);
         managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity());
@@ -202,7 +199,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (name.getText().toString().equals(groupName)){
+                if (name.getText().toString().equals(group.getName())){
                     saveGroupName.setVisibility(View.INVISIBLE);
                 }
                 else{
@@ -235,7 +232,6 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
     public void init(Group group){
         name.setText(group.getName());
-        groupName = group.getName();
         devicesRecyclerViewAdapter.setItems(group.getDevices());
         usersRecyclerViewAdapter.setItems(group.getHumanUsers());
         managersRecyclerViewAdapter.setItems(group.getAdmins());
@@ -275,7 +271,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     @OnClick(R.id.leaveGroup_btn)
     void clickOnLeaveGroup(){
         userId=RayanApplication.getPref().getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment1","ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟" );
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment3","ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟" );
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
@@ -289,7 +285,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     public void clickOnRemoveUserSubmit() {
         editGroupFragmentViewModel.deleteUser(userId, group.getId()).observe(this, baseResponse -> {
             Log.e("remove user code",baseResponse.getStatus().getCode());
-            Toast.makeText(getActivity(), "remove user code"+baseResponse.getStatus().getCode()+" "+ baseResponse.getData().getMessage(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(), "remove user code"+baseResponse.getStatus().getCode()+" "+ baseResponse.getData().getMessage(), Toast.LENGTH_SHORT).show();
             if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")){
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"این کاربر وجود ندارد");
             }
@@ -323,6 +319,33 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
             else if (baseResponse.getStatus().getCode().equals("200")){
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مدیر با موفقیت حذف شد");
                 editGroupFragmentViewModel.getGroups();
+            }
+            else
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
+        });
+    }
+    public void clickOnLeaveGroupSubmit(){
+        editGroupFragmentViewModel.deleteUser(userId, group.getId()).observe(this, baseResponse -> {
+            Log.e("remove user code",baseResponse.getStatus().getCode());
+//            Toast.makeText(getActivity(), "remove user code"+baseResponse.getStatus().getCode()+" "+ baseResponse.getData().getMessage(), Toast.LENGTH_SHORT).show();
+            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")){
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"این کاربر وجود ندارد");
+            }
+            else if (baseResponse.getStatus().getCode().equals("404")){
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"حذف این کاربر امکان پذیر نیست");
+            }
+            else if (baseResponse.getStatus().getCode().equals("403")){
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما قادر به حذف این کاربر نیستید");
+            }
+            else if (baseResponse.getStatus().getCode().equals("204")){
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما با موفقیت از گروه خارج شدید");
+//                ((DoneWithFragment)getActivity()).operationDone();
+                getActivity().onBackPressed();
+            }
+            else if (baseResponse.getStatus().getCode().equals("200")){
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما با موفقیت از گروه خارج شدید");
+//                ((DoneWithFragment)getActivity()).operationDone();
+                getActivity().onBackPressed();
             }
             else
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
