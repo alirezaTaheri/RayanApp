@@ -155,4 +155,26 @@ public class NewDevice {
         this.hpwd = hpwd;
     }
 
+    @Override
+    public String toString() {
+        return "NewDevice{" +
+                "id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", name='" + name + '\'' +
+                ", ssid='" + ssid + '\'' +
+                ", accessPointName='" + accessPointName + '\'' +
+                ", toggleCount=" + toggleCount +
+                ", pwd='" + pwd + '\'' +
+                ", topic=" + topic +
+                ", mqttUser='" + mqttUser + '\'' +
+                ", mqttPass='" + mqttPass + '\'' +
+                ", hpwd='" + hpwd + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", group=" + group +
+                ", chip_id='" + chip_id + '\'' +
+                ", pin1='" + pin1 + '\'' +
+                ", pin2='" + pin2 + '\'' +
+                '}';
+    }
 }

@@ -45,7 +45,8 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
                 oldDevice.getPin1().equals(newDevice.getPin1())
                 && oldDevice.getPin2().equals(newDevice.getPin2())
                 && oldDevice.getName1().equals(newDevice.getName1())
-                && oldDevice.isFavorite() == newDevice.isFavorite();
+                && oldDevice.isFavorite() == newDevice.isFavorite()
+                && oldDevice.isLocallyAccessibility() == newDevice.isLocallyAccessibility();
 //                && oldDevice.getState2_1().equals(newDevice.getState2_1())
 //                && oldDevice.getIp().equals(newDevice.getIp())
 //                && (oldDevice.isReadyForMqtt() == newDevice.isReadyForMqtt());
@@ -63,6 +64,8 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
             b.putString("pin1", newDevice.getPin1());
         if (!newDevice.getPin2().equals(oldDevice.getPin2()))
             b.putString("pin2", newDevice.getPin2());
+        if (!newDevice.isLocallyAccessibility() == (oldDevice.isLocallyAccessibility()))
+            b.putBoolean("la", newDevice.isLocallyAccessibility());
 //        if (newDevice.getIp() != null && !newDevice.getIp().equals(oldDevice.getIp()))
 //            b.putString("ip", newDevice.getIp());
 //        if (newDevice.getState2_1() != null && !newDevice.getState2_1().equals(oldDevice.getState2_1()))

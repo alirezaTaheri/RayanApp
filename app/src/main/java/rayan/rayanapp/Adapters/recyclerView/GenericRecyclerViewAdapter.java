@@ -61,6 +61,11 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
     public void setListener(L listener) {
         this.listener = listener;
     }
+
+    public L getListener() {
+        return listener;
+    }
+
     @Override
     public void setHasStableIds(boolean hasStableIds) {
         super.setHasStableIds(hasStableIds);

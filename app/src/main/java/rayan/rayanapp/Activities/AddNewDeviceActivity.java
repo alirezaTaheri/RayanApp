@@ -202,7 +202,7 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 
     private void initNewDevice(){
         newDevice = new NewDevice();
-        newDevice.setChip_id("132465");
+        newDevice.setChip_id("");
         newDevice.setPin1("off");
         newDevice.setPin2("off");
     }

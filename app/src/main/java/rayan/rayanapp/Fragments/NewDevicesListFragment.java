@@ -202,16 +202,16 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
             Toast.makeText(getContext(), "لطفا یک دستگاه را انتخاب کنید", Toast.LENGTH_SHORT).show();
         else{
             ((AddNewDeviceActivity)getActivity()).getNewDevice().setAccessPointName(selectedAccessPoint.getSSID());
-            ((AddNewDeviceActivity)getActivity()).getNewDevice().setAccessPointName(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-1]);
-
+            ((AddNewDeviceActivity)getActivity()).getNewDevice().setChip_id(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-1]);
+            Log.e("//////////" , "Device is:  " + ((AddNewDeviceActivity) getActivity()).getNewDevice());
             if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_1);
 
-            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
+            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_2))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_2);
 
             else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_PLUG))
-                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_1);
+                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_PLUG);
 
             callback.goToNextStep();
         }

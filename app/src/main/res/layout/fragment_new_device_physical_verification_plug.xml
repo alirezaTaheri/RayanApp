@@ -18,16 +18,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
-            app:srcCompat="@drawable/ic_lamp_off"
+            app:srcCompat="@drawable/ic_lamp_on"
             android:id="@+id/onIcon"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="55dp" />
         <ImageView
-            app:srcCompat="@drawable/ic_lamp_on"
+            app:srcCompat="@drawable/ic_lamp_off"
             android:layout_weight="1"
             android:id="@+id/offIcon"
             android:layout_width="0dp"
             android:layout_height="55dp" />
     </LinearLayout>
+    <TextView
+        android:layout_margin="7dp"
+        android:textColor="#000000"
+        android:text="responses"
+        android:id="@+id/responses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

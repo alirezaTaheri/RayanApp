@@ -20,6 +20,7 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
@@ -132,6 +133,14 @@ Log.d(TAG,"Completed");
         return ((RayanApplication)activity.getApplication()).getNetworkBus().toObservable();
     }
 
+    private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .editDevice(RayanApplication.getPref().getToken(), editDeviceRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     Disposable disposable;
     public SingleLiveEvent<SetPrimaryConfigResponse> registerDeviceSendToDevice(WifiManager wifiManager,AddNewDeviceActivity activity, RegisterDeviceRequest registerDeviceRequest, String ip){
         SingleLiveEvent<SetPrimaryConfigResponse> result = new SingleLiveEvent<>();
@@ -142,12 +151,14 @@ Log.d(TAG,"Completed");
                 .observeOn(Schedulers.io())
                 .flatMap(deviceResponse ->{
                     Log.e(TAG, "Device Registration Passed\nAdding Device To Group...");
-                    Device d = deviceResponse.getData().getDevice();
-                    activity.getNewDevice().setId(d.getId());
-                    activity.getNewDevice().setUsername(d.getUsername());
-                    activity.getNewDevice().setPassword(d.getPassword());
-                    return addDeviceToGroupObservable(new AddDeviceToGroupRequest(activity.getNewDevice().getId(),activity.getNewDevice().getGroup().getId()));
+                    Log.e(TAG, "deviceResponse: " + deviceResponse.getData().getMessage());
+                        Device d = deviceResponse.getData().getDevice();
+                        activity.getNewDevice().setId(d.getId());
+                        activity.getNewDevice().setUsername(d.getUsername());
+                        activity.getNewDevice().setPassword(d.getPassword());
+                        return addDeviceToGroupObservable(new AddDeviceToGroupRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId()));
                 })
+                .flatMap(baseResponse -> editDeviceObservable(new EditDeviceRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getName(), activity.getNewDevice().getType())))
                 .flatMap(deviceResponse -> createTopicObservable(new CreateTopicRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getChip_id(), AppConstants.MQTT_HOST)))
                 .flatMap(deviceBaseResponse ->{
                     Log.e(TAG, "Topic Creation Passed\nConnecting to device...");

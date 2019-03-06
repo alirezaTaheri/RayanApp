@@ -3,9 +3,11 @@ package rayan.rayanapp.Activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,6 +33,7 @@ import com.polyak.iconswitch.IconSwitch;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -66,7 +69,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.navigationView)
     NavigationView navigationView;
     MqttStatus mqttStatus;
+
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -337,7 +342,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     ArrayList<String> text = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-
                     Log.e(TAG+ "/////////", "Text is: " + text.get(0));
 
                 }
@@ -345,14 +349,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
         }
-    }
-
-    @SuppressLint("CheckResult")
-    @Override
-    public void onBackPressed() {
-//        Observable.range(0, 1).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
-//                .
-//        reco();
     }
 
     @Override

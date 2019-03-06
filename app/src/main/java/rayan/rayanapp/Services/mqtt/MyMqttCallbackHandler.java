@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
@@ -58,6 +59,7 @@ public class MyMqttCallbackHandler implements MqttCallback {
               String pin2 = jsonMessage.getString("pin2");
               Device device = deviceDatabase.getDevice(src);
               if (device != null){
+                  ((RayanApplication)context.getApplicationContext()).getDevicesAccessibilityBus().removeWaiting(src);
                   device.setPin1(pin1);
                   device.setPin2(pin2);
                   deviceDatabase.updateDevice(device);

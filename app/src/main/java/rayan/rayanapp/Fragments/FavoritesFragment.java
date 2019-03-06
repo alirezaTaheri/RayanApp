@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +19,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Activities.MainActivity;
-import rayan.rayanapp.Listeners.OnStatusIconClickListener;
+import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
 import rayan.rayanapp.ViewModels.FavoritesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class FavoritesFragment extends Fragment implements OnStatusIconClickListener {
+public class FavoritesFragment extends Fragment implements OnToggleDeviceListener<Device> {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     List<Device> devices = new ArrayList<>();
@@ -68,12 +66,13 @@ public class FavoritesFragment extends Fragment implements OnStatusIconClickList
     }
 
     @Override
-    public void onPin1Clicked(Object Item) {
-        favoritesFragmentViewModel.togglePin1((Device) Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
+    public void onPin1Clicked(Device Item, int position) {
+        favoritesFragmentViewModel.togglePin1(position, ((RayanApplication)getActivity().getApplication()), Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
 
     @Override
-    public void onPin2Clicked(Object Item) {
-        favoritesFragmentViewModel.togglePin2((Device) Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
+    public void onPin2Clicked(Device Item, int position) {
+        favoritesFragmentViewModel.togglePin2(position, (RayanApplication) getActivity().getApplication(), Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
+
 }

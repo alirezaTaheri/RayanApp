@@ -12,6 +12,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Util.dataConverter.DeviceDataConverter;
 import rayan.rayanapp.Util.dataConverter.UserDataConverter;
@@ -119,10 +120,10 @@ public class Group implements Parcelable {
     @Override
     public String toString() {
         return "Group{" +
-                "id='" + id + '\'' +
+//                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", admins=" + admins +
-                ", humanUsers=" + humanUsers +
+//                ", admins=" + admins +
+//                ", humanUsers=" + humanUsers +
                 ", devices=" + devices +
                 '}';
     }

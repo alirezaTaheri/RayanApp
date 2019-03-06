@@ -26,11 +26,13 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
@@ -240,10 +242,28 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     @SuppressLint("CheckResult")
-    public LiveData<String> toDeviceFactoryReset(String ip){
+    public LiveData<String> toDeviceFactoryReset(Device device){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
+        deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId())).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                .flatMap(deviceBaseResponse -> {
+                    if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+                        return toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET), device.getIp());
+                    else {
+                        results.postValue(AppConstants.ERROR_DESCRIPTION);
+                        return null;
+                    }
+                }).subscribe(toDeviceFactoryResetObserver(results));
+//        toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
         return results;
+    }
+
+
+    private Observable<BaseResponse> deleteUserObservable(DeleteUserRequest deleteUserRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deleteUser(RayanApplication.getPref().getToken(), deleteUserRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     private Observable<DeviceBaseResponse> toDeviceFactoryResetObservable(BaseRequest baseRequest, String ip){

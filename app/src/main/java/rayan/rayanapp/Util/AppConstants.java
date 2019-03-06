@@ -67,4 +67,13 @@ public class AppConstants {
     public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";
     public final static String DEVICE_TYPE_PLUG = "plug";
 
+    /**
+     * API
+     */
+    public final static String DUPLICATE_USER = "duplicate user";
+    public final static String SUCCESS_DESCRIPTION = "success";
+    public final static String ERROR_DESCRIPTION = "error";
+    public final static String USER_NOT_FOUND_RESPONSE = "User not found";
+    public final static String WRONG_PASSWORD_RESPONSE = "Wrong password";
+
 }

@@ -2,6 +2,7 @@ package rayan.rayanapp.Adapters.recyclerView;
 
 import android.content.Context;
 import android.support.v7.util.DiffUtil;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -24,6 +25,8 @@ public class GroupsRecyclerViewAdapter extends GenericRecyclerViewAdapter<Group,
         if (items == null) {
             throw new IllegalArgumentException("Cannot set `null` item to the Recycler adapter");
         }
+//        Log.e("OldGroups:" , "oldGroups: "  + this.items);
+//        Log.e("NewGroups:" , "newGroups: "  + items);
         GroupsDiffCallBack devicesDiffCallBack = new GroupsDiffCallBack(items, this.items);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack);
         this.items.clear();

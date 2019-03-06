@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Persistance.AppDatabase;
@@ -73,6 +74,8 @@ public class UDPServerService extends Service {
                             if (device == null)
                                 Log.e(TAG, "Couldn't find this Device: " + src);
                             else{
+                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().removeWaiting(src);
+                                device.setLocallyAccessibility(true);
                                 device.setPin1(pin1);
                                 device.setPin2(pin2);
                                 device.setIp(senderIP);
@@ -87,6 +90,8 @@ public class UDPServerService extends Service {
                             device = deviceDatabase.getDevice(src);
                             Log.d(TAG, "TLMSDONETLMSDONE: " + device);
                             if (device != null){
+                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().removeWaiting(src);
+                                device.setLocallyAccessibility(true);
                                 device.setIp(senderIP);
                                 device.setName1(new String(decodedName, "UTF-8"));
                                 device.setPin1(pin1);
@@ -110,6 +115,8 @@ public class UDPServerService extends Service {
                             device = deviceDatabase.getDevice(src);
                             Log.d(TAG, "YESYESYES: " + device);
                             if (device != null){
+                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().removeWaiting(src);
+                                device.setLocallyAccessibility(true);
                                 device.setIp(senderIP);
                                 device.setName1(new String(decodedName, "UTF-8"));
                                 device.setSsid(ssid);

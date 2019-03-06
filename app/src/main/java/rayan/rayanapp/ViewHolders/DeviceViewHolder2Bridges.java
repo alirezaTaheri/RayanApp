@@ -1,6 +1,7 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -10,7 +11,7 @@ import com.varunest.sparkbutton.SparkButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Listeners.OnStatusIconClickListener;
+import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.R;
 
 public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
@@ -28,9 +29,13 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     }
 
     @Override
-    public void onBind(Device item, @Nullable OnStatusIconClickListener<Device> listener) {
+    public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
         Log.e(TAG, "Processing this Device: " + item);
         name.setText(item.getName1());
+//        if (!item.isLocallyAccessibility() || item.getIp() == null)
+//            bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.red_acc_4));
+//        else
+            bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         if (item.getPin1().equals("on")){
             pin1.setChecked(true);
         }
@@ -44,8 +49,8 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
             pin2.setChecked(false);
         }
         if (listener != null){
-            pin1.setOnClickListener(v -> listener.onPin1Clicked(item));
-            pin2.setOnClickListener(v -> listener.onPin2Clicked(item));
+            pin1.setOnClickListener(v -> listener.onPin1Clicked(item, getAdapterPosition()));
+            pin2.setOnClickListener(v -> listener.onPin2Clicked(item, getAdapterPosition()));
         }
 
 

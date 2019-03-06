@@ -54,9 +54,10 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
                     switch (activeNetwork.getType()){
                         case ConnectivityManager.TYPE_WIFI:
                             String status = NetworkUtil.getConnectivityStatusString(context);
-                            if (status.equals(AppConstants.WIFI))
-                                ((RayanApplication)((Application)context)).getNetworkBus().send(getCurrentSSID());
-                            postValue(new NetworkConnection(AppConstants.WIFI_NETWORK,true));
+                            if (status.equals(AppConstants.WIFI)){
+                                ((RayanApplication)(context)).getNetworkBus().send(getCurrentSSID());
+                            }
+                            postValue(new NetworkConnection(AppConstants.WIFI_NETWORK,true, getCurrentSSID()));
                             break;
                         case ConnectivityManager.TYPE_MOBILE:
                             postValue(new NetworkConnection(AppConstants.MOBILE_DATA,true));

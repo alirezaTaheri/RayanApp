@@ -14,6 +14,7 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
@@ -63,13 +64,13 @@ public class NewDevicePhysicalVerificationViewModel extends NewDevicesListViewMo
 
     public LiveData<DeviceBaseResponse> toDeviceStatus(String status){
         final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();
-        toDeviceStatusObservable(new BaseRequest(status), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceStatusObserver(results));
+        toDeviceStatusObservable(new PlugPhysicalVerificationRequest(status), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceStatusObserver(results));
         return results;
     }
-    private Observable<DeviceBaseResponse> toDeviceStatusObservable(BaseRequest baseRequest, String ip){
+    private Observable<DeviceBaseResponse> toDeviceStatusObservable(PlugPhysicalVerificationRequest request, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .ITET(getDeviceAddress(ip), baseRequest)
+                .plugStatusVerification(getDeviceAddress(ip), request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -85,6 +86,7 @@ public class NewDevicePhysicalVerificationViewModel extends NewDevicesListViewMo
             @Override
             public void onError(@NonNull Throwable e) {
                 Log.d(TAG,"Error"+e);
+                results.postValue(new DeviceBaseResponse(AppConstants.SOCKET_TIME_OUT));
                 e.printStackTrace();
             }
 

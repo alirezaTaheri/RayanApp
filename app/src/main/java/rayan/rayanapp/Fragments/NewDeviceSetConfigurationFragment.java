@@ -140,7 +140,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
         else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid().trim().length()<1)
             Toast.makeText(getContext(), "لطفا یک مودم را انتخاب کنید", Toast.LENGTH_SHORT).show();
         else{
-            mViewModel.internetProvied().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
+            mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
                 if (aBoolean){
                     callback.getStepperLayout().showProgress("درحال برقراری ارتباط با دستگاه"+"\n"+"لطفا کمی صبرکنید");
                     ((AddNewDeviceActivity) getActivity()).getNewDevice().setName(nameEditText.getText().toString());

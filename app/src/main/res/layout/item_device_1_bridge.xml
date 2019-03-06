@@ -51,17 +51,17 @@
             </RelativeLayout>
         </LinearLayout>
         <View
-            android:id="@+id/offBottomStrip"
-            android:layout_gravity="bottom"
+            android:layout_gravity="center_horizontal|bottom"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:background="@color/grey_light_1"/>
+            android:background="@color/grey_light_3"
+            />
         <View
-            android:id="@+id/onBottomStrip"
-            android:layout_gravity="bottom"
+            android:id="@+id/bottomStrip"
+            android:layout_gravity="center_horizontal|bottom"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:background="@color/baseColor"/>
+            />
         <ImageView
             android:visibility="invisible"
             android:id="@+id/aliveIndicator"

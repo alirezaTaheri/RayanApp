@@ -31,7 +31,8 @@ import rayan.rayanapp.ViewModels.NewDevicePhysicalVerificationViewModel;
 public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implements StepperItemSimulation {
     private OnFragmentInteractionListener mListener;
     NewDevicePhysicalVerificationViewModel viewModel;
-
+    @BindView(R.id.responses)
+    TextView responses;
     public NewDevice_Plug_PhysicalVerificationFragment() {
 
     }
@@ -68,6 +69,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
     @OnClick(R.id.onIcon)
     void sendOnStatus(){
         viewModel.toDeviceStatus(AppConstants.NEW_DEVICE_ON_STATUS).observe(this, deviceBaseResponse -> {
+            responses.append("\n"+deviceBaseResponse.toString());
             switch (deviceBaseResponse.getCmd()){
                 case AppConstants.NEW_DEVICE_PHV_TRUE:
                     Toast.makeText(getActivity(), "درست", Toast.LENGTH_SHORT).show();
@@ -82,12 +84,16 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                     Toast.makeText(getActivity(), "دسترسی شما تایید شد", Toast.LENGTH_SHORT).show();
                     ((AddNewDeviceActivity)getContext()).setStepperPosition(3);
                     break;
+                case AppConstants.SOCKET_TIME_OUT:
+                    Toast.makeText(getActivity(), "پاسخی دریافت نشد", Toast.LENGTH_SHORT).show();
+                    break;
             }
         });
     }
     @OnClick(R.id.offIcon)
     void sendOffStatus(){
         viewModel.toDeviceStatus(AppConstants.NEW_DEVICE_OFF_STATUS).observe(this, deviceBaseResponse -> {
+            responses.append("\n"+deviceBaseResponse.toString());
             switch (deviceBaseResponse.getCmd()){
                 case AppConstants.NEW_DEVICE_PHV_TRUE:
                     Toast.makeText(getActivity(), "درست", Toast.LENGTH_SHORT).show();
@@ -100,6 +106,10 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                     break;
                 case AppConstants.NEW_DEVICE_PHV_VERIFIED:
                     Toast.makeText(getActivity(), "دسترسی شما تایید شد", Toast.LENGTH_SHORT).show();
+                    ((AddNewDeviceActivity)getContext()).setStepperPosition(3);
+                    break;
+                case AppConstants.SOCKET_TIME_OUT:
+                    Toast.makeText(getActivity(), "پاسخی دریافت نشد", Toast.LENGTH_SHORT).show();
                     break;
             }
         });

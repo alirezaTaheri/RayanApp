@@ -9,6 +9,8 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.net.SocketTimeoutException;
+
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
@@ -17,10 +19,12 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Data;
+import rayan.rayanapp.Util.AppConstants;
 
 public class LoginViewModel extends ViewModel {
     private final String TAG = LoginViewModel.class.getSimpleName();
-    private final MutableLiveData<BaseResponse> loginResponse = new MutableLiveData<>();
+    public final MutableLiveData<BaseResponse> loginResponse = new MutableLiveData<>();
     public boolean isConnected(Context context){
         ConnectivityManager CManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo NInfo = CManager.getActiveNetworkInfo();
@@ -44,13 +48,19 @@ public class LoginViewModel extends ViewModel {
             @Override
             public void onNext(@NonNull BaseResponse baseResponse) {
                 Log.d(TAG,"OnNext "+baseResponse);
-                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
                     loginResponse.setValue(baseResponse);
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
                 Log.d(TAG,"Error"+e);
+                if (e instanceof SocketTimeoutException){
+                    BaseResponse b = new BaseResponse();
+                    Data d = new Data();
+                    d.setMessage(AppConstants.SOCKET_TIME_OUT);
+                    b.setData(d);
+                    loginResponse.postValue(b);
+                }
                 e.printStackTrace();
             }
 

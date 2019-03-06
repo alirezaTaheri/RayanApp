@@ -10,8 +10,6 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
 import android.util.Log;
 
-import com.google.gson.JsonObject;
-
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -25,10 +23,13 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
@@ -253,7 +254,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 @Override
                 public void onChanged(int i, int i1, @Nullable Object o) {
 //                    Log.e("DEF", "onChanged: from: "+i+" To: " + (i1+i) +"Count: " + i1);
-                    groupDatabase.updateGroups(serverGroups.subList(i, i+1));
+                    groupDatabase.updateGroups(serverGroups.subList(i, i+i1));
                 }
             });
 //            groupDatabase.addGroups(newGroups);
@@ -286,29 +287,137 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         }
     }
 
-    public void togglePin1(Device device, boolean local){
+    public void togglePin1(int position, RayanApplication rayanApplication, Device device, boolean local){
         if (local){
-            sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString());
-
+            setTracker1(position, device, rayanApplication);
         }
         else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null){
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString(), 0, false);
+            timerObservable.subscribe(new Observer<Long>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+                        rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
+                    rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position);
+                }
 
+                @Override
+                public void onNext(Long aLong) {
+                    Log.e("/////////", "////////OnNext////: " + aLong);
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e("/////////", "////////onError/////: " +e);
+                }
+
+                @Override
+                public void onComplete() {
+                    Log.e("/////////", "////////OnComplete/////: ");
+                    if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+                        rayanApplication.getDevicesAccessibilityBus().setDeviceOnlineAccessibility(device.getChipId(), false);
+                }
+            });
         }
     }
 
-    public void togglePin2(Device device, boolean local){
+    public void togglePin2(int position, RayanApplication rayanApplication, Device device, boolean local){
         if (local){
-            sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString());
-
+                setTracker2(position, device,rayanApplication);
         }
         else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString(), 0, false);
+            timerObservable.subscribe(new Observer<Long>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+                        rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
+                    rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position);
+                }
 
+                @Override
+                public void onNext(Long aLong) {
+                    Log.e("/////////", "////////OnNext////: " + aLong);
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e("/////////", "////////onError/////: " +e);
+                }
+
+                @Override
+                public void onComplete() {
+                    Log.e("/////////", "////////OnComplete/////: ");
+                    if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+                        rayanApplication.getDevicesAccessibilityBus().setDeviceOnlineAccessibility(device.getChipId(), false);
+                }
+            });
         }
+
     }
 
-    public Single<Boolean> internetProvied(){
+
+    Observable<Long> counterObservable = Observable.interval(0,700,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
+    Observable<Long> timerObservable = Observable.timer(4, TimeUnit.SECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
+    public void setTracker1(int position, Device device, RayanApplication rayanApplication){
+                counterObservable.takeWhile(aLong -> aLong<5 && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+                            rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position);
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        Log.e("/////////", "////////OnNext////: " + aLong);
+                        sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("/////////", "////////onError/////: " +e);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e("/////////", "////////OnComplete/////: ");
+                        rayanApplication.getDevicesAccessibilityBus().setDeviceLocallyAccessibility(device.getChipId(), false);
+                    }
+                });
+    }
+
+    public void setTracker2(int position, Device device, RayanApplication rayanApplication){
+                counterObservable.takeWhile(aLong -> aLong<5 && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+                            rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position);
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        Log.e("/////////", "////////OnNext////: " + aLong);
+                        sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("/////////", "////////onError/////: " +e);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e("/////////", "////////OnComplete/////: ");
+                        rayanApplication.getDevicesAccessibilityBus().setDeviceLocallyAccessibility(device.getChipId(), false);
+                    }
+                });
+    }
+
+    public Single<Boolean> internetProvided(){
         return Single.fromCallable(() -> {
             try {
                 Socket sock = new Socket();

@@ -4,6 +4,7 @@ import android.support.v7.util.DiffUtil;
 
 import java.util.List;
 
+import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 public class GroupsDiffCallBack extends DiffUtil.Callback {
@@ -30,6 +31,14 @@ public class GroupsDiffCallBack extends DiffUtil.Callback {
 
     @Override
     public boolean areContentsTheSame(int i, int i1) {
+//        boolean devices = true;
+//        Group oldG = oldGroups.get(i);
+//        Group newG = newGroups.get(i1);
+//        for (int a = 0; a<oldG.getDevices().size();a++)
+//            for (int b = 0;b<newG.getDevices().size();b++)
+//                if (oldG.getDevices().get(a).getId().equals(newG.getDevices().get(b).getId())
+//                        && oldG.getDevices().get(a).getName1().equals(newG.getDevices().get(b).getName1()))
+//                    devices = false;
         return oldGroups.get(i).getName().equals(newGroups.get(i1).getName()) &&
                 oldGroups.get(i).getHumanUsers().size() == newGroups.get(i1).getHumanUsers().size() &&
                 oldGroups.get(i).getAdmins().size() == newGroups.get(i1).getAdmins().size() &&

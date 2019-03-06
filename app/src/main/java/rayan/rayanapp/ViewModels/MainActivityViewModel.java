@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.net.DhcpInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -135,5 +136,14 @@ public class MainActivityViewModel extends AndroidViewModel {
         jsonObject.addProperty("src", RayanApplication.getPref().getId());
         jsonObject.addProperty("cmd", AppConstants.TO_DEVICE_NODE);
         sendUDPMessage.sendUdpMessage(RayanApplication.getPref().getLocalBroadcastAddress(), jsonObject.toString());
+    }
+
+    public String getCurrentSSID(WifiManager wifiManager){
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        String currentSSID  = wifiInfo.getSSID();
+        if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
+            currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
+        }
+        return currentSSID;
     }
 }

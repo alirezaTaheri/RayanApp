@@ -11,4 +11,15 @@ public class RegisterDeviceRequest {
         this.device_type = device_type;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getDevice_name() {
+        return device_name;
+    }
+
+    public String getDevice_type() {
+        return device_type;
+    }
 }

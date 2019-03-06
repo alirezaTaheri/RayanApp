@@ -22,6 +22,7 @@ import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
 import rayan.rayanapp.Receivers.LanguageDetailsChecker;
 import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
+import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
 import rayan.rayanapp.RxBus.NetworkConnectionBus;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
@@ -36,11 +37,14 @@ public class RayanApplication extends Application {
     private static PrefManager pref;
     private NetworkConnectionLiveData networkConnectionLiveData;
     private NetworkConnectionBus networkBus;
+    private DevicesAccessibilityBus devicesAccessibilityBus;
+    private String currentSSID;
     @Override
     public void onCreate() {
         super.onCreate();
 
         wifiBus = new WifiScanResultsBus();
+        devicesAccessibilityBus = new DevicesAccessibilityBus(this);
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
 //                .setDefaultFontPath("fonts/Dosis_Regular.ttf")
 //                .setFontAttrId(R.attr.fontPath)
@@ -69,6 +73,14 @@ public class RayanApplication extends Application {
 
     }
 
+    public String getCurrentSSID() {
+        return currentSSID;
+    }
+
+    public void setCurrentSSID(String currentSSID) {
+        this.currentSSID = currentSSID;
+    }
+
     public NetworkConnectionBus getNetworkBus() {
         return networkBus;
     }
@@ -79,6 +91,10 @@ public class RayanApplication extends Application {
 
     public JSONObject getJson(String cmd, List<String> values){
         return jsonMaker.getJson(cmd, values);
+    }
+
+    public DevicesAccessibilityBus getDevicesAccessibilityBus() {
+        return devicesAccessibilityBus;
     }
 
     public UDPMessageRxBus getBus(){

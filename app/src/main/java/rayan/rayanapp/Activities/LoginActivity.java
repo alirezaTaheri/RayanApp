@@ -18,6 +18,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
@@ -45,12 +46,31 @@ public class LoginActivity extends AppCompatActivity {
         }
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         loginViewModel.getLoginResponse().observe(this, baseResponse -> {
-            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
-                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
-                RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
+            if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
+                if (baseResponse.getData().getUser().getRegistered().equals("true")) {
+                    RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
+                    RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+                else
+                    Toast.makeText(this, "کاربری شما تایید نشده است", Toast.LENGTH_SHORT).show();
+            }
+            else
+            switch (baseResponse.getData().getMessage()){
+                case AppConstants.SOCKET_TIME_OUT:
+                    Toast.makeText(this, "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.USER_NOT_FOUND_RESPONSE:
+                    Toast.makeText(this, "کاربری با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.WRONG_PASSWORD_RESPONSE:
+                    Toast.makeText(this, "رمز عبور اشتباه است", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.SUCCESS_DESCRIPTION:
+
+                    break;
             }
         });
     }

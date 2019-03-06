@@ -33,7 +33,6 @@ public class BaseResponse {
         this.status = status;
     }
 
-
     @Override
     public String toString() {
         return "DeviceBaseResponse{" +

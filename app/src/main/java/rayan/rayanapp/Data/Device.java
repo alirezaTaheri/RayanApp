@@ -46,6 +46,9 @@ public class Device implements Parcelable {
     private String ip;
     private String password;
     private boolean favorite;
+    private boolean locallyAccessibility;
+    private boolean onlineAccessibility;
+
 
     public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId) {
         this.chipId = chipId;
@@ -211,25 +214,43 @@ public class Device implements Parcelable {
         this.favorite = favorite;
     }
 
+    public boolean isLocallyAccessibility() {
+        return locallyAccessibility && getIp()!=null;
+    }
+
+    public void setLocallyAccessibility(boolean locallyAccessibility) {
+        this.locallyAccessibility = locallyAccessibility;
+    }
+
+    public boolean isOnlineAccessibility() {
+        return onlineAccessibility ;
+//        return true ;
+    }
+
+    public void setOnlineAccessibility(boolean onlineAccessibility) {
+        this.onlineAccessibility = onlineAccessibility;
+    }
+
     @Override
     public String toString() {
         return "Device{" +
-                "chipId='" + chipId + '\'' +
+//                "chipId='" + chipId + '\'' +
                 ", name1='" + name1 + '\'' +
-//                ", name2='" + name2 + '\'' +
-                ", pin1='" + pin1 + '\'' +
+//                ", pin1='" + pin1 + '\'' +
 //                ", pin2='" + pin2 + '\'' +
-//                ", id='" + id + '\'' +
-                ", type='" + type + '\'' +
-//                ", username='" + username + '\'' +
 //                ", topic=" + topic +
+//                ", name2='" + name2 + '\'' +
+//                ", id='" + id + '\'' +
+//                ", type='" + type + '\'' +
+//                ", username='" + username + '\'' +
+//                ", password='" + password + '\'' +
 //                ", groupId='" + groupId + '\'' +
 //                ", style='" + style + '\'' +
 //                ", ssid='" + ssid + '\'' +
 //                ", ip='" + ip + '\'' +
-//                ", password='" + password + '\'' +
-//                ", ready4Mqtt=" + ready4Mqtt +
-                ", favorite=" + favorite +
+//                ", favorite=" + favorite +
+//                ", locallyAccessibility=" + locallyAccessibility +
+//                ", onlineAccessibility=" + onlineAccessibility +
                 '}';
     }
 

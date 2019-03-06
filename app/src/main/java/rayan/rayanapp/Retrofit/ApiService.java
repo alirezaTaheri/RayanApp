@@ -13,6 +13,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
@@ -95,6 +96,8 @@ public interface ApiService {
     Observable<ChangeNameResponse> changeName(@Url String url, @Body ChangeNameRequest changeNameRequest);
     @POST
     Observable<DeviceBaseResponse> ITET(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<DeviceBaseResponse> plugStatusVerification(@Url String url, @Body PlugPhysicalVerificationRequest request);
     @POST
     Observable<ToggleDeviceResponse> toggle(@Url String url, @Body BaseRequest baseRequest);
     @POST

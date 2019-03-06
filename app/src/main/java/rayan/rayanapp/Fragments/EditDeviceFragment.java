@@ -1,5 +1,6 @@
 package rayan.rayanapp.Fragments;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,8 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.R;
@@ -169,21 +172,28 @@ public class EditDeviceFragment extends BackHandledFragment{
             }
         });
     }
+    @SuppressLint("CheckResult")
     @OnClick(R.id.factoryReset)
     void toDeviceFactoryReset(){
-        editDeviceFragmentViewModel.toDeviceFactoryReset(device.getIp()).observe(this, s -> {
-            assert s != null;
-                switch (s){
-                    case AppConstants.FACTORY_RESET_DONE:
-                        Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
-                        setDeviceTopicStatus(TopicStatus.CHANGED);
-                        break;
-                    case AppConstants.SOCKET_TIME_OUT:
-                        setDeviceTopicStatus(TopicStatus.CHANGED);
-                        Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-        });
+        editDeviceFragmentViewModel.internetProvided().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe((aBoolean, throwable) -> {
+                    if (aBoolean)
+                        editDeviceFragmentViewModel.toDeviceFactoryReset(device).observe(this, s -> {
+                            assert s != null;
+                            switch (s){
+                                case AppConstants.FACTORY_RESET_DONE:
+                                    Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
+                                    setDeviceTopicStatus(TopicStatus.CHANGED);
+                                    break;
+                                case AppConstants.SOCKET_TIME_OUT:
+                                    setDeviceTopicStatus(TopicStatus.CHANGED);
+                                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                        });
+                    else ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
+                });
+
     }
     @OnClick(R.id.changeAccessPoint)
     void toDeviceChangeAccessPoint(){
