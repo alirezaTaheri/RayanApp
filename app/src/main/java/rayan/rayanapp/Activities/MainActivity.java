@@ -53,6 +53,7 @@ import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus {
     int bottomNavigationHeight;
@@ -78,6 +79,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ViewPager bottom_navigation_viewpager;
     MenuItem prevMenuItem;
     MqttStatus mqttStatus;
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

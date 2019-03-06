@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -25,6 +26,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.LoginViewModel;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -36,7 +38,9 @@ public class LoginActivity extends AppCompatActivity {
     EditText phoneEditText;
     @BindView(R.id.passwordEditText)
     EditText passwordInput;
-
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

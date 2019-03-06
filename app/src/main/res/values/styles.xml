@@ -19,7 +19,9 @@
 
     <style name="AppTheme.NoActionBar" parent="CustomTheme">
         <item name="windowActionBar">false</item>
+
         <item name="windowNoTitle">true</item>
+
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
@@ -36,5 +38,7 @@
     <style name="PreferenceScreen" parent="CustomTheme">
         <item name="android:textColor">@color/baseColor</item>
     </style>
-
+    <style name="BottomNavigationViewTextStyle">
+        <item name="android:fontFamily">fonts/iransans</item>
+    </style>
 </resources>

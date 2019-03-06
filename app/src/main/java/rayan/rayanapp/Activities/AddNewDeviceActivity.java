@@ -37,6 +37,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment {
     private final String TAG = AddNewDeviceActivity.class.getSimpleName();
@@ -53,6 +54,11 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     private SetPrimaryConfigRequest setPrimaryConfigRequest;
     private NewDevice newDevice;
     GroupsListFragmentViewModel viewModel;
+
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
     @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {

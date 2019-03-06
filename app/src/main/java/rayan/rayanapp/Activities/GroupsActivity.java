@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 
+import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class GroupsActivity extends AppCompatActivity implements GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked {
     GroupsListFragment groupsListFragment;
@@ -26,7 +28,9 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
     EditGroupFragment editGroupFragment;
     CreateGroupFragment createGroupFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
-
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

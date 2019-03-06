@@ -2,12 +2,14 @@ package rayan.rayanapp.Activities;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import java.util.Objects;
 
@@ -21,6 +23,8 @@ import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.DevicesManagementActivityViewModel;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
     EditDeviceFragment editDeviceFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
@@ -29,6 +33,9 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
     DevicesManagementActivityViewModel viewModel;
     BackHandledFragment currentFragment;
     Device device;
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +46,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.title_deviceManagementActivity);
         fragmentManager = getSupportFragmentManager();
-        transaction = fragmentManager.beginTransaction();
+         transaction = fragmentManager.beginTransaction();
         DevicesManagementListFragment devicesManagementListFragment = DevicesManagementListFragment.newInstance();
         transaction.replace(R.id.frameLayout, devicesManagementListFragment);
         transaction.commit();
