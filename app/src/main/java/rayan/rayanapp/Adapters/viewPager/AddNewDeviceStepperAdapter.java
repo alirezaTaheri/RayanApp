@@ -72,13 +72,11 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
     @NonNull
     @Override
     public StepViewModel getViewModel(int position) {
-        Log.e("///////////","getViewModel " + position);
         return super.getViewModel(position);
     }
 
     @Override
     public int getItemPosition(@NonNull Object object) {
-        Log.e("///////////","getItemPosition " + object + object.getClass());
         return POSITION_UNCHANGED;
     }
 

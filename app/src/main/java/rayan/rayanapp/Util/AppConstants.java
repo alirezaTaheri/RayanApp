@@ -63,6 +63,7 @@ public class AppConstants {
     public final static String FACTORY_RESET = "factory_reset";
     public final static String FACTORY_RESET_DONE = "factory_reseted";
 //<<<<<<< HEAD
+//<<<<<<< HEAD
     public final static String DEVICE_PRIMARY_PASSWORD = "12345678";
     public final static String DEVICE_TYPE_SWITCH_1 = "switch_1";
     public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";
@@ -77,6 +78,8 @@ public class AppConstants {
     public final static String USER_NOT_FOUND_RESPONSE = "User not found";
     public final static String WRONG_PASSWORD_RESPONSE = "Wrong password";
 //=======
+//=======
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 
     public final static String DEVICE_IS_READY_FOR_UPDATE = "ready4update?";
     public final static String DEVICE_READY_FOR_UPDATE = "ready4update";
@@ -86,6 +89,15 @@ public class AppConstants {
     public final static String DEVICE_DO_UPDATE = "update";
     public final static String DEVICE_ALL_FILES_LIST = "all_files_list";
     public final static String DEVICE_SEND_FILES_PERMIT = "send_files_to_device?";
+//<<<<<<< HEAD
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
+
+//    public final static String DEVICE_PRIMARY_PASSWORD = "12345678";
+//    public final static String DEVICE_TYPE_SWITCH_1 = "switch_1";
+//    public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";
+//    public final static String DEVICE_TYPE_PLUG = "plug";
+
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 
 }

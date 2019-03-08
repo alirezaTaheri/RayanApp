@@ -16,8 +16,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 
+import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.StepperLayout;
 
 import java.util.Objects;
@@ -29,16 +32,19 @@ import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.ChangeGroupFragment;
+import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
+import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.WifiScanReceiver;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment {
+public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
     private final String TAG = AddNewDeviceActivity.class.getSimpleName();
     private WifiHandler wifiHandler;
     WifiScanReceiver wifiReceiver;
@@ -53,6 +59,12 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     private SetPrimaryConfigRequest setPrimaryConfigRequest;
     private NewDevice newDevice;
     GroupsListFragmentViewModel viewModel;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
     @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +74,15 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         initNewDevice();
         setPrimaryConfigRequest = new SetPrimaryConfigRequest();
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("");
         stepperAdapter = new AddNewDeviceStepperAdapter(getSupportFragmentManager(), this);
         stepperLayout.setAdapter(stepperAdapter);
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
-        setActionBarTitle("افزودن دستگاه جدید");
+        setActionBarTitle("");
         wifiReceiver = new WifiScanReceiver();
         wifiHandler = new WifiHandler();
 //        if (savedInstanceState == null) {
@@ -84,6 +100,16 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -215,5 +241,13 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 
     public AddNewDeviceStepperAdapter getStepperAdapter() {
         return stepperAdapter;
+    }
+
+    @Override
+    public void submitClicked(String tag) {
+        ChangeGroupFragment changeGroupFragment = (ChangeGroupFragment) getSupportFragmentManager().findFragmentByTag("changeGroup");
+        CreateGroupFragment createGroupFragment = (CreateGroupFragment) changeGroupFragment.getChildFragmentManager().findFragmentByTag("createGroup");
+        createGroupFragment.clickOnSubmit();
+
     }
 }

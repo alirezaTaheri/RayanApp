@@ -69,7 +69,6 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
             recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
         }
 
-
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         return view;

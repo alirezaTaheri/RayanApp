@@ -34,6 +34,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation_view"
+        app:theme="@style/NavigationDrawerStyle"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"

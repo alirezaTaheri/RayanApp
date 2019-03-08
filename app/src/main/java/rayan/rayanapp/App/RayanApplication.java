@@ -1,33 +1,32 @@
 package rayan.rayanapp.App;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Environment;
-import android.speech.RecognizerIntent;
 
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
+//<<<<<<< HEAD
 import rayan.rayanapp.Receivers.LanguageDetailsChecker;
 import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
 import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
+//=======
+import rayan.rayanapp.R;
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 import rayan.rayanapp.RxBus.NetworkConnectionBus;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.JsonMaker;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class RayanApplication extends Application {
     private static Context context;
@@ -42,7 +41,11 @@ public class RayanApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/iransans.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
         wifiBus = new WifiScanResultsBus();
         devicesAccessibilityBus = new DevicesAccessibilityBus(this);
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()

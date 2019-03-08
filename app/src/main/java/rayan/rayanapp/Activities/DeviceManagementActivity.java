@@ -2,58 +2,79 @@ package rayan.rayanapp.Activities;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.Objects;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
-//<<<<<<< HEAD
-import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
-//=======
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
+import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.DevicesManagementActivityViewModel;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+//<<<<<<< HEAD
+//<<<<<<< HEAD////
+//=======
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
+
+//<<<<<<< HEAD
 //<<<<<<< HEAD
 public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
 
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 //=======
 //public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, OnBottomSheetSubmitClicked {
     EditDeviceFragment editDeviceFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
+//public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
+//    EditDeviceFragment editDeviceFragment;
+//    YesNoButtomSheetFragment yesNoButtomSheetFragment;
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
     DevicesManagementActivityViewModel viewModel;
     BackHandledFragment currentFragment;
     Device device;
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_management);
         viewModel = ViewModelProviders.of(this).get(DevicesManagementActivityViewModel.class);
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         yesNoButtomSheetFragment=new YesNoButtomSheetFragment();
         yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.title_deviceManagementActivity);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("");
         fragmentManager = getSupportFragmentManager();
-        transaction = fragmentManager.beginTransaction();
+         transaction = fragmentManager.beginTransaction();
         DevicesManagementListFragment devicesManagementListFragment = DevicesManagementListFragment.newInstance();
         transaction.replace(R.id.frameLayout, devicesManagementListFragment);
         transaction.commit();
-
     }
 
     @SuppressLint("CheckResult")
@@ -61,7 +82,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
     public void clickOnDevice(Device device) {}
 
     public void setActionBarTitle(String title) {
-        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("");
     }
 
     @Override
@@ -109,15 +130,19 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         }
     }
     public void setActionBarTitle(){
-        getSupportActionBar().setTitle(R.string.title_deviceManagementActivity);
+//        getSupportActionBar().setTitle(R.string.title_deviceManagementActivity);
+        getSupportActionBar().setTitle("");
     }
 
     @Override
+//<<<<<<< HEAD
 //<<<<<<< HEAD
     public void accessPointSelected(String ssid, String pass) {
 
     }
 //=======
+//=======
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     public void submitClicked(String tag) {
         Log.e("tag of fragment",tag);
         switch (tag){
@@ -127,7 +152,16 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
             default:
                 break;
         }
+//<<<<<<< HEAD
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
 
-    }
+
+}
+
+//    @Override
+//    public void accessPointSelected(String ssid, String pass) {
+////>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
+//
+//    }
 }

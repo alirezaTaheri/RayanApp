@@ -44,7 +44,7 @@ import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 
-public class NewDevicesListFragment extends Fragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, BlockingStep {
+public class NewDevicesListFragment extends BackHandledFragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, BlockingStep {
 
     private final String TAG = NewDevicesListFragment.class.getSimpleName();
     public AccessPoint selectedAccessPoint;
@@ -60,6 +60,11 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     private String currentSSID;
     public static NewDevicesListFragment newInstance() {
         return new NewDevicesListFragment();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
     @Override
@@ -79,7 +84,6 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
                 }else{
                     this.failure();
                 }
-
             }
         });
     }
@@ -140,11 +144,18 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     public void successful() {
         connectionStatus = ConnectionStatus.SUCCESSFUL;
 //<<<<<<< HEAD
+//<<<<<<< HEAD
 //        Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
-        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
+//        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
+//=======
+//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"باموفقیت متصل شد");
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 //=======
         SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"باموفقیت متصل شد");
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+        Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
+        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
+
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     }
 
     @Override
@@ -156,23 +167,29 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
     @Override
     public void searching() {
         connectionStatus = ConnectionStatus.SEARCHING;
-        ((AddNewDeviceActivity)Objects.requireNonNull(getActivity())).setActionBarTitle("در حال جستجو");
+//        ((AddNewDeviceActivity)Objects.requireNonNull(getActivity())).setActionBarTitle("در حال جستجو");
     }
 
     @Override
     public void idle() {
-        if (getActivity() != null)
-            ((AddNewDeviceActivity)(getActivity())).setActionBarTitle("افزود دستگاه جدید");
+//        if (getActivity() != null)
+//            ((AddNewDeviceActivity)(getActivity())).setActionBarTitle("افزود دستگاه جدید");
     }
 
     @Override
     public void connectToSame() {
 //<<<<<<< HEAD
+//<<<<<<< HEAD
 //        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
-        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
+//        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
 //=======
         SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"در حال حاضر به این دستگاه متصل هستید");
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
+//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"در حال حاضر به این دستگاه متصل هستید");
+//        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
+        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     }
 
     @Override
@@ -197,7 +214,7 @@ public class NewDevicesListFragment extends Fragment implements OnNewDeviceClick
 
     @Override
     public void onSelected() {
-
+        super.onResume();
     }
 
     @Override

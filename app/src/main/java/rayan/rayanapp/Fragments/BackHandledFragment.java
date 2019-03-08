@@ -2,6 +2,7 @@ package rayan.rayanapp.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 public abstract class BackHandledFragment extends Fragment {
     protected BackHandlerInterface backHandlerInterface;
@@ -19,12 +20,17 @@ public abstract class BackHandledFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        // Mark this fragment as the selected Fragment.
+    public void onResume() {
+        super.onResume();
         backHandlerInterface.setSelectedFragment(this);
     }
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        // Mark this fragment as the selected Fragment.
+//        backHandlerInterface.setSelectedFragment(this);
+//    }
 
     public interface BackHandlerInterface {
         public void setSelectedFragment(BackHandledFragment backHandledFragment);

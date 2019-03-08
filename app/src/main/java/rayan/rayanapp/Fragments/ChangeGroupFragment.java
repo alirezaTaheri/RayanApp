@@ -29,10 +29,16 @@ import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 //<<<<<<< HEAD
+//<<<<<<< HEAD
 //=======
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.ChangeDeviceAccessPointFragmentViewModel;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
+
+import rayan.rayanapp.Util.SnackBarSetup;
+import rayan.rayanapp.ViewModels.ChangeDeviceAccessPointFragmentViewModel;
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 public class ChangeGroupFragment extends BottomSheetDialogFragment implements OnGroupClicked<Group> , View.OnClickListener {
@@ -130,6 +136,8 @@ public class ChangeGroupFragment extends BottomSheetDialogFragment implements On
 //        transaction.addToBackStack(null);
         transaction.commit();
     }
+
+
 
     public void selectGroupMode(){
         groupsRecyclerViewAdapter.setItems(viewModel.getAllGroups());

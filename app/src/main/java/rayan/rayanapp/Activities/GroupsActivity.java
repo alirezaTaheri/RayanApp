@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 //<<<<<<< HEAD
+//<<<<<<< HEAD
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -10,9 +11,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Fragments.EditGroupFragment;
 import rayan.rayanapp.Fragments.GroupsListFragment;
@@ -20,23 +24,54 @@ import rayan.rayanapp.Fragments.GroupsListFragment;
 //=======
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
+
+import android.content.Context;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+
+
+import rayan.rayanapp.Fragments.CreateGroupFragment;
+import rayan.rayanapp.Fragments.EditGroupFragment;
+import rayan.rayanapp.Fragments.GroupsListFragment;
+import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class GroupsActivity extends AppCompatActivity implements GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked {
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     GroupsListFragment groupsListFragment;
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
     EditGroupFragment editGroupFragment;
     CreateGroupFragment createGroupFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
-
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_groups);
+        ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("");
         yesNoButtomSheetFragment=new YesNoButtomSheetFragment();
         yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
         fragmentManager = getSupportFragmentManager();
@@ -47,6 +82,15 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void clickOnGroup(Group group) {
         transaction = fragmentManager.beginTransaction();

@@ -50,11 +50,11 @@
         <activity
             android:name=".Activities.DeviceManagementActivity"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CustomTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.GroupsActivity"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CustomTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.ProfileActivity"
             android:parentActivityName=".Activities.MainActivity"
@@ -62,7 +62,7 @@
         <activity
             android:name=".Activities.AddNewDeviceActivity"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CustomTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.SettingsActivity"
             android:supportsRtl="true"

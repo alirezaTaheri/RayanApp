@@ -1,5 +1,6 @@
 package rayan.rayanapp.Fragments;
 
+import android.animation.ValueAnimator;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -21,11 +22,12 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
+import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.ViewModels.FavoritesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class FavoritesFragment extends Fragment implements OnToggleDeviceListener<Device> {
+public class FavoritesFragment extends Fragment implements OnToggleDeviceListener<Device>, ToggleDeviceAnimationProgress {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     List<Device> devices = new ArrayList<>();
@@ -67,12 +69,34 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
 
     @Override
     public void onPin1Clicked(Device Item, int position) {
+        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         favoritesFragmentViewModel.togglePin1(position, ((RayanApplication)getActivity().getApplication()), Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
 
     @Override
     public void onPin2Clicked(Device Item, int position) {
+        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         favoritesFragmentViewModel.togglePin2(position, (RayanApplication) getActivity().getApplication(), Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
 
+    @Override
+    public void toggleAnimationProgressChanged(int progress, int position) {
+        Bundle b = new Bundle();
+        b.putInt("progress", progress);
+        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
+    }
+
+    @Override
+    public void stopToggleAnimation(ValueAnimator valueAnimator, int position, int currentProgress, int progressWidth) {
+        getActivity().runOnUiThread(() -> {
+            valueAnimator.cancel();
+            valueAnimator.setIntValues(currentProgress,
+                    (currentProgress +(progressWidth - currentProgress)/3),
+                    (currentProgress + (progressWidth - currentProgress)/3*2),
+                    progressWidth
+            );
+            valueAnimator.setDuration(365);
+            valueAnimator.start();
+        });
+    }
 }

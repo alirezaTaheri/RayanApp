@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
@@ -81,7 +83,6 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return view;
     }
-
     @Override
     public void onItemClick(Device item) {
         if (disposable != null)
@@ -121,18 +122,18 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
         d.setFavorite(!item.isFavorite());
         devicesManagementListFragmentViewModel.updateDevice(d);
-        if (item.isFavorite())
+        if (!item.isFavorite())
             Snackbar.make(coordinatorLayout," " +item.getName1()+" به موردعلاقه ها اضافه شد", Snackbar.LENGTH_LONG)
-                    .setAction("بازگشت",v -> {
-                        d.setFavorite(item.isFavorite());
-                        devicesManagementListFragmentViewModel.updateDevice(d);
-                    })
+//                    .setAction("بازگشت",v -> {
+//                        d.setFavorite(item.isFavorite());
+//                        devicesManagementListFragmentViewModel.updateDevice(d);
+//                    })
                     .show();
         else Snackbar.make(coordinatorLayout," " +item.getName1()+" از موردعلاقه ها حذف شد", Snackbar.LENGTH_LONG)
-                .setAction("بازگشت",v -> {
-                    d.setFavorite(item.isFavorite());
-                    devicesManagementListFragmentViewModel.updateDevice(d);
-                })
+//                .setAction("بازگشت",v -> {
+//                    d.setFavorite(item.isFavorite());
+//                    devicesManagementListFragmentViewModel.updateDevice(d);
+//                })
                 .show();
     }
 

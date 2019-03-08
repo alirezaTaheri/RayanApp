@@ -30,6 +30,7 @@ import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SnackBarSetup;
@@ -90,7 +91,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 
     @Override
     public void onSelected() {
-
+        super.onResume();
     }
 
     @Override
@@ -136,11 +137,15 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
         if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
 //<<<<<<< HEAD
-            Toast.makeText(getContext(), "لطفا نام دستگاه را وارد کنید", Toast.LENGTH_SHORT).show();
+//<<<<<<< HEAD
+//            Toast.makeText(getContext(), "لطفا نام دستگاه را وارد کنید", Toast.LENGTH_SHORT).show();
+//=======
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام دستگاه را وارد کنید");
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
         else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getId().trim().length()<1)
-            Toast.makeText(getContext(), "لطفا یک گروه را انتخاب کنید", Toast.LENGTH_SHORT).show();
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک گروه را انتخاب کنید");
         else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid().trim().length()<1)
-            Toast.makeText(getContext(), "لطفا یک مودم را انتخاب کنید", Toast.LENGTH_SHORT).show();
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مودم را انتخاب کنید");
         else{
             mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
                 if (aBoolean){
@@ -173,6 +178,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
             });
 
         }
+//<<<<<<< HEAD
 //=======
 //        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام دستگاه را وارد کنید");
 //        else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getGroupId() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroupId().trim().length()<1)
@@ -182,6 +188,8 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 //        else
 //        mViewModel.registerDeviceSendToDevice(((AddNewDeviceActivity)getActivity()),new RegisterDeviceRequest("someUsername", "DeviceName", "DeviceType") , new CreateTopicRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getId(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getGroupId(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), AppConstants.MQTT_HOST),new SetPrimaryConfigRequest("SSID", "pwd", "hostName", "mqttHost", "mqttPort", "mqttTopic", "mqttUser", "mqttPass", "hpwd"), "192.168.1.102");
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     }
 
     @Override

@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -57,6 +58,7 @@ import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus {
     int bottomNavigationHeight;
@@ -84,7 +86,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     MqttStatus mqttStatus;
 
     @Override
+//<<<<<<< HEAD
 
+//=======
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+    @Override
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

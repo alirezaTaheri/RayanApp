@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -29,6 +30,7 @@ import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SnackBarSetup;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import rayan.rayanapp.ViewModels.LoginViewModel;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -40,7 +42,9 @@ public class LoginActivity extends AppCompatActivity {
     EditText phoneEditText;
     @BindView(R.id.passwordEditText)
     EditText passwordInput;
-
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +58,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
+//<<<<<<< HEAD
 //<<<<<<< HEAD
         loginViewModel.getLoginResponse().observe(this, baseResponse -> {
             if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
@@ -84,6 +89,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 //=======
+//=======
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 //        loginViewModel.getLoginResponse().observe(this, baseResponse -> {
 //            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
 //                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
@@ -95,7 +102,21 @@ public class LoginActivity extends AppCompatActivity {
 //                Log.e("login msg",baseResponse.getData().getMessage());
 //            }
 //        });
+//<<<<<<< HEAD
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+//=======
+
+//        loginViewModel.getLoginResponse().observe(this, baseResponse -> {
+//            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
+//                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
+//                RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
+//                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(intent);
+//            }
+//        });
+
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     }
     @OnClick(R.id.signUpTextView)
     void clickOnSignUp(){

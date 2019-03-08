@@ -46,10 +46,8 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         return groupDatabase.getGroup(id).getHumanUsers();
     }
 
-    public LiveData<BaseResponse> addUserByMobile(String phone, String groupId){
+    public LiveData<BaseResponse> addUserByMobile(ArrayList<String> phones, String groupId){
         final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
-        List<String> phones = new ArrayList<>();
-        phones.add(phone);
         addUserByMobileObservable(new AddUserByMobileRequest(phones, groupId)).subscribe(addUserByMobileObserver(results));
         return results;
     }

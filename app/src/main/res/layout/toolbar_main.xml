@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/baseColor"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -23,7 +22,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         app:isw_default_selection="left"
-        app:isw_background_color="@color/baseColor"
+        app:isw_background_color="@color/white"
         app:isw_icon_left="@drawable/png_home"
         app:isw_icon_right="@drawable/png_online_mode"
         app:isw_thumb_color_left="@color/grey"
