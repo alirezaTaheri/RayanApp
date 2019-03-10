@@ -31,43 +31,35 @@ public class DevicesAccessibilityBus {
 
     private PublishSubject<Map<String, Disposable>> bus = PublishSubject.create();
 
-    public void registerForAnimation(ToggleDeviceAnimationProgress animationProgress, int progressBarWidth){
-        listener = animationProgress;
-        this.progressBarWidth = progressBarWidth;
-    }
+//    public void registerForAnimation(ToggleDeviceAnimationProgress animationProgress, int progressBarWidth){
+//        listener = animationProgress;
+//        this.progressBarWidth = progressBarWidth;
+//    }
+//
+//    public void setWaiting(String chipId, Disposable disposable, int position, String onVsOff, int pin) {
+//
+//    }
+//
+//    public void removeWaiting(String chipId) {
+//    }
+//
+//    public Observable<Map<String, Disposable>> toObservable() {
+//        return bus;
+//    }
+//
+//    public boolean isWaiting(String chipId){
+//        return disposables.get(chipId) != null;
+//    }
 
-    public void setWaiting(String chipId, Disposable disposable, int position, String onVsOff, int pin) {
-        if (pin == 1)
-            listener.startToggleAnimationPin1(chipId,position);
-        else
-            listener.startToggleAnimationPin2();
-        disposables.put(chipId, disposable);
-        bus.onNext(disposables);
-    }
-
-    public void removeWaiting(String chipId) {
-        disposables.remove(chipId);
-        listener.stopToggleAnimationPin1(chipId);
-        bus.onNext(disposables);
-    }
-
-    public Observable<Map<String, Disposable>> toObservable() {
-        return bus;
-    }
-
-    public boolean isWaiting(String chipId){
-        return disposables.get(chipId) != null;
-    }
-
-    public void setDeviceLocallyAccessibility(String chipId, boolean accessibility){
-        Device d = deviceDatabase.getDevice(chipId);
-        d.setLocallyAccessibility(accessibility);
-        deviceDatabase.updateDevice(d);
-    }
-
-    public void setDeviceOnlineAccessibility(String chipId, boolean accessibility){
-        Device d = deviceDatabase.getDevice(chipId);
-        d.setOnlineAccessibility(accessibility);
-        deviceDatabase.updateDevice(d);
-    }
+//    public void setDeviceLocallyAccessibility(String chipId, boolean accessibility){
+//        Device d = deviceDatabase.getDevice(chipId);
+//        d.setLocallyAccessibility(accessibility);
+//        deviceDatabase.updateDevice(d);
+//    }
+//
+//    public void setDeviceOnlineAccessibility(String chipId, boolean accessibility){
+//        Device d = deviceDatabase.getDevice(chipId);
+//        d.setOnlineAccessibility(accessibility);
+//        deviceDatabase.updateDevice(d);
+//    }
 }

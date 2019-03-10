@@ -69,14 +69,14 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
 
     @Override
     public void onPin1Clicked(Device Item, int position) {
-        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
-        favoritesFragmentViewModel.togglePin1(position, ((RayanApplication)getActivity().getApplication()), Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
+//        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+//        favoritesFragmentViewModel.togglePin1(position, ((RayanApplication)getActivity().getApplication()), Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
 
     @Override
     public void onPin2Clicked(Device Item, int position) {
-        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
-        favoritesFragmentViewModel.togglePin2(position, (RayanApplication) getActivity().getApplication(), Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
+//        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+//        favoritesFragmentViewModel.togglePin2(position, (RayanApplication) getActivity().getApplication(), Item, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
     }
 
     @Override

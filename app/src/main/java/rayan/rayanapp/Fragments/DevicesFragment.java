@@ -99,7 +99,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 //            devicesRecyclerViewAdapter.notifyItemChanged(position,b);
 //        }
 //        counter++;
-        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+//        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
             if (device.isLocallyAccessibility())
                 devicesFragmentViewModel.togglePin1(position, ((RayanApplication) getActivity().getApplication()), device, true);
@@ -122,7 +122,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void onPin2Clicked(Device device, int position) {
-        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+//        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
             if (device.isLocallyAccessibility())
                 devicesFragmentViewModel.togglePin2(position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
