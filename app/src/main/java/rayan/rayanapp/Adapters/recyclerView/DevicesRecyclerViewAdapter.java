@@ -1,5 +1,6 @@
 package rayan.rayanapp.Adapters.recyclerView;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,7 +9,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
@@ -21,6 +24,7 @@ import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnToggleDeviceListener<Device>, DeviceViewHolder1Bridge> {
 
 
+    private Map<String, ValueAnimator> animatorMap = new HashMap<>();
     public DevicesRecyclerViewAdapter(Context context, List<Device> devices) {
         super(context);
         this.items = devices;
@@ -54,8 +58,26 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
         if (!payloads.isEmpty()) {
             Bundle b = (Bundle) payloads.get(0);
             for (String key : b.keySet()) {
-                if (key.equals("progress")){
-                    holder.setAnimationProgress(b.getInt("progress"));
+                if (key.equals("progressPin1")){
+                    holder.setAnimationProgressPin1(b.getInt("progressPin1"));
+                }
+                if (key.equals("progressPin2")){
+                    ((DeviceViewHolder2Bridges)holder).setAnimationProgressPin2(b.getInt("progressPin2"));
+                }
+                if (key.equals("startToggleOnAnimation")){
+                    Log.e("startToggleOnAnimati" , "b.startToggleOnAnimation: " + b.getString("startToggleOnAnimation"));
+                    ValueAnimator v;
+                    if (b.getString("status").equals(AppConstants.ON_STATUS))
+                        v = ValueAnimator.ofInt(b.getInt("progressWidth"), 0);
+                    else
+                        v = ValueAnimator.ofInt(0, b.getInt("progressWidth"));
+                    animatorMap.put(b.getString("chipId"), v);
+                    holder.startToggleAnimationPin1(v);
+                }
+                if (key.equals("stopToggleOnAnimation")){
+                    Log.e("stopToggleOnAnimation" , "b.stopToggleOnAnimation: " + b.getString("stopToggleOnAnimation"));
+                    holder.stopToggleOnAnimation(animatorMap.get(b.getString("chipId")), b.getString("status"));
+//                    animatorMap.remove(b.getString("chipId"));
                 }
 //            if (key.equals("name"))
 //                holder.setName(b.getString("name"));

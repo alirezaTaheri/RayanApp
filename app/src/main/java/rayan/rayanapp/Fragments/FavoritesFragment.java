@@ -80,23 +80,39 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     }
 
     @Override
-    public void toggleAnimationProgressChanged(int progress, int position) {
-        Bundle b = new Bundle();
-        b.putInt("progress", progress);
-        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
+    public int getItemWidth(int position) {
+        return recyclerView.getLayoutManager().getWidth();
+    }
+
+
+    @Override
+    public void toggleAnimationProgressChangedPin1(int progress, int position) {
+
     }
 
     @Override
-    public void stopToggleAnimation(ValueAnimator valueAnimator, int position, int currentProgress, int progressWidth) {
-        getActivity().runOnUiThread(() -> {
-            valueAnimator.cancel();
-            valueAnimator.setIntValues(currentProgress,
-                    (currentProgress +(progressWidth - currentProgress)/3),
-                    (currentProgress + (progressWidth - currentProgress)/3*2),
-                    progressWidth
-            );
-            valueAnimator.setDuration(365);
-            valueAnimator.start();
-        });
+    public void toggleAnimationProgressChangedPin2(int progress, int position) {
+
+    }
+
+    @Override
+    public void startToggleAnimationPin1(String chipId, int position) {
+
+    }
+
+    @Override
+    public void startToggleAnimationPin2() {
+
+    }
+
+    @Override
+    public void stopToggleAnimationPin1(String chipId) {
+
+    }
+
+
+    @Override
+    public void stopToggleAnimationPin2(int position) {
+
     }
 }

@@ -78,12 +78,45 @@
             android:layout_height="5dp"
             android:background="@color/grey_light_3"
             />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
             <View
                 android:id="@+id/bottomStrip"
-                android:layout_gravity="bottom|center_horizontal"
                 android:layout_width="match_parent"
+                android:layout_centerInParent="true"
+                android:background="@color/baseColor2"
                 android:layout_height="5dp"
                 />
+                </RelativeLayout>
+            </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <View
+                android:layout_centerInParent="true"
+                android:id="@+id/bottomStrip2"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:background="@color/baseColor2"
+                android:layout_height="5dp"
+                />
+            </RelativeLayout>
+        </LinearLayout>
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/aliveIndicator"
             android:visibility="invisible"

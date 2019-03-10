@@ -58,6 +58,7 @@
             />
         <View
             android:id="@+id/bottomStrip"
+            android:background="@color/baseColor2"
             android:layout_gravity="center_horizontal|bottom"
             android:layout_width="match_parent"
             android:layout_height="5dp"

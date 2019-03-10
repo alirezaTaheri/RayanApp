@@ -1,6 +1,7 @@
 package rayan.rayanapp.Fragments;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -18,6 +19,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ import rayan.rayanapp.Util.AppConstants;
 
 public class DevicesFragment extends Fragment implements OnToggleDeviceListener<Device>,ToggleDeviceAnimationProgress {
     DevicesFragmentViewModel devicesFragmentViewModel;
+    Activity activity;
 
     public DevicesFragment() {}
     @BindView(R.id.recyclerView)
@@ -54,8 +57,10 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
         devicesFragmentViewModel.getAllDevices().observe(this, devices -> {
          devicesRecyclerViewAdapter.updateItems(devices);
+         Log.e("uuuuuuuuuuuuu", "updating devices");
          this.devices = devices;
         });
+        activity = getActivity();
     }
 
     @Override
@@ -74,10 +79,27 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         return view;
     }
 
-
+//int counter = 0;
     @Override
     public void onPin1Clicked(Device device, int position) {
-        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+//        if (counter%2==0){
+//            startToggleAnimationPin1(device.getChipId(), position);
+//            Bundle b = new Bundle();
+//            b.putString("startToggleOnAnimation", "startToggleOnAnimation");
+//            b.putString("chipId", device.getChipId());
+//            b.putInt("progressWidth", recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+//            devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+//        }else{
+//            stopToggleAnimationPin1(position);
+//            Bundle b = new Bundle();
+//            b.putString("stopToggleOnAnimation", "stopToggleOnAnimation");
+//            b.putString("chipId", device.getChipId());
+//            b.putString("status", AppConstants.OFF_STATUS);
+//            b.putInt("progressWidth", recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+//            devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+//        }
+//        counter++;
+        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
             if (device.isLocallyAccessibility())
                 devicesFragmentViewModel.togglePin1(position, ((RayanApplication) getActivity().getApplication()), device, true);
@@ -100,7 +122,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void onPin2Clicked(Device device, int position) {
-        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
             if (device.isLocallyAccessibility())
                 devicesFragmentViewModel.togglePin2(position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
@@ -121,6 +143,52 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
         }
 
+
+    @Override
+    public void startToggleAnimationPin1(String chipId, int position) {
+        Bundle b = new Bundle();
+        b.putString("startToggleOnAnimation", "startToggleOnAnimation");
+        b.putString("chipId", chipId);
+        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+        b.putInt("progressWidth", recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+    }
+
+    @Override
+    public void startToggleAnimationPin2() {
+
+    }
+
+    int deviceWidth = -1;
+    @Override
+    public void stopToggleAnimationPin1(String chipId) {
+            Bundle b = new Bundle();
+            int position = findDevicePosition(chipId);
+            b.putString("stopToggleOnAnimation", "stopToggleOnAnimation");
+            b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
+            b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+            if (deviceWidth != -1)
+            b.putInt("progressWidth", deviceWidth);
+            else
+                deviceWidth = recyclerView.getLayoutManager().findViewByPosition(position).getWidth();
+            b.putInt("progressWidth", deviceWidth);
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+                }
+            });
+    }
+
+    @Override
+    public void stopToggleAnimationPin2(int position) {
+
+    }
+    @Override
+    public int getItemWidth(int position) {
+        return recyclerView.getLayoutManager().findViewByPosition(position).getWidth();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -131,61 +199,16 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     }
 
     @Override
-    public void toggleAnimationProgressChanged(int progress, int position) {
+    public void toggleAnimationProgressChangedPin1(int progress, int position) {
         Bundle b = new Bundle();
-        b.putInt("progress", progress);
+        b.putInt("progressPin1", progress);
         devicesRecyclerViewAdapter.notifyItemChanged(position, b);
     }
-
     @Override
-    public void stopToggleAnimation(ValueAnimator valueAnimator, int position, int currentProgress, int progressWidth) {
-        getActivity().runOnUiThread(() -> {
-//            valueAnimator.end();
-            valueAnimator.cancel();
-            valueAnimator.setIntValues(currentProgress,
-                    (currentProgress +(progressWidth - currentProgress)/3),
-                    (currentProgress + (progressWidth - currentProgress)/3*2),
-                    progressWidth
-            );
-            valueAnimator.setDuration(365);
-            valueAnimator.start();
-//            valueAnimator.setCurrentPlayTime(1500);
-//            Bundle b = new Bundle();
-//            b.putInt("progress", progressWidth);
-//            devicesRecyclerViewAdapter.notifyItemChanged(position, b);
-//            valueAnimator.setIntValues(currentProgress + (progressWidth-currentProgress)/3,
-//                    currentProgress + (progressWidth-currentProgress)*2/3,
-//                    currentProgress + (progressWidth-currentProgress));
-//            valueAnimator.setIntValues(200, 300, 400, 500, 510);
-//        Bundle b = new Bundle();
-//        b.putInt("progress", 550);
-//        valueAnimator.setCurrentPlayTime(7000);
-//        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
-        });
-//    @Override
-//    public void stopToggleAnimation(ValueAnimator valueAnimator, int position, int currentProgress, int progressWidth) {
-//        getActivity().runOnUiThread(() -> {
-//            valueAnimator.cancel();
-////            valueAnimator.setIntValues(currentProgress,
-////                    (currentProgress +(progressWidth - currentProgress)/3),
-////                    (currentProgress + (progressWidth - currentProgress)/3*2),
-////                    progressWidth
-////            );
-//            valueAnimator.setDuration(500);
-//            valueAnimator.start();
-////            valueAnimator.setCurrentPlayTime(1500);
-////            Bundle b = new Bundle();
-////            b.putInt("progress", progressWidth);
-////            devicesRecyclerViewAdapter.notifyItemChanged(position, b);
-////            valueAnimator.setIntValues(currentProgress + (progressWidth-currentProgress)/3,
-////                    currentProgress + (progressWidth-currentProgress)*2/3,
-////                    currentProgress + (progressWidth-currentProgress));
-////            valueAnimator.setIntValues(200, 300, 400, 500, 510);
-////        Bundle b = new Bundle();
-////        b.putInt("progress", 550);
-////        valueAnimator.setCurrentPlayTime(7000);
-////        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
-//        });
+    public void toggleAnimationProgressChangedPin2(int progress, int position) {
+        Bundle b = new Bundle();
+        b.putInt("progressPin2", progress);
+        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
     }
 
     public static int calculateNoOfColumns(Context context, float columnWidthDp) {
@@ -197,5 +220,11 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     public static boolean isTablet(Context ctx){
         return (ctx.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    public int findDevicePosition(String chipId){
+        for (int a = 0;a<devices.size();a++)
+            if (chipId.equals(devices.get(a).getChipId())) return a;
+        return -1;
     }
 }

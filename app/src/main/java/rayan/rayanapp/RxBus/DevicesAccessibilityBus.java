@@ -1,10 +1,14 @@
 package rayan.rayanapp.RxBus;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
@@ -13,18 +17,15 @@ import io.reactivex.subjects.PublishSubject;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
+import rayan.rayanapp.Util.AppConstants;
 
 public class DevicesAccessibilityBus {
     Map<String, Disposable> disposables;
-    Map<String, ValueAnimator> animatorMap;
-    Map<String, Integer> idPos;
     DeviceDatabase deviceDatabase;
     ToggleDeviceAnimationProgress listener;
     int progressBarWidth = -1;
     public DevicesAccessibilityBus(Context context) {
         disposables = new HashMap<>();
-        animatorMap = new HashMap<>();
-        idPos = new HashMap<>();
         deviceDatabase = new DeviceDatabase(context);
     }
 
@@ -35,33 +36,18 @@ public class DevicesAccessibilityBus {
         this.progressBarWidth = progressBarWidth;
     }
 
-    public void setWaiting(String chipId, Disposable disposable, int position) {
-        idPos.put(chipId, position);
-        disposables.put(chipId,disposable);
-        if (animatorMap.get(chipId) != null)
-            animatorMap.get(chipId).cancel();
-        ValueAnimator v = ValueAnimator.ofInt(0,progressBarWidth);
-        v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                listener.toggleAnimationProgressChanged((int)animation.getAnimatedValue(), position);
-            }
-        });
-        v.setDuration(4000);
-        v.setInterpolator(new AccelerateDecelerateInterpolator());
-//        v.setStartDelay(500);
-        v.start();
-        animatorMap.put(chipId, v);
+    public void setWaiting(String chipId, Disposable disposable, int position, String onVsOff, int pin) {
+        if (pin == 1)
+            listener.startToggleAnimationPin1(chipId,position);
+        else
+            listener.startToggleAnimationPin2();
+        disposables.put(chipId, disposable);
         bus.onNext(disposables);
     }
 
     public void removeWaiting(String chipId) {
-        if (disposables.get(chipId) != null)
-            disposables.get(chipId).dispose();
-        if (animatorMap.get(chipId) != null && idPos.get(chipId) != null)
-            listener.stopToggleAnimation(animatorMap.get(chipId), idPos.get(chipId), (int)animatorMap.get(chipId).getAnimatedValue(), progressBarWidth);
-        animatorMap.remove(chipId);
         disposables.remove(chipId);
+        listener.stopToggleAnimationPin1(chipId);
         bus.onNext(disposables);
     }
 

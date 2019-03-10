@@ -3,6 +3,7 @@ package rayan.rayanapp.Util.diffUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
+import android.util.Log;
 
 import java.util.List;
 
@@ -41,6 +42,12 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
         Device oldDevice = oldDevices.get(oldItemPosition);
         Device newDevice = newDevices.get(newItemPosition);
+        Log.e("Comparing: " ,"Comparing: " +(
+                oldDevice.getPin1().equals(newDevice.getPin1())
+                        && oldDevice.getPin2().equals(newDevice.getPin2())
+                        && oldDevice.getName1().equals(newDevice.getName1())
+                        && oldDevice.isFavorite() == newDevice.isFavorite()
+                        && oldDevice.isLocallyAccessibility() == newDevice.isLocallyAccessibility()));
         return
                 oldDevice.getPin1().equals(newDevice.getPin1())
                 && oldDevice.getPin2().equals(newDevice.getPin2())

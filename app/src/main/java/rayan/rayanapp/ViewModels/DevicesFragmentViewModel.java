@@ -298,7 +298,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 public void onSubscribe(Disposable d) {
                     if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
                         rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
-                    rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position);
+                    rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position,device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.ON_STATUS : AppConstants.OFF_STATUS,1 );
                 }
 
                 @Override
@@ -332,7 +332,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 public void onSubscribe(Disposable d) {
                     if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
                         rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
-                    rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position);
+                    rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position,device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.ON_STATUS : AppConstants.OFF_STATUS,2);
                 }
 
                 @Override
@@ -366,7 +366,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     public void onSubscribe(Disposable d) {
                         if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
                             rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
-                        rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position);
+                        rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position,device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.ON_STATUS : AppConstants.OFF_STATUS,1);
                     }
 
                     @Override
@@ -384,6 +384,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     public void onComplete() {
                         Log.e("/////////", "////////OnComplete/////: ");
                         rayanApplication.getDevicesAccessibilityBus().setDeviceLocallyAccessibility(device.getChipId(), false);
+                        rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
                     }
                 });
     }
@@ -395,7 +396,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     public void onSubscribe(Disposable d) {
                         if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
                             rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
-                        rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position);
+                        rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position,device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.ON_STATUS : AppConstants.OFF_STATUS,2);
                     }
 
                     @Override

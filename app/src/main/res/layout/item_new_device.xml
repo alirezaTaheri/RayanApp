@@ -22,7 +22,7 @@
         android:text="تست"
         android:gravity="center"
         android:textColor="@color/white"
-        android:padding="8dp"
+        android:padding="2dp"
         android:layout_margin="5dp"
         android:drawableRight="@drawable/ic_test_device"
         android:layout_gravity="right|center_vertical"

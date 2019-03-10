@@ -22,7 +22,8 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     SparkButton pin1;
     @BindView(R.id.pin2)
     SparkButton pin2;
-
+    @BindView(R.id.bottomStrip2)
+    View bottomStrip2;
     public DeviceViewHolder2Bridges(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
@@ -38,21 +39,45 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
             bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         if (item.getPin1().equals("on")){
             pin1.setChecked(true);
+            itemView.post(new Runnable() {
+                @Override
+                public void run(){
+                    Log.e("///////////////", "cellWidth: " + itemView.getWidth());
+                    bottomStrip.getLayoutParams().width = itemView.getWidth()/2;
+                    bottomStrip.requestLayout();
+                }
+            });
         }
         else {
+            bottomStrip.getLayoutParams().width = 0;
+            bottomStrip.requestLayout();
             pin1.setChecked(false);
         }
         if (item.getPin2().equals("on")){
             pin2.setChecked(true);
+            itemView.post(new Runnable() {
+                @Override
+                public void run(){
+                    Log.e("///////////////", "cellWidth: " + itemView.getWidth());
+                    bottomStrip2.getLayoutParams().width = itemView.getWidth()/2;
+                    bottomStrip2.requestLayout();
+                }
+            });
         }
         else {
+            bottomStrip2.getLayoutParams().width = 0;
+            bottomStrip2.requestLayout();
             pin2.setChecked(false);
         }
         if (listener != null){
             pin1.setOnClickListener(v -> listener.onPin1Clicked(item, getAdapterPosition()));
             pin2.setOnClickListener(v -> listener.onPin2Clicked(item, getAdapterPosition()));
         }
+    }
 
-
+    public void setAnimationProgressPin2(int progress){
+        Log.e("Toggling:::: " , "Toggling pin2: " + bottomStrip2.getLayoutParams().width + progress);
+        bottomStrip2.getLayoutParams().width = progress;
+        bottomStrip2.requestLayout();
     }
 }
