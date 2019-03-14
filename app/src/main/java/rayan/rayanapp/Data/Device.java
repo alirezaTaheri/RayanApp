@@ -236,7 +236,7 @@ public class Device implements Parcelable {
         return "Device{" +
 //                "chipId='" + chipId + '\'' +
                 ", name1='" + name1 + '\'' +
-//                ", pin1='" + pin1 + '\'' +
+                ", pin1='" + pin1 + '\'' +
 //                ", pin2='" + pin2 + '\'' +
 //                ", topic=" + topic +
 //                ", name2='" + name2 + '\'' +

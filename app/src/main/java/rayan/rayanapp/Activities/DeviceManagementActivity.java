@@ -99,36 +99,36 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
             return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-//<<<<<<< HEAD
-        device = viewModel.getDevice("111111");
-        device.setIp("192.168.1.102");
-        if (device != null){
-        transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-        EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
-        transaction.replace(R.id.frameLayout, editGroupFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();}
-//=======
-//        device = viewModel.getDevice("137067");
+//    @Override
+//    public void onBackPressed() {
+////<<<<<<< HEAD
+//        device = viewModel.getDevice("111111");
+//        device.setIp("192.168.1.102");
 //        if (device != null){
 //        transaction = fragmentManager.beginTransaction();
 //        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-//        editDeviceFragment = EditDeviceFragment.newInstance(device);
-//        transaction.replace(R.id.frameLayout, editDeviceFragment);
+//        EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
+//        transaction.replace(R.id.frameLayout, editGroupFragment);
 //        transaction.addToBackStack(null);
-//        transaction.commit();
-//        }
-//        if(currentFragment == null || !currentFragment.onBackPressed()) {
-//            super.onBackPressed();
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-//        }
-//        if(currentFragment == null || !currentFragment.onBackPressed()) {
-//            super.onBackPressed();
-//        }
-    }
+//        transaction.commit();}
+////=======
+////        device = viewModel.getDevice("137067");
+////        if (device != null){
+////        transaction = fragmentManager.beginTransaction();
+////        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+////        editDeviceFragment = EditDeviceFragment.newInstance(device);
+////        transaction.replace(R.id.frameLayout, editDeviceFragment);
+////        transaction.addToBackStack(null);
+////        transaction.commit();
+////        }
+////        if(currentFragment == null || !currentFragment.onBackPressed()) {
+////            super.onBackPressed();
+////>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+////        }
+////        if(currentFragment == null || !currentFragment.onBackPressed()) {
+////            super.onBackPressed();
+////        }
+//    }
     public void setActionBarTitle(){
 //        getSupportActionBar().setTitle(R.string.title_deviceManagementActivity);
         getSupportActionBar().setTitle("");

@@ -27,6 +27,10 @@ public class Group implements Parcelable {
     @SerializedName("name")
     @Expose
     private String name;
+    @SerializedName("secret")
+    @Expose
+    private String secret;
+
 //    @SerializedName("admins")
 //    @Expose
 //    @Ignore
@@ -115,6 +119,14 @@ public class Group implements Parcelable {
 
     public void setAdmins(List<User> admins) {
         this.admins = admins;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -38,6 +39,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.polyak.iconswitch.IconSwitch;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.File;
 import java.io.IOException;
@@ -383,6 +386,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onDestroy() {
         stopService(new Intent(this, UDPServerService.class));
+        mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection);
         super.onDestroy();
     }
 
@@ -540,6 +544,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onPageScrollStateChanged(int state) {
             }
         });
-
     }
 }

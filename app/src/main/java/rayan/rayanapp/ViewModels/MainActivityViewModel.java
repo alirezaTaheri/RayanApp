@@ -13,6 +13,8 @@ import android.util.Log;
 
 import com.google.gson.JsonObject;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -59,7 +61,7 @@ public class MainActivityViewModel extends AndroidViewModel {
                 mqttConnectOptions.setAutomaticReconnect(true);
                 mqttConnectOptions.setCleanSession(false);
                 mqttConnectOptions.setConnectionTimeout(5);
-                mqttConnectOptions.setKeepAliveInterval(10);
+                mqttConnectOptions.setKeepAliveInterval(200);
                 Connection connection = Connection.createConnection("ClientHandle" + System.currentTimeMillis(),"ClientId"+ System.currentTimeMillis(),"api.rayansmarthome.ir",1883,context,false);
                 connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTING);
                 connection.setSubscriptions(getSubscriptions(connection));
@@ -85,14 +87,24 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public LiveData<Connection> disconnectMQTT(LiveData<Connection> connection){
         MutableLiveData<Connection> updateConnection = new MutableLiveData<>();
-        if (connection.getValue()!= null)
+        if (connection.getValue()!= null && connection.getValue().getClient() != null)
         try {
-            connection.getValue().getClient().unregisterResources();
-            connection.getValue().getClient().close();
-            connection.getValue().getClient().disconnect();
+//            connection.getValue().getClient().unregisterResources();
+//            connection.getValue().getClient().close();
+            connection.getValue().getClient().disconnect().setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.e(getClass().getSimpleName(),"OnSuccess in Disconnection");
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Log.e(getClass().getSimpleName(),"OnFailure in Disconnection");
+                }
+            });
             connection.getValue().changeConnectionStatus(Connection.ConnectionStatus.DISCONNECTED);
             updateConnection.postValue(connection.getValue());
-        } catch( MqttException | IllegalArgumentException ex){
+        } catch(Exception ex){
             Log.e(TAG, "Exception occurred during disconnect: " + ex.getMessage());
         }
         return updateConnection;

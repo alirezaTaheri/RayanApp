@@ -1,6 +1,7 @@
 package rayan.rayanapp.Fragments;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -27,6 +28,9 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
@@ -49,6 +53,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         return new DevicesFragment();
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +62,6 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
         devicesFragmentViewModel.getAllDevices().observe(this, devices -> {
          devicesRecyclerViewAdapter.updateItems(devices);
-         Log.e("uuuuuuuuuuuuu", "updating devices");
          this.devices = devices;
         });
         activity = getActivity();
@@ -73,47 +77,27 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
         }
-
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         return view;
     }
 
-//int counter = 0;
     @Override
     public void onPin1Clicked(Device device, int position) {
-//        if (counter%2==0){
-//            startToggleAnimationPin1(device.getChipId(), position);
-//            Bundle b = new Bundle();
-//            b.putString("startToggleOnAnimation", "startToggleOnAnimation");
-//            b.putString("chipId", device.getChipId());
-//            b.putInt("progressWidth", recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
-//            devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-//        }else{
-//            stopToggleAnimationPin1(position);
-//            Bundle b = new Bundle();
-//            b.putString("stopToggleOnAnimation", "stopToggleOnAnimation");
-//            b.putString("chipId", device.getChipId());
-//            b.putString("status", AppConstants.OFF_STATUS);
-//            b.putInt("progressWidth", recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
-//            devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-//        }
-//        counter++;
-//        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
             if (device.isLocallyAccessibility())
-                devicesFragmentViewModel.togglePin1(position, ((RayanApplication) getActivity().getApplication()), device, true);
+                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
             else{
-                devicesFragmentViewModel.togglePin1(position, ((RayanApplication) getActivity().getApplication()), device, true);
+                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
             }
         }
         else {
             if (device.isOnlineAccessibility()){
-                devicesFragmentViewModel.togglePin1(position, ((RayanApplication) getActivity().getApplication()), device, false);
+                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
             }
             else{
-                devicesFragmentViewModel.togglePin1(position, ((RayanApplication) getActivity().getApplication()), device, false);
+                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
             }
         }
@@ -125,18 +109,18 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 //        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
             if (device.isLocallyAccessibility())
-                devicesFragmentViewModel.togglePin2(position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
+                devicesFragmentViewModel.togglePin2(this,position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
             else{
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-                devicesFragmentViewModel.togglePin2(position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
+                devicesFragmentViewModel.togglePin2(this, position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
             }
         }
         else {
             if (device.isOnlineAccessibility()){
-                devicesFragmentViewModel.togglePin2(position, ((RayanApplication) getActivity().getApplication()), device, false);
+                devicesFragmentViewModel.togglePin2(this,position, ((RayanApplication) getActivity().getApplication()), device, false);
             }
             else{
-                devicesFragmentViewModel.togglePin2(position, ((RayanApplication) getActivity().getApplication()), device, false);
+                devicesFragmentViewModel.togglePin2(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
             }
         }
@@ -147,46 +131,49 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     @Override
     public void startToggleAnimationPin1(String chipId, int position) {
         Bundle b = new Bundle();
-        b.putString("startToggleOnAnimation", "startToggleOnAnimation");
+        b.putString("startTogglingPin1", "startTogglingPin1");
         b.putString("chipId", chipId);
         b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
-        b.putInt("progressWidth", recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
         devicesRecyclerViewAdapter.notifyItemChanged(position,b);
     }
 
     @Override
-    public void startToggleAnimationPin2() {
-
+    public void startToggleAnimationPin2(String chipId, int position) {
+        Bundle b = new Bundle();
+        b.putString("startTogglingPin2", "startTogglingPin2");
+        b.putString("chipId", chipId);
+        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin2().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
     }
 
-    int deviceWidth = -1;
     @Override
     public void stopToggleAnimationPin1(String chipId) {
             Bundle b = new Bundle();
             int position = findDevicePosition(chipId);
-            b.putString("stopToggleOnAnimation", "stopToggleOnAnimation");
+            b.putString("stopToggleAnimationPin1", "stopToggleAnimationPin1");
             b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-            b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
-            if (deviceWidth != -1)
-            b.putInt("progressWidth", deviceWidth);
-            else
-                deviceWidth = recyclerView.getLayoutManager().findViewByPosition(position).getWidth();
-            b.putInt("progressWidth", deviceWidth);
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+                    Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
                 }
             });
     }
 
     @Override
-    public void stopToggleAnimationPin2(int position) {
-
-    }
-    @Override
-    public int getItemWidth(int position) {
-        return recyclerView.getLayoutManager().findViewByPosition(position).getWidth();
+    public void stopToggleAnimationPin2(String chipId) {
+        Bundle b = new Bundle();
+        int position = findDevicePosition(chipId);
+        b.putString("stopToggleAnimationPin2", "stopToggleAnimationPin2");
+        b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+                Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
+            }
+        });
     }
 
     @Override
@@ -196,19 +183,6 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         ((RayanApplication)getActivity().getApplication()).getNetworkStatus().observe(getActivity(), networkConnection -> {
             devicesRecyclerViewAdapter.updateItems(devices);
         });
-    }
-
-    @Override
-    public void toggleAnimationProgressChangedPin1(int progress, int position) {
-        Bundle b = new Bundle();
-        b.putInt("progressPin1", progress);
-        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
-    }
-    @Override
-    public void toggleAnimationProgressChangedPin2(int progress, int position) {
-        Bundle b = new Bundle();
-        b.putInt("progressPin2", progress);
-        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
     }
 
     public static int calculateNoOfColumns(Context context, float columnWidthDp) {

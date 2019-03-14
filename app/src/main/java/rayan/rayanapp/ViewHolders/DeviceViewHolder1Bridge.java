@@ -34,17 +34,13 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     @Override
     public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
-        Log.e(TAG, "Processing this Device: " + item+"\nThis Class: " + this + this.getClass() +"\n"+ animators);
-//        if (!item.isLocallyAccessibility() || item.getIp() == null)
-//            bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.red_acc_4));
-//        else
+        Log.e(TAG, "Processing this Device: " + item);
             bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setChecked(true);
             itemView.post(new Runnable() {
                 @Override
                 public void run(){
-                    Log.e("///////////////", "cellWidth: " + itemView.getWidth());
                     bottomStrip.getLayoutParams().width = itemView.getWidth();
                     bottomStrip.requestLayout();
                 }
@@ -61,7 +57,6 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
             itemView.post(new Runnable() {
                 @Override
                 public void run(){
-                    Log.e("///////////////", "cellWidth: " + itemView.getWidth());
                     bottomStrip.getLayoutParams().width = itemView.getWidth();
                     bottomStrip.requestLayout();
                 }
@@ -72,23 +67,21 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
             bottomStrip.getLayoutParams().width = 0;
             bottomStrip.requestLayout();
         }
+
         if (listener != null)
-        pin1.setOnClickListener(v -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+            pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
     }
 
 
     public void setAnimationProgressPin1(int progress){
-        Log.e("Toggling:::: " , "Toggling pin1: " + progress);
         bottomStrip.getLayoutParams().width = progress;
         bottomStrip.requestLayout();
     }
 
     public void startToggleAnimationPin1(ValueAnimator v){
-        Log.e("startingAnimation", "startingAnimation" + itemView.getWidth());
         v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                Log.e("onanimationupdate;" ,"update: " + animation.getAnimatedValue());
                 bottomStrip.getLayoutParams().width = (int) animation.getAnimatedValue();
                 bottomStrip.requestLayout();
             }
@@ -97,10 +90,10 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         v.start();
     }
 
-    public void stopToggleOnAnimation(ValueAnimator v, String status){
+    public void stopToggleAnimationPin1(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
         if (v != null) {
             v.cancel();
-            if (status.equals(AppConstants.ON_STATUS)) {
+            if (item.getPin1().equals(AppConstants.ON_STATUS)) {
                 v.setIntValues((int) v.getAnimatedValue(),
                         ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
                         ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
@@ -111,17 +104,25 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
                         ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3 * 2),
                         0);
             }
+        }
+        else {
+            if (item.getPin1().equals(AppConstants.ON_STATUS))
+                v = ValueAnimator.ofInt(0,getDeviceItemWidth());
+            else
+                v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    bottomStrip.getLayoutParams().width = (int) animation.getAnimatedValue();
+                    bottomStrip.requestLayout();
+                }
+            });
+        }
             v.setDuration(300);
             v.start();
-        }else {
-            if (status.equals(AppConstants.ON_STATUS)){
-                bottomStrip.getLayoutParams().width = itemView.getWidth();
-                bottomStrip.requestLayout();
-            }else{
-                bottomStrip.getLayoutParams().width = 0;
-                bottomStrip.requestLayout();
-            }
-        }
+            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
+        if (listener != null)
+            pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
     }
 
     public void messageArrivedOrFinishAnimation(Device item){
@@ -130,7 +131,6 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
             itemView.post(new Runnable() {
                 @Override
                 public void run(){
-                    Log.e("///////////////", "cellWidth: " + itemView.getWidth());
                     bottomStrip.getLayoutParams().width = itemView.getWidth();
                     bottomStrip.requestLayout();
                 }
@@ -141,6 +141,10 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
             bottomStrip.getLayoutParams().width = 0;
             bottomStrip.requestLayout();
         }
+    }
+
+    public int getDeviceItemWidth(){
+        return itemView.getWidth();
     }
 
 }

@@ -34,6 +34,7 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
@@ -287,18 +288,18 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         }
     }
 
-    public void togglePin1(int position, RayanApplication rayanApplication, Device device, boolean local){
+    public void togglePin1(ToggleDeviceAnimationProgress fragment, int position, RayanApplication rayanApplication, Device device, boolean local){
         if (local){
-            setTracker1(position, device, rayanApplication);
+            setTracker1(fragment, position, device, rayanApplication);
         }
         else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null){
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString(), 0, false);
             timerObservable.subscribe(new Observer<Long>() {
                 @Override
                 public void onSubscribe(Disposable d) {
-//                    if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
-//                        rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
-//                    rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position,device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.ON_STATUS : AppConstants.OFF_STATUS,1 );
+                    fragment.startToggleAnimationPin1(device.getChipId(), position);
+                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+                    rayanApplication.getDevicesAccessibilityBus().setWaitingPin1(device.getChipId(), d);
                 }
 
                 @Override
@@ -313,26 +314,26 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
                 @Override
                 public void onComplete() {
-                    Log.e("/////////", "////////OnComplete/////: ");
-//                    if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
-//                        rayanApplication.getDevicesAccessibilityBus().setDeviceOnlineAccessibility(device.getChipId(), false);
+                    Log.e("/////////", "////////OnComplete/////Pin1 Stopping animation:: ");
+                    fragment.stopToggleAnimationPin1(device.getChipId());
+                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                 }
             });
         }
     }
 
-    public void togglePin2(int position, RayanApplication rayanApplication, Device device, boolean local){
+    public void togglePin2(ToggleDeviceAnimationProgress fragment, int position, RayanApplication rayanApplication, Device device, boolean local){
         if (local){
-                setTracker2(position, device,rayanApplication);
+                setTracker2(fragment, position, device,rayanApplication);
         }
         else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
             publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString(), 0, false);
             timerObservable.subscribe(new Observer<Long>() {
                 @Override
                 public void onSubscribe(Disposable d) {
-//                    if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
-//                        rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
-//                    rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position,device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.ON_STATUS : AppConstants.OFF_STATUS,2);
+                    fragment.startToggleAnimationPin2(device.getChipId(), position);
+                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+                    rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
                 }
 
                 @Override
@@ -347,9 +348,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
                 @Override
                 public void onComplete() {
-                    Log.e("/////////", "////////OnComplete/////: ");
-//                    if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
-//                        rayanApplication.getDevicesAccessibilityBus().setDeviceOnlineAccessibility(device.getChipId(), false);
+                    Log.e("/////////", "////////OnComplete/////Pin2 Stopping animation: ");
+                    fragment.stopToggleAnimationPin2(device.getChipId());
+                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                 }
             });
         }
@@ -359,16 +360,14 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
     Observable<Long> counterObservable = Observable.interval(0,700,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     Observable<Long> timerObservable = Observable.timer(4, TimeUnit.SECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
-    public void setTracker1(int position, Device device, RayanApplication rayanApplication){
-                counterObservable.takeWhile(aLong -> aLong<5
-//                        && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId())
-                )
+    public void setTracker1(ToggleDeviceAnimationProgress fragment, int position, Device device, RayanApplication rayanApplication){
+                counterObservable.takeWhile(aLong -> aLong<5 && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
                 .subscribe(new Observer<Long>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-//                        if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
-//                            rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
-//                        rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position,device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.ON_STATUS : AppConstants.OFF_STATUS,1);
+                        fragment.startToggleAnimationPin1(device.getChipId(), position);
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().setWaitingPin1(device.getChipId(), d);
                     }
 
                     @Override
@@ -385,22 +384,20 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     @Override
                     public void onComplete() {
                         Log.e("/////////", "////////OnComplete/////: ");
-//                        rayanApplication.getDevicesAccessibilityBus().setDeviceLocallyAccessibility(device.getChipId(), false);
-//                        rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
+                        fragment.stopToggleAnimationPin1(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                     }
                 });
     }
 
-    public void setTracker2(int position, Device device, RayanApplication rayanApplication){
-                counterObservable.takeWhile(aLong -> aLong<5
-//                        && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId())
-                )
+    public void setTracker2(ToggleDeviceAnimationProgress fragment, int position, Device device, RayanApplication rayanApplication){
+                counterObservable.takeWhile(aLong -> aLong<5 && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
                 .subscribe(new Observer<Long>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-//                        if (rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
-//                            rayanApplication.getDevicesAccessibilityBus().removeWaiting(device.getChipId());
-//                        rayanApplication.getDevicesAccessibilityBus().setWaiting(device.getChipId(), d, position,device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.ON_STATUS : AppConstants.OFF_STATUS,2);
+                        fragment.startToggleAnimationPin2(device.getChipId(), position);
+                            rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
                     }
 
                     @Override
@@ -417,7 +414,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     @Override
                     public void onComplete() {
                         Log.e("/////////", "////////OnComplete/////: ");
-//                        rayanApplication.getDevicesAccessibilityBus().setDeviceLocallyAccessibility(device.getChipId(), false);
+                        fragment.stopToggleAnimationPin2(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                     }
                 });
     }

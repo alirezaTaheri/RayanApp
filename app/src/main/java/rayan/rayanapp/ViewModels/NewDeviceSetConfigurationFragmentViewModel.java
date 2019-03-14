@@ -169,7 +169,7 @@ Log.d(TAG,"Completed");
                     return connectToDeviceObservable(activity, wifiManager);
                 })
                 .flatMap(deviceResponse ->
-                    toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(),activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, AppConstants.MQTT_PORT, activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), activity.getNewDevice().getHpwd(), AppConstants.DEVICE_CONNECTED_STYLE), ip))
+                    toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(),activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, AppConstants.MQTT_PORT, activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), activity.getNewDevice().getHpwd(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip))
                 .subscribe(new Observer<SetPrimaryConfigResponse>() {
                     @Override
                     public void onSubscribe(Disposable d) {

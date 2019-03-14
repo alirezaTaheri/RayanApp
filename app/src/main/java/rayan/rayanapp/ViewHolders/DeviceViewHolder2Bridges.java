@@ -1,5 +1,6 @@
 package rayan.rayanapp.ViewHolders;
 
+import android.animation.ValueAnimator;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -13,6 +14,7 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
 
 public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     private final String TAG = DeviceViewHolder2Bridges.class.getSimpleName();
@@ -75,9 +77,54 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
         }
     }
 
-    public void setAnimationProgressPin2(int progress){
-        Log.e("Toggling:::: " , "Toggling pin2: " + bottomStrip2.getLayoutParams().width + progress);
-        bottomStrip2.getLayoutParams().width = progress;
-        bottomStrip2.requestLayout();
+
+    public void startToggleAnimationPin2(ValueAnimator v){
+        v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                bottomStrip2.getLayoutParams().width = (int) animation.getAnimatedValue();
+                bottomStrip2.requestLayout();
+            }
+        });
+        v.setDuration(4000);
+        v.start();
+    }
+
+    public void stopToggleAnimationPin2(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
+        if (v != null) {
+            v.cancel();
+            if (item.getPin2().equals(AppConstants.ON_STATUS)) {
+                v.setIntValues((int) v.getAnimatedValue(),
+                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
+                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
+                        itemView.getWidth());
+            } else {
+                v.setIntValues((int) v.getAnimatedValue(),
+                        ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3),
+                        ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3 * 2),
+                        0);
+            }
+        }
+        else {
+            if (item.getPin2().equals(AppConstants.ON_STATUS))
+                v = ValueAnimator.ofInt(0,getDeviceItemWidth());
+            else
+                v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    bottomStrip2.getLayoutParams().width = (int) animation.getAnimatedValue();
+                    bottomStrip2.requestLayout();
+                }
+            });
+        }
+        v.setDuration(300);
+        v.start();
+        pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
+        pin2.setChecked(item.getPin2().equals(AppConstants.ON_STATUS));
+        if (listener != null){
+            pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+            pin2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));
+        }
     }
 }

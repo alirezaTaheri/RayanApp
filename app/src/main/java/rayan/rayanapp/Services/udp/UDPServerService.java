@@ -74,7 +74,7 @@ public class UDPServerService extends Service {
                             if (device == null)
                                 Log.e(TAG, "Couldn't find this Device: " + src);
                             else{
-//                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().removeWaiting(src);
+                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().send(src);
                                 device.setLocallyAccessibility(true);
                                 device.setPin1(pin1);
                                 device.setPin2(pin2);
@@ -90,7 +90,7 @@ public class UDPServerService extends Service {
                             device = deviceDatabase.getDevice(src);
                             Log.d(TAG, "TLMSDONETLMSDONE: " + device);
                             if (device != null){
-//                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().removeWaiting(src);
+                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().send(src);
                                 device.setLocallyAccessibility(true);
                                 device.setIp(senderIP);
                                 device.setName1(new String(decodedName, "UTF-8"));
@@ -115,7 +115,7 @@ public class UDPServerService extends Service {
                             device = deviceDatabase.getDevice(src);
                             Log.d(TAG, "YESYESYES: " + device);
                             if (device != null){
-//                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().removeWaiting(src);
+                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().send(src);
                                 device.setLocallyAccessibility(true);
                                 device.setIp(senderIP);
                                 device.setName1(new String(decodedName, "UTF-8"));

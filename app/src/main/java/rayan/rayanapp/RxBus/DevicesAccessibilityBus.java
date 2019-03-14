@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.net.wifi.ScanResult;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import java.util.ArrayList;
@@ -20,36 +21,50 @@ import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Util.AppConstants;
 
 public class DevicesAccessibilityBus {
-    Map<String, Disposable> disposables;
+    Map<String, Disposable> disposablesPin1;
+    Map<String, Disposable> disposablesPin2;
     DeviceDatabase deviceDatabase;
     ToggleDeviceAnimationProgress listener;
     int progressBarWidth = -1;
     public DevicesAccessibilityBus(Context context) {
-        disposables = new HashMap<>();
+        disposablesPin1 = new HashMap<>();
+        disposablesPin2 = new HashMap<>();
         deviceDatabase = new DeviceDatabase(context);
     }
 
-    private PublishSubject<Map<String, Disposable>> bus = PublishSubject.create();
+    private PublishSubject<String> bus = PublishSubject.create();
 
-//    public void registerForAnimation(ToggleDeviceAnimationProgress animationProgress, int progressBarWidth){
-//        listener = animationProgress;
-//        this.progressBarWidth = progressBarWidth;
-//    }
-//
-//    public void setWaiting(String chipId, Disposable disposable, int position, String onVsOff, int pin) {
-//
-//    }
-//
-//    public void removeWaiting(String chipId) {
-//    }
-//
-//    public Observable<Map<String, Disposable>> toObservable() {
-//        return bus;
-//    }
-//
-//    public boolean isWaiting(String chipId){
-//        return disposables.get(chipId) != null;
-//    }
+    public void setWaitingPin1(String chipId, Disposable disposable) {
+        disposablesPin1.put(chipId, disposable);
+    }
+
+    public void removeWaitingPin1(String chipId) {
+        if (disposablesPin1.get(chipId) != null)
+            disposablesPin1.get(chipId).dispose();
+        disposablesPin1.remove(chipId);
+    }
+    public void setWaitingPin2(String chipId, Disposable disposable) {
+        disposablesPin2.put(chipId, disposable);
+    }
+
+    public void removeWaitingPin2(String chipId) {
+        if (disposablesPin2.get(chipId) != null)
+            disposablesPin2.get(chipId).dispose();
+        disposablesPin2.remove(chipId);
+    }
+
+    public Observable<String> toObservable() {
+        return bus;
+    }
+
+    public void send(String o) {
+        bus.onNext(o);
+    }
+
+
+    public boolean isWaiting(String chipId){
+        return disposablesPin1.get(chipId) != null || disposablesPin2.get(chipId) != null;
+    }
 
 //    public void setDeviceLocallyAccessibility(String chipId, boolean accessibility){
 //        Device d = deviceDatabase.getDevice(chipId);
