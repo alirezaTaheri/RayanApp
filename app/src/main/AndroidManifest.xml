@@ -58,7 +58,7 @@
         <activity
             android:name=".Activities.ProfileActivity"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CustomTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.AddNewDeviceActivity"
             android:parentActivityName=".Activities.MainActivity"
@@ -67,7 +67,9 @@
             android:name=".Activities.SettingsActivity"
             android:supportsRtl="true"
             android:theme="@style/PreferenceScreen" />
-
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="ad3a16c7f3170306882d8f85a367d63fdf8e0ab5" />
     </application>
 
 </manifest>

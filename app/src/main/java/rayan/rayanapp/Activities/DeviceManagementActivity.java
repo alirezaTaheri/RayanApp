@@ -26,15 +26,6 @@ import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.DevicesManagementActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-//<<<<<<< HEAD
-//<<<<<<< HEAD////
-//=======
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-//=======
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
-
-//<<<<<<< HEAD
-//<<<<<<< HEAD
 public class DeviceManagementActivity extends AppCompatActivity implements DevicesManagementListFragment.ClickOnDevice, BackHandledFragment.BackHandlerInterface, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
 
 

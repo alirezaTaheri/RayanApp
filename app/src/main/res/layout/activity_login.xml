@@ -83,8 +83,6 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
                     android:layout_height="wrap_content">
                     <ImageView
                         android:layout_width="wrap_content"

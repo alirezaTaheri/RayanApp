@@ -85,8 +85,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="178dp">
 
@@ -122,8 +120,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="260dp">
 
@@ -160,8 +156,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="260dp" />
 
@@ -169,8 +163,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="260dp">
 
@@ -179,8 +171,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/baseColor"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
                 android:text="@string/text_sign_up_button"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="260dp" />

@@ -38,6 +38,9 @@ public class User implements Parcelable {
     @SerializedName("role")
     @Expose
     private String role;
+    private String contactNameOnPhone;
+
+
 
     protected User(Parcel in) {
         id = in.readString();
@@ -49,6 +52,7 @@ public class User implements Parcelable {
         type = in.readString();
         role = in.readString();
         email= in.readString();
+        contactNameOnPhone=in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -79,6 +83,7 @@ public class User implements Parcelable {
         this.groupId = groupId;
         this.role = role;
         this.email=email;
+        this.contactNameOnPhone=contactNameOnPhone;
     }
 
     @NonNull
@@ -96,6 +101,14 @@ public class User implements Parcelable {
 
     public void setContactName(String contactName) {
         this.contactName = contactName;
+    }
+
+    public String getContactNameOnPhone() {
+        return contactNameOnPhone;
+    }
+
+    public void setContactNameOnPhone(String contactNameOnPhone) {
+        this.contactNameOnPhone = contactNameOnPhone;
     }
 
     public String getUsername() {
@@ -180,5 +193,6 @@ public class User implements Parcelable {
         dest.writeString(type);
         dest.writeString(role);
         dest.writeString(email);
+        dest.writeString(contactNameOnPhone);
     }
 }

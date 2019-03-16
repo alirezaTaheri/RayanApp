@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "327919449494",
+    "firebase_url": "https://rayanv2-16200.firebaseio.com",
+    "project_id": "rayanv2-16200",
+    "storage_bucket": "rayanv2-16200.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:327919449494:android:b725d147c1648d96",
+        "android_client_info": {
+          "package_name": "rayan.rayanappp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "327919449494-pik2bo70c07tlh3abr6ugonatde2tsqa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "rayan.rayanappp",
+            "certificate_hash": "4d04b631f63c2c683fc853d415be71608aaf6e35"
+          }
+        },
+        {
+          "client_id": "327919449494-aekev5o842582n85s7ib6u4nc19ka3s6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI869rUBbXTfPoJG-idZcsyy6kSRUVBDI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "327919449494-aekev5o842582n85s7ib6u4nc19ka3s6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
