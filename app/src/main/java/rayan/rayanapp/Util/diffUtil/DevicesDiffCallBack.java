@@ -55,7 +55,8 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
                 && oldDevice.getPin2().equals(newDevice.getPin2())
                 && oldDevice.getName1().equals(newDevice.getName1())
                 && oldDevice.isFavorite() == newDevice.isFavorite()
-                && oldDevice.isLocallyAccessibility() == newDevice.isLocallyAccessibility();
+                && oldDevice.isLocallyAccessibility() == newDevice.isLocallyAccessibility()
+                && oldDevice.getSsid().equals(newDevice.getSsid());
 //                && oldDevice.getState2_1().equals(newDevice.getState2_1())
 //                && oldDevice.getIp().equals(newDevice.getIp())
 //                && (oldDevice.isReadyForMqtt() == newDevice.isReadyForMqtt());

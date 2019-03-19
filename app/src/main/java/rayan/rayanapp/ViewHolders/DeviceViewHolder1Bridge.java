@@ -125,6 +125,10 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
             pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
     }
 
+    public void changeName(String name){
+        this.name.setText(name);
+    }
+
     public void messageArrivedOrFinishAnimation(Device item){
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setChecked(true);

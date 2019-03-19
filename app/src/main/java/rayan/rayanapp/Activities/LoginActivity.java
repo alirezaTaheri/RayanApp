@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    finish();
                 }
                 else
                     Toast.makeText(this, "کاربری شما تایید نشده است", Toast.LENGTH_SHORT).show();

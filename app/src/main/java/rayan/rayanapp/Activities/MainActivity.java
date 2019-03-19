@@ -1,19 +1,15 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 //<<<<<<< HEAD
-import android.net.wifi.WifiManager;
 //=======
-import android.content.res.Resources;
-import android.graphics.Color;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,43 +19,53 @@ import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.polyak.iconswitch.IconSwitch;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+
+import javax.crypto.spec.SecretKeySpec;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Fragments.DevicesFragment;
-import rayan.rayanapp.Fragments.FavoritesFragment;
-import rayan.rayanapp.Fragments.ScenariosFragment;
+import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
+import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -71,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ProgressBar progressBar;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
     @BindView(R.id.viewPager)
     ViewPager viewPager;
     MainActivityViewModel mainActivityViewModel;
@@ -87,6 +92,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ViewPager bottom_navigation_viewpager;
     MenuItem prevMenuItem;
     MqttStatus mqttStatus;
+    @BindView(R.id.status)
+    TextView actionBarStatus;
+    @BindView(R.id.statusIcon)
+    ImageView statusIcon;
 
     @Override
 //<<<<<<< HEAD
@@ -95,25 +104,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
+
     @Override
 //>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!RayanApplication.getPref().isLoggedIn()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        }else {
         setContentView(R.layout.activity_main);
         requestRecordAudioPermission();
         ButterKnife.bind(this);
         mqttStatus = this;
 //        setSupportActionBar(toolbar_main);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        Log.e("setting",RayanApplication.getPref().getThemeKey()+ " "+ RayanApplication.getPref().getShowNotification());
+        Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getShowNotification());
         navigationView.bringToFront();
-       navigationView.invalidate();
+        navigationView.invalidate();
         navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
-            switch (connection.getStatus()){
+            switch (connection.getStatus()) {
                 case NONE:
                     break;
                 case CONNECTING:
@@ -132,12 +148,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
             }
         });
-        ((RayanApplication)getApplication()).getNetworkStatus().observe(this, networkConnection -> {
+        ((RayanApplication) getApplication()).getNetworkStatus().observe(this, networkConnection -> {
             Log.e(TAG, "Network Connection: " + networkConnection);
-            if (!networkConnection.isConnected()){
+            if (!networkConnection.isConnected()) {
                 mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection).observe(this, connection -> {
                     MainActivityViewModel.connection.postValue(connection);
-                    switch (connection.getStatus()){
+                    switch (connection.getStatus()) {
                         case NONE:
                             break;
                         case CONNECTING:
@@ -157,79 +173,107 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
                 RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+//                actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.yellow_acc_4));
+                statusIcon.setVisibility(View.INVISIBLE);
+                actionBarStatus.setText("عدم اتصال به اینترنت");
+            } else
+//                if (MainActivityViewModel.connection.getValue() == null || MainActivityViewModel.connection.getValue() != null && !MainActivityViewModel.connection.getValue().isConnected())
+            {
+                Log.e("///////////////", "////connecting to mqtt");
+                mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
+                    MainActivityViewModel.connection.postValue(connection);
+                    switch (connection.getStatus()) {
+                        case NONE:
+                            break;
+                        case CONNECTING:
+                            this.mqttConnecting();
+                            break;
+                        case CONNECTED:
+                            this.mqttConnected();
+                            break;
+                        case DISCONNECTING:
+                            break;
+                        case DISCONNECTED:
+                            this.mqttDisconnected();
+                            break;
+                        case ERROR:
+                            this.mqttError();
+                            break;
+                    }
+                });
             }
         });
-       // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         MainActivityViewPagerAdapter viewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(1);
-       // viewPager.setBackgroundColor(Color.GREEN);
-        accessModeSwitch.setCheckedChangeListener(current -> {
-            if (current.equals(IconSwitch.Checked.RIGHT)){
-                Log.e(TAG, "SET To Right");
-                mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
-                    MainActivityViewModel.connection.postValue(connection);
-                    switch (connection.getStatus()){
-                        case NONE:
-                            break;
-                        case CONNECTING:
-                            this.mqttConnecting();
-                            break;
-                        case CONNECTED:
-                            this.mqttConnected();
-                            break;
-                        case DISCONNECTING:
-                            break;
-                        case DISCONNECTED:
-                            this.mqttDisconnected();
-                            break;
-                        case ERROR:
-                            this.mqttError();
-                            break;
-                    }
-                });
-            }
-            else{
-                Log.e(TAG, "SET To Left");
-                mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection).observe(this, connection -> {
-                    MainActivityViewModel.connection.postValue(connection);
-                    switch (connection.getStatus()){
-                        case NONE:
-                            break;
-                        case CONNECTING:
-                            this.mqttConnecting();
-                            break;
-                        case CONNECTED:
-                            this.mqttConnected();
-                            break;
-                        case DISCONNECTING:
-                            break;
-                        case DISCONNECTED:
-                            this.mqttDisconnected();
-                            break;
-                        case ERROR:
-                            this.mqttError();
-                            break;
-                    }
-                });
-                RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-            }
-        });
+        // viewPager.setBackgroundColor(Color.GREEN);
+//        accessModeSwitch.setCheckedChangeListener(current -> {
+//            if (current.equals(IconSwitch.Checked.RIGHT)){
+//                Log.e(TAG, "SET To Right");
+//                mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
+//                    MainActivityViewModel.connection.postValue(connection);
+//                    switch (connection.getStatus()){
+//                        case NONE:
+//                            break;
+//                        case CONNECTING:
+//                            this.mqttConnecting();
+//                            break;
+//                        case CONNECTED:
+//                            this.mqttConnected();
+//                            break;
+//                        case DISCONNECTING:
+//                            break;
+//                        case DISCONNECTED:
+//                            this.mqttDisconnected();
+//                            break;
+//                        case ERROR:
+//                            this.mqttError();
+//                            break;
+//                    }
+//                });
+//            }
+//            else{
+//                Log.e(TAG, "SET To Left");
+//                mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection).observe(this, connection -> {
+//                    MainActivityViewModel.connection.postValue(connection);
+//                    switch (connection.getStatus()){
+//                        case NONE:
+//                            break;
+//                        case CONNECTING:
+//                            this.mqttConnecting();
+//                            break;
+//                        case CONNECTED:
+//                            this.mqttConnected();
+//                            break;
+//                        case DISCONNECTING:
+//                            break;
+//                        case DISCONNECTED:
+//                            this.mqttDisconnected();
+//                            break;
+//                        case ERROR:
+//                            this.mqttError();
+//                            break;
+//                    }
+//                });
+//                RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+//            }
+//        });
         initialize();
-        if ( isExternalStorageWritable() ) {
+        if (isExternalStorageWritable()) {
 
-            File appDirectory = new File( Environment.getExternalStorageDirectory() + "/RayanAppFolder" );
-            File logDirectory = new File( appDirectory + "/log" );
-            File logFile = new File( logDirectory, "logcat" + System.currentTimeMillis() + ".txt" );
-            File logFile2 = new File( logDirectory, "logcat" + System.currentTimeMillis() + "2.txt" );
+            File appDirectory = new File(Environment.getExternalStorageDirectory() + "/RayanAppFolder");
+            File logDirectory = new File(appDirectory + "/log");
+            File logFile = new File(logDirectory, "logcat" + System.currentTimeMillis() + ".txt");
+            File logFile2 = new File(logDirectory, "logcat" + System.currentTimeMillis() + "2.txt");
 
             // create app folder
-            if ( !appDirectory.exists() ) {
+            if (!appDirectory.exists()) {
                 appDirectory.mkdir();
             }
 
             // create log folder
-            if ( !logDirectory.exists() ) {
+            if (!logDirectory.exists()) {
                 logDirectory.mkdir();
             }
 
@@ -238,11 +282,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Process process = Runtime.getRuntime().exec("logcat -c");
                 process = Runtime.getRuntime().exec("logcat -f " + logFile);
 //                process = Runtime.getRuntime().exec("logcat -f " + logFile2 + " *:S EditDeviceFragment:E UDPServerService:E EditGroupFragmentViewModel:E");
-            } catch ( IOException e ) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
-        } else if ( isExternalStorageReadable() ) {
+        } else if (isExternalStorageReadable()) {
             // only readable
         } else {
             // not accessible
@@ -251,6 +295,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         initializeBottomNavigation();
     }
+
+}
 
 
     public void initialize(){
@@ -268,9 +314,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        startService(new Intent(this, UDPServerService.class));
-        RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/",""));
-        mainActivityViewModel.sendNodeToAll();
+        if (RayanApplication.getPref().isLoggedIn()) {
+            startService(new Intent(this, UDPServerService.class));
+            RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
+            mainActivityViewModel.sendNodeToAll();
+        }
     }
 
     @Override
@@ -296,42 +344,99 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @OnClick(R.id.statusIcon)
+    public void onRetryMqtt(){
+        Log.e("///////////////", "////Retry Connecting To mqtt");
+        mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
+            MainActivityViewModel.connection.postValue(connection);
+            switch (connection.getStatus()){
+                case NONE:
+                    break;
+                case CONNECTING:
+                    this.mqttConnecting();
+                    break;
+                case CONNECTED:
+                    this.mqttConnected();
+                    break;
+                case DISCONNECTING:
+                    break;
+                case DISCONNECTED:
+                    this.mqttDisconnected();
+                    break;
+                case ERROR:
+                    this.mqttError();
+                    break;
+            }
+        });
+    }
+
     @Override
     public void mqttConnecting() {
-        accessModeSwitch.setVisibility(View.INVISIBLE);
+//        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.yellow_acc_4));
+        actionBarStatus.setText("درحال اتصال");
+        statusIcon.setVisibility(View.INVISIBLE);
+//        accessModeSwitch.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
-        Toast.makeText(this, "CONNECTING", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "CONNECTING", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: CONNECTING");
+        ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
     }
 
     @Override
     public void mqttConnected() {
-        accessModeSwitch.setVisibility(View.VISIBLE);
+//        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.orange_acc_4));
+        actionBarStatus.setText("رایان");
+        statusIcon.setVisibility(View.INVISIBLE);
+//        accessModeSwitch.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
         accessModeSwitch.setChecked(IconSwitch.Checked.RIGHT);
         RayanApplication.getPref().saveProtocol(AppConstants.MQTT);
-        Toast.makeText(this, "CONNECTED", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "CONNECTED", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: CONNECTED");
+        ((RayanApplication)getApplication()).getMtd().updateMqttStatus(true);
     }
 
     @Override
     public void mqttDisconnected() {
-        accessModeSwitch.setVisibility(View.VISIBLE);
+//        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.red_acc_4));
+        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)){
+            actionBarStatus.setText("عدم اتصال به اینترنت");
+            statusIcon.setVisibility(View.INVISIBLE);
+        }
+        else{
+            actionBarStatus.setText("عدم اتصال");
+            statusIcon.setVisibility(View.VISIBLE);
+
+        }
+//        accessModeSwitch.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
         accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
         RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-        Toast.makeText(this, "DISCONNECTED", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "DISCONNECTED", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: DISCONNECTED");
+        ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
     }
 
     @Override
     public void mqttError() {
-        accessModeSwitch.setVisibility(View.VISIBLE);
+//        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.red_acc_4));
+        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)){
+            actionBarStatus.setText("عدم اتصال به اینترنت");
+            statusIcon.setVisibility(View.INVISIBLE);
+        }
+        else{
+            actionBarStatus.setText("عدم اتصال");
+            statusIcon.setVisibility(View.VISIBLE);
+
+        }
+        statusIcon.setVisibility(View.VISIBLE);
+//        accessModeSwitch.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
         accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
         RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-        Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: ERROR");
+        ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
     }
 
     public boolean isExternalStorageWritable() {
@@ -385,9 +490,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(this, UDPServerService.class));
-        mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection);
-        super.onDestroy();
+        if (RayanApplication.getPref().isLoggedIn()) {
+            stopService(new Intent(this, UDPServerService.class));
+            mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection);
+            RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+        }
+            super.onDestroy();
     }
 
     private void reco(){
@@ -545,4 +653,73 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
-}
+
+//    @Override
+//    public void onBackPressed() {
+//        publish(MainActivityViewModel.connection.getValue(), null, "message", 0, false);
+//    }
+    private void publish(Connection connection, String topic, String message, int qos, boolean retain){
+        try {
+            String[] actionArgs = new String[2];
+            actionArgs[0] = message;
+            actionArgs[1] = topic;
+//            final ActionListener callback = new ActionListener(context,
+//                    ActionListener.Action.PUBLISH, connection, actionArgs);
+            IMqttActionListener iMqttActionListener = new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.e(TAG, "onSuccess Publish message" + topic);
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Log.e(TAG, "onFailure Publish message");
+                }
+            };
+            connection.getClient().publish(topic, message.getBytes(), qos, retain, null, iMqttActionListener);
+        } catch( MqttException ex){
+            Log.e(TAG, "Exception occurred during publish: " + ex.getMessage());
+        }
+    }
+    //    String key = "q7tt0yk18nrjrqur";
+//    String textToDecrypt = "xpq/VGgyD0pAf94O1fmSgg==";
+//    String secretOfAkbar = "8nro4q0emv8k1uv5";
+
+
+//    private static SecretKeySpec generateKey(final String password) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+//        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//        byte[] bytes = password.getBytes("UTF-8");
+//        digest.update(bytes, 0, bytes.length);
+//        byte[] key = digest.digest();
+//
+//        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+//        return secretKeySpec;
+//    }
+    public static SecretKeySpec secretKeySpec;
+//    @Override
+//    public void onBackPressed() {
+////        secretKeySpec = new SecretKeySpec("8nro4q0emv8k1uv5".getBytes(), "AES");
+//        secretKeySpec = new SecretKeySpec("1234567812345678".getBytes(), "AES");
+//        String plainText = "123";
+//        String encryptedString = Encryptor.encrypt(plainText, key);
+//        String decryptedString = Encryptor.decrypt("yxEX1vOqupgRIiIE6mi11szCSG6glHizIdaPimHgGJoMk5B5jC/aTuoLF5p7MTJlz/yIH4seE3HatSek9ipis8JNmUzJX7tnKI7E14ur5jZ7y9Xr0TUIv3HQcU0sfMf3", key);
+//        Log.e(getClass().getSimpleName(), "Plaing Text: " + plainText);
+//        Log.e(getClass().getSimpleName(), "encryptedString: " + encryptedString);
+////        Log.e(getClass().getSimpleName(), "decryptedString: " + decryptedString);
+////        Log.e(getClass().getSimpleName(), "text to decrypt is: " + Encryptor.decrypt(textToDecrypt, secretOfAkbar));
+////        Log.e(getClass().getSimpleName(), "text to decrypt is: " + Encryptor.encrypt(Encryptor.decrypt(textToDecrypt, secretOfAkbar), secretOfAkbar));
+////        try {
+////            Log.e(getClass().getSimpleName(), "Base64 of node message is: " + new String(Base64.decode(textToDecrypt, Base64.DEFAULT), "UTF-8"));
+////        } catch (UnsupportedEncodingException e) {
+////            e.printStackTrace();
+////        }
+//    }//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
+}//{"src":"989898","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
+//{"text":"yxEX1vOqupgRIiIE6mi11szCSG6glHizIdaPimHgGJoMk5B5jC/aTuoLF5p7MTJlz/yIH4seE3HatSek9ipis8JNmUzJX7tnKI7E14ur5jZ7y9Xr0TUIv3HQcU0sfMf3", "cmd":"en", "src":""}
+//{"text":"ILaSCiqVbgCucFnGJEuKJ+XqOHxmaaDeeLj2H625xQM=", "cmd":"de", "src":""}
+//{"text":"G9DU4Dr/jyMuH6OTchlQebccrrbqa7JrIfGuKZ8RurU=", "cmd":"de", "src":""}
+//{"text":"mSogYeUvsoVkkskLyBM/RQ==", "cmd":"de", "src":""}
+//{"text":"WJywYCPo75GyPxMPPSTKFg==", "cmd":"de", "src":""}
+//{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "cmd":"de", "src":""}
+//{"text":"b3To9C4IlG9gBCb95KYvTQ==\n", "cmd":"de", "src":""}
+//{"text":"1237/0", "cmd":"en", "src":""}

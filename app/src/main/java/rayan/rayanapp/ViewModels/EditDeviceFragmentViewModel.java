@@ -59,9 +59,9 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
 
-    public LiveData<DeviceResponse> editDevice(String id, String name, String type, String groupId){
+    public LiveData<DeviceResponse> editDevice(String id, String name, String type, String groupId, String ssid){
         final MutableLiveData<DeviceResponse> results = new MutableLiveData<>();
-        editDeviceObservable(new EditDeviceRequest(id, groupId, name, type)).subscribe(editDeviceObserver(results));
+        editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribe(editDeviceObserver(results));
         return results;
     }
     private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
@@ -131,7 +131,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
-    public MutableLiveData<String> zipChangeName(String id , String name, String type, String groupId, String ip){
+    public MutableLiveData<String> zipChangeName(String id , String name, String type, String groupId, String ip, String ssid){
         MutableLiveData<String> response = new MutableLiveData<>();
         byte[] data = name.getBytes();
         String baseName = Base64.encodeToString(data, Base64.DEFAULT);
@@ -139,7 +139,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 toDeviceChangeNameObservable(new ChangeNameRequest(baseName),ip).subscribeOn(Schedulers.io()).doOnNext(changeNameResponse -> {
                     Log.e(TAG, " 00000000 ChangeNameResponse: " + changeNameResponse);
                 }),
-                editDeviceObservable(new EditDeviceRequest(id, groupId, name, type)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
+                editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
                     Log.e(TAG, "000000000 DeviceResponse: " + deviceResponse);
                 }),
                 (BiFunction<ChangeNameResponse, DeviceResponse, Object>) (changeNameResponse, deviceResponse) -> {

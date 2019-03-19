@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +81,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         View view = inflater.inflate(R.layout.fragment_devices_management_list, container, false);
         ButterKnife.bind(this, view);
         recyclerView.setAdapter(devicesRecyclerViewAdapterManagement);
+        ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return view;
     }

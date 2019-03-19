@@ -73,6 +73,7 @@ public class AppConstants {
      * API
      */
     public final static String DUPLICATE_USER = "duplicate user";
+    public final static String UNKNOWN_SSID = "Unknown SSID";
     public final static String SUCCESS_DESCRIPTION = "success";
     public final static String ERROR_DESCRIPTION = "error";
     public final static String USER_NOT_FOUND_RESPONSE = "User not found";

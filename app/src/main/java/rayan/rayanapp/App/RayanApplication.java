@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -15,6 +16,9 @@ import java.util.List;
 import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
 //<<<<<<< HEAD
+import rayan.rayanapp.Helper.MessageTransmissionDecider;
+import rayan.rayanapp.Helper.SendMessageToDevice;
+import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Receivers.LanguageDetailsChecker;
 import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
 import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
@@ -38,6 +42,9 @@ public class RayanApplication extends Application {
     private NetworkConnectionBus networkBus;
     private DevicesAccessibilityBus devicesAccessibilityBus;
     private String currentSSID;
+    private MessageTransmissionDecider mtd;
+    private DeviceDatabase deviceDatabase;
+    private SendMessageToDevice sendMessageToDevice;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -64,16 +71,22 @@ public class RayanApplication extends Application {
         bus = new UDPMessageRxBus();
         pref = new PrefManager();
         jsonMaker = new JsonMaker();
-        if (!pref.isLoggedIn()){
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        }
+        deviceDatabase = new DeviceDatabase(this);
+        mtd = new MessageTransmissionDecider(this,deviceDatabase.getAllDevices());
+        sendMessageToDevice = new SendMessageToDevice();
 
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
 
+    }
+
+    public MessageTransmissionDecider getMtd() {
+        return mtd;
+    }
+
+    public SendMessageToDevice getSendMessageToDevice() {
+        return sendMessageToDevice;
     }
 
     public String getCurrentSSID() {

@@ -79,7 +79,7 @@ public interface ApiService {
     @POST("api/v2/groups")
     Observable<BaseResponse> createGroup(@Header("Authorization") String token, @Body CreateGroupRequest createGroupRequest);
 
-    @POST("api/v2/groups/editusertopic")
+    @POST("api/v2/groups/edittopic")
     Observable<DeviceResponse> editDevice(@Header("Authorization") String token, @Body EditDeviceRequest editDeviceRequest);
 
     @POST("api/v2/groups/addtopic")

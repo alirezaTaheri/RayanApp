@@ -47,9 +47,10 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
     @BindView(R.id.selectedAccessPoint)
     TextView selectedAccessPointTitle;
 
-    public static ChangeDeviceAccessPointFragment newInstance() {
+    public static ChangeDeviceAccessPointFragment newInstance(String ssid) {
         final ChangeDeviceAccessPointFragment fragment = new ChangeDeviceAccessPointFragment();
         final Bundle args = new Bundle();
+        args.putString("ssid", ssid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -79,8 +80,7 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
                         newDevices.add(new AccessPoint(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities, scanResults.get(a).level));
                     accessPointsRecyclerViewAdapter.setItems(newDevices);
                 });
-        if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() != null)
-            selectedAccessPointTitle.setText(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid());
+        selectedAccessPointTitle.setText(getArguments().getString("ssid"));
         selectedAccessPoint.setSSID(((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid() != null? ((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid():"");
         password.setText(((AddNewDeviceActivity) getActivity()).getNewDevice().getPwd());
     }
@@ -119,10 +119,12 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
     }
 
     DoneWithSelectAccessPointFragment listener;
+    Context context;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         listener = (DoneWithSelectAccessPointFragment) context;
+        this.context = context;
     }
 
     @Override

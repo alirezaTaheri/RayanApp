@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -34,6 +35,8 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Helper.Encryptor;
+import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
@@ -186,11 +189,14 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     Device u = g.getDevices().get(b);
                     Device existing = deviceDatabase.getDevice(u.getChipId());
                     if (existing == null){
-                        Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId());
+                        Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
+                        deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
                         if (deviceUser.getType()!= null && deviceUser.getName1() != null)
                             devices.add(deviceUser);
                     }
                     else {
+                        existing.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
+                        existing.setSecret(g.getSecret());
                         existing.setName1(u.getName1());
                         existing.setType(u.getType());
                         existing.setTopic(u.getTopic());
@@ -289,71 +295,80 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
 
     public void togglePin1(ToggleDeviceAnimationProgress fragment, int position, RayanApplication rayanApplication, Device device, boolean local){
-        if (local){
-            setTracker1(fragment, position, device, rayanApplication);
-        }
-        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null){
-            publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString(), 0, false);
-            timerObservable.subscribe(new Observer<Long>() {
-                @Override
-                public void onSubscribe(Disposable d) {
-                    fragment.startToggleAnimationPin1(device.getChipId(), position);
-                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
-                    rayanApplication.getDevicesAccessibilityBus().setWaitingPin1(device.getChipId(), d);
-                }
+        rayanApplication.getSendMessageToDevice().toggleDevicePin1(fragment, device, position, rayanApplication);
+//        List<String> arguments = new ArrayList<>();
+//        arguments.add(Encryptor.encrypt(device.getStatusWord(), device.getSecret()));
 
-                @Override
-                public void onNext(Long aLong) {
-                    Log.e("/////////", "////////OnNext////: " + aLong);
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.e("/////////", "////////onError/////: " +e);
-                }
-
-                @Override
-                public void onComplete() {
-                    Log.e("/////////", "////////OnComplete/////Pin1 Stopping animation:: ");
-                    fragment.stopToggleAnimationPin1(device.getChipId());
-                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
-                }
-            });
-        }
+//        if (local){
+//            setTracker1(fragment, position, device, rayanApplication);
+//        }
+//        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected() && device.getTopic() != null){
+//            List<String> arguments = new ArrayList<>();
+//            arguments.add(Encryptor.encrypt(device.getStatusWord(), device.getSecret()));
+//            publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString(), 0, false);
+//            timerObservable.subscribe(new Observer<Long>() {
+//                @Override
+//                public void onSubscribe(Disposable d) {
+//                    fragment.startToggleAnimationPin1(device.getChipId(), position);
+//                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+//                    rayanApplication.getDevicesAccessibilityBus().setWaitingPin1(device.getChipId(), d);
+//                }
+//
+//                @Override
+//                public void onNext(Long aLong) {
+//                    Log.e("/////////", "////////OnNext////: " + aLong);
+//                }
+//
+//                @Override
+//                public void onError(Throwable e) {
+//                    Log.e("/////////", "////////onError/////: " +e);
+//                }
+//
+//                @Override
+//                public void onComplete() {
+//                    Log.e("/////////", "////////OnComplete/////Pin1 Stopping animation:: ");
+//                    fragment.stopToggleAnimationPin1(device.getChipId());
+//                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+//                }
+//            });
+//        }
     }
 
     public void togglePin2(ToggleDeviceAnimationProgress fragment, int position, RayanApplication rayanApplication, Device device, boolean local){
-        if (local){
-                setTracker2(fragment, position, device,rayanApplication);
-        }
-        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
-            publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString(), 0, false);
-            timerObservable.subscribe(new Observer<Long>() {
-                @Override
-                public void onSubscribe(Disposable d) {
-                    fragment.startToggleAnimationPin2(device.getChipId(), position);
-                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
-                    rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
-                }
-
-                @Override
-                public void onNext(Long aLong) {
-                    Log.e("/////////", "////////OnNext////: " + aLong);
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.e("/////////", "////////onError/////: " +e);
-                }
-
-                @Override
-                public void onComplete() {
-                    Log.e("/////////", "////////OnComplete/////Pin2 Stopping animation: ");
-                    fragment.stopToggleAnimationPin2(device.getChipId());
-                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
-                }
-            });
-        }
+        rayanApplication.getSendMessageToDevice().toggleDevicePin2(fragment, device, position, rayanApplication);
+//        if (local){
+//                setTracker2(fragment, position, device,rayanApplication);
+//        }
+//        else if (MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
+//            List<String> arguments = new ArrayList<>();
+//            arguments.add(Encryptor.encrypt(device.getStatusWord(), device.getSecret()));
+//            publish(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), ((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString(), 0, false);
+//            timerObservable.subscribe(new Observer<Long>() {
+//                @Override
+//                public void onSubscribe(Disposable d) {
+//                    fragment.startToggleAnimationPin2(device.getChipId(), position);
+//                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+//                    rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
+//                }
+//
+//                @Override
+//                public void onNext(Long aLong) {
+//                    Log.e("/////////", "////////OnNext////: " + aLong);
+//                }
+//
+//                @Override
+//                public void onError(Throwable e) {
+//                    Log.e("/////////", "////////onError/////: " +e);
+//                }
+//
+//                @Override
+//                public void onComplete() {
+//                    Log.e("/////////", "////////OnComplete/////Pin2 Stopping animation: ");
+//                    fragment.stopToggleAnimationPin2(device.getChipId());
+//                    rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+//                }
+//            });
+//        }
 
     }
 
@@ -361,6 +376,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     Observable<Long> counterObservable = Observable.interval(0,700,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     Observable<Long> timerObservable = Observable.timer(4, TimeUnit.SECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     public void setTracker1(ToggleDeviceAnimationProgress fragment, int position, Device device, RayanApplication rayanApplication){
+        List<String> arguments = new ArrayList<>();
+        arguments.add(device.getStatusWord());
                 counterObservable.takeWhile(aLong -> aLong<5 && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
                 .subscribe(new Observer<Long>() {
                     @Override
@@ -372,8 +389,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
                     @Override
                     public void onNext(Long aLong) {
+                        arguments.set(0,Encryptor.encrypt(String.valueOf(Integer.parseInt(device.getStatusWord())+aLong), device.getSecret()));
                         Log.e("/////////", "////////OnNext////: " + aLong);
-                        sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,null).toString());
+                        sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString());
                     }
 
                     @Override
@@ -391,7 +409,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
 
     public void setTracker2(ToggleDeviceAnimationProgress fragment, int position, Device device, RayanApplication rayanApplication){
-                counterObservable.takeWhile(aLong -> aLong<5 && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
+        List<String> arguments = new ArrayList<>();
+        arguments.add(device.getStatusWord());
+        counterObservable.takeWhile(aLong -> aLong<5 && rayanApplication.getDevicesAccessibilityBus().isWaiting(device.getChipId()))
                 .subscribe(new Observer<Long>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -402,8 +422,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
                     @Override
                     public void onNext(Long aLong) {
+                        arguments.set(0,Encryptor.encrypt(String.valueOf(Integer.parseInt(device.getStatusWord())+aLong), device.getSecret()));
                         Log.e("/////////", "////////OnNext////: " + aLong);
-                        sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,null).toString());
+                        sendUDPMessage.sendUdpMessage(device.getIp(),((RayanApplication)getApplication()).getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString());
                     }
 
                     @Override

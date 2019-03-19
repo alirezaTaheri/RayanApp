@@ -48,9 +48,11 @@ public class Device implements Parcelable {
     private boolean favorite;
     private boolean locallyAccessibility;
     private boolean onlineAccessibility;
+    private String statusWord;
+    private String secret;
 
 
-    public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId) {
+    public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId, String secret) {
         this.chipId = chipId;
         this.name1 = name1;
         this.id = id;
@@ -61,6 +63,8 @@ public class Device implements Parcelable {
         this.favorite = false;
         this.setPin1("off");
         this.setPin2("off");
+        this.secret = secret;
+        this.statusWord = "0";
     }
 
     protected Device(Parcel in) {
@@ -218,6 +222,14 @@ public class Device implements Parcelable {
         return locallyAccessibility && getIp()!=null;
     }
 
+    public String getStatusWord() {
+        return statusWord;
+    }
+
+    public void setStatusWord(String statusWord) {
+        this.statusWord = statusWord;
+    }
+
     public void setLocallyAccessibility(boolean locallyAccessibility) {
         this.locallyAccessibility = locallyAccessibility;
     }
@@ -231,23 +243,33 @@ public class Device implements Parcelable {
         this.onlineAccessibility = onlineAccessibility;
     }
 
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
     @Override
     public String toString() {
         return "Device{" +
-//                "chipId='" + chipId + '\'' +
+                "chipId='" + chipId + '\'' +
                 ", name1='" + name1 + '\'' +
                 ", pin1='" + pin1 + '\'' +
-//                ", pin2='" + pin2 + '\'' +
-//                ", topic=" + topic +
+                ", pin2='" + pin2 + '\'' +
+                ", topic=" + topic +
+                ", secret=" + secret +
 //                ", name2='" + name2 + '\'' +
 //                ", id='" + id + '\'' +
-//                ", type='" + type + '\'' +
+                ", type='" + type + '\'' +
 //                ", username='" + username + '\'' +
 //                ", password='" + password + '\'' +
-//                ", groupId='" + groupId + '\'' +
+                ", groupId='" + groupId + '\'' +
 //                ", style='" + style + '\'' +
-//                ", ssid='" + ssid + '\'' +
-//                ", ip='" + ip + '\'' +
+                ", ssid='" + ssid + '\'' +
+                ", ip='" + ip + '\'' +
+                ", stateWord='" + statusWord + '\'' +
 //                ", favorite=" + favorite +
 //                ", locallyAccessibility=" + locallyAccessibility +
 //                ", onlineAccessibility=" + onlineAccessibility +

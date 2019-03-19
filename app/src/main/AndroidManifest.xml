@@ -67,17 +67,6 @@
             android:name=".Activities.SettingsActivity"
             android:supportsRtl="true"
             android:theme="@style/PreferenceScreen" />
-
     </application>
 
-</manifest>
-        <!--<receiver-->
-            <!--android:name=".Receivers.LampWidgetReceiver">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-            <!--</intent-filter>-->
-
-            <!--<meta-data-->
-                <!--android:name="android.appwidget.provider"-->
-                <!--android:resource="@xml/lamp_widget_info" />-->
-        <!--</receiver>-->
+</manifest> <!-- <receiver --><!-- android:name=".Receivers.LampWidgetReceiver"> --><!-- <intent-filter> --><!-- <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> --><!-- </intent-filter> --><!-- <meta-data --><!-- android:name="android.appwidget.provider" --><!-- android:resource="@xml/lamp_widget_info" /> --><!-- </receiver> -->

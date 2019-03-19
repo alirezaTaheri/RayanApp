@@ -16,6 +16,7 @@ import java.util.Objects;
 
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Fragments.NewDevicesListFragment;
+import rayan.rayanapp.Helper.MessageTransmissionDecider;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.NetworkUtil;
 
@@ -58,12 +59,16 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
                                 ((RayanApplication)(context)).getNetworkBus().send(getCurrentSSID());
                             }
                             postValue(new NetworkConnection(AppConstants.WIFI_NETWORK,true, getCurrentSSID()));
+                            ((RayanApplication)context).getMtd().setCurrentSSID(getCurrentSSID());
+                            ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.Status.WIFI);
                             break;
                         case ConnectivityManager.TYPE_MOBILE:
+                            ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.Status.MOBILE);
                             postValue(new NetworkConnection(AppConstants.MOBILE_DATA,true));
                             break;
                     }
                 } else {
+                    ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.Status.NOT_CONNECTED);
                     postValue(new NetworkConnection(0,false));
                 }
             }

@@ -18,18 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                      <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/file/ic_cloud_off_black_24dp.xml" />
-=======
-                                      <entry key="url" value="jar:file:/E:/Android_Studio/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_widgets_black_24dp.xml" />
->>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-=======
-                                      <entry key="url" value="jar:file:/E:/Android_Studio/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_widgets_black_24dp.xml" />
-=======
-                                      <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/file/ic_cloud_off_black_24dp.xml" />
->>>>>>> 1cd8eacac6a42322b0604215a8a53bf6e972729d
->>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
+                                      <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_refresh_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -39,24 +28,8 @@
                         </option>
                         <option name="values">
                           <map>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                            <entry key="outputName" value="ic_cloud_off" />
+                            <entry key="outputName" value="ic_refresh" />
                             <entry key="sourceFile" value="C:\Users\Alireza" />
-=======
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_devices" />
-                            <entry key="sourceFile" value="C:\Users\milad" />
->>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-=======
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_devices" />
-                            <entry key="sourceFile" value="C:\Users\milad" />
-=======
-                            <entry key="outputName" value="ic_cloud_off" />
-                            <entry key="sourceFile" value="C:\Users\Alireza" />
->>>>>>> 1cd8eacac6a42322b0604215a8a53bf6e972729d
->>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
                           </map>
                         </option>
                       </PersistentState>

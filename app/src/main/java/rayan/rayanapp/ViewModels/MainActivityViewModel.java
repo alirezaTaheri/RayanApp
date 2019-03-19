@@ -24,8 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Services.mqtt.ActionListener;
 import rayan.rayanapp.Services.mqtt.Connection;
@@ -91,17 +97,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         try {
 //            connection.getValue().getClient().unregisterResources();
 //            connection.getValue().getClient().close();
-            connection.getValue().getClient().disconnect().setActionCallback(new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.e(getClass().getSimpleName(),"OnSuccess in Disconnection");
-                }
-
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.e(getClass().getSimpleName(),"OnFailure in Disconnection");
-                }
-            });
+            connection.getValue().getClient().disconnect();
             connection.getValue().changeConnectionStatus(Connection.ConnectionStatus.DISCONNECTED);
             updateConnection.postValue(connection.getValue());
         } catch(Exception ex){
@@ -148,8 +144,28 @@ public class MainActivityViewModel extends AndroidViewModel {
         jsonObject.addProperty("src", RayanApplication.getPref().getId());
         jsonObject.addProperty("cmd", AppConstants.TO_DEVICE_NODE);
         sendUDPMessage.sendUdpMessage(RayanApplication.getPref().getLocalBroadcastAddress(), jsonObject.toString());
+        counterObservable.takeWhile(aLong -> aLong<5)
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        sendUDPMessage.sendUdpMessage(RayanApplication.getPref().getLocalBroadcastAddress(), jsonObject.toString());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
     }
 
+    Observable<Long> counterObservable = Observable.interval(0,700,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     public String getCurrentSSID(WifiManager wifiManager){
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         String currentSSID  = wifiInfo.getSSID();
@@ -158,4 +174,6 @@ public class MainActivityViewModel extends AndroidViewModel {
         }
         return currentSSID;
     }
+
+
 }

@@ -63,7 +63,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     }
     @OnClick(R.id.changeAccessPoint)
     void changeAccessPoint(){
-        ChangeDeviceAccessPointFragment.newInstance().show(getActivity().getSupportFragmentManager(), "changeAccessPoint");
+        ChangeDeviceAccessPointFragment.newInstance(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid()).show(getActivity().getSupportFragmentManager(), "changeAccessPoint");
     }
 
     @OnClick(R.id.changeGroup)

@@ -30,18 +30,22 @@ public class JsonMaker {
                     jsonObject.put("src", src);
                 break;
             case AppConstants.ON_1:
+                    jsonObject.put("stword", values.get(0));
                     jsonObject.put("cmd",AppConstants.ON_1);
                     jsonObject.put("src", src);
                 break;
             case AppConstants.ON_2:
+                    jsonObject.put("stword", values.get(0));
                     jsonObject.put("cmd",AppConstants.ON_2);
                     jsonObject.put("src", src);
                 break;
             case AppConstants.OFF_1:
+                    jsonObject.put("stword", values.get(0));
                     jsonObject.put("cmd",AppConstants.OFF_1);
                     jsonObject.put("src", src);
                 break;
             case AppConstants.OFF_2:
+                    jsonObject.put("stword", values.get(0));
                     jsonObject.put("cmd",AppConstants.OFF_2);
                     jsonObject.put("src", src);
                 break;

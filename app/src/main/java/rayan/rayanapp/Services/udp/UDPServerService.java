@@ -13,6 +13,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.JsonObject;
+import com.scottyab.aescrypt.AESCrypt;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,13 +22,16 @@ import org.json.JSONObject;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Helper.AES;
+import rayan.rayanapp.Helper.Encryptor;
+import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Util.AppConstants;
+import se.simbio.encryption.Encryption;
 
 public class UDPServerService extends Service {
     private AsyncTask<Void, Void, Void> async;
@@ -63,8 +67,8 @@ public class UDPServerService extends Service {
                     ((RayanApplication)getApplication()).getBus().send(jsonMessage);
                     String cmd = jsonMessage.getString("cmd");
                     String src = jsonMessage.getString("src");
-                    String pin1, pin2, name, ssid, style, type;
-                    byte[] decodedName;
+                    String pin1, pin2, name, ssid, style, type,statusWord;
+                    byte[]  decodedName;
                     Device device;
                     switch (cmd) {
                         case "tgl":
@@ -82,10 +86,36 @@ public class UDPServerService extends Service {
                                 deviceDatabase.updateDevice(device);
                             }
                             break;
+                        case "en":
+                            String a = jsonMessage.getString("text");
+//                            AES.setKey("q7tt0yk18nrjrqur");
+//                            Log.e("Encrypting","Encrypted is: " + Encryptor.encrypt(a,"q7tt0yk18nrjrqur"));
+//                            Encryption encryption = Encryption.getDefault("8nro4q0emv8k1uv5", "", new byte[16]);
+//                            Log.e("Encrypting","Encrypted is: " + encryption.encryptOrNull(a));
+                            Log.e("Encrypting","Encrypted is: " + Encryptor.encrypt(a,"8nro4q0emv8k1uv5"));
+//                            Log.e("Encrypting","Library   is: " + AESCrypt.encrypt("8nro4q0emv8k1uv5",a));
+//                            Log.e("Encrypting","Encrypted2222 is: " + AES.encrypt(a));
+
+//                            Log.e("Encrypting","Encrypted22 is: " + AES.encrypt(a,"q7tt0yk18nrjrqur"));
+
+                            break;
+//                        case "tos":
+//                            byte[] de = Base64.decode(jsonMessage.getString("text"), Base64.DEFAULT);
+//                            Log.e("bbbbbbbbbb", "bbbbbbbbb: " + new String(de,"UTF-8"));
+//                            break;
+//                        case "toba":
+//                            Log.e("bbbbbbbbbb", "bbbbbbbbb: " + Base64.encodeToString(jsonMessage.getString("text").getBytes(), Base64.DEFAULT));
+//                            break;
+                        case "de":
+                            String b = jsonMessage.getString("text");
+                            Log.e("Decrypting","Decrypted is: " + Encryptor.decrypt(b,"8nro4q0emv8k1uv5"));
+//                            Log.e("Decrypting","Decrypted22 is: " + AESCrypt.decrypt("8nro4q0emv8k1uv5",b));
+                            break;
                         case "TLMSDONE":
                             pin1 = jsonMessage.getString("pin1");
                             pin2 = jsonMessage.getString("pin2");
                             name = jsonMessage.getString("name");
+                            statusWord = jsonMessage.getString("stword");
                             decodedName = Base64.decode(name, Base64.DEFAULT);
                             device = deviceDatabase.getDevice(src);
                             Log.d(TAG, "TLMSDONETLMSDONE: " + device);
@@ -96,6 +126,11 @@ public class UDPServerService extends Service {
                                 device.setName1(new String(decodedName, "UTF-8"));
                                 device.setPin1(pin1);
                                 device.setPin2(pin2);
+                                Log.e(getClass().getSimpleName(),"Received Stword: " + statusWord);
+                                Log.e(getClass().getSimpleName(),"Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord,device.getSecret()).split("#")[0])+1));
+
+                                device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord,device.getSecret()).split("#")[0])+1) + "#");
+                                Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
                                 deviceDatabase.updateDevice(device);
                             }
                             else{
@@ -124,7 +159,7 @@ public class UDPServerService extends Service {
                                 deviceDatabase.updateDevice(device);
                             }
                             else{
-                                device = new Device(src, new String(decodedName, "UTF-8"), "", type, "", new Topic(), "");
+                                device = new Device(src, new String(decodedName, "UTF-8"), "", type, "", new Topic(), "","");
                                 device.setSsid(ssid);
                                 device.setStyle(style);
                                 device.setIp(senderIP);
@@ -134,6 +169,9 @@ public class UDPServerService extends Service {
                             jsonObject.addProperty("cmd",AppConstants.TO_DEVICE_TLMS);
                             jsonObject.addProperty("src",RayanApplication.getPref().getId());
                             sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
+                            break;
+                        case "wrong_stword":
+
                             break;
 
                     }

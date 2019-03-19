@@ -102,7 +102,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 //    @Override
 //    public void onBackPressed() {
 ////<<<<<<< HEAD
-//        device = viewModel.getDevice("111111");
+//        device = viewModel.getDevice("989898");
 //        device.setIp("192.168.1.102");
 //        if (device != null){
 //        transaction = fragmentManager.beginTransaction();
@@ -110,7 +110,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 //        EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
 //        transaction.replace(R.id.frameLayout, editGroupFragment);
 //        transaction.addToBackStack(null);
-//        transaction.commit();}
+//        transaction.commit();}}
 ////=======
 ////        device = viewModel.getDevice("137067");
 ////        if (device != null){
