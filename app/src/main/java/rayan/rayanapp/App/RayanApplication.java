@@ -10,6 +10,8 @@ import android.net.wifi.WifiManager;
 import android.support.multidex.MultiDexApplication;
 import io.fabric.sdk.android.Fabric;
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.json.JSONObject;
 
 import java.util.List;
