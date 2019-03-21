@@ -17,6 +17,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
@@ -32,6 +33,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ForgetPasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.RegisterUserRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -104,6 +106,12 @@ public interface ApiService {
     Observable<DeviceBaseResponse> plugStatusVerification(@Url String url, @Body PlugPhysicalVerificationRequest request);
     @POST
     Observable<ToggleDeviceResponse> toggle(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<ToggleDeviceResponse> togglePin1(@Url String url, @Body ToggleDevice toggleDevice);
+    @POST
+    Observable<ToggleDeviceResponse> togglePin2(@Url String url, @Body ToggleDevice toggleDevice);
+    @POST
+    Observable<TlmsDoneResponse> tlms(@Url String url, @Body BaseRequest baseRequest);
     @POST
     Observable<SetPrimaryConfigResponse> sendFirstConfig(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST

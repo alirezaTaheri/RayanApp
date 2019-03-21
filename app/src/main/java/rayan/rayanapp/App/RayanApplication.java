@@ -17,6 +17,7 @@ import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
 //<<<<<<< HEAD
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
+import rayan.rayanapp.Helper.RequestManager;
 import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Receivers.LanguageDetailsChecker;
@@ -45,6 +46,7 @@ public class RayanApplication extends Application {
     private MessageTransmissionDecider mtd;
     private DeviceDatabase deviceDatabase;
     private SendMessageToDevice sendMessageToDevice;
+    private RequestManager requestManager;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -73,8 +75,8 @@ public class RayanApplication extends Application {
         jsonMaker = new JsonMaker();
         deviceDatabase = new DeviceDatabase(this);
         mtd = new MessageTransmissionDecider(this,deviceDatabase.getAllDevices());
-        sendMessageToDevice = new SendMessageToDevice();
-
+        sendMessageToDevice = new SendMessageToDevice(this);
+        requestManager = new RequestManager();
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
@@ -87,6 +89,10 @@ public class RayanApplication extends Application {
 
     public SendMessageToDevice getSendMessageToDevice() {
         return sendMessageToDevice;
+    }
+
+    public RequestManager getRequestManager() {
+        return requestManager;
     }
 
     public String getCurrentSSID() {
