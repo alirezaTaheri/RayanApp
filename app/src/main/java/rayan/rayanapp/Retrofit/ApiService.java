@@ -35,6 +35,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.RegisterUserRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -112,6 +113,8 @@ public interface ApiService {
     Observable<ToggleDeviceResponse> togglePin2(@Url String url, @Body ToggleDevice toggleDevice);
     @POST
     Observable<TlmsDoneResponse> tlms(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<YesResponse> NODE(@Url String url, @Body BaseRequest baseRequest);
     @POST
     Observable<SetPrimaryConfigResponse> sendFirstConfig(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST

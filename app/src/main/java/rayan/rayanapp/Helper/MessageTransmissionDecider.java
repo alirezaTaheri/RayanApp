@@ -83,9 +83,9 @@ public class MessageTransmissionDecider {
                 case WIFI:
                     if (devices.get(a).getSsid().equals(currentSSID) && devices.get(a).getIp() != null) {
                         Log.e("I am MTD:","WIFIWIFIWIFI "+ status);
-                        protocols.add(PROTOCOL.UDP);
                         protocols.add(PROTOCOL.HTTP);
-                        Log.e("I am MTD:","computeCommunicationRoutes connected to same ssid ");
+                        protocols.add(PROTOCOL.UDP);
+                        Log.e("I am MTD:","computeCommunicationRoutes connected to same ssid");
                     }
                     if (mqttConnected && devices.get(a).getTopic()!= null && MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().isConnected()){
                         protocols.add(PROTOCOL.MQTT);
@@ -101,8 +101,8 @@ public class MessageTransmissionDecider {
                     Log.e("I am MTD:","computeCommunicationRoutes ");
                     break;
                 case NOT_CONNECTED:
-                    if (!devices.get(a).getSsid().equals(AppConstants.UNKNOWN_SSID))
-                        protocols.add(PROTOCOL.STANDALONE);
+//                    if (!devices.get(a).getSsid().equals(AppConstants.UNKNOWN_SSID) && devices.get(a).getStyle().equals(AppConstants.DEVICE_STANDALONE_STYLE))
+//                        protocols.add(PROTOCOL.STANDALONE);
                     Log.e("I am MTD:","STANDALONESTANDALONEcomputeCommunicationRoutes ");
                     break;
             }

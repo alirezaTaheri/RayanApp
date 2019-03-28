@@ -31,6 +31,7 @@ import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
@@ -85,7 +86,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void onPin1Clicked(Device device, int position) {
-        Log.e("Pin1 Is Touching: " , "Device: " +device);
+        if (!((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().isWaitingPin1(device.getChipId()))
+            Log.e("Pin1 Is Touching: " , "Device: " +device);
 //        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
 //            if (device.getIp() != null)
                 devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);

@@ -67,6 +67,7 @@ public class RayanApplication extends Application {
 //        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
 //        intentFilter.addAction("android.net.wifi.WIFI_STATE_CHANGED");
 //        registerReceiver(networkReceiver,intentFilter);
+        Log.e("seekbarthis","in the rayan application creating networkconnectionlivedata");
         networkConnectionLiveData = new NetworkConnectionLiveData(this);
         networkBus = new NetworkConnectionBus();
         context = this;

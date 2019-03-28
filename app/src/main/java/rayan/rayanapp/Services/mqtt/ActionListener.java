@@ -131,7 +131,7 @@ public class ActionListener implements IMqttActionListener {
                 Log.i(TAG, "Auto-subscribing to: " + sub.getTopic() + " @ QoS: " + sub.getQos() + connection.getClient());
                 connection.getClient().subscribe(sub.getTopic(), sub.getQos());
             }
-        } catch (MqttException ex){
+        } catch (MqttException | IllegalArgumentException ex){
             Log.e(TAG, "Failed to Auto-Subscribe: " + ex.getMessage());
         }
         updateConnection.postValue(connection);

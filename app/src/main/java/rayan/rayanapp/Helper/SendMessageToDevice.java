@@ -16,7 +16,10 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
@@ -29,7 +32,9 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
 import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
 import rayan.rayanapp.Services.mqtt.Connection;
+import rayan.rayanapp.Services.mqtt.model.Subscription;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
@@ -69,11 +74,11 @@ public class SendMessageToDevice {
     }
 
     Observable<Long> counterObservable = Observable.interval(0,700,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
-    Observable<Long> timerObservable = Observable.timer(4, TimeUnit.SECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
+    Observable<Long> timerObservable = Observable.timer(AppConstants.MQTT_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
 
     private void sendMqttPin1(RayanApplication rayanApplication, Device device, int position, ToggleDeviceAnimationProgress fragment){
         List<String> arguments = new ArrayList<>();
-        arguments.add(Encryptor.encrypt(device.getStatusWord(), device.getSecret()));
+        arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
         publishMqtt(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString(), 0, false);
             timerObservable.subscribe(new Observer<Long>() {
                 @Override
@@ -104,7 +109,7 @@ public class SendMessageToDevice {
 
     private void sendMqttPin2(RayanApplication rayanApplication, Device device, int position, ToggleDeviceAnimationProgress fragment){
         List<String> arguments = new ArrayList<>();
-        arguments.add(Encryptor.encrypt(device.getStatusWord(), device.getSecret()));
+        arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
         publishMqtt(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString(), 0, false);
         timerObservable.subscribe(new Observer<Long>() {
             @Override
@@ -159,6 +164,8 @@ public class SendMessageToDevice {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("/////////", "////////onError/////: " +e);
+                        fragment.stopToggleAnimationPin1(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                     }
 
                     @Override
@@ -210,109 +217,196 @@ public class SendMessageToDevice {
     }
 
     @SuppressLint("CheckResult")
-    private Observable<ToggleDeviceResponse> sendHttpPin1(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position){
-         return apiService.togglePin1("http://192.168.1.103/test.php", new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,device.getStatusWord()))
-                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
-//                .subscribe(new Observer<ToggleDeviceResponse>() {
-//                    @Override
-//                    public void onSubscribe(Disposable d) {
-//                        Log.e("/////////s", "subscribe");
-//                    }
-//
-//                    @Override
-//                    public void onNext(ToggleDeviceResponse toggleDeviceResponse) {
-//                        Log.e("/////////s", "onNext");
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e("/////////s", "onError");
-//                    }
-//
-//                    @Override
-//                    public void onComplete() {
-//                        Log.e("/////////s", "onComplete");
-//                    }
-//                });
+    public void sendHttpNodeToDevice(String ip){
+        apiService.NODE(getDeviceAddress(ip),new BaseRequest(AppConstants.TO_DEVICE_NODE))
+                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<YesResponse>() {
+                     @Override
+                     public void onSubscribe(Disposable d) {
+                         Log.e("ggggggggg","gggggggggg: onSubscribe");
+                     }
 
-//                .concatMap(toggleDeviceResponse -> {
-//                    if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
-//                        return getNewStatusWord(device);
-//                    else if (toggleDeviceResponse.getCmd().equals("toggle")){
-//                        device.setPin1(toggleDeviceResponse.getPin1());
-//                        device.setPin2(toggleDeviceResponse.getPin2());
-//                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(device.getStatusWord(),device.getSecret()).split("#")[0])+1) + "#");
-//                        deviceDatabase.updateDevice(device);
-//                    }
-//                    return null;
-//                });
+                     @Override
+                     public void onNext(YesResponse yesResponse) {
+                         Log.e("gggggggggg","ggggggggg: onNext: "+ yesResponse);
+                         Device device = deviceDatabase.getDevice(yesResponse.getSrc());
+                         Log.e("gggggggggg","ggggggggg: onNext:Device: "+ device);
+                         if (device != null){
+                             device.setPin1(yesResponse.getPin1());
+                             device.setPin2(yesResponse.getPin2());
+                             device.setSsid(yesResponse.getSsid());
+                             device.setStyle(yesResponse.getStyle());
+                             device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(yesResponse.getStword(),device.getSecret()).split("#")[0])+1));
+                             device.setIp(ip);
+                             deviceDatabase.updateDevice(device);
+                         }
+                     }
+
+                     @Override
+                     public void onError(Throwable e) {
+                         Log.e("ggggggggg","ggggggggg: onError: "+e);
+                         e.printStackTrace();
+                     }
+
+                     @Override
+                     public void onComplete() {
+                         Log.e("ggggggggggg","ggggggggggg: onComplete");
+                     }
+                 });
+    }
+    @SuppressLint("CheckResult")
+    private Observable<ToggleDeviceResponse> toDeviceHttpPin1(Device device){
+         return apiService.togglePin1(getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
+                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
+    }
+    @SuppressLint("CheckResult")
+    private Observable<ToggleDeviceResponse> toDeviceHttpPin2(Device device){
+         return apiService.togglePin1(getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
+                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
     }
 
     @SuppressLint("CheckResult")
-    private void sendToInsurance(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position){
-
-        sendHttpPin1(device, rayanApplication, fragment, position)
-                .flatMap(toggleDeviceResponse -> {
-                    Log.e("rrrrrrrrrrr", "response is: " + toggleDeviceResponse + String.valueOf(Integer.parseInt(toggleDeviceResponse.getStword())+1));
-                    if (toggleDeviceResponse.getCmd().equals("wrong_stword")){
-                        device.setStatusWord(String.valueOf(Integer.parseInt(toggleDeviceResponse.getStword())+1));
-                        return sendHttpPin1(device, rayanApplication, fragment, position);
-                    }
-                    else {
+    private void sendHttpPin1(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position){
+        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
+                Observable.just(1).flatMap(a -> {
+                    Log.e("TAGTAGTAGTAG", "Sending stword is: " + device.getStatusWord());
+                    return toDeviceHttpPin1(device);
+                })
+                .repeatWhen(completed -> {
+                    Log.e("TAGTAGTAG", "repeatwhen: " + completed);
+                    return completed.delay(200, TimeUnit.MILLISECONDS);
+                })
+                        .takeWhile(toggleDeviceResponse -> {
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0])+1));
+                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
+                    if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
+                        return true;
+                    else{
                         device.setPin1(toggleDeviceResponse.getPin1());
                         device.setPin2(toggleDeviceResponse.getPin2());
-                        device.setStatusWord(String.valueOf(Integer.parseInt(toggleDeviceResponse.getStword())+1));
                         deviceDatabase.updateDevice(device);
+                        fragment.stopToggleAnimationPin1(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+                        return false;
                     }
-                    return null;
                 })
-                .repeat()
-                .takeWhile(tlmsDoneResponse -> {
-                    return tlmsDoneResponse != null;
-        })
-                .subscribe(new Observer<ToggleDeviceResponse>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                Log.e("/////////s", "subscribe");
-            }
+                ,
+                (changeNameResponse, deviceResponse) -> {
+            return changeNameResponse;})
+                .timeout(4, TimeUnit.SECONDS)
+                .takeWhile(aLong -> aLong<1)
+                .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onSubscribe");
+                        fragment.startToggleAnimationPin1(device.getChipId(), position);
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().setWaitingPin1(device.getChipId(), d);
+                    }
 
-            @Override
-            public void onNext(ToggleDeviceResponse tlmsDoneResponse) {
-                Log.e("/////////s", "onNext" + tlmsDoneResponse);
-            }
+                    @Override
+                    public void onNext(Long aLong) {
+                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onNext: " + aLong);
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                Log.e("/////////s", "onError" + e);
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onError: " + e);
+                        fragment.stopToggleAnimationPin1(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+                        e.printStackTrace();
+                    }
 
-            @Override
-            public void onComplete() {
-                Log.e("/////////s", "onComplete");
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onComplete ");
+                        fragment.stopToggleAnimationPin1(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+                    }
+                });
+    }
+    private void sendHttpPin2(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position){
+        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
+                Observable.just(1).flatMap(a -> {
+                    Log.e("TAGTAGTAGTAG", "Sending stword is: " + device.getStatusWord());
+                    return toDeviceHttpPin2(device);
+                })
+                .repeatWhen(completed -> {
+                    Log.e("TAGTAGTAG", "Should I go in repeatwhen: " + completed);
+                    return completed.delay(200, TimeUnit.MILLISECONDS);
+                })
+                        .takeWhile(toggleDeviceResponse -> {
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0])+1));
+                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
+                    if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
+                        return true;
+                    else{
+                        device.setPin1(toggleDeviceResponse.getPin1());
+                        device.setPin2(toggleDeviceResponse.getPin2());
+                        deviceDatabase.updateDevice(device);
+                        fragment.stopToggleAnimationPin2(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+                        return false;
+                    }
+                })
+                ,
+                (changeNameResponse, deviceResponse) -> {
+            return changeNameResponse;})
+                .timeout(4, TimeUnit.SECONDS)
+                .takeWhile(aLong -> aLong<1)
+                .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onSubscribe");
+                        fragment.startToggleAnimationPin2(device.getChipId(), position);
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onNext: " + aLong);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onError: " + e);
+                        fragment.stopToggleAnimationPin2(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onComplete ");
+                        fragment.stopToggleAnimationPin2(device.getChipId());
+                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+                    }
+                });
     }
 
     public void toggleDevicePin1(ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         Log.e(TAG,"Be Chi Befrestam? : " + rayanApplication.getMtd().sendMessage(device));
         Toast.makeText(rayanApplication, rayanApplication.getMtd().sendMessage(device), Toast.LENGTH_SHORT).show();
-        sendToInsurance(device, rayanApplication, fragment, position);
-//        switch (rayanApplication.getMtd().sendMessage(device)){
-//            case "UDP":
-//                sendUdpPin1(device, rayanApplication,fragment, position);
-//                break;
-//            case "MQTT":
-//                sendMqttPin1(rayanApplication,device, position, fragment);
-//                break;
-//            case "STANDALONE":
-//                Toast.makeText(rayanApplication, "دستگاه فقط از طریق اتصال مستقیم قابل دسترسی است", Toast.LENGTH_SHORT).show();
-//                break;
-//            case "HTTP":
-//                break;
-//            case "NONE":
-//                Toast.makeText(rayanApplication, "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
-//                break;
-//        }
+        switch (rayanApplication.getMtd().sendMessage(device)){
+            case "UDP":
+                sendUdpPin1(device, rayanApplication,fragment, position);
+                break;
+            case "MQTT":
+                sendMqttPin1(rayanApplication,device, position, fragment);
+                break;
+            case "STANDALONE":
+                Toast.makeText(rayanApplication, "دستگاه فقط از طریق اتصال مستقیم قابل دسترسی است", Toast.LENGTH_SHORT).show();
+                break;
+            case "HTTP":
+                sendHttpPin1(device, rayanApplication, fragment, position);
+                break;
+            case "NONE":
+                Toast.makeText(rayanApplication, "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
     public void toggleDevicePin2(ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         Log.e(TAG,"Be Chi Befrestam2? : " + rayanApplication.getMtd().sendMessage(device));
@@ -328,6 +422,7 @@ public class SendMessageToDevice {
                 Toast.makeText(rayanApplication, "دستگاه فقط از طریق اتصال مستقیم قابل دسترسی است", Toast.LENGTH_SHORT).show();
                 break;
             case "HTTP":
+                sendHttpPin2(device, rayanApplication, fragment, position);
                 break;
             case "NONE":
                 Toast.makeText(rayanApplication, "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
@@ -335,4 +430,7 @@ public class SendMessageToDevice {
         }
     }
 
+    public String getDeviceAddress(String ip){
+        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+    }
 }

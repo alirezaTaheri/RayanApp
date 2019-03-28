@@ -1,7 +1,7 @@
 package rayan.rayanapp.Retrofit.Models.Responses.device;
 
 public class TlmsDoneResponse extends DeviceBaseResponse {
-    private String name, stword, pin1, pin2;
+    protected String name, stword, pin1, pin2;
 
     public String getName() {
         return name;
@@ -17,5 +17,15 @@ public class TlmsDoneResponse extends DeviceBaseResponse {
 
     public String getPin2() {
         return pin2;
+    }
+
+    @Override
+    public String toString() {
+        return "TlmsDoneResponse{" +
+                "name='" + name + '\'' +
+                ", stword='" + stword + '\'' +
+                ", pin1='" + pin1 + '\'' +
+                ", pin2='" + pin2 + '\'' +
+                '}';
     }
 }

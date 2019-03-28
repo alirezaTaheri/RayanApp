@@ -1,8 +1,8 @@
 package rayan.rayanapp.Retrofit.Models.Responses.device;
 
 public class DeviceBaseResponse {
-    private String src;
-    private String cmd;
+    protected String src;
+    protected String cmd;
 
     public DeviceBaseResponse() {
     }

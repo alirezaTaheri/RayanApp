@@ -79,6 +79,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     }
 
     public void startToggleAnimationPin1(ValueAnimator v){
+        pin1.setEnabled(false);
         v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -86,11 +87,12 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
                 bottomStrip.requestLayout();
             }
         });
-        v.setDuration(4000);
+        v.setDuration(AppConstants.TOGGLE_ANIMATION_TIMEOUT);
         v.start();
     }
 
     public void stopToggleAnimationPin1(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
+        pin1.setEnabled(true);
         if (v != null) {
             v.cancel();
             if (item.getPin1().equals(AppConstants.ON_STATUS)) {

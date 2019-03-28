@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "300779851180",
+    "firebase_url": "https://rayanv2app.firebaseio.com",
+    "project_id": "rayanv2app",
+    "storage_bucket": "rayanv2app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:300779851180:android:b725d147c1648d96",
+        "android_client_info": {
+          "package_name": "rayan.rayanappp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "300779851180-6ovdard1ut6637phrscf7d0k9ipkqse1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArbCCrv98rR8N26D_LI9rlnvy0g5FAzxE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

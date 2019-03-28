@@ -49,19 +49,32 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.spec.SecretKeySpec;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Helper.Encryptor;
+import rayan.rayanapp.Helper.NsdHelper;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
+import rayan.rayanapp.Retrofit.ApiService;
+import rayan.rayanapp.Retrofit.ApiUtils;
+import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
@@ -116,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             finish();
         }else {
         setContentView(R.layout.activity_main);
-        requestRecordAudioPermission();
+//        requestRecordAudioPermission();
         ButterKnife.bind(this);
         mqttStatus = this;
 //        setSupportActionBar(toolbar_main);
@@ -150,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         ((RayanApplication) getApplication()).getNetworkStatus().observe(this, networkConnection -> {
             Log.e(TAG, "Network Connection: " + networkConnection);
+            Log.e("seekbarthis","in the mainactivity received update for observable: " + networkConnection);
             if (!networkConnection.isConnected()) {
                 mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection).observe(this, connection -> {
                     MainActivityViewModel.connection.postValue(connection);
@@ -317,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (RayanApplication.getPref().isLoggedIn()) {
             startService(new Intent(this, UDPServerService.class));
             RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
-            mainActivityViewModel.sendNodeToAll();
+//            mainActivityViewModel.sendNodeToAll();
         }
     }
 
@@ -652,35 +666,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onPageScrollStateChanged(int state) {
             }
         });
+        nsdHelper = new NsdHelper(this);
+        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
     }
 
-//    @Override
+    NsdHelper nsdHelper;
+    @Override
+    public void onBackPressed() {
+        nsdHelper.discoverServices();
+    }
+
+    //    @Override
 //    public void onBackPressed() {
 //        publish(MainActivityViewModel.connection.getValue(), null, "message", 0, false);
 //    }
-    private void publish(Connection connection, String topic, String message, int qos, boolean retain){
-        try {
-            String[] actionArgs = new String[2];
-            actionArgs[0] = message;
-            actionArgs[1] = topic;
-//            final ActionListener callback = new ActionListener(context,
-//                    ActionListener.Action.PUBLISH, connection, actionArgs);
-            IMqttActionListener iMqttActionListener = new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.e(TAG, "onSuccess Publish message" + topic);
-                }
 
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.e(TAG, "onFailure Publish message");
-                }
-            };
-            connection.getClient().publish(topic, message.getBytes(), qos, retain, null, iMqttActionListener);
-        } catch( MqttException ex){
-            Log.e(TAG, "Exception occurred during publish: " + ex.getMessage());
-        }
-    }
     //    String key = "q7tt0yk18nrjrqur";
 //    String textToDecrypt = "xpq/VGgyD0pAf94O1fmSgg==";
 //    String secretOfAkbar = "8nro4q0emv8k1uv5";
@@ -714,12 +714,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////            e.printStackTrace();
 ////        }
 //    }//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
-}//{"src":"989898","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
+}//{"src":"14337767","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
 //{"text":"yxEX1vOqupgRIiIE6mi11szCSG6glHizIdaPimHgGJoMk5B5jC/aTuoLF5p7MTJlz/yIH4seE3HatSek9ipis8JNmUzJX7tnKI7E14ur5jZ7y9Xr0TUIv3HQcU0sfMf3", "cmd":"en", "src":""}
 //{"text":"ILaSCiqVbgCucFnGJEuKJ+XqOHxmaaDeeLj2H625xQM=", "cmd":"de", "src":""}
 //{"text":"G9DU4Dr/jyMuH6OTchlQebccrrbqa7JrIfGuKZ8RurU=", "cmd":"de", "src":""}
-//{"text":"mSogYeUvsoVkkskLyBM/RQ==", "cmd":"de", "src":""}
+//{"text":"xpq/VGgyD0pAf94O1fmSgg==", "cmd":"de", "src":"","k":"8nro4q0emv8k1uv5"}
 //{"text":"WJywYCPo75GyPxMPPSTKFg==", "cmd":"de", "src":""}
 //{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "cmd":"de", "src":""}
-//{"text":"b3To9C4IlG9gBCb95KYvTQ==\n", "cmd":"de", "src":""}
-//{"text":"1237/0", "cmd":"en", "src":""}
+//{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "cmd":"de", "src":"", "k":"8nro4q0emv8k1uv5"}
+//{"text":"28#", "cmd":"en", "src":"", "k":"q7tt0yk18nrjrqur"}
+//{"src":"5958528","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"TJpYO/lEqtn6Yg6L8uBkIQ=="}
