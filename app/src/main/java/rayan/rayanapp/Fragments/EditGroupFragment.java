@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +51,8 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     static final int PICK_CONTACT=1;
     private Group group;
     private String userId;
+    private List<User> admins;
+    private List<User> humanUsers;
     private final String TAG = EditGroupFragment.class.getSimpleName();
     String cNumber;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
@@ -100,8 +103,19 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
             else RayanApplication.getPref().setIsGroupAdminKey(false);
             editGroupFragmentViewModel.getGroupLive(getArguments().getString("id")).observe(this, group1 -> {
                 this.group = group1;
-                usersRecyclerViewAdapter.setItems(group1.getHumanUsers());
-                managersRecyclerViewAdapter.setItems(group1.getAdmins());
+                admins=group1.getAdmins();
+                humanUsers=group1.getHumanUsers();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
+                    for(int i=0;i<=admins.size()-1;i++){
+                        admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(),getActivity()));
+                    }
+                    for(int i=0;i<=humanUsers.size()-1;i++){
+                        humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(),getActivity()));
+                    }
+                }
+                else getContactPermission();
+                usersRecyclerViewAdapter.setItems(humanUsers);
+                managersRecyclerViewAdapter.setItems(admins);
                 devicesRecyclerViewAdapter.setItems(group1.getDevices());
             });
         }

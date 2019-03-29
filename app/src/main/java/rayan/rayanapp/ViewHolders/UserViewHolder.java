@@ -16,6 +16,8 @@ public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
     private final String TAG = UserViewHolder.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;
+    @BindView(R.id.contactName)
+    TextView contactName;
     @BindView(R.id.deleteUser)
     ImageView delete;
     public UserViewHolder(View itemView) {
@@ -26,6 +28,7 @@ public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
     @Override
     public void onBind(User item, @Nullable OnUserClicked<User> listener) {
         name.setText(item.getUsername());
+        contactName.setText(item.getContactNameOnPhone());
         if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
             delete.setVisibility(View.INVISIBLE);
         }

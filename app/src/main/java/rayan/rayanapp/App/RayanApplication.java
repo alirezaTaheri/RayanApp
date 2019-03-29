@@ -8,6 +8,10 @@ import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.support.multidex.MultiDexApplication;
+import io.fabric.sdk.android.Fabric;
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONObject;
 
@@ -33,7 +37,7 @@ import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.JsonMaker;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
-public class RayanApplication extends Application {
+public class RayanApplication extends MultiDexApplication {
     private static Context context;
     private UDPMessageRxBus bus;
     private WifiScanResultsBus wifiBus;
@@ -50,6 +54,7 @@ public class RayanApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/iransans.ttf")
                 .setFontAttrId(R.attr.fontPath)

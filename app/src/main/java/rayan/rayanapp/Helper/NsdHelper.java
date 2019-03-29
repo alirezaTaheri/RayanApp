@@ -24,11 +24,11 @@ public class NsdHelper {
     public NsdHelper(Context context) {
         mContext = context;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
-        initializeResolveListener();
+//        initializeResolveListener();
         sendMessageToDevice = new SendMessageToDevice(context);
     }
     public void initializeNsd() {
-        initializeResolveListener();
+//        initializeResolveListener();
         //mNsdManager.init(mContext.getMainLooper(), this);
     }
     public void initializeDiscoveryListener() {
@@ -46,9 +46,9 @@ public class NsdHelper {
                 } else if (service.getServiceName().equals(mServiceName)) {
                     Log.d(TAG, "Same machine: " + mServiceName);
                 } else if (service.getServiceName().contains(mServiceName)){
-                    mNsdManager.resolveService(service, mResolveListener);
+                    mNsdManager.resolveService(service, new ResolverListner());
                 }
-                mNsdManager.resolveService(service, mResolveListener);
+                mNsdManager.resolveService(service, new ResolverListner());
             }
             @Override
             public void onServiceLost(NsdServiceInfo service) {
@@ -72,26 +72,6 @@ public class NsdHelper {
         };
     }
 
-    public void initializeResolveListener() {
-        mResolveListener = new NsdManager.ResolveListener() {
-            @Override
-            public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-                Toast.makeText(mContext, "Failure: " + serviceInfo, Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Resolve failed" + errorCode);
-            }
-            @Override
-            public void onServiceResolved(NsdServiceInfo serviceInfo) {
-                Toast.makeText(mContext, "Success: " + serviceInfo, Toast.LENGTH_LONG).show();
-                Log.e(TAG, "Resolve Succeeded. " + serviceInfo + serviceInfo.getHost().getHostAddress());
-                sendMessageToDevice.sendHttpNodeToDevice(serviceInfo.getHost().getHostAddress());
-                mService = serviceInfo;
-                if (serviceInfo.getServiceName().equals(mServiceName)) {
-                    Log.d(TAG, "Same IP.");
-                    return;
-                }
-            }
-        };
-    }
     public void initializeRegistrationListener() {
         mRegistrationListener = new NsdManager.RegistrationListener() {
             @Override
@@ -164,5 +144,24 @@ public class NsdHelper {
             }
         }
         return true;
+    }
+    public class ResolverListner implements NsdManager.ResolveListener {
+
+        @Override
+        public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Toast.makeText(mContext, "Failure: " + serviceInfo, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Resolve failed" + errorCode);
+        }
+        @Override
+        public void onServiceResolved(NsdServiceInfo serviceInfo) {
+            Toast.makeText(mContext, "Success: " + serviceInfo, Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Resolve Succeeded. " + serviceInfo + serviceInfo.getHost().getHostAddress());
+            sendMessageToDevice.sendHttpNodeToDevice(serviceInfo.getHost().getHostAddress());
+            mService = serviceInfo;
+            if (serviceInfo.getServiceName().equals(mServiceName)) {
+                Log.d(TAG, "Same IP.");
+                return;
+            }
+        }
     }
 }

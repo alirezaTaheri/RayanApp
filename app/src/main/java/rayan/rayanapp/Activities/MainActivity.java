@@ -37,6 +37,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.polyak.iconswitch.IconSwitch;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ButterKnife.bind(this);
         mqttStatus = this;
 //        setSupportActionBar(toolbar_main);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getShowNotification());

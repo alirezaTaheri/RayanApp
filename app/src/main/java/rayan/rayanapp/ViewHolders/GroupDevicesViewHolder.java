@@ -4,6 +4,8 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
+import com.varunest.sparkbutton.SparkButton;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
@@ -14,7 +16,8 @@ public class GroupDevicesViewHolder extends BaseViewHolder<Device, OnDeviceClick
     private final String TAG = GroupDevicesViewHolder.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;
-
+    @BindView(R.id.favoriteIcon)
+    SparkButton favoriteIcon;
     public GroupDevicesViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
@@ -23,5 +26,6 @@ public class GroupDevicesViewHolder extends BaseViewHolder<Device, OnDeviceClick
     @Override
     public void onBind(Device item, @Nullable OnDeviceClickListenerManagement<Device> listener) {
         name.setText(item.getName1());
+        favoriteIcon.setVisibility(View.GONE);
     }
 }
