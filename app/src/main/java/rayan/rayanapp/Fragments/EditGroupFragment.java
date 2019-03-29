@@ -352,7 +352,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
         });
     }
 
-    @OnClick(R.id.leaveGroup_btn)
+//    @OnClick(R.id.leaveGroup_btn)
     void clickOnLeaveGroup(){
         userId=RayanApplication.getPref().getId();
         YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment3","ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟" );

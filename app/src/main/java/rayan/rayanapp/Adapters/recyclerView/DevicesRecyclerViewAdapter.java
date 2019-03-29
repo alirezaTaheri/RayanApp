@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
-import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.HashMap;
@@ -64,6 +62,9 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                 if (key.equals("pin2")){
                     if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2))
                         ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
+                }
+                if (key.equals("name")){
+                        holder.changeName(b.getString("name"));
                 }
 //                if (key.equals("progressPin1")){
 //                    holder.setAnimationProgressPin1(b.getInt("progressPin1"));

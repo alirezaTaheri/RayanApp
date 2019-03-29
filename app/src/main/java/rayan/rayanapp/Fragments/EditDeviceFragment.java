@@ -156,7 +156,7 @@ public class EditDeviceFragment extends BackHandledFragment{
     @OnClick(R.id.editDevice)
     void toDeviceChangeName(){
         setDeviceNameStatus(NameStatus.CHANGING);
-        editDeviceFragmentViewModel.zipChangeName(device.getId(), name.getText().toString(), device.getType(), device.getGroupId(), device.getIp()).observe(this, s -> {
+        editDeviceFragmentViewModel.zipChangeName(device.getId(), name.getText().toString(), device.getType(), device.getGroupId(), device.getIp(), device.getSsid()).observe(this, s -> {
             switch (s){
                 case AppConstants.FORBIDDEN:
                     editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(), device.getIp());
@@ -165,7 +165,7 @@ public class EditDeviceFragment extends BackHandledFragment{
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.CHANGE_NAME_FALSE:
-                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId());
+                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId(), device.getSsid());
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"امکان ویرایش نام وجود ندارد");
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
@@ -178,7 +178,7 @@ public class EditDeviceFragment extends BackHandledFragment{
                 case AppConstants.SOCKET_TIME_OUT:
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
                     editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(),device.getIp());
-                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId());
+                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId(), device.getSsid());
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
@@ -359,7 +359,7 @@ public class EditDeviceFragment extends BackHandledFragment{
             buildAlertMessageNoGps();
         }
         else
-            ChangeDeviceAccessPointFragment.newInstance().show(getActivity().getSupportFragmentManager(), "dialog");
+            ChangeDeviceAccessPointFragment.newInstance(device.getSsid()).show(getActivity().getSupportFragmentManager(), "dialog");
     }
 
     private void buildAlertMessageNoGps() {

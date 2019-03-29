@@ -31,6 +31,7 @@ import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
@@ -62,7 +63,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
         devicesFragmentViewModel.getAllDevices().observe(this, devices -> {
          devicesRecyclerViewAdapter.updateItems(devices);
-         this.devices = devices;
+            ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(devices);
+            this.devices = devices;
         });
         activity = getActivity();
     }
@@ -84,46 +86,49 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void onPin1Clicked(Device device, int position) {
-        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
-            if (device.isLocallyAccessibility())
+        if (!((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().isWaitingPin1(device.getChipId()))
+            Log.e("Pin1 Is Touching: " , "Device: " +device);
+//        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
+//            if (device.getIp() != null)
                 devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
-            else{
-                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
+//            else{
+////                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else {
-            if (device.isOnlineAccessibility()){
-                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
-            }
-            else{
-                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
+//            }
+//        }
+//        else {
+//            if (device.getTopic() != null){
+//                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
+//            }
+//            else{
+////                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-            }
-        }
+//            }
+//        }
 
     }
 
     @Override
     public void onPin2Clicked(Device device, int position) {
-//        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
-        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
-            if (device.isLocallyAccessibility())
+//        Log.e("Pin2 Is Touching: " , "Device: " +device);
+////        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
+//        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
+//            if (device.getIp()!= null)
                 devicesFragmentViewModel.togglePin2(this,position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
-            else{
+//            else{
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-                devicesFragmentViewModel.togglePin2(this, position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
-            }
-        }
-        else {
-            if (device.isOnlineAccessibility()){
-                devicesFragmentViewModel.togglePin2(this,position, ((RayanApplication) getActivity().getApplication()), device, false);
-            }
-            else{
-                devicesFragmentViewModel.togglePin2(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
+////                devicesFragmentViewModel.togglePin2(this, position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
+//            }
+//        }
+//        else {
+//            if (device.getTopic() != null){
+//                devicesFragmentViewModel.togglePin2(this,position, ((RayanApplication) getActivity().getApplication()), device, false);
+//            }
+//            else{
+////                devicesFragmentViewModel.togglePin2(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-            }
-        }
+//            }
+//        }
 
         }
 

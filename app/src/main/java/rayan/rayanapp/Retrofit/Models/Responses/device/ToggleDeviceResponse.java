@@ -1,18 +1,15 @@
 package rayan.rayanapp.Retrofit.Models.Responses.device;
 
 public class ToggleDeviceResponse extends DeviceBaseResponse{
-    private String src, sid, pin1, pin2;
+    private String sid, pin1, pin2,stword;
 
-    public String getSrc() {
-        return src;
-    }
-
-    public void setSrc(String src) {
-        this.src = src;
-    }
 
     public String getSid() {
         return sid;
+    }
+
+    public String getStword() {
+        return stword;
     }
 
     public void setSid(String sid) {
@@ -33,5 +30,17 @@ public class ToggleDeviceResponse extends DeviceBaseResponse{
 
     public void setPin2(String pin2) {
         this.pin2 = pin2;
+    }
+
+    @Override
+    public String toString() {
+        return "ToggleDeviceResponse{" +
+                "sid='" + sid + '\'' +
+                ", pin1='" + pin1 + '\'' +
+                ", cmd='" + getCmd() + '\'' +
+                ", src='" + getSrc() + '\'' +
+                ", pin2='" + pin2 + '\'' +
+                ", stword='" + stword + '\'' +
+                '}';
     }
 }

@@ -23,7 +23,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
-        versionName "2.5"
+        versionName "2.6"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -106,6 +106,8 @@ dependencies {
 //    implementation 'androidx.core:core-ktx:1.1.0-alpha3'
 //    implementation 'com.tbuonomo:morph-bottom-navigation:1.0.1'
     //    implementation 'com.github.Guilherme-HRamos:OwlBottomSheet:1.01'
+    implementation 'com.scottyab:aescrypt:0.0.1'
+    implementation 'com.github.simbiose:Encryption:2.0.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
     implementation 'com.google.firebase:firebase-core:16.0.7'
    // implementation 'com.google.android.gms:play-services:12.0.1'

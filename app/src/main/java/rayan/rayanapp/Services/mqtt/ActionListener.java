@@ -123,7 +123,7 @@ public class ActionListener implements IMqttActionListener {
 //        connection.setSubscriptions(subscriptionss);
         connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTED);
         connection.addAction("Client Connected");
-        Toast.makeText(context, "Successfully Connected", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "Successfully Connected", Toast.LENGTH_SHORT).show();
         Log.i(TAG, connection.handle() + " connected.");
         try {
             ArrayList<Subscription> subscriptions = connection.getSubscriptions();
@@ -131,7 +131,7 @@ public class ActionListener implements IMqttActionListener {
                 Log.i(TAG, "Auto-subscribing to: " + sub.getTopic() + " @ QoS: " + sub.getQos() + connection.getClient());
                 connection.getClient().subscribe(sub.getTopic(), sub.getQos());
             }
-        } catch (MqttException ex){
+        } catch (MqttException | IllegalArgumentException ex){
             Log.e(TAG, "Failed to Auto-Subscribe: " + ex.getMessage());
         }
         updateConnection.postValue(connection);
@@ -191,7 +191,7 @@ public class ActionListener implements IMqttActionListener {
     }
 
     private void connect(Throwable exception) {
-        Toast.makeText(context, "Can't Connect", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "Can't Connect", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "In Connect Method 2" + exception);
 //        Connection c = MainActivityViewModel.connection.getValue();
 //        if (c == null)

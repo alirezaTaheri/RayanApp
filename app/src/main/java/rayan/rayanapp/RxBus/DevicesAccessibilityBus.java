@@ -65,6 +65,12 @@ public class DevicesAccessibilityBus {
     public boolean isWaiting(String chipId){
         return disposablesPin1.get(chipId) != null || disposablesPin2.get(chipId) != null;
     }
+    public boolean isWaitingPin1(String chipId){
+        return disposablesPin1.get(chipId) != null;
+    }
+    public boolean isWaitingPin2(String chipId){
+        return disposablesPin2.get(chipId) != null;
+    }
 
 //    public void setDeviceLocallyAccessibility(String chipId, boolean accessibility){
 //        Device d = deviceDatabase.getDevice(chipId);
