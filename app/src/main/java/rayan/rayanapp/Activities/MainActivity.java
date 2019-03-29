@@ -1,19 +1,10 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-//<<<<<<< HEAD
-import android.net.wifi.WifiManager;
-//=======
-import android.content.res.Resources;
-import android.graphics.Color;
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -34,33 +25,25 @@ import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.polyak.iconswitch.IconSwitch;
-
-import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
+import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Fragments.DevicesFragment;
-import rayan.rayanapp.Fragments.FavoritesFragment;
-import rayan.rayanapp.Fragments.ScenariosFragment;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.CustomViewPager;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -74,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Toolbar toolbar;
 
     @BindView(R.id.viewPager)
-    ViewPager viewPager;
+    CustomViewPager viewPager;
     MainActivityViewModel mainActivityViewModel;
     private final String TAG = MainActivity.class.getSimpleName();
     @BindView(R.id.drawerLayout)
@@ -84,8 +67,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavigationView navigationView;
     @BindView(R.id.bottom_navigation_view)
     BottomNavigationView bottomNavigationView;
-    @BindView(R.id.bottom_navigation_viewpager)
-    ViewPager bottom_navigation_viewpager;
     MenuItem prevMenuItem;
     MqttStatus mqttStatus;
 
@@ -109,8 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        Log.e("setting",RayanApplication.getPref().getThemeKey()+ " "+ RayanApplication.getPref().getShowNotification());
-        navigationView.bringToFront();
+         navigationView.bringToFront();
        navigationView.invalidate();
         navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
@@ -489,21 +469,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void initializeBottomNavigation(){
+        viewPager.disableScroll(true);
         setupBottomNavigationViewPager(viewPager);
 
-        bottomNavigationView.getMenu().getItem(1).setChecked(true);
+        bottomNavigationView.getMenu().getItem(RayanApplication.getPref().getBottomNavigationIndexKey()).setChecked(true);
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.action_device:
+                                RayanApplication.getPref().setBottomNavigationIndexKey(1);
                                 viewPager.setCurrentItem(1);
+
                                 break;
                             case R.id.action_senario:
+                                RayanApplication.getPref().setBottomNavigationIndexKey(0);
                                 viewPager.setCurrentItem(0);
                                 break;
                             case R.id.action_favorite:
+                                RayanApplication.getPref().setBottomNavigationIndexKey(2);
                                 viewPager.setCurrentItem(2);
                                 break;
                         }
@@ -516,6 +501,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setupBottomNavigationViewPager(ViewPager viewPager) {
         BottomNavigationViewPagerAdapter adapter = new BottomNavigationViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
+     //   viewPager.beginFakeDrag();
         TypedValue tv = new TypedValue();
         if (this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
         {
@@ -523,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
         lp.bottomMargin += actionBarHeight+15;
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(RayanApplication.getPref().getBottomNavigationIndexKey());
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -539,6 +525,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     bottomNavigationView.getMenu().getItem(1).setChecked(false);
                 }
                 Log.d("page", "onPageSelected: "+position);
+                RayanApplication.getPref().setBottomNavigationIndexKey(position);
+              //  Toast.makeText(MainActivity.this,RayanApplication.getPref().getBottomNavigationIndexKey()+ "", Toast.LENGTH_SHORT).show();
                 bottomNavigationView.getMenu().getItem(position).setChecked(true);
                 prevMenuItem = bottomNavigationView.getMenu().getItem(position);
             }

@@ -3,20 +3,27 @@ package rayan.rayanapp.Activities;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class SettingsActivity extends PreferenceActivity {
     Toolbar bar;
+    CheckBoxPreference isNotification;
+
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
@@ -26,6 +33,25 @@ public class SettingsActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.settings_preferences);
         if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.JELLY_BEAN_MR1)
             getListView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+
+      isNotification = (CheckBoxPreference) getPreferenceManager().findPreference("KEY_NOTIFICATION");
+
+        isNotification.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Log.d("MyApp", "Pref " + preference.getKey() + " changed to " + newValue.toString());
+if (RayanApplication.getPref().getIsNotificationOn()){
+    RayanApplication.getPref().setIsNotificationOn(false);
+    Toast.makeText(SettingsActivity.this, RayanApplication.getPref().getIsNotificationOn()+"", Toast.LENGTH_SHORT).show();
+}else {
+    RayanApplication.getPref().setIsNotificationOn(true);
+    Toast.makeText(SettingsActivity.this, RayanApplication.getPref().getIsNotificationOn()+"", Toast.LENGTH_SHORT).show();
+
+}
+                return true;
+            }
+        });
+
+
         setupToolbar();
     }
 

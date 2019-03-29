@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="دریافت نوتیفیکیشن"
+        android:title="تنظیمات نوتیفیکیشن"
         android:textColor="@color/baseColor"
         android:layout="@layout/setting_preferences_category_text"
         android:key="SET_NOTIFICATION">
@@ -9,22 +9,22 @@
         <CheckBoxPreference
             android:key="KEY_NOTIFICATION"
             android:textColor="@color/baseColor"
-            android:summary="Enable or disable notification"
-            android:title="Notification"
+            android:summary="فعال و غیر فعال کردن دریافت نوتیفیکیشن"
+            android:title="دریافت نوتیفیکیشن"
             android:defaultValue="true"/>
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="انتخاب تم برنامه"
+        android:title="تنظیمات تم برنامه"
         android:textColor="@color/baseColor"
         android:layout="@layout/setting_preferences_category_text"
         android:key="CHOOSE_THEME">
 
         <ListPreference
             android:key="KEY_THEME"
-            android:title="theme select"
-            android:summary="select your theme"
+            android:title="انتخاب تم"
+            android:summary="تم مورد نظر خود را انتخاب کنید"
             android:entries="@array/choose_theme_setting"
             android:entryValues="@array/choose_theme_setting_values"
             android:defaultValue="تم 1"

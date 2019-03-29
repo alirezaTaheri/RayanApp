@@ -19,7 +19,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "rayan.rayanappp"
+        applicationId "rayan.rayanapp"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
@@ -27,8 +27,6 @@ android {
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-
-
     }
     buildTypes {
         release {
@@ -102,6 +100,7 @@ dependencies {
     implementation 'com.jaredrummler:material-spinner:1.3.1'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
 //    implementation 'com.android.support:preference-v7:28.0.0'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'org.apache.commons:commons-lang3:3.6'
     implementation 'uk.co.chrisjenx:calligraphy:2.2.0'
 //    implementation 'androidx.core:core-ktx:1.1.0-alpha3'
