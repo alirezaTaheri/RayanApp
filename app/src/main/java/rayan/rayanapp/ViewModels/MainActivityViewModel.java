@@ -8,6 +8,7 @@ import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.provider.SyncStateContract;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -18,13 +19,27 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -33,6 +48,7 @@ import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
+import rayan.rayanapp.R;
 import rayan.rayanapp.Services.mqtt.ActionListener;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.mqtt.MyMqttCallbackHandler;
@@ -63,14 +79,43 @@ public class MainActivityViewModel extends AndroidViewModel {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
+                try {
                 MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
                 mqttConnectOptions.setAutomaticReconnect(true);
                 mqttConnectOptions.setCleanSession(false);
                 mqttConnectOptions.setConnectionTimeout(5);
                 mqttConnectOptions.setKeepAliveInterval(200);
-                Connection connection = Connection.createConnection("ClientHandle" + System.currentTimeMillis(),"ClientId"+ System.currentTimeMillis(),"api.rayansmarthome.ir",1883,context,false);
+                    InputStream input =
+                            context.getApplicationContext().getAssets().open("ca_certificate.pem");
+                    Log.e("/////////////" ,"/////////////Input: " + input);
+                Connection connection = Connection.createConnection("ClientHandle" + System.currentTimeMillis(),"ClientId"+ System.currentTimeMillis(),AppConstants.MQTT_HOST,AppConstants.MQTT_PORT,context,true);
                 connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTING);
                 connection.setSubscriptions(getSubscriptions(connection));
+                    Log.e("/////////////" ,"/////////////000000");
+//                    SSLSocketFactory result;  	// check to see if already created
+//
+//                        KeyStore keystoreTrust = KeyStore.getInstance("BKS");        // Bouncy Castle
+//
+//                        keystoreTrust.load(context.getResources().openRawResource(R.raw.ca_certificate),
+//                                "12345678".toCharArray());
+//
+//                        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+//
+//                        trustManagerFactory.init(keystoreTrust);
+//
+//                        SSLContext sslContext = SSLContext.getInstance("TLS");
+//
+//                        sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
+//
+//                        result = sslContext.getSocketFactory();
+//
+//                mqttConnectOptions.setSocketFactory(result);
+                    mqttConnectOptions.setUserName(RayanApplication.getPref().getUsername());
+                    mqttConnectOptions.setPassword(RayanApplication.getPref().getPassword().toCharArray());
+                    mqttConnectOptions.setSocketFactory(getSocketFactory(context));
+//                mqttConnectOptions.setSocketFactory(connection.getClient().getSSLSocketFactory(input, "12345678"));
+//                    mqttConnectOptions.setSocketFactory(connection.getClient().getSSLSocketFactory());
+                    Log.e("/////////////" ,"/////////////1111111");
                 connection.addConnectionOptions(mqttConnectOptions);
                 updateConnection.postValue(connection);
                 String[] actionArgs = new String[1];
@@ -79,12 +124,13 @@ public class MainActivityViewModel extends AndroidViewModel {
                         ActionListener.Action.CONNECT,connection, updateConnection, actionArgs);
 //        connection.getClient().setCallback(new MqttCallbackHandler(this, connection.handle()));
                 connection.getClient().setCallback(new MyMqttCallbackHandler(context));
-                try {
                     connection.getClient().connect(connection.getConnectionOptions(), null, callback);
                 }
-                catch (MqttException e) {
+                catch (MqttException | IOException e) {
                     Log.e(this.getClass().getCanonicalName(),
                             "MqttException occurred", e);
+                    Log.e("//////////error","error: " + e);
+                    e.printStackTrace();
                 }
             }
         });
@@ -175,5 +221,25 @@ public class MainActivityViewModel extends AndroidViewModel {
         return currentSSID;
     }
 
+    private SocketFactory getSocketFactory(Context c) {
+        try {
+            SSLContext context;
+            KeyStore ts = KeyStore.getInstance("BKS");
+            ts.load(c.getResources().openRawResource(R.raw.def),
+                    "12345678".toCharArray());
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
+            tmf.init(ts);
+            TrustManager[] tm = tmf.getTrustManagers();
+            context = SSLContext.getInstance("TLS");
+            context.init(null, tm, null);
+
+            return context.getSocketFactory();
+        } catch (Exception e) {
+            Log.e(TAG+"......", "", e);
+            Log.e(TAG+"......", "" + e.getLocalizedMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 }

@@ -10,8 +10,10 @@ public class AppConstants {
     public final static int MQTT_MESSAGING_TIMEOUT = 4000;
     public final static int HTTP_MESSAGING_TIMEOUT = 4000;
     public final static int TOGGLE_ANIMATION_TIMEOUT = 4000;
-    public final static String MQTT_HOST = "api.rayansmarthome.ir";
-    public final static String MQTT_PORT = "1883";
+//    public final static String MQTT_HOST = "api.rayansmarthome.ir";
+//    public final static int MQTT_PORT = 1883;
+    public final static String MQTT_HOST = "api2.mahdiesrafili.ir";
+    public final static int MQTT_PORT = 8883;
     //New Devices
     public final static String NEW_DEVICE_TYPE_SWITCH = "switch";
     public final static String NEW_DEVICE_TYPE_PLUG = "plug";

@@ -189,7 +189,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                         deviceResponse.getData().getDevice().getUsername(),
                         ((deviceResponse.getData().getDevice().getPassword() != null) ? deviceResponse.getData().getDevice().getPassword():"Password Not Set"),
                         deviceResponse.getData().getDevice().getTopic().getTopic(),
-                        AppConstants.MQTT_PORT
+                        String.valueOf(AppConstants.MQTT_PORT)
                         ),device.getIp()))
         .subscribe(new Observer<DeviceBaseResponse>() {
             @Override
