@@ -92,7 +92,7 @@ public class MainActivityViewModel extends AndroidViewModel {
                 mqttConnectOptions.setAutomaticReconnect(true);
                 mqttConnectOptions.setCleanSession(false);
                 mqttConnectOptions.setConnectionTimeout(5);
-                mqttConnectOptions.setKeepAliveInterval(200);
+                mqttConnectOptions.setKeepAliveInterval(10);
                     InputStream input =
                             context.getApplicationContext().getAssets().open("ca_certificate.pem");
                     Log.e("/////////////" ,"/////////////Input: " + input);
