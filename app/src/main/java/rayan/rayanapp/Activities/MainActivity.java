@@ -4,12 +4,8 @@ import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-//<<<<<<< HEAD
-//=======
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,72 +15,64 @@ import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.polyak.iconswitch.IconSwitch;
 
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
+import net.cachapa.expandablelayout.ExpandableLayout;
+
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Objects;
 
 import javax.crypto.spec.SecretKeySpec;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
+import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
+import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Helper.Encryptor;
-import rayan.rayanapp.Helper.NsdHelper;
+import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Listeners.MqttStatus;
+import rayan.rayanapp.Listeners.OnGroupClicked;
+import rayan.rayanapp.Menu.CustomDrawerAdapter;
+import rayan.rayanapp.Menu.DrawerItem;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
-import rayan.rayanapp.Retrofit.ApiService;
-import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.CustomViewPager;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus {
-    int bottomNavigationHeight;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus, View.OnClickListener, OnGroupClicked<Group> {
     @BindView(R.id.accessModeSwitch)
     IconSwitch accessModeSwitch;
     @BindView(R.id.progress_bar)
@@ -92,35 +80,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.viewPager)
-    ViewPager viewPager;
+    CustomViewPager viewPager;
     MainActivityViewModel mainActivityViewModel;
     private final String TAG = MainActivity.class.getSimpleName();
     @BindView(R.id.drawerLayout)
     DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
-    @BindView(R.id.navigationView)
-    NavigationView navigationView;
+//    @BindView(R.id.navigationView)
+//    NavigationView navigationView;
     @BindView(R.id.bottom_navigation_view)
     BottomNavigationView bottomNavigationView;
-    @BindView(R.id.bottom_navigation_viewpager)
-    ViewPager bottom_navigation_viewpager;
     MenuItem prevMenuItem;
     MqttStatus mqttStatus;
     @BindView(R.id.status)
     TextView actionBarStatus;
     @BindView(R.id.statusIcon)
     ImageView statusIcon;
-
+    ///////////////////////////////////////////////////////
+    @BindView(R.id.expandable_layout)
+    ExpandableLayout expandableLayout;
+    @BindView(R.id.groupsActivity)
+    LinearLayout drawer_groupsActivity;
+    @BindView(R.id.addNewDeviceActivity)
+    LinearLayout drawer_addNewDeviceActivity;
+    @BindView(R.id.devicesManagementActivity)
+    LinearLayout drawer_deviceManagementActivity;
+    @BindView(R.id.settingsActivity)
+    LinearLayout drawer_settings;
+    @BindView(R.id.sortByGroup)
+    RelativeLayout drawer_sortByGroup;
+    @BindView(R.id.profileActivity)
+    LinearLayout drawer_profile;
+    @BindView(R.id.parent)
+    LinearLayout drawer_parent;
+    @BindView(R.id.version)
+    TextView version;
+    @BindView(R.id.groupsRecyclerView)
+    RecyclerView drawer_groupsRecyclerView;
+    SortByGroupRecyclerViewAdapter drawer_groupsRecyclerViewAdapter;
+    int connectionRetries;
     @Override
-//<<<<<<< HEAD
-
-//=======
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @Override
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!RayanApplication.getPref().isLoggedIn()) {
@@ -137,10 +141,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getShowNotification());
-        navigationView.bringToFront();
-        navigationView.invalidate();
-        navigationView.setNavigationItemSelectedListener(this);
+        Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getIsNotificationOn());
+//        navigationView.bringToFront();
+//        navigationView.invalidate();
+//        navigationView.bringToFront();
+//        navigationView.invalidate();
+//        navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
             switch (connection.getStatus()) {
@@ -192,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 statusIcon.setVisibility(View.INVISIBLE);
                 actionBarStatus.setText("عدم اتصال به اینترنت");
             } else
-//                if (MainActivityViewModel.connection.getValue() == null || MainActivityViewModel.connection.getValue() != null && !MainActivityViewModel.connection.getValue().isConnected())
+                if (MainActivityViewModel.connection.getValue() == null || MainActivityViewModel.connection.getValue().getClient() != null && !Objects.requireNonNull(MainActivityViewModel.connection.getValue()).isConnected() && !MainActivityViewModel.connection.getValue().getStatus().equals(Connection.ConnectionStatus.CONNECTING))
             {
                 Log.e("///////////////", "////connecting to mqtt");
                 mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
@@ -222,76 +228,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MainActivityViewPagerAdapter viewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(1);
-        // viewPager.setBackgroundColor(Color.GREEN);
-//        accessModeSwitch.setCheckedChangeListener(current -> {
-//            if (current.equals(IconSwitch.Checked.RIGHT)){
-//                Log.e(TAG, "SET To Right");
-//                mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
-//                    MainActivityViewModel.connection.postValue(connection);
-//                    switch (connection.getStatus()){
-//                        case NONE:
-//                            break;
-//                        case CONNECTING:
-//                            this.mqttConnecting();
-//                            break;
-//                        case CONNECTED:
-//                            this.mqttConnected();
-//                            break;
-//                        case DISCONNECTING:
-//                            break;
-//                        case DISCONNECTED:
-//                            this.mqttDisconnected();
-//                            break;
-//                        case ERROR:
-//                            this.mqttError();
-//                            break;
-//                    }
-//                });
-//            }
-//            else{
-//                Log.e(TAG, "SET To Left");
-//                mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection).observe(this, connection -> {
-//                    MainActivityViewModel.connection.postValue(connection);
-//                    switch (connection.getStatus()){
-//                        case NONE:
-//                            break;
-//                        case CONNECTING:
-//                            this.mqttConnecting();
-//                            break;
-//                        case CONNECTED:
-//                            this.mqttConnected();
-//                            break;
-//                        case DISCONNECTING:
-//                            break;
-//                        case DISCONNECTED:
-//                            this.mqttDisconnected();
-//                            break;
-//                        case ERROR:
-//                            this.mqttError();
-//                            break;
-//                    }
-//                });
-//                RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-//            }
-//        });
         initialize();
         if (isExternalStorageWritable()) {
-
             File appDirectory = new File(Environment.getExternalStorageDirectory() + "/RayanAppFolder");
             File logDirectory = new File(appDirectory + "/log");
             File logFile = new File(logDirectory, "logcat" + System.currentTimeMillis() + ".txt");
-            File logFile2 = new File(logDirectory, "logcat" + System.currentTimeMillis() + "2.txt");
-
+            File logFile2 = new File(logDirectory, "logcat" + System.currentTimeMillis() + "_2.txt");
             // create app folder
             if (!appDirectory.exists()) {
                 appDirectory.mkdir();
             }
-
             // create log folder
             if (!logDirectory.exists()) {
                 logDirectory.mkdir();
             }
-
             // clear the previous logcat and then write the new one to the file
             try {
                 Process process = Runtime.getRuntime().exec("logcat -c");
@@ -306,8 +256,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             // not accessible
         }
-
-
         initializeBottomNavigation();
     }
 
@@ -324,6 +272,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             else
                 accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
+        drawer_addNewDeviceActivity.setOnClickListener(this);
+        drawer_settings.setOnClickListener(this);
+        drawer_profile.setOnClickListener(this);
+        drawer_groupsActivity.setOnClickListener(this);
+        drawer_sortByGroup.setOnClickListener(this);
+        drawer_deviceManagementActivity.setOnClickListener(this);
+        drawer_parent.setOnClickListener(this);
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version.setText(pInfo.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -332,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (RayanApplication.getPref().isLoggedIn()) {
             startService(new Intent(this, UDPServerService.class));
             RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
-//            mainActivityViewModel.sendNodeToAll();
+            mainActivityViewModel.sendNodeToAll();
         }
     }
 
@@ -355,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
         }
-        drawerLayout.closeDrawer(GravityCompat.START);
+//        drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -399,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttConnected() {
+        connectionRetries = 0;
 //        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.orange_acc_4));
         actionBarStatus.setText("رایان");
         statusIcon.setVisibility(View.INVISIBLE);
@@ -434,24 +396,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttError() {
+        connectionRetries++;
+        if (connectionRetries>2){
+            connectionRetries = 0;
 //        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.red_acc_4));
-        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)){
+        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
             actionBarStatus.setText("عدم اتصال به اینترنت");
             statusIcon.setVisibility(View.INVISIBLE);
-        }
-        else{
+        } else {
             actionBarStatus.setText("عدم اتصال");
             statusIcon.setVisibility(View.VISIBLE);
 
         }
         statusIcon.setVisibility(View.VISIBLE);
-//        accessModeSwitch.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
+//        accessModeSwitch.setVisibility(View.VISIBLE);
         accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
         RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+        ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
+    }
+    else onRetryMqtt();
 //        Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: ERROR");
-        ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
     }
 
     public boolean isExternalStorageWritable() {
@@ -610,21 +576,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void initializeBottomNavigation(){
+        viewPager.disableScroll(true);
         setupBottomNavigationViewPager(viewPager);
 
-        bottomNavigationView.getMenu().getItem(1).setChecked(true);
+        bottomNavigationView.getMenu().getItem(RayanApplication.getPref().getBottomNavigationIndexKey()).setChecked(true);
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.action_device:
+                                RayanApplication.getPref().setBottomNavigationIndexKey(1);
                                 viewPager.setCurrentItem(1);
+
                                 break;
                             case R.id.action_senario:
+                                RayanApplication.getPref().setBottomNavigationIndexKey(0);
                                 viewPager.setCurrentItem(0);
                                 break;
                             case R.id.action_favorite:
+                                RayanApplication.getPref().setBottomNavigationIndexKey(2);
                                 viewPager.setCurrentItem(2);
                                 break;
                         }
@@ -637,6 +608,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setupBottomNavigationViewPager(ViewPager viewPager) {
         BottomNavigationViewPagerAdapter adapter = new BottomNavigationViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
+     //   viewPager.beginFakeDrag();
         TypedValue tv = new TypedValue();
         if (this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
         {
@@ -644,7 +616,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
         lp.bottomMargin += actionBarHeight+15;
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(RayanApplication.getPref().getBottomNavigationIndexKey());
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -660,6 +632,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     bottomNavigationView.getMenu().getItem(1).setChecked(false);
                 }
                 Log.d("page", "onPageSelected: "+position);
+                RayanApplication.getPref().setBottomNavigationIndexKey(position);
+              //  Toast.makeText(MainActivity.this,RayanApplication.getPref().getBottomNavigationIndexKey()+ "", Toast.LENGTH_SHORT).show();
                 bottomNavigationView.getMenu().getItem(position).setChecked(true);
                 prevMenuItem = bottomNavigationView.getMenu().getItem(position);
             }
@@ -667,15 +641,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onPageScrollStateChanged(int state) {
             }
         });
-        nsdHelper = new NsdHelper(this);
-        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
+//        nsdHelper = new NsdHelper(this);
+//        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
     }
 
-    NsdHelper nsdHelper;
-    @Override
-    public void onBackPressed() {
-        nsdHelper.discoverServices();
-    }
+//    NsdHelper nsdHelper;
 
     //    @Override
 //    public void onBackPressed() {
@@ -697,7 +667,56 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        return secretKeySpec;
 //    }
     public static SecretKeySpec secretKeySpec;
-//    @Override
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.groupsActivity:
+                startActivity(new Intent(this, GroupsActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.devicesManagementActivity:
+                startActivity(new Intent(this, DeviceManagementActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.profileActivity:
+                startActivity(new Intent(this, ProfileActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.addNewDeviceActivity:
+                startActivity(new Intent(this, AddNewDeviceActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.settingsActivity:
+                startActivity(new Intent(this, SettingsActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.sortByGroup:
+                expandableLayout.toggle();
+                if (drawer_groupsRecyclerViewAdapter == null){
+                    drawer_groupsRecyclerViewAdapter = new SortByGroupRecyclerViewAdapter(this, new ArrayList<>());
+                    drawer_groupsRecyclerViewAdapter.setItems(mainActivityViewModel.getAllGroups());
+                    drawer_groupsRecyclerView.setAdapter(drawer_groupsRecyclerViewAdapter);
+                    drawer_groupsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+                    drawer_groupsRecyclerViewAdapter.setListener(this);
+                }
+                break;
+            case R.id.parent:
+                break;
+        }
+    }
+
+    @Override
+    public void onGroupClicked(Group item) {
+        ((DevicesFragment)getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item);
+    }
+
+    @Override
+    public void onGroupLongPress(Group Item) {
+
+    }
+
+    //    @Override
 //    public void onBackPressed() {
 ////        secretKeySpec = new SecretKeySpec("8nro4q0emv8k1uv5".getBytes(), "AES");
 //        secretKeySpec = new SecretKeySpec("1234567812345678".getBytes(), "AES");

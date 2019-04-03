@@ -1,6 +1,7 @@
 package rayan.rayanapp.Retrofit.Models.Responses.api;
 
 import android.arch.persistence.room.PrimaryKey;
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -39,6 +40,9 @@ public class User implements Parcelable {
     @Expose
     private String role;
     private String contactNameOnPhone;
+
+
+    private Bitmap contactImageOnPhone;
 
 
 
@@ -110,6 +114,13 @@ public class User implements Parcelable {
     public void setContactNameOnPhone(String contactNameOnPhone) {
         this.contactNameOnPhone = contactNameOnPhone;
     }
+    public Bitmap getContactImageOnPhone() {
+        return contactImageOnPhone;
+    }
+    public void setContactImageOnPhone(Bitmap contactImageOnPhone) {
+        this.contactImageOnPhone = contactImageOnPhone;
+    }
+
 
     public String getUsername() {
         return username;

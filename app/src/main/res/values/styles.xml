@@ -40,7 +40,7 @@
         <item name="android:textColor">@color/baseColor</item>
     </style>
     <style name="BottomNavigationViewTextStyle">
-        <item name="android:fontFamily">fonts/iransans</item>
+        <item name="android:fontFamily">fonts/IRANSans1</item>
     </style>
 
     <style name="ActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">

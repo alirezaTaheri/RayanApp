@@ -11,6 +11,7 @@ public class PrefManager {
     private  final String PREF_NAME = "RayanSmartHome";
     private  int PRIVATE_MODE = 0;
     private  PrefManager prefManager;
+
     private final String KEY_NOTIFICATION = "KEY_NOTIFICATION";
     private final String KEY_THEME = "KEY_THEME";
     private final String KEY_PROTOCOL = "KEY_PROTOCOL";
@@ -21,6 +22,7 @@ public class PrefManager {
     private final String KEY_IS_GROUP_ADMIN = "KEY_IS_GROUP_ADMIN";
     private final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private final String KEY_ID = "KEY_ID";
+    private final String KEY_BOTTOM_NAVIGATION_INDEX = "Bottom_Navigation";
     private final String KEY_USERNAME = "KEY_USERNAME";
     private final String KEY_PASSWORD = "KEY_PASSWORD";
     private final String KEY_LOCAL_BROADCAST_ADDRESS = "KEY_LOCAL_BROADCAST_ADDRESS";
@@ -88,13 +90,6 @@ public class PrefManager {
         return pref.getString(KEY_LOCAL_BROADCAST_ADDRESS,null);
     }
 
-    public void showNotification(String notificationKey){
-        editor.putString(KEY_NOTIFICATION,notificationKey);
-        editor.commit();
-    }
-    public String getShowNotification(){
-        return pref.getString(KEY_NOTIFICATION,"true");
-    }
 
     public void setThemeKey(Integer themeKey){
         editor.putInt(KEY_THEME,themeKey);
@@ -133,5 +128,20 @@ public class PrefManager {
     }
     public Boolean getIsGroupAdminKey(){
         return pref.getBoolean(KEY_IS_GROUP_ADMIN,false);
+    }
+
+    public void setBottomNavigationIndexKey(Integer bottomNavigationIndexKey){
+        editor.putInt(KEY_BOTTOM_NAVIGATION_INDEX,bottomNavigationIndexKey);
+        editor.commit();
+    }
+    public Integer getBottomNavigationIndexKey(){
+        return pref.getInt(KEY_BOTTOM_NAVIGATION_INDEX,1);
+    }
+public void setIsNotificationOn(Boolean isNotificationOn){
+    editor.putBoolean(KEY_NOTIFICATION, isNotificationOn);
+    editor.commit();
+}
+    public Boolean getIsNotificationOn(){
+        return pref.getBoolean(KEY_NOTIFICATION,true);
     }
 }

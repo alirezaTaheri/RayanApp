@@ -3,13 +3,20 @@ package rayan.rayanapp.ViewModels;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +27,7 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
@@ -293,4 +301,100 @@ public String getContactNameFromPhone(final String phoneNumber, Context context)
     }
     return contactName;
 }
+
+    public Bitmap getContactImageFromPhone(final String phoneNumber, Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        String contactId = null;
+        InputStream inputStream=null;
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup._ID};
+
+        Cursor cursor =
+                contentResolver.query(
+                        uri,
+                        projection,
+                        null,
+                        null,
+                        null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup._ID));
+            }
+            cursor.close();
+        }
+
+        Bitmap photo = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.ic_person);
+
+        try {
+            if (contactId!=null) {
+                 inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
+                        ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.valueOf(contactId)));
+            }
+            if (inputStream != null) {
+                photo = BitmapFactory.decodeStream(inputStream);
+            }
+
+            assert inputStream != null;
+            if (contactId!=null) {
+                inputStream.close();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return photo;
+    }
+    public static Bitmap retrieveContactPhoto(String number, Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        String contactId = null;
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup._ID};
+
+        Cursor cursor =
+                contentResolver.query(
+                        uri,
+                        projection,
+                        null,
+                        null,
+                        null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup._ID));
+            }
+            cursor.close();
+        }
+
+        Bitmap photo = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.ic_person);
+
+
+
+
+
+        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(contactId));
+        Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
+        cursor = context.getContentResolver().query(photoUri,
+                new String[]{ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+        try {
+            if (cursor.moveToFirst()) {
+                byte[] data = cursor.getBlob(0);
+                if (data != null) {
+                    return  BitmapFactory.decodeStream( new ByteArrayInputStream(data));
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+        return null;
+    }
+
+
 }

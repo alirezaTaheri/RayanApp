@@ -37,6 +37,7 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -72,6 +73,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.e("///////////" , "//////// tag is : " + getTag());
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
         ButterKnife.bind(this, view);
         if (isTablet(getActivity())) {
@@ -82,6 +84,10 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         return view;
+    }
+
+    public void sortDevicesByGroup(Group group){
+        devicesRecyclerViewAdapter.updateItems(group.getDevices());
     }
 
     @Override

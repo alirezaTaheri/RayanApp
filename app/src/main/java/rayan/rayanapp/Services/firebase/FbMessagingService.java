@@ -27,6 +27,7 @@ import java.util.Map;
 
 import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Activities.MainActivity;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
 
 public class FbMessagingService extends FirebaseMessagingService {
@@ -51,8 +52,10 @@ Bitmap bitmap;
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.e(TAG, "From: " + remoteMessage.getFrom());
-
+Log.e(TAG,RayanApplication.getPref().getIsNotificationOn()+"");
         // Check if message contains a data payload.
+        if (!RayanApplication.getPref().getIsNotificationOn()) {
+        }else {
         if (remoteMessage.getData().size() > 0) {
             Log.e(TAG, "Message data payload: " + remoteMessage.getData());
             Map<String, String> data = remoteMessage.getData();
@@ -67,13 +70,13 @@ Bitmap bitmap;
                             Intent groupIntent = new Intent(this, GroupsActivity.class);
                             groupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             // sendNotification(remoteMessage.getNotification().getBody(),groupIntent);
-                            createNotification(this, remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(),bitmap, groupIntent);
+                            showNotification(this, remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(), groupIntent);
                             break;
                         case ACTIVITY_MAIN:
                             Intent mainIntent = new Intent(this, MainActivity.class);
                             mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             //  sendNotification(remoteMessage.getNotification().getBody(),mainIntent);
-                            createNotification(this, remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(),bitmap, mainIntent);
+                            showNotification(this, remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(), mainIntent);
                             break;
                     }
                     break;
@@ -82,9 +85,9 @@ Bitmap bitmap;
                     Intent showUrl = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     showUrl.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     //     sendNotification(remoteMessage.getNotification().getBody(),Intent.createChooser(showUrl,"انتخاب مرورگر"));
-                    createNotification(this, remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(),bitmap, Intent.createChooser(showUrl, "انتخاب مرورگر"));
+                    showNotification(this, remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(), Intent.createChooser(showUrl, "انتخاب مرورگر"));
                     break;
-            }
+            }}
         }
 
         // Check if message contains a notification payload.
@@ -121,17 +124,6 @@ Bitmap bitmap;
         if (notifManager == null) {
             notifManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = notifManager.getNotificationChannel(id);
-            if (mChannel == null) {
-                mChannel = new NotificationChannel(id, title, importance);
-                mChannel.enableVibration(true);
-                mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-                notifManager.createNotificationChannel(mChannel);
-            }
-
                         builder = new NotificationCompat.Builder(context, id);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
@@ -142,29 +134,42 @@ Bitmap bitmap;
                                 .setAutoCancel(true)
                                 .setContentIntent(pendingIntent)
                                 .setTicker(title)
+                                .setChannelId(id)
                                 .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 
-        } else {
 
-                builder = new NotificationCompat.Builder(context, id);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-                builder.setContentTitle(title)                            // required
-                        .setSmallIcon(android.R.drawable.ic_popup_reminder)   // required
-                        .setContentText(body) // required
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setAutoCancel(true)
-                        .setContentIntent(pendingIntent)
-                        .setTicker(title)
-                        .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
-                        .setPriority(Notification.PRIORITY_HIGH);
-
-
-        }
         Notification notification = builder.build();
         notifManager.notify(NOTIFY_ID, notification);
     }
+    public void showNotification(Context context, String title, String body, Intent intent) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        int notificationId = 1;
+        String channelId = "channel-01";
+        String channelName = "Channel Name";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel mChannel = new NotificationChannel(
+                    channelId, channelName, importance);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(body);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addNextIntent(intent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        notificationManager.notify(notificationId, mBuilder.build());
+    }
     public Bitmap getBitmapfromUrl(String imageUrl) {
         try {
             URL url = new URL(imageUrl);

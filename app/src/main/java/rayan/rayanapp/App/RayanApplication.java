@@ -56,7 +56,7 @@ public class RayanApplication extends MultiDexApplication {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/iransans.ttf")
+                .setDefaultFontPath("fonts/IRANSans1.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:300779851180:android:b725d147c1648d96",
+        "mobilesdk_app_id": "1:300779851180:android:4662ee7b4516e6bf",
         "android_client_info": {
-          "package_name": "rayan.rayanappp"
+          "package_name": "rayan.rayanapp"
         }
       },
       "oauth_client": [

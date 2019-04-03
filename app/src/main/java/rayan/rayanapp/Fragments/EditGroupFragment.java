@@ -108,9 +108,11 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
                     for(int i=0;i<=admins.size()-1;i++){
                         admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(),getActivity()));
+                        admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(),getActivity()));
                     }
                     for(int i=0;i<=humanUsers.size()-1;i++){
                         humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(),getActivity()));
+                        humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(),getActivity()));
                     }
                 }
                 else getContactPermission();

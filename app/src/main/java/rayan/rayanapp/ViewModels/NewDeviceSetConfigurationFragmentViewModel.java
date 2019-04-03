@@ -124,7 +124,7 @@ Log.d(TAG,"Completed");
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<String> connectToDeviceObservable(Activity activity, WifiManager wifiManager){
+    private Observable<String> connectToDeviceObservable(Activity activity, WifiManager wifiManager, String password){
         if (!wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(true);
         if (getCurrentSSID(wifiManager).equals(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName()))
@@ -166,7 +166,14 @@ Log.d(TAG,"Completed");
                     byte[] data = activity.getNewDevice().getName().getBytes();
                     String baseName = Base64.encodeToString(data, Base64.DEFAULT);
                     activity.getNewDevice().setName(baseName);
-                    return connectToDeviceObservable(activity, wifiManager);
+                    String secret;
+                    Log.e("////////////////", "//////////////: " + (activity.getNewDevice().getAccessPointName().substring(activity.getNewDevice().getAccessPointName().length()-1,activity.getNewDevice().getAccessPointName().length()-1).toLowerCase().equals("f")? "secret" : AppConstants.DEVICE_PRIMARY_PASSWORD));
+                    Log.e("////////////////", "//////////////: " + activity.getNewDevice().getAccessPointName().substring(activity.getNewDevice().getAccessPointName().length()-1,activity.getNewDevice().getAccessPointName().length()-1));
+                    if (deviceDatabase.getDevice(activity.getNewDevice().getChip_id()) != null){
+                        secret = deviceDatabase.getDevice(activity.getNewDevice().getChip_id()).getSecret();
+                        return connectToDeviceObservable(activity, wifiManager, activity.getNewDevice().getAccessPointName().substring(activity.getNewDevice().getAccessPointName().length()-1,activity.getNewDevice().getAccessPointName().length()-1).toLowerCase().equals("f")? secret : AppConstants.DEVICE_PRIMARY_PASSWORD);
+                    }
+                    return connectToDeviceObservable(activity, wifiManager, AppConstants.DEVICE_PRIMARY_PASSWORD);
                 })
                 .flatMap(deviceResponse ->
                     toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(),activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, String.valueOf(AppConstants.MQTT_PORT), activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), activity.getNewDevice().getHpwd(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip))

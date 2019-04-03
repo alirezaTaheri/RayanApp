@@ -16,8 +16,9 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 
 public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> {
     private final String TAG = AdminViewHolder.class.getSimpleName();
-    @BindView(R.id.name)
-    TextView name;
+
+    @BindView(R.id.contactImage)
+    ImageView contactImage;
     @BindView(R.id.contactName)
     TextView contactName;
     @BindView(R.id.deleteUser)
@@ -29,8 +30,13 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
 
     @Override
     public void onBind(User item, @Nullable OnAdminClicked<User> listener) {
-        name.setText(item.getUsername());
-        contactName.setText(item.getContactNameOnPhone());
+        contactImage.setImageBitmap(item.getContactImageOnPhone());
+        contactName.setText(item.getUsername());
+        if(item.getContactNameOnPhone()!=null){
+            if (item.getContactNameOnPhone().length()>1) {
+                contactName.setText(item.getContactNameOnPhone());
+            }
+       }
         if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
             delete.setVisibility(View.INVISIBLE);
         }

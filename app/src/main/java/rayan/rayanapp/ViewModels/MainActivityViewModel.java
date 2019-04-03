@@ -48,7 +48,9 @@ import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
+import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.ActionListener;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.mqtt.MyMqttCallbackHandler;
@@ -63,18 +65,24 @@ public class MainActivityViewModel extends AndroidViewModel {
     private ExecutorService executorService;
     private DeviceDatabase deviceDatabase;
     private SendUDPMessage sendUDPMessage;
+    private GroupDatabase groupDatabase;
     public static MutableLiveData<Connection> connection = new MutableLiveData<>();
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         executorService = Executors.newSingleThreadExecutor();
         deviceDatabase = new DeviceDatabase(application);
         sendUDPMessage = new SendUDPMessage();
+        groupDatabase = new GroupDatabase(application);
 //        connection = new MutableLiveData<>();
 //        connection.setValue(Connection.createConnection("ClientHandle","ClientId","api.rayansmarthome.ir",1883,application,false));
     }
 
+    public List<Group> getAllGroups(){
+        return groupDatabase.getAllGroups();
+    }
 
     public MutableLiveData<Connection> connectToMqtt(Context context){
+        disconnectMQTT(MainActivityViewModel.connection);
         MutableLiveData<Connection> updateConnection = new MutableLiveData<>();
         executorService.execute(new Runnable() {
             @Override

@@ -116,6 +116,8 @@ public interface ApiService {
     @POST
     Observable<YesResponse> NODE(@Url String url, @Body BaseRequest baseRequest);
     @POST
+    Observable<DeviceBaseResponse> settings(@Url String url, @Body BaseRequest baseRequest);
+    @POST
     Observable<SetPrimaryConfigResponse> sendFirstConfig(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST
     Observable<DeviceBaseResponse> factoryReset(@Url String url, @Body BaseRequest baseRequest);
