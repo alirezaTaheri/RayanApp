@@ -2,6 +2,7 @@ package rayan.rayanapp.ViewModels;
 
 import android.app.Activity;
 import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
@@ -21,10 +22,12 @@ import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SingleLiveEvent;
@@ -141,6 +144,36 @@ Log.d(TAG,"Completed");
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public MutableLiveData<String> getDeviceVersion(Device device){
+        MutableLiveData<String> results = new MutableLiveData<>();
+        ApiUtils.getApiService().getVersion(getDeviceAddress(device.getIp()), new BaseRequest(AppConstants.GET_VERSION))
+                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<DeviceBaseResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.e(TAG, "Getting device version onSubscribe: ");
+                    }
+
+                    @Override
+                    public void onNext(DeviceBaseResponse deviceBaseResponse) {
+                        Log.e(TAG, "Getting device version on next: " + deviceBaseResponse);
+                        results.postValue(deviceBaseResponse.getCmd());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "Getting device version onError: " + e);
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "Getting device version onComplete: ");
+                    }
+                });
+        return results;
+    }
+
     Disposable disposable;
     public SingleLiveEvent<SetPrimaryConfigResponse> registerDeviceSendToDevice(WifiManager wifiManager,AddNewDeviceActivity activity, RegisterDeviceRequest registerDeviceRequest, String ip){
         SingleLiveEvent<SetPrimaryConfigResponse> result = new SingleLiveEvent<>();
@@ -167,11 +200,9 @@ Log.d(TAG,"Completed");
                     String baseName = Base64.encodeToString(data, Base64.DEFAULT);
                     activity.getNewDevice().setName(baseName);
                     String secret;
-                    Log.e("////////////////", "//////////////: " + (activity.getNewDevice().getAccessPointName().substring(activity.getNewDevice().getAccessPointName().length()-1,activity.getNewDevice().getAccessPointName().length()-1).toLowerCase().equals("f")? "secret" : AppConstants.DEVICE_PRIMARY_PASSWORD));
-                    Log.e("////////////////", "//////////////: " + activity.getNewDevice().getAccessPointName().substring(activity.getNewDevice().getAccessPointName().length()-1,activity.getNewDevice().getAccessPointName().length()-1));
                     if (deviceDatabase.getDevice(activity.getNewDevice().getChip_id()) != null){
                         secret = deviceDatabase.getDevice(activity.getNewDevice().getChip_id()).getSecret();
-                        return connectToDeviceObservable(activity, wifiManager, activity.getNewDevice().getAccessPointName().substring(activity.getNewDevice().getAccessPointName().length()-1,activity.getNewDevice().getAccessPointName().length()-1).toLowerCase().equals("f")? secret : AppConstants.DEVICE_PRIMARY_PASSWORD);
+                        return connectToDeviceObservable(activity, wifiManager, activity.getNewDevice().getAccessPointName().substring(activity.getNewDevice().getAccessPointName().length()-1,activity.getNewDevice().getAccessPointName().length()-1).toLowerCase().equals("f")? AppConstants.DEVICE_PRIMARY_PASSWORD : secret);
                     }
                     return connectToDeviceObservable(activity, wifiManager, AppConstants.DEVICE_PRIMARY_PASSWORD);
                 })

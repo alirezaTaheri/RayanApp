@@ -1,6 +1,7 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.animation.ValueAnimator;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -39,7 +40,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
 //            bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.red_acc_4));
 //        else
             bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
-        if (item.getPin1().equals("on")){
+        if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setChecked(true);
             itemView.post(new Runnable() {
                 @Override
@@ -55,7 +56,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
             bottomStrip.requestLayout();
             pin1.setChecked(false);
         }
-        if (item.getPin2().equals("on")){
+        if (item.getPin2().equals(AppConstants.ON_STATUS)){
             pin2.setChecked(true);
             itemView.post(new Runnable() {
                 @Override

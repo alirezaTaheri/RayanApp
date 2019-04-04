@@ -36,21 +36,6 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
         Log.e(TAG, "Processing this Device: " + item);
             bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
-        if (item.getPin1().equals(AppConstants.ON_STATUS)){
-            pin1.setChecked(true);
-            itemView.post(new Runnable() {
-                @Override
-                public void run(){
-                    bottomStrip.getLayoutParams().width = itemView.getWidth();
-                    bottomStrip.requestLayout();
-                }
-            });
-        }
-        else {
-            pin1.setChecked(false);
-            bottomStrip.getLayoutParams().width = 0;
-            bottomStrip.requestLayout();
-        }
         name.setText(item.getName1());
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setChecked(true);
@@ -70,12 +55,6 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
         if (listener != null)
             pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
-    }
-
-
-    public void setAnimationProgressPin1(int progress){
-        bottomStrip.getLayoutParams().width = progress;
-        bottomStrip.requestLayout();
     }
 
     public void startToggleAnimationPin1(ValueAnimator v){
@@ -129,24 +108,6 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     public void changeName(String name){
         this.name.setText(name);
-    }
-
-    public void messageArrivedOrFinishAnimation(Device item){
-        if (item.getPin1().equals(AppConstants.ON_STATUS)){
-            pin1.setChecked(true);
-            itemView.post(new Runnable() {
-                @Override
-                public void run(){
-                    bottomStrip.getLayoutParams().width = itemView.getWidth();
-                    bottomStrip.requestLayout();
-                }
-            });
-        }
-        else {
-            pin1.setChecked(false);
-            bottomStrip.getLayoutParams().width = 0;
-            bottomStrip.requestLayout();
-        }
     }
 
     public int getDeviceItemWidth(){

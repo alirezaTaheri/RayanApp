@@ -6,11 +6,13 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.LocallyChange;
 import rayan.rayanapp.Persistance.database.dao.DevicesDAO;
 import rayan.rayanapp.Persistance.database.dao.GroupsDAO;
+import rayan.rayanapp.Persistance.database.dao.LocallyChangesDAO;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
-@Database(entities = {Device.class, Group.class}, version = 1, exportSchema = false)
+@Database(entities = {Device.class, Group.class, LocallyChange.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public static final String DATABASE_NAME = "RayanDatabase";
@@ -23,6 +25,8 @@ public abstract class AppDatabase extends RoomDatabase {
         }
         return appDatabase;
     }
+
+    public abstract LocallyChangesDAO getLocallyChangesDAO();
 
     public abstract DevicesDAO getDeviceDAO();
 

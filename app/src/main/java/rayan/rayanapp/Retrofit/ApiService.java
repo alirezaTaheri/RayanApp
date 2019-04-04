@@ -99,10 +99,13 @@ public interface ApiService {
 
     @POST("api/v2/groups/adduser")
     Observable<BaseResponse> addDeviceToGroup(@Header("Authorization") String token, @Body AddDeviceToGroupRequest addDeviceToGroupRequest);
+
     @POST
     Observable<ChangeNameResponse> changeName(@Url String url, @Body ChangeNameRequest changeNameRequest);
     @POST
     Observable<DeviceBaseResponse> ITET(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<DeviceBaseResponse> getVersion(@Url String url, @Body BaseRequest baseRequest);
     @POST
     Observable<DeviceBaseResponse> plugStatusVerification(@Url String url, @Body PlugPhysicalVerificationRequest request);
     @POST

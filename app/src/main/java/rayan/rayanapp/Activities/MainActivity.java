@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -36,10 +37,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.polyak.iconswitch.IconSwitch;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.File;
@@ -53,17 +57,25 @@ import javax.crypto.spec.SecretKeySpec;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.LocallyChange;
 import rayan.rayanapp.Fragments.DevicesFragment;
+import rayan.rayanapp.Helper.ControlRequests;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.Menu.CustomDrawerAdapter;
 import rayan.rayanapp.Menu.DrawerItem;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Retrofit.ApiUtils;
+import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
@@ -360,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttConnected() {
-        connectionRetries = 0;
+//        connectionRetries = 0;
 //        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.orange_acc_4));
         actionBarStatus.setText("رایان");
         statusIcon.setVisibility(View.INVISIBLE);
@@ -397,8 +409,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void mqttError() {
         connectionRetries++;
-        if (connectionRetries>2){
-            connectionRetries = 0;
+//        if (connectionRetries>2){
+//            connectionRetries = 0;
 //        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.red_acc_4));
         if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
             actionBarStatus.setText("عدم اتصال به اینترنت");
@@ -414,8 +426,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
         RayanApplication.getPref().saveProtocol(AppConstants.UDP);
         ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
-    }
-    else onRetryMqtt();
+//    }
+//    else onRetryMqtt();
 //        Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "Mqtt Status: ERROR");
     }
@@ -478,6 +490,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
             super.onDestroy();
     }
+//
+//    @Override
+//    public void onBackPressed() {
+//        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+//// The first in the list of RunningTasks is always the foreground task.
+//        List<ActivityManager.RunningTaskInfo> f = am.getRunningTasks(1);
+//        Log.e("//////////////","Foreground task info: " + f);
+//        ActivityManager.RunningTaskInfo foregroundTaskInfo = am.getRunningTasks(1).get(0);
+//        Log.e("//////////////","Foreground task info: " + foregroundTaskInfo);
+//        String foregroundTaskPackageName = foregroundTaskInfo .topActivity.getPackageName();
+//        Log.e("//////////////","foregroundTaskPackageName: " + foregroundTaskPackageName);
+//        PackageManager pm = this.getPackageManager();
+//        PackageInfo foregroundAppPackageInfo = null;
+//        try {
+//            foregroundAppPackageInfo = pm.getPackageInfo(foregroundTaskPackageName, 0);
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        Log.e("//////////////","foregroundAppPackageInfo:  " + foregroundAppPackageInfo);
+//        String foregroundTaskAppName = foregroundAppPackageInfo.applicationInfo.loadLabel(pm).toString();
+//        Log.e("//////////////","foregroundTaskAppName: " + foregroundTaskAppName);
+//    }
 
     private void reco(){
 
@@ -643,6 +677,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 //        nsdHelper = new NsdHelper(this);
 //        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
+        controlRequests = new ControlRequests(this);
+
     }
 
 //    NsdHelper nsdHelper;
@@ -708,12 +744,67 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onGroupClicked(Group item) {
-        ((DevicesFragment)getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item);
+        controlRequests.submitRequests();
+//        ((DevicesFragment)getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item);
     }
 
     @Override
     public void onGroupLongPress(Group Item) {
+    }
+    ControlRequests controlRequests;
+    @Override
+    public void onBackPressed() {
+        ChangeNameRequest re = new ChangeNameRequest("newName");
+        ApiUtils.getApiService().changeName("http://192.168.1.100/test.php", re).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<ChangeNameResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
 
+                    @Override
+                    public void onNext(ChangeNameResponse changeNameResponse) {
+                        Log.e("tagtagtagtag", "onNext: changenameresponse: " + changeNameResponse);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("tagtagtagtag", "onError: " + e);
+                        e.printStackTrace();
+                        controlRequests.addRequest(new LocallyChange(String.valueOf(System.currentTimeMillis()),
+                                new GsonBuilder().create().toJson(re).toString(),
+                                LocallyChange.Type.NAME_API, "http://192.168.1.105/test.php"));
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e("tagtagtagtag", "onComplete: ");
+                    }
+                });
+        ApiUtils.getApiService().changeName("http://192.168.1.105/test.php", re).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<ChangeNameResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(ChangeNameResponse changeNameResponse) {
+                        Log.e("tagtagtagtag", "onNext: changenameresponse: " + changeNameResponse);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("tagtagtagtag", "onError: " + e);
+                        e.printStackTrace();
+                        controlRequests.addRequest(new LocallyChange(String.valueOf(System.currentTimeMillis()),
+                                new GsonBuilder().create().toJson(re).toString(),
+                                LocallyChange.Type.NAME_API, "http://192.168.1.105/test.php"));
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e("tagtagtagtag", "onComplete: ");
+                    }
+                });
     }
 
     //    @Override

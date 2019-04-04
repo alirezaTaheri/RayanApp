@@ -265,9 +265,11 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     groupDatabase.updateGroups(serverGroups.subList(i, i+i1));
                 }
             });
-            Log.e(TAG, "After getting Groups mqtt connection is: " + MainActivityViewModel.connection.getValue().getClient().isConnected());
-            if (MainActivityViewModel.connection.getValue().getClient().isConnected())
+
+            if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {
+                Log.e(TAG, "After getting Groups mqtt connection is: " + MainActivityViewModel.connection.getValue().getClient().isConnected());
                 subscribeToAll();
+            }
 //            MainActivityViewModel.connection.getValue().getClient().subs
 //            groupDatabase.addGroups(newGroups);
 //            myViewModel.addUsers(newUsers);
