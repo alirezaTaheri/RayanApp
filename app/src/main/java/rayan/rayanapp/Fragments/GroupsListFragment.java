@@ -93,7 +93,6 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
 
     @Override
     public void onGroupLongPress(Group Item) {
-        onInstallShortcutClick();
         groupId=Item.getId();
        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("GroupsListFragment","حذف گروه", "بازگشت", "آیا مایل به حذف این گروه هستید؟");
        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
@@ -164,10 +163,9 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         return (ctx.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
-
+//add shortcut code
     private static final String DATA = "tanelikorri://shortcut";
     public void onInstallShortcutClick() {
-
         // Get the shortcut intent
         final Intent sIntent = new Intent(getContext(), MainActivity.class);
         sIntent.setAction(Intent.ACTION_MAIN);

@@ -1,34 +1,25 @@
 package rayan.rayanapp.App;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.media.RemoteController;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.support.multidex.MultiDexApplication;
 import io.fabric.sdk.android.Fabric;
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONObject;
 
 import java.util.List;
 
-import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
 //<<<<<<< HEAD
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
 import rayan.rayanapp.Helper.RequestManager;
 import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
-import rayan.rayanapp.Receivers.LanguageDetailsChecker;
-import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
-import rayan.rayanapp.Receivers.SMSBroadCastReceiver;
 import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
 //=======
 import rayan.rayanapp.R;
@@ -37,7 +28,6 @@ import rayan.rayanapp.RxBus.NetworkConnectionBus;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.RxBus.WifiScanResultsBus;
-import rayan.rayanapp.Util.HomeScreenWidgetProvider;
 import rayan.rayanapp.Util.JsonMaker;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 

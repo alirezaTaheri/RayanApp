@@ -86,19 +86,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <receiver android:icon="@drawable/ic_rayan"
-            android:label="@string/app_name"
-            android:name=".Util.HomeScreenWidgetProvider">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/home_screen_widget_provider" />
-        </receiver>
-        <service android:name=".Services.widget.HomeScreenWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
     </application>
 
 </manifest>

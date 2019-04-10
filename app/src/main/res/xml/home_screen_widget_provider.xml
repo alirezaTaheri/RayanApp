@@ -1,9 +1,0 @@
-<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="146dip"
-    android:minHeight="146dip"
-    android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/home_screen_widget_gridview"
-    android:autoAdvanceViewId="@+id/widget_gridview"
-    android:previewImage="@drawable/ic_launcher_background"
-    android:resizeMode="vertical"
-    />
