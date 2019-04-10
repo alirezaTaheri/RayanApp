@@ -19,6 +19,9 @@ public interface DevicesDAO extends BaseDAO<Device>{
     @Query("SELECT * FROM Device WHERE favorite = 1")
     LiveData<List<Device>> getAllFavoritesLive();
 
+    @Query("SELECT * FROM Device WHERE favorite = 1")
+    List<Device> getAllFavorites();
+
     @Query("SELECT * FROM Device ")
     List<Device> getAll();
 

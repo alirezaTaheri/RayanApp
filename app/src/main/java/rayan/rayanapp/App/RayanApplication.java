@@ -3,8 +3,10 @@ package rayan.rayanapp.App;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.RemoteController;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -26,6 +28,7 @@ import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Receivers.LanguageDetailsChecker;
 import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
+import rayan.rayanapp.Receivers.SMSBroadCastReceiver;
 import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
 //=======
 import rayan.rayanapp.R;
@@ -34,6 +37,7 @@ import rayan.rayanapp.RxBus.NetworkConnectionBus;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.RxBus.WifiScanResultsBus;
+import rayan.rayanapp.Util.HomeScreenWidgetProvider;
 import rayan.rayanapp.Util.JsonMaker;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -86,7 +90,6 @@ public class RayanApplication extends MultiDexApplication {
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
-
     }
 
     public MessageTransmissionDecider getMtd() {

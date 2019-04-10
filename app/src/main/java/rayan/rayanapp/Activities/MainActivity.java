@@ -646,9 +646,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     NsdHelper nsdHelper;
+
     @Override
     public void onBackPressed() {
-        nsdHelper.discoverServices();
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+            nsdHelper.discoverServices();
+           finish();
+
+        }
     }
 
     //    @Override

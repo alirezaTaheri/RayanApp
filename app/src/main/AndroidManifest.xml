@@ -23,7 +23,9 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
 
     <application
         android:name=".App.RayanApplication"
@@ -43,7 +45,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.LoginActivity" />
+        <activity android:name=".Activities.LoginActivity"
+            android:windowSoftInputMode="adjustResize"/>
 
         <service android:name=".Services.udp.UDPServerService" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
@@ -55,7 +58,8 @@
         <activity
             android:name=".Activities.GroupsActivity"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity
             android:name=".Activities.ProfileActivity"
             android:parentActivityName=".Activities.MainActivity"
@@ -67,21 +71,34 @@
         <activity
             android:name=".Activities.SettingsActivity"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme.NoActionBar"
-            />
-        <!--this metadata is for crashlytics-->
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <!-- this metadata is for crashlytics -->
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="ad3a16c7f3170306882d8f85a367d63fdf8e0ab5" />
-
-        <!-- To receive notifications in apps. This is absolutely necessary for android
-         push notifications to work while the app is not active.-->
-        <service
-            android:name=".Services.firebase.FbMessagingService">
+        <!--
+ To receive notifications in apps. This is absolutely necessary for android
+         push notifications to work while the app is not active.
+        -->
+        <service android:name=".Services.firebase.FbMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <receiver android:icon="@drawable/ic_rayan"
+            android:label="@string/app_name"
+            android:name=".Util.HomeScreenWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/home_screen_widget_provider" />
+        </receiver>
+        <service android:name=".Services.widget.HomeScreenWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
     </application>
 
-</manifest> <!-- <receiver --><!-- android:name=".Receivers.LampWidgetReceiver"> --><!-- <intent-filter> --><!-- <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> --><!-- </intent-filter> --><!-- <meta-data --><!-- android:name="android.appwidget.provider" --><!-- android:resource="@xml/lamp_widget_info" /> --><!-- </receiver> -->
+</manifest>

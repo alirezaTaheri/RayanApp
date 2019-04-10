@@ -20,12 +20,13 @@
     <string name="text_confirm_code_button">ورود</string>
     <string name="hint_sign_in_password">رمز عبور</string>
     <string name="text_sign_in_button">ورود</string>
-    <string name="text_forgot_pass_hint">فراموشی رمز عبور</string>
+    <string name="text_forgot_pass_hint">بازیابی رمز عبور</string>
     <string name="text_sign_up_button">ثبت نام</string>
     <string name="leave_group_button">ترک گروه</string>
     <string name="title_deviceManagementActivity">مدیریت دستگاه‌ها</string>
 
 
+    <string name="shortcut_not_supported">Current launcher doesn\'t support shortcuts</string>
     <string name="setting_notification_switch">دریافت نوتیفیکیشن</string>
     <string name="setting_theme_select">انتخاب تم برنامه</string>
     <string name="setting_theme1">تم اولیه</string>

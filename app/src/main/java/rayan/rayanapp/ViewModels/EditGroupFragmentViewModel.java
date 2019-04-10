@@ -45,7 +45,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         super(application);
         groupDatabase = new GroupDatabase(application);
     }
-
     public LiveData<Group> getGroupLive(String id){
         return groupDatabase.getGroupLive(id);
     }
@@ -337,10 +336,11 @@ public String getContactNameFromPhone(final String phoneNumber, Context context)
                 photo = BitmapFactory.decodeStream(inputStream);
             }
 
-            assert inputStream != null;
+            //assert inputStream != null;
+
             if (contactId!=null) {
-                inputStream.close();
-            }
+                if (inputStream!=null){inputStream.close();}
+                }
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -12,7 +12,9 @@ public class PrefManager {
     private  int PRIVATE_MODE = 0;
     private  PrefManager prefManager;
 
+   // private final String KEY_GROUPSACTIVITY_FIRSTLAUNCH = "KEY_GROUPSACTIVITY_FIRSTLAUNCH";
     private final String KEY_NOTIFICATION = "KEY_NOTIFICATION";
+    private final String KEY_APPLICATION_LANGUAGE = "KEY_APPLICATION_LANGUAGE";
     private final String KEY_THEME = "KEY_THEME";
     private final String KEY_PROTOCOL = "KEY_PROTOCOL";
     private final String KEY_EMAIL = "KEY_EMAIL";
@@ -80,6 +82,19 @@ public class PrefManager {
         editor.commit();
     }
 
+    public void removeSession(){
+        editor.remove(KEY_ID);
+        editor.remove(KEY_USERNAME);
+        editor.remove(KEY_PASSWORD);
+        editor.remove(KEY_NAME);
+        editor.remove(KEY_GENDER);
+        editor.remove(KEY_IS_LOGGED_IN);
+        editor.remove(KEY_EMAIL);
+      //  editor.remove(KEY_GROUPSACTIVITY_FIRSTLAUNCH);
+        editor.commit();
+    }
+
+
 
     public void saveLocalBroadcastAddress(String localBroadcastAddress){
         editor.putString(KEY_LOCAL_BROADCAST_ADDRESS, localBroadcastAddress);
@@ -144,4 +159,21 @@ public void setIsNotificationOn(Boolean isNotificationOn){
     public Boolean getIsNotificationOn(){
         return pref.getBoolean(KEY_NOTIFICATION,true);
     }
+
+    public void setApplicationLanguage(String language){
+        editor.putString(KEY_APPLICATION_LANGUAGE, language);
+        editor.commit();
+    }
+    public String getApplicationLanguage(){
+        return pref.getString(KEY_APPLICATION_LANGUAGE,"HARD");
+    }
+
+//    public void setIsGroupsActivityFirstLunch(Boolean isGroupsActivityFirstLunch){
+//        editor.putBoolean(KEY_GROUPSACTIVITY_FIRSTLAUNCH, isGroupsActivityFirstLunch);
+//        editor.commit();
+//    }
+//    public Boolean getIsGroupsActivityFirstLunch(){
+//        return pref.getBoolean(KEY_GROUPSACTIVITY_FIRSTLAUNCH,true);
+//    }
+
 }

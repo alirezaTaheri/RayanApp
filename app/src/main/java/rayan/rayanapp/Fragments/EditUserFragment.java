@@ -2,6 +2,7 @@ package rayan.rayanapp.Fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,6 +10,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -24,6 +28,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Activities.LoginActivity;
+import rayan.rayanapp.Activities.ProfileActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.SnackBarSetup;
@@ -55,6 +61,7 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
         ButterKnife.bind(this, view);
         Log.e("settttt",nameEditText.getText().toString());
         setDefaultValues();
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -127,6 +134,23 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.leaveMenu){
+            clickOnSignOut();
+        return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.leave_menu, menu);
+        menu.findItem(R.id.leaveMenu).setTitle("خروج از حساب کاربری");
+        // Use filter.xml from step 1
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         clickOnChangePassword = null;
@@ -164,7 +188,9 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
         }else {
             emailEditText.setText("ایمیل خود را ثبت نکرده اید!");
         }
-
-
+    }
+    void clickOnSignOut(){
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditUserFragment","خروج از اکانت", "بازگشت", "آیا مایل به خروج هستید؟" );
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 }

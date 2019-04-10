@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditUserViewModel;
 import rayan.rayanapp.ViewModels.RegisterUserViewModel;
@@ -44,6 +47,19 @@ public class RegisterUserFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register_user, container, false);
         ButterKnife.bind(this, view);
+        if (NetworkUtil.getConnectivityStatusString(getContext()).equals(AppConstants.NOT_CONNECTED)){
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه به اینترنت متصل نیست");
+        }
+        phone_register_EditText.setHint("09xxxxxxxxx");
+        phone_register_EditText.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if(phone_register_EditText.getText().toString().length()==11)     //size as per your requirement
+                {
+                    email_register_EditText.requestFocus();
+                }
+                return false;
+            }
+        });
         return view;
     }
 
@@ -65,6 +81,9 @@ public class RegisterUserFragment extends Fragment {
 
     @OnClick({R.id.register_btn})
     void clickOnRegisterBtn() {
+        if (NetworkUtil.getConnectivityStatusString(getContext()).equals(AppConstants.NOT_CONNECTED)){
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه به اینترنت متصل نیست");
+        }else {
         if (password_register_EditText.getText().toString().equals(passwordReapet_register_EditText.getText().toString())) {
             registerUserViewModel.registerUser(phone_register_EditText.getText().toString(),
                     password_register_EditText.getText().toString(),email_register_EditText.getText().toString() ).observe(this, baseResponse -> {
@@ -99,7 +118,7 @@ public class RegisterUserFragment extends Fragment {
         }else{
             SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"رمزهای وارد شده برابر نیستند");
         }
-    }
+    }}
 
     @Override
     public void onAttach(Context context) {
