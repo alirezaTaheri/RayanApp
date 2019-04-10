@@ -193,6 +193,7 @@ public class ActionListener implements IMqttActionListener {
     private void connect(Throwable exception) {
 //        Toast.makeText(context, "Can't Connect", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "In Connect Method 2" + exception);
+        exception.printStackTrace();
 //        Connection c = MainActivityViewModel.connection.getValue();
 //        if (c == null)
 //            c = connection;

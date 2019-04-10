@@ -28,6 +28,7 @@
     <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
 
     <application
+        android:configChanges="layoutDirection|locale"
         android:name=".App.RayanApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

@@ -40,7 +40,7 @@
         <item name="android:textColor">@color/baseColor</item>
     </style>
     <style name="BottomNavigationViewTextStyle">
-        <item name="android:fontFamily">fonts/iransans</item>
+        <item name="android:fontFamily">fonts/IRANSans1</item>
     </style>
 
     <style name="ActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
@@ -66,5 +66,15 @@
 
         <!--<item name="android:listPreferredItemPaddingRight">8dp</item>-->
         <!--<item name="listPreferredItemPaddingRight">8dp</item>-->
+    </style>
+
+    <style name="ProgressDialogTheme" parent="android:Theme.DeviceDefault">
+        <!--buttons color-->
+        <item name="colorAccent">@color/baseColor2</item>
+        <item name="android:statusBarColor">@color/background_progress_bar</item>
+        <!--title and message color-->
+        <!--<item name="android:textColorPrimary">@android:color/holo_red_dark</item>-->
+        <!--dialog background-->
+        <!--<item name="android:windowBackground">@drawable/background_dialog</item>-->
     </style>
 </resources>

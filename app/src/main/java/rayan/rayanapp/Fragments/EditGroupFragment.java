@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -163,7 +164,6 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
                         if(requestCode == REQUEST_CODE_PICK_CONTACT  )
                         {
-
                             Bundle bundle =  data.getExtras();
                             ArrayList<String> contacts = bundle.getStringArrayList("result");
                             for (int a = 0; a<contacts.size();a++){
@@ -303,6 +303,13 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
             //startActivityForResult(Intent.createChooser(phonebookIntent,""), REQUEST_CODE_PICK_CONTACT);
             //its important:
             startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
+            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+            startActivityForResult(intent, PICK_CONTACT);
+//            Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
+//            phonebookIntent.putExtra("additional", "phone-multi");
+//            phonebookIntent.putExtra("maxRecipientCount", MAX_PICK_CONTACT);
+//            phonebookIntent.putExtra("FromMMS", true);
+//            startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
         }
         else getContactPermission();
 

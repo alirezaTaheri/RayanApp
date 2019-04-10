@@ -33,6 +33,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.Encryptor;
@@ -84,6 +85,16 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         return null;
     }
 
+    public List<Device> getAllDevicesInGroup(String groupId){
+            return deviceDatabase.getAllInGroup(groupId);
+    }
+    public LiveData<List<Device>> getAllDevicesInGroupLive(String groupId){
+            return deviceDatabase.getAllInGroupLive(groupId);
+    }
+
+    public void updateDevice(Device device){
+        deviceDatabase.updateDevice(device);
+    }
 
     private class GetAllDevices extends AsyncTask<Void, Void,LiveData<List<Device>>> {
         @Override
@@ -168,6 +179,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         };
     }
 
+    int nOd = 0;
     private class SyncGroups extends AsyncTask<Void, Void, Void>{
         private List<Group> serverGroups = new ArrayList<>();
         public SyncGroups(List<Group> groups){
@@ -191,6 +203,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     if (existing == null){
                         Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
+                        deviceUser.setPosition(nOd);
                         if (deviceUser.getType()!= null && deviceUser.getName1() != null)
                             devices.add(deviceUser);
                     }
@@ -203,6 +216,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         existing.setGroupId(g.getId());
                         devices.add(existing);
                     }
+                    nOd++;
                 }
                 g.setDevices(devices);
                 g.setHumanUsers(users);
@@ -264,10 +278,29 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     groupDatabase.updateGroups(serverGroups.subList(i, i+i1));
                 }
             });
+            nOd = 0;
+            if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {
+                Log.e(TAG, "After getting Groups mqtt connection is: " + MainActivityViewModel.connection.getValue().getClient().isConnected());
+                subscribeToAll();
+            }
+//            MainActivityViewModel.connection.getValue().getClient().subs
 //            groupDatabase.addGroups(newGroups);
 //            myViewModel.addUsers(newUsers);
             return null;
         }
+    }
+
+    private void subscribeToAll(){
+        List<Device> devices = deviceDatabase.getAllDevices();
+            try {
+                for (int a = 0;a<devices.size();a++){
+                    Log.e(TAG, "Subscribing to: " + devices.get(a));
+                    MainActivityViewModel.connection.getValue().getClient().subscribe(devices.get(a).getTopic().getTopic(), 0);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in Subscribing: " + e);
+                e.printStackTrace();
+            }
     }
 
     private void publish(Connection connection, String topic, String message, int qos, boolean retain){
@@ -372,7 +405,6 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
     }
 
-
     Observable<Long> counterObservable = Observable.interval(0,700,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     Observable<Long> timerObservable = Observable.timer(4, TimeUnit.SECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     public void setTracker1(ToggleDeviceAnimationProgress fragment, int position, Device device, RayanApplication rayanApplication){
@@ -454,7 +486,6 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             }
         });
     }
-
 
     public String getDeviceAddress(String ip){
         return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;

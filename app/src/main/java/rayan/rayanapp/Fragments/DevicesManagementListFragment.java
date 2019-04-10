@@ -1,9 +1,11 @@
 package rayan.rayanapp.Fragments;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -13,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,36 +90,64 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     }
     @Override
     public void onItemClick(Device item) {
-        if (disposable != null)
-            disposable.dispose();
-        disposable = ((RayanApplication)getActivity().getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
-            if (o.getString("cmd").equals(AppConstants.SETTINGS)){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"Message: " + o);
-                waiting.remove(device.getChipId());
-                transaction = fragmentManager.beginTransaction();
-                transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-                EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
-                ((DeviceManagementActivity)Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
-                transaction.replace(R.id.frameLayout, editGroupFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-                disposable.dispose();
-            }
-        });
-        this.device = item;
-        if (device.getIp() == null)
-            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
-        else {
+
+//        if (item.getIp() != null) {
             waiting.add(item.getChipId());
             devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
-            devicesManagementListFragmentViewModel.setReadyForSettings(device).observe(this, s -> {
-                if (waiting.contains(s)){
-                    waiting.remove(s);
-                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
+            devicesManagementListFragmentViewModel.setReadyForSettingsHttp(item).observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable String s) {
+                    Log.e("...........", "............" + s);
+                    if (s.equals(AppConstants.SETTINGS)) {
+                        transaction = fragmentManager.beginTransaction();
+                        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+                        EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
+                        ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
+                        transaction.replace(R.id.frameLayout, editGroupFragment);
+                        transaction.addToBackStack(null);
+                        transaction.commit();
+                    }else if (s.equals(AppConstants.SOCKET_TIME_OUT)){
+                        Log.e("ttttttttttt", "tttttttttttttt" +s);
+                        Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
+                    }else
+                        Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                    waiting.remove(item.getChipId());
+                    devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
                 }
-                devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
             });
-        }
+//        }else SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
+
+
+//        if (disposable != null)
+//            disposable.dispose();
+//        disposable = ((RayanApplication)getActivity().getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
+//            if (o.getString("cmd").equals(AppConstants.SETTINGS)){
+//                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"Message: " + o);
+//                waiting.remove(device.getChipId());
+//                transaction = fragmentManager.beginTransaction();
+//                transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+//                EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
+//                ((DeviceManagementActivity)Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
+//                transaction.replace(R.id.frameLayout, editGroupFragment);
+//                transaction.addToBackStack(null);
+//                transaction.commit();
+//                disposable.dispose();
+//            }
+//        });
+//        this.device = item;
+//        if (device.getIp() == null)
+//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
+//        else {
+//            waiting.add(item.getChipId());
+//            devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+//            devicesManagementListFragmentViewModel.setReadyForSettings(device).observe(this, s -> {
+//                if (waiting.contains(s)){
+//                    waiting.remove(s);
+//                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
+//                }
+//                devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+//            });
+//        }
     }
 
     @Override

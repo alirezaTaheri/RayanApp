@@ -18,6 +18,11 @@ public class NewDevice {
     private String chip_id;
     private String pin1;
     private String pin2;
+    private NodeStatus status;
+    public enum NodeStatus {
+            IDLE,
+            NEW
+    }
 
     public String getAccessPointName() {
         return accessPointName;
@@ -155,6 +160,14 @@ public class NewDevice {
         this.hpwd = hpwd;
     }
 
+    public NodeStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(NodeStatus status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "NewDevice{" +
@@ -175,6 +188,7 @@ public class NewDevice {
                 ", chip_id='" + chip_id + '\'' +
                 ", pin1='" + pin1 + '\'' +
                 ", pin2='" + pin2 + '\'' +
+                ", status=" + status +
                 '}';
     }
 }

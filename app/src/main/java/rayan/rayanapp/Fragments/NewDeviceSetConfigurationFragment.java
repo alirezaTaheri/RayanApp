@@ -28,6 +28,7 @@ import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
+import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
@@ -149,6 +150,16 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
         else{
             mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
                 if (aBoolean){
+                    ProgressDialog progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
+                    progressDialog.show();
+                    progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.e(getClass().getSimpleName(),">>>>>>>>>>>>>>>>>Canceling The Process");
+                            mViewModel.getConfigDeviceDisposable().dispose();
+                            progressDialog.dismiss();
+                        }
+                    });
                     callback.getStepperLayout().showProgress("درحال برقراری ارتباط با دستگاه"+"\n"+"لطفا کمی صبرکنید");
                     ((AddNewDeviceActivity) getActivity()).getNewDevice().setName(nameEditText.getText().toString());
                     mViewModel.registerDeviceSendToDevice(
@@ -170,6 +181,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                                         break;
                                 }
                                 callback.getStepperLayout().hideProgress();
+                                progressDialog.dismiss();
                             });
                 }
                 else{

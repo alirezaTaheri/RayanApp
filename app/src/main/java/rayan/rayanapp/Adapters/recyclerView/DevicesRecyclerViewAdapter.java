@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.HashMap;
@@ -57,21 +58,20 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
             Bundle b = (Bundle) payloads.get(0);
             for (String key : b.keySet()) {
                 if (key.equals("pin1")){
+                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge1" + items.get(position));
                     holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
                 }
                 if (key.equals("pin2")){
+                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge2" + items.get(position));
                     if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2))
                         ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
                 }
                 if (key.equals("name")){
-                        holder.changeName(b.getString("name"));
+                    holder.changeName(b.getString("name"));
+                    holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
+                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2))
+                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
                 }
-//                if (key.equals("progressPin1")){
-//                    holder.setAnimationProgressPin1(b.getInt("progressPin1"));
-//                }
-//                if (key.equals("progressPin2")){
-//                    ((DeviceViewHolder2Bridges)holder).setAnimationProgressPin2(b.getInt("progressPin2"));
-//                }
                 if (key.equals("startTogglingPin1")){
                     ValueAnimator v;
                     if (b.getString("status").equals(AppConstants.ON_STATUS))

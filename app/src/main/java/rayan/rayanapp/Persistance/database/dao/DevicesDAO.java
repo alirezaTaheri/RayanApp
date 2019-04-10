@@ -25,6 +25,12 @@ public interface DevicesDAO extends BaseDAO<Device>{
     @Query("SELECT * FROM Device ")
     List<Device> getAll();
 
+    @Query("SELECT * FROM Device WHERE groupId = :groupId")
+    List<Device> getAllInGroup(String groupId);
+
+    @Query("SELECT * FROM Device WHERE groupId = :groupId")
+    LiveData<List<Device>> getAllInGroupLive(String groupId);
+
     @Query("SELECT * FROM Device WHERE chipId = :chipId")
     Device getDevice(String chipId);
 

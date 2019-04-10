@@ -15,6 +15,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
@@ -32,6 +33,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ForgetPasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.RegisterUserRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
@@ -99,10 +101,13 @@ public interface ApiService {
 
     @POST("api/v2/groups/adduser")
     Observable<BaseResponse> addDeviceToGroup(@Header("Authorization") String token, @Body AddDeviceToGroupRequest addDeviceToGroupRequest);
+
     @POST
     Observable<ChangeNameResponse> changeName(@Url String url, @Body ChangeNameRequest changeNameRequest);
     @POST
     Observable<DeviceBaseResponse> ITET(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<DeviceBaseResponse> getVersion(@Url String url, @Body BaseRequest baseRequest);
     @POST
     Observable<DeviceBaseResponse> plugStatusVerification(@Url String url, @Body PlugPhysicalVerificationRequest request);
     @POST
@@ -115,6 +120,8 @@ public interface ApiService {
     Observable<TlmsDoneResponse> tlms(@Url String url, @Body BaseRequest baseRequest);
     @POST
     Observable<YesResponse> NODE(@Url String url, @Body BaseRequest baseRequest);
+    @POST
+    Observable<Ready4SettingsResponse> settings(@Url String url, @Body Ready4SettingsRequest ready4SettingsRequest);
     @POST
     Observable<SetPrimaryConfigResponse> sendFirstConfig(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST

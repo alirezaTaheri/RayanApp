@@ -25,6 +25,7 @@ public class MyMqttCallbackHandler implements MqttCallback {
   public MyMqttCallbackHandler(Context context){
       this.context = context;
       deviceDatabase = new DeviceDatabase(context);
+      Log.e(TAG, "I am Coming" + this);
   }
 
 //  public static synchronized MqttCallbackHandler getInstance(){
@@ -73,7 +74,7 @@ public class MyMqttCallbackHandler implements MqttCallback {
 
   @Override
   public void deliveryComplete(IMqttDeliveryToken token) {
-      Log.e(TAG, "Delivery Completed//: ");
+      Log.e(TAG, "Delivery Completed//: "+this);
   }
 
     public static boolean isJSONValid(String test) {

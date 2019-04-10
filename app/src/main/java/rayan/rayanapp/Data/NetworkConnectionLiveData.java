@@ -86,11 +86,25 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
         }
     };
         private String getCurrentSSID(){
+            Log.e(this.getClass().getSimpleName(), "Getting current ssid" + wifiManager);
             wifiInfo = wifiManager.getConnectionInfo();
+            Log.e(this.getClass().getSimpleName(), "Getting current ssid" + wifiInfo);
             String currentSSID  = wifiInfo.getSSID();
             if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
                 currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
             }
+            Log.e(this.getClass().getSimpleName(), "Getting current ssid" + currentSSID);
+            if (currentSSID == null){
+                ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo info = cm.getActiveNetworkInfo();
+                if (info != null && info.isConnected()) {
+                    String ssid = info.getExtraInfo();
+                    Log.d(this.getClass().getSimpleName(), "WiFi SSID: " + ssid);
+                    Log.e(this.getClass().getSimpleName(), "now swaping current ssid and ssid: " + currentSSID);
+                    currentSSID = ssid;
+                }
+            }
+            Log.e(this.getClass().getSimpleName(), "returning current ssid: "  + currentSSID);
             return currentSSID;
         }
 }

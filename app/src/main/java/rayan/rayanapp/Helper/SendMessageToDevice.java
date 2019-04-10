@@ -10,6 +10,7 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -76,14 +77,15 @@ public class SendMessageToDevice {
     Observable<Long> counterObservable = Observable.interval(0,700,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     Observable<Long> timerObservable = Observable.timer(AppConstants.MQTT_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
 
-    private void sendMqttPin1(RayanApplication rayanApplication, Device device, int position, ToggleDeviceAnimationProgress fragment){
+    private void sendMqttPin1(RayanApplication rayanApplication, Device device, int position, ToggleDeviceAnimationProgress fragment, boolean animation){
         List<String> arguments = new ArrayList<>();
         arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
         publishMqtt(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString(), 0, false);
             timerObservable.subscribe(new Observer<Long>() {
                 @Override
                 public void onSubscribe(Disposable d) {
-                    fragment.startToggleAnimationPin1(device.getChipId(), position);
+                    if (animation)
+                        fragment.startToggleAnimationPin1(device.getChipId(), position);
                     rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                     rayanApplication.getDevicesAccessibilityBus().setWaitingPin1(device.getChipId(), d);
                 }
@@ -107,14 +109,15 @@ public class SendMessageToDevice {
             });
     }
 
-    private void sendMqttPin2(RayanApplication rayanApplication, Device device, int position, ToggleDeviceAnimationProgress fragment){
+    private void sendMqttPin2(RayanApplication rayanApplication, Device device, int position, ToggleDeviceAnimationProgress fragment, boolean animation){
         List<String> arguments = new ArrayList<>();
         arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
         publishMqtt(MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString(), 0, false);
         timerObservable.subscribe(new Observer<Long>() {
             @Override
             public void onSubscribe(Disposable d) {
-                fragment.startToggleAnimationPin2(device.getChipId(), position);
+                if (animation)
+                    fragment.startToggleAnimationPin2(device.getChipId(), position);
                 rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                 rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
             }
@@ -265,8 +268,39 @@ public class SendMessageToDevice {
                 .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
     }
 
+    HashMap<String , Disposable> mqttBackup = new HashMap<>();
     @SuppressLint("CheckResult")
-    private void sendHttpPin1(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position){
+    private void sendHttpPin1(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position, boolean withBackup){
+        if (withBackup && rayanApplication.getMtd().getListOfAvailableRouts(device.getChipId()).contains(MessageTransmissionDecider.PROTOCOL.MQTT))
+        Observable.interval(0,700, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                mqttBackup.put(device.getChipId()+"1", d);
+                Log.e(TAG, "onSubscribe Timer executed for Mqtt Backup");
+            }
+
+            @Override
+            public void onNext(Long aLong) {
+                Log.e(TAG, " onNext  Timer executed for Mqtt Backup" + aLong);
+                if (aLong>0){
+                    Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
+                    sendMqttPin1(rayanApplication, device, position, fragment, false);
+                    mqttBackup.get(device.getChipId()+"1").dispose();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(TAG, "OnError Timer executed for Mqtt Backup: " + e);
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+                Log.e(TAG, "onComplete  Timer executed for Mqtt Backup");
+            }
+        });
         Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
                 Observable.just(1).flatMap(a -> {
                     Log.e("TAGTAGTAGTAG", "Sending stword is: " + device.getStatusWord());
@@ -277,6 +311,8 @@ public class SendMessageToDevice {
                     return completed.delay(200, TimeUnit.MILLISECONDS);
                 })
                         .takeWhile(toggleDeviceResponse -> {
+                            if (mqttBackup.get(device.getChipId()+"1") != null && !mqttBackup.get(device.getChipId()+"1").isDisposed())
+                                mqttBackup.get(device.getChipId()+"1").dispose();
                             device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0])+1));
                             Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
                     if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
@@ -294,7 +330,9 @@ public class SendMessageToDevice {
                 (changeNameResponse, deviceResponse) -> {
             return changeNameResponse;})
                 .timeout(4, TimeUnit.SECONDS)
-                .takeWhile(aLong -> aLong<1)
+                .takeWhile(aLong ->{
+                    return aLong<1;
+                })
                 .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
                 .subscribe(new Observer<Long>() {
                     @Override
@@ -312,6 +350,8 @@ public class SendMessageToDevice {
 
                     @Override
                     public void onError(Throwable e) {
+                        if (mqttBackup.get(device.getChipId()+"1") != null && !mqttBackup.get(device.getChipId()+"1").isDisposed())
+                            mqttBackup.get(device.getChipId()+"1").dispose();
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onError: " + e);
                         fragment.stopToggleAnimationPin1(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
@@ -326,7 +366,37 @@ public class SendMessageToDevice {
                     }
                 });
     }
-    private void sendHttpPin2(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position){
+    private void sendHttpPin2(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position, boolean withBackup){
+        if (withBackup && rayanApplication.getMtd().getListOfAvailableRouts(device.getChipId()).contains(MessageTransmissionDecider.PROTOCOL.MQTT))
+            Observable.interval(0,700, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    mqttBackup.put(device.getChipId()+"2", d);
+                    Log.e(TAG, "onSubscribe Timer executed for Mqtt Backup");
+                }
+
+                @Override
+                public void onNext(Long aLong) {
+                    Log.e(TAG, " onNext  Timer executed for Mqtt Backup" + aLong);
+                    if (aLong>0){
+                        Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
+                        sendMqttPin1(rayanApplication, device, position, fragment, false);
+                        mqttBackup.get(device.getChipId()+"2").dispose();
+                    }
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "OnError Timer executed for Mqtt Backup: " + e);
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onComplete() {
+                    Log.e(TAG, "onComplete  Timer executed for Mqtt Backup");
+                }
+            });
         Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
                 Observable.just(1).flatMap(a -> {
                     Log.e("TAGTAGTAGTAG", "Sending stword is: " + device.getStatusWord());
@@ -337,6 +407,8 @@ public class SendMessageToDevice {
                     return completed.delay(200, TimeUnit.MILLISECONDS);
                 })
                         .takeWhile(toggleDeviceResponse -> {
+                            if (mqttBackup.get(device.getChipId()+"2") != null && !mqttBackup.get(device.getChipId()+"2").isDisposed())
+                                mqttBackup.get(device.getChipId()+"2").dispose();
                             device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0])+1));
                             Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
                     if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
@@ -373,6 +445,8 @@ public class SendMessageToDevice {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onError: " + e);
+                        if (mqttBackup.get(device.getChipId()+"2") != null && !mqttBackup.get(device.getChipId()+"2").isDisposed())
+                            mqttBackup.get(device.getChipId()+"2").dispose();
                         fragment.stopToggleAnimationPin2(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                         e.printStackTrace();
@@ -395,13 +469,13 @@ public class SendMessageToDevice {
                 sendUdpPin1(device, rayanApplication,fragment, position);
                 break;
             case "MQTT":
-                sendMqttPin1(rayanApplication,device, position, fragment);
+                sendMqttPin1(rayanApplication,device, position, fragment, true);
                 break;
             case "STANDALONE":
                 Toast.makeText(rayanApplication, "دستگاه فقط از طریق اتصال مستقیم قابل دسترسی است", Toast.LENGTH_SHORT).show();
                 break;
             case "HTTP":
-                sendHttpPin1(device, rayanApplication, fragment, position);
+                sendHttpPin1(device, rayanApplication, fragment, position, false);
                 break;
             case "NONE":
                 Toast.makeText(rayanApplication, "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
@@ -416,13 +490,13 @@ public class SendMessageToDevice {
                 sendUdpPin2(device, rayanApplication,fragment, position);
                 break;
             case "MQTT":
-                sendMqttPin2(rayanApplication,device, position, fragment);
+                sendMqttPin2(rayanApplication,device, position, fragment, true);
                 break;
             case "STANDALONE":
                 Toast.makeText(rayanApplication, "دستگاه فقط از طریق اتصال مستقیم قابل دسترسی است", Toast.LENGTH_SHORT).show();
                 break;
             case "HTTP":
-                sendHttpPin2(device, rayanApplication, fragment, position);
+                sendHttpPin2(device, rayanApplication, fragment, position, false);
                 break;
             case "NONE":
                 Toast.makeText(rayanApplication, "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
@@ -432,5 +506,7 @@ public class SendMessageToDevice {
 
     public String getDeviceAddress(String ip){
         return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+//        return "http://192.168.1.105/test.php";
+
     }
 }

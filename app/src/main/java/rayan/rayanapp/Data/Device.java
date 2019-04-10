@@ -50,7 +50,7 @@ public class Device implements Parcelable {
     private boolean onlineAccessibility;
     private String statusWord;
     private String secret;
-
+    private int position;
 
     public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId, String secret) {
         this.chipId = chipId;
@@ -256,24 +256,33 @@ public class Device implements Parcelable {
         return "Device{" +
                 "chipId='" + chipId + '\'' +
                 ", name1='" + name1 + '\'' +
+                ", name2='" + name2 + '\'' +
                 ", pin1='" + pin1 + '\'' +
                 ", pin2='" + pin2 + '\'' +
-                ", topic=" + topic +
-                ", secret=" + secret +
-//                ", name2='" + name2 + '\'' +
-//                ", id='" + id + '\'' +
+                ", id='" + id + '\'' +
                 ", type='" + type + '\'' +
-//                ", username='" + username + '\'' +
-//                ", password='" + password + '\'' +
+                ", username='" + username + '\'' +
+                ", topic=" + topic +
                 ", groupId='" + groupId + '\'' +
-//                ", style='" + style + '\'' +
+                ", style='" + style + '\'' +
                 ", ssid='" + ssid + '\'' +
                 ", ip='" + ip + '\'' +
-                ", stateWord='" + statusWord + '\'' +
-//                ", favorite=" + favorite +
-//                ", locallyAccessibility=" + locallyAccessibility +
-//                ", onlineAccessibility=" + onlineAccessibility +
+                ", password='" + password + '\'' +
+                ", favorite=" + favorite +
+                ", locallyAccessibility=" + locallyAccessibility +
+                ", onlineAccessibility=" + onlineAccessibility +
+                ", statusWord='" + statusWord + '\'' +
+                ", secret='" + secret + '\'' +
+                ", position=" + position +
                 '}';
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     @Override

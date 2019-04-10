@@ -35,22 +35,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     @Override
     public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
         Log.e(TAG, "Processing this Device: " + item);
-            bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
-        if (item.getPin1().equals(AppConstants.ON_STATUS)){
-            pin1.setChecked(true);
-            itemView.post(new Runnable() {
-                @Override
-                public void run(){
-                    bottomStrip.getLayoutParams().width = itemView.getWidth();
-                    bottomStrip.requestLayout();
-                }
-            });
-        }
-        else {
-            pin1.setChecked(false);
-            bottomStrip.getLayoutParams().width = 0;
-            bottomStrip.requestLayout();
-        }
+        bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         name.setText(item.getName1());
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setChecked(true);
@@ -72,13 +57,8 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
             pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
     }
 
-
-    public void setAnimationProgressPin1(int progress){
-        bottomStrip.getLayoutParams().width = progress;
-        bottomStrip.requestLayout();
-    }
-
     public void startToggleAnimationPin1(ValueAnimator v){
+        Log.e("<<<<<<<<<<<<<<<<","<Starting bridge1");
         pin1.setEnabled(false);
         v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -92,6 +72,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     }
 
     public void stopToggleAnimationPin1(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
+        Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge1" + item);
         pin1.setEnabled(true);
         if (v != null) {
             v.cancel();
@@ -129,24 +110,6 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     public void changeName(String name){
         this.name.setText(name);
-    }
-
-    public void messageArrivedOrFinishAnimation(Device item){
-        if (item.getPin1().equals(AppConstants.ON_STATUS)){
-            pin1.setChecked(true);
-            itemView.post(new Runnable() {
-                @Override
-                public void run(){
-                    bottomStrip.getLayoutParams().width = itemView.getWidth();
-                    bottomStrip.requestLayout();
-                }
-            });
-        }
-        else {
-            pin1.setChecked(false);
-            bottomStrip.getLayoutParams().width = 0;
-            bottomStrip.requestLayout();
-        }
     }
 
     public int getDeviceItemWidth(){

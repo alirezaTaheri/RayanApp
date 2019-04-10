@@ -2,29 +2,38 @@ package rayan.rayanapp.ViewModels;
 
 import android.app.Activity;
 import android.app.Application;
+import android.arch.lifecycle.MutableLiveData;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
+import org.reactivestreams.Subscription;
+
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SingleLiveEvent;
@@ -124,7 +133,7 @@ Log.d(TAG,"Completed");
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<String> connectToDeviceObservable(Activity activity, WifiManager wifiManager){
+    private Observable<String> connectToDeviceObservable(Activity activity, WifiManager wifiManager, String password){
         if (!wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(true);
         if (getCurrentSSID(wifiManager).equals(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName()))
@@ -141,7 +150,42 @@ Log.d(TAG,"Completed");
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public MutableLiveData<String> getDeviceVersion(Device device){
+        MutableLiveData<String> results = new MutableLiveData<>();
+        ApiUtils.getApiService().getVersion(getDeviceAddress(device.getIp()), new BaseRequest(AppConstants.GET_VERSION))
+                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<DeviceBaseResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.e(TAG, "Getting device version onSubscribe: ");
+                    }
+
+                    @Override
+                    public void onNext(DeviceBaseResponse deviceBaseResponse) {
+                        Log.e(TAG, "Getting device version on next: " + deviceBaseResponse);
+                        results.postValue(deviceBaseResponse.getCmd());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "Getting device version onError: " + e);
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "Getting device version onComplete: ");
+                    }
+                });
+        return results;
+    }
+
     Disposable disposable;
+    Disposable setConfigDeviceDisposable;
+
+    public Disposable getConfigDeviceDisposable(){
+        return setConfigDeviceDisposable;
+    }
     public SingleLiveEvent<SetPrimaryConfigResponse> registerDeviceSendToDevice(WifiManager wifiManager,AddNewDeviceActivity activity, RegisterDeviceRequest registerDeviceRequest, String ip){
         SingleLiveEvent<SetPrimaryConfigResponse> result = new SingleLiveEvent<>();
         ApiService apiService = ApiUtils.getApiService();
@@ -166,14 +210,21 @@ Log.d(TAG,"Completed");
                     byte[] data = activity.getNewDevice().getName().getBytes();
                     String baseName = Base64.encodeToString(data, Base64.DEFAULT);
                     activity.getNewDevice().setName(baseName);
-                    return connectToDeviceObservable(activity, wifiManager);
+                    String secret;
+                    if (deviceDatabase.getDevice(activity.getNewDevice().getChip_id()) != null){
+                        secret = deviceDatabase.getDevice(activity.getNewDevice().getChip_id()).getSecret();
+                        Log.e(TAG, "A device with this chip id is already saved on device and password will be: " + (activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret));
+                        return connectToDeviceObservable(activity, wifiManager, activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret);
+                    }
+                    return connectToDeviceObservable(activity, wifiManager, AppConstants.DEVICE_PRIMARY_PASSWORD);
                 })
                 .flatMap(deviceResponse ->
-                    toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(),activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, AppConstants.MQTT_PORT, activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), activity.getNewDevice().getHpwd(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip))
+                    toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(),activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, String.valueOf(AppConstants.MQTT_PORT), activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip))
                 .subscribe(new Observer<SetPrimaryConfigResponse>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         disposable = d;
+                        setConfigDeviceDisposable = d;
                     }
 
                     @Override

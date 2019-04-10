@@ -41,6 +41,12 @@ public class DeviceDatabase {
     public List<String> getAllTopics(){
         return deviceDAO.getAllTopics();
     }
+    public List<Device> getAllInGroup(String groupId){
+        return deviceDAO.getAllInGroup(groupId);
+    }
+    public LiveData<List<Device>> getAllInGroupLive(String groupId){
+        return deviceDAO.getAllInGroupLive(groupId);
+    }
 
     public void deleteDevices(List<Device> devices){
         deviceDAO.deleteDevices(devices);

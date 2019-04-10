@@ -41,6 +41,10 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
         this.items.addAll(items);
         notifyDataSetChanged();
     }
+    public void addItemToFirst(T item){
+        if (item != null)
+            this.items.add(0,item);
+    }
     public List<T> getItems() {
         return items;
     }
@@ -53,6 +57,10 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
             items.remove(position);
             notifyItemRemoved(position);
         }
+    }
+    public void onItemMove(int fromPosition, int toPosition){
+        items.add(toPosition, items.remove(fromPosition));
+        notifyItemMoved(fromPosition, toPosition);
     }
     public void clear() {
         items.clear();

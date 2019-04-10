@@ -79,7 +79,7 @@ editUserFragment=EditUserFragment.newInstance("", "");
 
         if (count == 0) {
             super.onBackPressed();
-            startActivity(new Intent(this, MainActivity.class));
+//            startActivity(new Intent(this, MainActivity.class));
         } else {
             FragmentManager fm = this.getSupportFragmentManager();
             fm.popBackStack();

@@ -28,6 +28,7 @@ public class PrefManager {
     private final String KEY_USERNAME = "KEY_USERNAME";
     private final String KEY_PASSWORD = "KEY_PASSWORD";
     private final String KEY_LOCAL_BROADCAST_ADDRESS = "KEY_LOCAL_BROADCAST_ADDRESS";
+    private final String KEY_CURRENT_SHOWING_GROUP = "KEY_CURRENT_SHOWING_GROUP";
     public PrefManager(){
         pref = RayanApplication.getContext().getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
@@ -41,6 +42,15 @@ public class PrefManager {
     public String getToken()
     {
         return pref.getString(KEY_TOKEN,null);
+    }
+
+    public void saveCurrentShowingGroup(String token){
+        editor.putString(KEY_CURRENT_SHOWING_GROUP, token);
+        editor.commit();
+    }
+
+    public String getCurrentShowingGroup() {
+        return pref.getString(KEY_CURRENT_SHOWING_GROUP,null);
     }
 
     public void saveProtocol(String access){
