@@ -85,6 +85,16 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         return null;
     }
 
+    public List<Device> getAllDevicesInGroup(String groupId){
+            return deviceDatabase.getAllInGroup(groupId);
+    }
+    public LiveData<List<Device>> getAllDevicesInGroupLive(String groupId){
+            return deviceDatabase.getAllInGroupLive(groupId);
+    }
+
+    public void updateDevice(Device device){
+        deviceDatabase.updateDevice(device);
+    }
 
     private class GetAllDevices extends AsyncTask<Void, Void,LiveData<List<Device>>> {
         @Override
@@ -169,6 +179,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         };
     }
 
+    int nOd = 0;
     private class SyncGroups extends AsyncTask<Void, Void, Void>{
         private List<Group> serverGroups = new ArrayList<>();
         public SyncGroups(List<Group> groups){
@@ -192,6 +203,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     if (existing == null){
                         Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
+                        deviceUser.setPosition(nOd);
                         if (deviceUser.getType()!= null && deviceUser.getName1() != null)
                             devices.add(deviceUser);
                     }
@@ -204,6 +216,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         existing.setGroupId(g.getId());
                         devices.add(existing);
                     }
+                    nOd++;
                 }
                 g.setDevices(devices);
                 g.setHumanUsers(users);
@@ -265,7 +278,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     groupDatabase.updateGroups(serverGroups.subList(i, i+i1));
                 }
             });
-
+            nOd = 0;
             if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {
                 Log.e(TAG, "After getting Groups mqtt connection is: " + MainActivityViewModel.connection.getValue().getClient().isConnected());
                 subscribeToAll();

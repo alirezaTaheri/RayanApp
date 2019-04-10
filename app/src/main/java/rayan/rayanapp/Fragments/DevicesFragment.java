@@ -3,16 +3,20 @@ package rayan.rayanapp.Fragments;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 //<<<<<<< HEAD
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 //=======
 import android.util.DisplayMetrics;
@@ -23,6 +27,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +44,7 @@ import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Services.mqtt.model.Subscription;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -51,6 +58,9 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     RecyclerView recyclerView;
     DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     List<Device> devices = new ArrayList<>();
+    LiveData<List<Device>> devicesObservable;
+    Observer<List<Device>> devicesObserver;
+    private final String TAG = this.getClass().getSimpleName();
     public static DevicesFragment newInstance() {
         return new DevicesFragment();
     }
@@ -62,18 +72,47 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices);
         devicesRecyclerViewAdapter.setListener(this);
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
-        devicesFragmentViewModel.getAllDevices().observe(this, devices -> {
-         devicesRecyclerViewAdapter.updateItems(devices);
-            ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(devices);
-            this.devices = devices;
-        });
+//        sortDevicesByGroup(RayanApplication.getPref().getCurrentShowingGroup());
+        devicesObservable = devicesFragmentViewModel.getAllDevices();
+        devicesObserver = new Observer<List<Device>>() {
+            @Override
+            public void onChanged(@Nullable List<Device> devices) {
+                List<Device> finalDevices = new ArrayList<>();
+                String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
+                Log.e(TAG ,"All Devices: " + devices.subList(0, devices.size()/3));
+                Log.e(TAG ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
+                Log.e(TAG ,"All Devices: " + devices.subList(devices.size()/3*2, devices.size()));
+                Log.e(TAG ,"currentGroup: " + currentGroup);
+                if (currentGroup != null)
+                    for (int a = 0; a<devices.size();a++){
+                        if (devices.get(a).getGroupId().equals(currentGroup)){
+                            finalDevices.add(devices.get(a));
+                        }
+                }
+                        else finalDevices = devices;
+                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
+            Collections.sort(finalDevices, new Comparator<Device>(){
+                public int compare(Device obj1, Device obj2) {
+                    // ## Ascending order
+//                    return obj1.firstName.compareToIgnoreCase(obj2.firstName); // To compare string values
+                     return Integer.compare(obj1.getPosition(), obj2.getPosition()); // To compare integer values
+                    // ## Descending order
+                    // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
+                    // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
+                }
+            });
+                Log.e(TAG ,"ShowingDevices: " + finalDevices);
+                devicesRecyclerViewAdapter.updateItems(finalDevices);
+                DevicesFragment.this.devices = finalDevices;
+            }
+        };
+        devicesObservable.observe(this, devicesObserver);
         activity = getActivity();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.e("///////////" , "//////// tag is : " + getTag());
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
         ButterKnife.bind(this, view);
         if (isTablet(getActivity())) {
@@ -83,11 +122,15 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         }
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
         return view;
     }
 
-    public void sortDevicesByGroup(Group group){
-        devicesRecyclerViewAdapter.updateItems(group.getDevices());
+    public void sortDevicesByGroup(String groupId){
+        RayanApplication.getPref().saveCurrentShowingGroup(groupId);
+        devicesObservable.removeObservers(this);
+        devicesObservable.observe(this,devicesObserver);
     }
 
     @Override
@@ -161,30 +204,34 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     public void stopToggleAnimationPin1(String chipId) {
             Bundle b = new Bundle();
             int position = findDevicePosition(chipId);
-            b.putString("stopToggleAnimationPin1", "stopToggleAnimationPin1");
-            b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-                    Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
-                }
-            });
+            if (position != -1) {
+                b.putString("stopToggleAnimationPin1", "stopToggleAnimationPin1");
+                b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
+                        Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
+                    }
+                });
+            }
     }
 
     @Override
     public void stopToggleAnimationPin2(String chipId) {
         Bundle b = new Bundle();
         int position = findDevicePosition(chipId);
-        b.putString("stopToggleAnimationPin2", "stopToggleAnimationPin2");
-        b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-                Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
-            }
-        });
+        if (position != -1) {
+            b.putString("stopToggleAnimationPin2", "stopToggleAnimationPin2");
+            b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    devicesRecyclerViewAdapter.notifyItemChanged(position, b);
+                    Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
+                }
+            });
+        }
     }
 
     @Override
@@ -212,4 +259,95 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
             if (chipId.equals(devices.get(a).getChipId())) return a;
         return -1;
     }
+    private ItemTouchHelper.Callback dragCallback = new ItemTouchHelper.Callback() {
+
+        int dragFrom = -1;
+        int dragTo = -1;
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(ItemTouchHelper.UP|ItemTouchHelper.DOWN|ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT,
+                    0);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+
+            Log.e("///////////" , "onMove : " + viewHolder);
+            Log.e("///////////" , "onMove : " + target);
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+            Log.e("///////////" , "onMove:new List:: " + devices);
+
+            Log.e("///////////" , "onMove From: " + fromPosition);
+            Log.e("///////////" , "onMove to: " + toPosition);
+
+
+            if(dragFrom == -1) {
+                dragFrom =  fromPosition;
+            }
+            dragTo = toPosition;
+
+            devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
+
+            return true;
+        }
+
+        private void reallyMoved(int from, int to) {
+            Log.e("///////////" , "reallyMoved From: " + from);
+            Log.e("///////////" , "reallyMoved To: " + to);
+            Log.e("oooooooooooo" , "reallyMoved: oldList:: " + devices);
+            if (from < to) {
+                for (int i = from; i < to; i++) {
+                    Device d = devices.get(i);
+                    d.setPosition(i+1);
+                    Device d1 = devices.get(i+1);
+                    d1.setPosition(i);
+                    Collections.swap(devices, i, i + 1);
+                    devicesFragmentViewModel.updateDevice(d);
+                    devicesFragmentViewModel.updateDevice(d1);
+                }
+            } else {
+                for (int i = from; i > to; i--) {
+                    Device d = devices.get(i);
+                    d.setPosition(i-1);
+                    Device d2 = devices.get(i-1);
+                    d2.setPosition(i);
+                    Collections.swap(devices, i, i - 1);
+                    devicesFragmentViewModel.updateDevice(d);
+                    devicesFragmentViewModel.updateDevice(d2);
+                }
+            }
+            Log.e("nnnnnnnnnnnnn" , "reallyMoved: NewList:: " + devices);
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            Log.e("///////////" , "////////onSwiped: " + direction);
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            Log.e("///////////" , "isLongPressDragEnabled"+devices);
+            return true;
+        }
+
+        @Override
+        public boolean isItemViewSwipeEnabled() {
+            Log.e("///////////" , "isItemViewSwipeEnabled");
+            return false;
+        }
+
+        @Override
+        public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            Log.e("///////////" , "////////clearView: ");
+            super.clearView(recyclerView, viewHolder);
+            if(dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+                reallyMoved(dragFrom, dragTo);
+            }
+            dragFrom = dragTo = -1;
+        }
+
+    };
+
 }

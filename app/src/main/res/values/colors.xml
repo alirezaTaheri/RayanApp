@@ -281,4 +281,5 @@
     <color name="blue_grey_dark_4">#263238</color>
     <color name="white">#ffffff</color>
     <color name="pre_loader">#111</color>
+    <color name="background_progress_bar">#b7bfbfbf</color>
 </resources>

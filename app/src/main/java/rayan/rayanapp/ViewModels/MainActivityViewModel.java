@@ -46,6 +46,7 @@ import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
@@ -81,6 +82,10 @@ public class MainActivityViewModel extends AndroidViewModel {
         return groupDatabase.getAllGroups();
     }
 
+    public List<Device> getAllDevices(){
+        return deviceDatabase.getAllDevices();
+    }
+
     public MutableLiveData<Connection> connectToMqtt(Context context){
         disconnectMQTT(MainActivityViewModel.connection);
         MutableLiveData<Connection> updateConnection = new MutableLiveData<>();
@@ -92,7 +97,7 @@ public class MainActivityViewModel extends AndroidViewModel {
                 mqttConnectOptions.setAutomaticReconnect(true);
                 mqttConnectOptions.setCleanSession(false);
                 mqttConnectOptions.setConnectionTimeout(5);
-                mqttConnectOptions.setKeepAliveInterval(10);
+                mqttConnectOptions.setKeepAliveInterval(500);
                     InputStream input =
                             context.getApplicationContext().getAssets().open("ca_certificate.pem");
                     Log.e("/////////////" ,"/////////////Input: " + input);

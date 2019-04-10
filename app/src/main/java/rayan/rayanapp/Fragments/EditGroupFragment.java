@@ -105,17 +105,17 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
                 this.group = group1;
                 admins=group1.getAdmins();
                 humanUsers=group1.getHumanUsers();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
-                    for(int i=0;i<=admins.size()-1;i++){
-                        admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(),getActivity()));
-                        admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(),getActivity()));
-                    }
-                    for(int i=0;i<=humanUsers.size()-1;i++){
-                        humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(),getActivity()));
-                        humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(),getActivity()));
-                    }
-                }
-                else getContactPermission();
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
+//                    for(int i=0;i<=admins.size()-1;i++){
+//                        admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(),getActivity()));
+//                        admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(),getActivity()));
+//                    }
+//                    for(int i=0;i<=humanUsers.size()-1;i++){
+//                        humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(),getActivity()));
+//                        humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(),getActivity()));
+//                    }
+//                }
+//                else getContactPermission();
                 usersRecyclerViewAdapter.setItems(humanUsers);
                 managersRecyclerViewAdapter.setItems(admins);
                 devicesRecyclerViewAdapter.setItems(group1.getDevices());
@@ -165,7 +165,6 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
                         if(requestCode == REQUEST_CODE_PICK_CONTACT  )
                         {
-
                             Bundle bundle =  data.getExtras();
                             ArrayList<String> contacts = bundle.getStringArrayList("result");
                             for (int a = 0; a<contacts.size();a++){
@@ -296,13 +295,13 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     @OnClick(R.id.addUserButton)
     void addUser(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
-//            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-//            startActivityForResult(intent, PICK_CONTACT);
-            Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
-            phonebookIntent.putExtra("additional", "phone-multi");
-            phonebookIntent.putExtra("maxRecipientCount", MAX_PICK_CONTACT);
-            phonebookIntent.putExtra("FromMMS", true);
-            startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
+            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+            startActivityForResult(intent, PICK_CONTACT);
+//            Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
+//            phonebookIntent.putExtra("additional", "phone-multi");
+//            phonebookIntent.putExtra("maxRecipientCount", MAX_PICK_CONTACT);
+//            phonebookIntent.putExtra("FromMMS", true);
+//            startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
         }
         else getContactPermission();
 

@@ -98,8 +98,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                 @Override
                 public void onChanged(@Nullable String s) {
                     Log.e("...........", "............" + s);
-                    if (s.equals("YES")) {
-                        waiting.remove(item.getChipId());
+                    if (s.equals(AppConstants.SETTINGS)) {
                         transaction = fragmentManager.beginTransaction();
                         transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
                         EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
@@ -109,9 +108,11 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                         transaction.commit();
                     }else if (s.equals(AppConstants.SOCKET_TIME_OUT)){
                         Log.e("ttttttttttt", "tttttttttttttt" +s);
-                        waiting.remove(item.getChipId());
-                        devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
-                    }
+                        Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
+                    }else
+                        Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                    waiting.remove(item.getChipId());
+                    devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
                 }
             });
 //        }else SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");

@@ -17,10 +17,12 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.varunest.sparkbutton.SparkButton;
@@ -45,10 +47,17 @@ public class TestDeviceFragment extends BottomSheetDialogFragment implements Vie
 
     @BindView(R.id.pin1)
     SparkButton pin1;
+    @BindView(R.id.name)
+    TextView name;
     NewDevice newDevice;
     TestDeviceFragmentViewModel viewModel;
-    public static TestDeviceFragment newInstance() {
-        return new TestDeviceFragment();
+    private String targetSSID;
+    public static TestDeviceFragment newInstance(String targetSSID) {
+        Bundle b = new Bundle();
+        b.putString("targetSSID", targetSSID);
+        TestDeviceFragment t = new TestDeviceFragment();
+        t.setArguments(b);
+        return t;
     }
 
     @Override
@@ -58,6 +67,7 @@ public class TestDeviceFragment extends BottomSheetDialogFragment implements Vie
         newDevice = ((AddNewDeviceActivity)getActivity()).getNewDevice();
         ButterKnife.bind(this, view);
         pin1.setOnClickListener(this);
+        name.setText(getArguments().getString("targetSSID"));
         return view;
     }
 
@@ -65,7 +75,6 @@ public class TestDeviceFragment extends BottomSheetDialogFragment implements Vie
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(TestDeviceFragmentViewModel.class);
-
     }
 
     private void toggleOn(int pin){

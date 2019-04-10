@@ -15,6 +15,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
@@ -32,6 +33,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ForgetPasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.RegisterUserRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
@@ -119,7 +121,7 @@ public interface ApiService {
     @POST
     Observable<YesResponse> NODE(@Url String url, @Body BaseRequest baseRequest);
     @POST
-    Observable<DeviceBaseResponse> settings(@Url String url, @Body BaseRequest baseRequest);
+    Observable<Ready4SettingsResponse> settings(@Url String url, @Body Ready4SettingsRequest ready4SettingsRequest);
     @POST
     Observable<SetPrimaryConfigResponse> sendFirstConfig(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST

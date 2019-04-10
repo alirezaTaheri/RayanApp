@@ -80,6 +80,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
 
 
     public void startToggleAnimationPin2(ValueAnimator v){
+        Log.e("<<<<<<<<<<<<<<<<","<Starting bridge2 ");
         pin2.setEnabled(false);
         v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -93,6 +94,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     }
 
     public void stopToggleAnimationPin2(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
+        Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge2" + item);
         pin2.setEnabled(true);
         if (v != null) {
             v.cancel();

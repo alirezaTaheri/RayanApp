@@ -9,14 +9,20 @@ import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
+import org.reactivestreams.Subscription;
+
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
@@ -175,6 +181,11 @@ Log.d(TAG,"Completed");
     }
 
     Disposable disposable;
+    Disposable setConfigDeviceDisposable;
+
+    public Disposable getConfigDeviceDisposable(){
+        return setConfigDeviceDisposable;
+    }
     public SingleLiveEvent<SetPrimaryConfigResponse> registerDeviceSendToDevice(WifiManager wifiManager,AddNewDeviceActivity activity, RegisterDeviceRequest registerDeviceRequest, String ip){
         SingleLiveEvent<SetPrimaryConfigResponse> result = new SingleLiveEvent<>();
         ApiService apiService = ApiUtils.getApiService();
@@ -202,16 +213,18 @@ Log.d(TAG,"Completed");
                     String secret;
                     if (deviceDatabase.getDevice(activity.getNewDevice().getChip_id()) != null){
                         secret = deviceDatabase.getDevice(activity.getNewDevice().getChip_id()).getSecret();
-                        return connectToDeviceObservable(activity, wifiManager, activity.getNewDevice().getAccessPointName().substring(activity.getNewDevice().getAccessPointName().length()-1,activity.getNewDevice().getAccessPointName().length()-1).toLowerCase().equals("f")? AppConstants.DEVICE_PRIMARY_PASSWORD : secret);
+                        Log.e(TAG, "A device with this chip id is already saved on device and password will be: " + (activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret));
+                        return connectToDeviceObservable(activity, wifiManager, activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret);
                     }
                     return connectToDeviceObservable(activity, wifiManager, AppConstants.DEVICE_PRIMARY_PASSWORD);
                 })
                 .flatMap(deviceResponse ->
-                    toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(),activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, String.valueOf(AppConstants.MQTT_PORT), activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), activity.getNewDevice().getHpwd(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip))
+                    toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(),activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, String.valueOf(AppConstants.MQTT_PORT), activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip))
                 .subscribe(new Observer<SetPrimaryConfigResponse>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         disposable = d;
+                        setConfigDeviceDisposable = d;
                     }
 
                     @Override

@@ -311,9 +311,55 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
-    public LiveData<String> toDeviceChangeAccessPoint(String hname, String pwd, String ssid, String style, String ip){
+    @SuppressLint("CheckResult")
+    public LiveData<String> toDeviceChangeAccessPoint(Device device, String ssid, String password){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        toDeviceChangeAccessPointObservable(new ChangeAccessPointRequest(hname, pwd, ssid, style),ip).subscribe(toDeviceChangeAccessPointObserver(results));
+//        toDeviceChangeAccessPointObservable(new ChangeAccessPointRequest(hname, pwd, ssid, style),ip).subscribe(toDeviceChangeAccessPointObserver(results));
+        Observable.zip(
+                toDeviceChangeAccessPointObservable(new ChangeAccessPointRequest(device.getName1(), password, ssid, device.getStyle()), device.getIp())
+                        .doOnNext(deviceBaseResponse -> {
+                            Log.e(TAG, "Do on next for changing accessPoint: " + deviceBaseResponse);
+                        }),
+                editDeviceObservable(new EditDeviceRequest(device.getId(), device.getGroupId(), device.getName1(), device.getType(), ssid)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
+                    Log.e(TAG, "000000000 DeviceResponse: " + deviceResponse);
+                }), (deviceBaseResponse, deviceResponse) -> {
+                    Log.e(TAG, "ChangeAccessPointResponse: " + deviceBaseResponse);
+                    Log.e(TAG, "DeviceResponse: " + deviceResponse);
+                    if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR)){
+                        if (deviceResponse.getData().getMessage() != null)
+                            return deviceResponse.getData().getMessage();
+                        else return AppConstants.ERROR;
+                    }
+                    if (deviceResponse.getData().getMessage()!=null && deviceResponse.getData().getMessage().toLowerCase().contains(AppConstants.FORBIDDEN)){
+                        return AppConstants.FORBIDDEN;
+                    }
+                    if (deviceBaseResponse.getCmd().contains(AppConstants.CHANGE_NAME_FALSE)){
+                        return AppConstants.CHANGE_NAME_FALSE;
+                    }
+                    return AppConstants.OPERATION_DONE;
+                }
+        ).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Observer<String>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                Log.e(TAG, "OnSubscribe whole zip change accessPoint");
+            }
+
+            @Override
+            public void onNext(String s) {
+                Log.e(TAG, "OnNext Change AccessPoint: " + s);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(TAG, "onError Change AccessPoint: " + e);
+            }
+
+            @Override
+            public void onComplete() {
+                Log.e(TAG, "onComplete Change AccessPoint: ");
+            }
+        });
+
         return results;
     }
     private Observable<DeviceBaseResponse> toDeviceChangeAccessPointObservable(ChangeAccessPointRequest changeAccessPointRequest, String ip){
@@ -347,6 +393,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
             }
         };
     }
+
 
     public LiveData<DeviceBaseResponse> toDeviceMqtt(String host, String user, String pass, String topic, String port, String ip){
         final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();
@@ -427,6 +474,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     public String getDeviceAddress(String ip){
        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+//       return "http://192.168.1.105/test.php";
     }
 
     public void writeToFile(String mycode) {

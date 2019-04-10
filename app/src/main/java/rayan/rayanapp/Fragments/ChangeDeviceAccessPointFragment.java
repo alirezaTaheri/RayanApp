@@ -9,6 +9,7 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,8 +82,10 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
                     accessPointsRecyclerViewAdapter.setItems(newDevices);
                 });
         selectedAccessPointTitle.setText(getArguments().getString("ssid"));
-        selectedAccessPoint.setSSID(((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid() != null? ((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid():"");
-        password.setText(((AddNewDeviceActivity) getActivity()).getNewDevice().getPwd());
+        if (getActivity() instanceof AddNewDeviceActivity) {
+            selectedAccessPoint.setSSID(((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid() != null ? ((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid() : "");
+            password.setText(((AddNewDeviceActivity) getActivity()).getNewDevice().getPwd());
+        }
     }
 
     @Override
@@ -101,14 +104,13 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
     void confirm(){
         if (TextUtils.isEmpty(password.getText().toString())){
             SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا رمزعبور را وارد کنید");
-
         }
         else if (selectedAccessPoint == null){
             SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مودم را انتخاب کنید");
-
         } else {
             listener.accessPointSelected(selectedAccessPoint.getSSID(), password.getText().toString());
-            ((NewDeviceSetConfigurationFragment)((AddNewDeviceActivity)getActivity()).getStepperAdapter().findStep(1)).setAccessPointTitle(selectedAccessPoint.getSSID());
+            if (getActivity() instanceof AddNewDeviceActivity)
+                ((NewDeviceSetConfigurationFragment)((AddNewDeviceActivity)getActivity()).getStepperAdapter().findStep(1)).setAccessPointTitle(selectedAccessPoint.getSSID());
             dismiss();
         }
     }

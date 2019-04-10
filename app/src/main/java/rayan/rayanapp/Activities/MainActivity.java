@@ -1,12 +1,12 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,25 +31,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.polyak.iconswitch.IconSwitch;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -57,25 +53,16 @@ import javax.crypto.spec.SecretKeySpec;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Data.LocallyChange;
+import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Fragments.DevicesFragment;
-import rayan.rayanapp.Helper.ControlRequests;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.Listeners.OnGroupClicked;
-import rayan.rayanapp.Menu.CustomDrawerAdapter;
-import rayan.rayanapp.Menu.DrawerItem;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
@@ -245,6 +232,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             File appDirectory = new File(Environment.getExternalStorageDirectory() + "/RayanAppFolder");
             File logDirectory = new File(appDirectory + "/log");
             File logFile = new File(logDirectory, "logcat" + System.currentTimeMillis() + ".txt");
+            Date currentTime = Calendar.getInstance().getTime();
+            Log.e(">>>>>>>>>", ">>>>>>>>>Date<<<<<<<< " + currentTime);
             File logFile2 = new File(logDirectory, "logcat" + System.currentTimeMillis() + "_2.txt");
             // create app folder
             if (!appDirectory.exists()) {
@@ -490,7 +479,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
             super.onDestroy();
     }
-//
+
+    @Override
+    public void onBackPressed() {
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    //
 //    @Override
 //    public void onBackPressed() {
 //        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
@@ -677,7 +676,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 //        nsdHelper = new NsdHelper(this);
 //        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
-        controlRequests = new ControlRequests(this);
 
     }
 
@@ -732,6 +730,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (drawer_groupsRecyclerViewAdapter == null){
                     drawer_groupsRecyclerViewAdapter = new SortByGroupRecyclerViewAdapter(this, new ArrayList<>());
                     drawer_groupsRecyclerViewAdapter.setItems(mainActivityViewModel.getAllGroups());
+                    Group g = new Group();
+                    g.setDevices(mainActivityViewModel.getAllDevices());
+                    g.setName("همه");
+                    drawer_groupsRecyclerViewAdapter.addItemToFirst(g);
                     drawer_groupsRecyclerView.setAdapter(drawer_groupsRecyclerViewAdapter);
                     drawer_groupsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
                     drawer_groupsRecyclerViewAdapter.setListener(this);
@@ -744,67 +746,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onGroupClicked(Group item) {
-        controlRequests.submitRequests();
-//        ((DevicesFragment)getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item);
+        drawerLayout.closeDrawer(GravityCompat.START);
+        ((DevicesFragment)getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item.getId());
+        drawer_groupsRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onGroupLongPress(Group Item) {
-    }
-    ControlRequests controlRequests;
-    @Override
-    public void onBackPressed() {
-        ChangeNameRequest re = new ChangeNameRequest("newName");
-        ApiUtils.getApiService().changeName("http://192.168.1.100/test.php", re).subscribeOn(Schedulers.io())
-                .subscribe(new Observer<ChangeNameResponse>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                    }
-
-                    @Override
-                    public void onNext(ChangeNameResponse changeNameResponse) {
-                        Log.e("tagtagtagtag", "onNext: changenameresponse: " + changeNameResponse);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("tagtagtagtag", "onError: " + e);
-                        e.printStackTrace();
-                        controlRequests.addRequest(new LocallyChange(String.valueOf(System.currentTimeMillis()),
-                                new GsonBuilder().create().toJson(re).toString(),
-                                LocallyChange.Type.NAME_API, "http://192.168.1.105/test.php"));
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.e("tagtagtagtag", "onComplete: ");
-                    }
-                });
-        ApiUtils.getApiService().changeName("http://192.168.1.105/test.php", re).subscribeOn(Schedulers.io())
-                .subscribe(new Observer<ChangeNameResponse>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                    }
-
-                    @Override
-                    public void onNext(ChangeNameResponse changeNameResponse) {
-                        Log.e("tagtagtagtag", "onNext: changenameresponse: " + changeNameResponse);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("tagtagtagtag", "onError: " + e);
-                        e.printStackTrace();
-                        controlRequests.addRequest(new LocallyChange(String.valueOf(System.currentTimeMillis()),
-                                new GsonBuilder().create().toJson(re).toString(),
-                                LocallyChange.Type.NAME_API, "http://192.168.1.105/test.php"));
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.e("tagtagtagtag", "onComplete: ");
-                    }
-                });
     }
 
     //    @Override
@@ -834,4 +782,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "cmd":"de", "src":""}
 //{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "cmd":"de", "src":"", "k":"8nro4q0emv8k1uv5"}
 //{"text":"28#", "cmd":"en", "src":"", "k":"q7tt0yk18nrjrqur"}
-//{"src":"5958528","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"TJpYO/lEqtn6Yg6L8uBkIQ=="}
+//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"TJpYO/lEqtn6Yg6L8uBkIQ=="}

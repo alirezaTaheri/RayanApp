@@ -26,6 +26,7 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
+        android:configChanges="layoutDirection|locale"
         android:name=".App.RayanApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

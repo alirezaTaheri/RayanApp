@@ -17,6 +17,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -39,6 +40,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SnackBarSetup;
@@ -46,7 +48,7 @@ import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
-public class EditDeviceFragment extends BackHandledFragment{
+public class EditDeviceFragment extends BackHandledFragment implements DoneWithSelectAccessPointFragment {
     private static EditDeviceFragment instance = null;
     String readFromFileResult;
     private ArrayList<String> codeList= new ArrayList<>();
@@ -86,12 +88,20 @@ public class EditDeviceFragment extends BackHandledFragment{
     }
     @Override
     public boolean onBackPressed() {
+        Log.e("///////", "/////onbakcmanamanaman");
         editDeviceFragmentViewModel.toDeviceEndSettings(device.getIp());
         ((DeviceManagementActivity)getActivity()).setActionBarTitle();
         getActivity().getSupportFragmentManager().popBackStack();
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            getActivity().onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -279,19 +289,24 @@ public class EditDeviceFragment extends BackHandledFragment{
         }
         else
             statusCheck();
-//        editDeviceFragmentViewModel.toDeviceChangeAccessPoint().observe(this, s -> {
-//            assert s != null;
-//                switch (s){
-//                    case AppConstants.FACTORY_RESET_DONE:
-//                        Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
-//                        setDeviceTopicStatus(TopicStatus.CHANGED);
-//                        break;
-//                    case AppConstants.SOCKET_TIME_OUT:
-//                        setDeviceTopicStatus(TopicStatus.CHANGED);
-//                        Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
-//                        break;
-//                }
-//        });
+    }
+
+    @Override
+    public void accessPointSelected(String ssid, String pass) {
+        Log.e(this.getClass().getSimpleName(),"Received SSID Password from dialog:" + ssid + pass);
+        editDeviceFragmentViewModel.toDeviceChangeAccessPoint(device, ssid, pass).observe(this, s -> {
+            assert s != null;
+                switch (s){
+                    case AppConstants.FACTORY_RESET_DONE:
+                        Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
+                        setDeviceTopicStatus(TopicStatus.CHANGED);
+                        break;
+                    case AppConstants.SOCKET_TIME_OUT:
+                        setDeviceTopicStatus(TopicStatus.CHANGED);
+                        Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+        });
     }
 
     public enum TopicStatus{

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -16,6 +17,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Locale;
 
 import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
@@ -51,9 +53,19 @@ public class RayanApplication extends MultiDexApplication {
     private DeviceDatabase deviceDatabase;
     private SendMessageToDevice sendMessageToDevice;
     private RequestManager requestManager;
+    private Locale locale = null;
     @Override
     public void onCreate() {
         super.onCreate();
+        Configuration config = getBaseContext().getResources().getConfiguration();
+        String lang = "en";
+        if (! config.locale.getLanguage().equals(lang)) {
+            locale = new Locale(lang);
+            Locale.setDefault(locale);
+            config.locale = locale;
+            getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        }
+
         Fabric.with(this, new Crashlytics());
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/IRANSans1.ttf")
@@ -178,7 +190,17 @@ public class RayanApplication extends MultiDexApplication {
     public static PrefManager getPref(){
         return pref;
     }
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+        if (locale != null)
+        {
+            newConfig.locale = locale;
+            Locale.setDefault(locale);
+            getBaseContext().getResources().updateConfiguration(newConfig, getBaseContext().getResources().getDisplayMetrics());
+        }
+    }
 
 
 

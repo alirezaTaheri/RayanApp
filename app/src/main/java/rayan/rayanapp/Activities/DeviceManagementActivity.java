@@ -86,6 +86,12 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
             return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (currentFragment == null || !currentFragment.onBackPressed())
+            super.onBackPressed();
+    }
+
     public void setActionBarTitle(){
 //        getSupportActionBar().setTitle(R.string.title_deviceManagementActivity);
         getSupportActionBar().setTitle("");
@@ -93,7 +99,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 
     @Override
     public void accessPointSelected(String ssid, String pass) {
-
+        ((EditDeviceFragment)getSupportFragmentManager().getFragments().get(0)).accessPointSelected(ssid, pass);
     }
     public void submitClicked(String tag) {
         Log.e("tag of fragment",tag);

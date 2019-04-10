@@ -112,63 +112,64 @@ public class UDPServerService extends Service {
 //                            Log.e("Decrypting","Decrypted22 is: " + AESCrypt.decrypt("8nro4q0emv8k1uv5",b));
                             break;
                         case "TLMSDONE":
-                            pin1 = jsonMessage.getString("pin1");
-                            pin2 = jsonMessage.getString("pin2");
+                            if (jsonMessage.has("stword")) {
+                                pin1 = jsonMessage.getString("pin1");
+                                pin2 = jsonMessage.getString("pin2");
+                                name = jsonMessage.getString("name");
+                                statusWord = jsonMessage.getString("stword");
+                                decodedName = Base64.decode(name, Base64.DEFAULT);
+                                device = deviceDatabase.getDevice(src);
+                                Log.d(TAG, "TLMSDONETLMSDONE: " + device);
+                                if (device != null) {
+                                    ((RayanApplication) getApplication()).getDevicesAccessibilityBus().send(src);
+                                    device.setLocallyAccessibility(true);
+                                    device.setIp(senderIP);
+                                    device.setName1(new String(decodedName, "UTF-8"));
+                                    device.setPin1(pin1);
+                                    device.setPin2(pin2);
+                                    Log.e(getClass().getSimpleName(), "Received Stword: " + statusWord);
+                                    Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
+
+                                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
+                                    Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
+                                    deviceDatabase.updateDevice(device);
+                                } else {
+                                    JsonObject jsonObject = new JsonObject();
+                                    jsonObject.addProperty("cmd", AppConstants.TO_DEVICE_NODE);
+                                    jsonObject.addProperty("src", RayanApplication.getPref().getId());
+                                    sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
+                                }
+                            } else Log.e(TAG, "There is a Unverified Device");
+                            break;
+                        case "YES":
+                            src = jsonMessage.getString("src");
                             name = jsonMessage.getString("name");
-                            statusWord = jsonMessage.getString("stword");
+                            ssid = jsonMessage.getString("ssid");
+                            style = jsonMessage.getString("style");
+                            type = jsonMessage.getString("type");
                             decodedName = Base64.decode(name, Base64.DEFAULT);
                             device = deviceDatabase.getDevice(src);
-                            Log.d(TAG, "TLMSDONETLMSDONE: " + device);
+                            Log.d(TAG, "YESYESYES"+ src);
                             if (device != null){
                                 ((RayanApplication)getApplication()).getDevicesAccessibilityBus().send(src);
                                 device.setLocallyAccessibility(true);
                                 device.setIp(senderIP);
                                 device.setName1(new String(decodedName, "UTF-8"));
-                                device.setPin1(pin1);
-                                device.setPin2(pin2);
-                                Log.e(getClass().getSimpleName(),"Received Stword: " + statusWord);
-                                Log.e(getClass().getSimpleName(),"Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord,device.getSecret()).split("#")[0])+1));
-
-                                device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord,device.getSecret()).split("#")[0])+1));
-                                Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
+                                device.setSsid(ssid);
+                                device.setStyle(style);
                                 deviceDatabase.updateDevice(device);
                             }
                             else{
-                                JsonObject jsonObject = new JsonObject();
-                                jsonObject.addProperty("cmd",AppConstants.TO_DEVICE_NODE);
-                                jsonObject.addProperty("src",RayanApplication.getPref().getId());
-                                sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
+                                device = new Device(src, new String(decodedName, "UTF-8"), "", type, "", new Topic(), "","");
+                                device.setSsid(ssid);
+                                device.setStyle(style);
+                                device.setIp(senderIP);
+                                deviceDatabase.addDevice(device);
                             }
-                            break;
-                        case "YES":
-//                            src = jsonMessage.getString("src");
-//                            name = jsonMessage.getString("name");
-//                            ssid = jsonMessage.getString("ssid");
-//                            style = jsonMessage.getString("style");
-//                            type = jsonMessage.getString("type");
-//                            decodedName = Base64.decode(name, Base64.DEFAULT);
-//                            device = deviceDatabase.getDevice(src);
-                            Log.d(TAG, "YESYESYES: Doing nothing because of HTTP");
-//                            if (device != null){
-//                                ((RayanApplication)getApplication()).getDevicesAccessibilityBus().send(src);
-//                                device.setLocallyAccessibility(true);
-//                                device.setIp(senderIP);
-//                                device.setName1(new String(decodedName, "UTF-8"));
-//                                device.setSsid(ssid);
-//                                device.setStyle(style);
-//                                deviceDatabase.updateDevice(device);
-//                            }
-//                            else{
-//                                device = new Device(src, new String(decodedName, "UTF-8"), "", type, "", new Topic(), "","");
-//                                device.setSsid(ssid);
-//                                device.setStyle(style);
-//                                device.setIp(senderIP);
-//                                deviceDatabase.addDevice(device);
-//                            }
-//                            JsonObject jsonObject = new JsonObject();
-//                            jsonObject.addProperty("cmd",AppConstants.TO_DEVICE_TLMS);
-//                            jsonObject.addProperty("src",RayanApplication.getPref().getId());
-//                            sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
+                            JsonObject jsonObject = new JsonObject();
+                            jsonObject.addProperty("cmd",AppConstants.TO_DEVICE_TLMS);
+                            jsonObject.addProperty("src",RayanApplication.getPref().getId());
+                            sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
                             break;
                         case "wrong_stword":
 
