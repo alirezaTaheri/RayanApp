@@ -9,6 +9,8 @@
     <string name="hint_edituser_email">ایمیل(اختیاری)</string>
     <string name="edituser_submitbtn">تایید</string>
     <string name="edituser_change_passwordbtn">تغییر رمز عبور</string>
+    <string name="selectContact_confirmbtn">انتخاب</string>
+
 
     <string name="change_password_current_pass">کد یا رمز عبور فعلی</string>
     <string name="change_password_new_pass">رمز عبور جدید</string>

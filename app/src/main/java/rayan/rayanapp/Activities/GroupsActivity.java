@@ -9,19 +9,25 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rayan.rayanapp.Data.PhoneContact;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Fragments.EditGroupFragment;
 import rayan.rayanapp.Fragments.GroupsListFragment;
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
+import rayan.rayanapp.Listeners.OnAddUserToGroupSubmitClicked;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class GroupsActivity extends AppCompatActivity implements GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked {
+public class GroupsActivity extends AppCompatActivity implements GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked, OnAddUserToGroupSubmitClicked {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     GroupsListFragment groupsListFragment;
@@ -41,7 +47,7 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
         setContentView(R.layout.activity_groups);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("");
         yesNoButtomSheetFragment = new YesNoButtomSheetFragment();
@@ -117,4 +123,28 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
                 break;
         }
     }
-}
+
+    @Override
+    public void addUserToGroupSubmitClicked(ArrayList<PhoneContact> SelectedContacts, String Tag) {
+
+        Log.e("tag of fragment", Tag);
+        switch (Tag) {
+            case "CreateGroupFragment":
+                createGroupFragment.users.clear();
+                createGroupFragment.numbers.clear();
+                for (int i=0;i<=SelectedContacts.size()-1;i++){
+                    User user = new User();
+                   user.setContactName(SelectedContacts.get(i).getName());
+                   user.setUsername(SelectedContacts.get(i).getNumbers());
+                    createGroupFragment.users.add(user);
+                    createGroupFragment.numbers.add(SelectedContacts.get(i).getNumbers());
+                }
+                createGroupFragment.usersRecyclerViewAdapter.setItems(createGroupFragment.users);
+                break;
+            case "EditGroupFragment":
+                editGroupFragment.doAddUserFromPhone(SelectedContacts);
+                break;
+            default:
+                break;
+    }
+}}

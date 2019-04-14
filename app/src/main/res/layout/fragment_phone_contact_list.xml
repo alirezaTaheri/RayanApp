@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Fragments.PhoneContactListBottomSheetFragment">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="انتخاب کابران" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:id="@+id/phoneContactsSearchEditText"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:hint="جستجو"
+            android:layout_weight="10"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:id="@+id/phoneContactsSearchBtn"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/ic_search"
+            android:background="#000000"
+            android:layout_weight="90"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/phoneContactsSelectBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:background="@color/baseColor"
+        android:text="تایید" />
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="20dp"
+        android:id="@+id/phoneContactsRecyclerView"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

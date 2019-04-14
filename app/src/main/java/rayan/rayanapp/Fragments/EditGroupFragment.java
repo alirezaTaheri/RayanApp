@@ -34,6 +34,7 @@ import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.GroupDevicesRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.PhoneContact;
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
@@ -42,13 +43,13 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
-public class EditGroupFragment extends Fragment implements OnUserClicked<User>, OnAdminClicked<User>{
-    static final int PICK_CONTACT=1;
+public class EditGroupFragment extends Fragment implements OnUserClicked<User>, OnAdminClicked<User> {
+    static final int PICK_CONTACT = 1;
     private Group group;
     private String userId;
     private List<User> admins;
     private List<User> humanUsers;
-    ArrayList<String> adminsUserNames=new ArrayList<>();
+    ArrayList<String> adminsUserNames = new ArrayList<>();
     private final String TAG = EditGroupFragment.class.getSimpleName();
     String cNumber;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
@@ -70,6 +71,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     ImageView addManagerButton;
     @BindView(R.id.saveGroupName)
     TextView saveGroupName;
+
     public EditGroupFragment() {
     }
 
@@ -99,19 +101,18 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
             else RayanApplication.getPref().setIsGroupAdminKey(false);
             editGroupFragmentViewModel.getGroupLive(getArguments().getString("id")).observe(this, group1 -> {
                 this.group = group1;
-                admins=group1.getAdmins();
-                humanUsers=group1.getHumanUsers();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
-                    for(int i=0;i<=admins.size()-1;i++){
-                        admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(),getActivity()));
-                        admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(),getActivity()));
+                admins = group1.getAdmins();
+                humanUsers = group1.getHumanUsers();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+                    for (int i = 0; i <= admins.size() - 1; i++) {
+                        admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(), getActivity()));
+                        admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(), getActivity()));
                     }
-                    for(int i=0;i<=humanUsers.size()-1;i++){
-                        humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(),getActivity()));
-                        humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(),getActivity()));
+                    for (int i = 0; i <= humanUsers.size() - 1; i++) {
+                        humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(), getActivity()));
+                        humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(), getActivity()));
                     }
-                }
-                else getContactPermission();
+                } else getContactPermission();
                 usersRecyclerViewAdapter.setItems(humanUsers);
                 managersRecyclerViewAdapter.setItems(admins);
                 devicesRecyclerViewAdapter.setItems(group1.getDevices());
@@ -139,18 +140,19 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.leaveMenu){
+        if (id == R.id.leaveMenu) {
             clickOnLeaveGroup();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.leave_menu, menu);
         menu.findItem(R.id.leaveMenu).setTitle("ترک کردن گروه");
-    // Use filter.xml from step 1
+        // Use filter.xml from step 1
     }
 
     @Override
@@ -162,44 +164,17 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 //                    if(resultCode==RESULT_OK)
 //                    {
 
-                        if(requestCode == REQUEST_CODE_PICK_CONTACT  )
-                        {
-                            Bundle bundle =  data.getExtras();
-                            ArrayList<String> contacts = bundle.getStringArrayList("result");
-                            for (int a = 0; a<contacts.size();a++){
-                                contacts.set(a, contacts.get(a).split(";")[1].replaceAll("\\s+", "").replace("+98", "0"));
-                            }
-                            Log.e("////////////" ," ///////////: " + contacts);
-
-                            editGroupFragmentViewModel.addUserByMobile(contacts, group.getId()).observe(getActivity(), baseResponse -> {
-                                if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
-                                    // TODO: 2/23/2019 user not found or nouser??
-                                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"کاربری با این شماره وجود ندارد");
-                                }
-                                else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().equals("forbidden")){
-                                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما مجاز به اضافه کردن کاربر نیستید");
-                                }
-                                else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")){
-                                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"این کاربر هم‌اکنون عضو گروه است");
-                                }
-                                else if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nogroup")){
-                                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"این گروه وجود ندارد");
-                                }
-                                else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter mobiles")){
-                                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شماره تلفن ها را وارد کنید");
-                                }
-                                else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter group_id")){
-                                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شماره گروه را وارد کنید");
-                                }
-                                else if (baseResponse.getStatus().getCode().equals("200")){
-                                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"کاربر با موفقیت اضافه شد");
-                                    editGroupFragmentViewModel.getGroups();
-                                }
-                                else
-                                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
-                            });
+                    if (requestCode == REQUEST_CODE_PICK_CONTACT) {
+                        Bundle bundle = data.getExtras();
+                        ArrayList<String> contacts = bundle.getStringArrayList("result");
+                        for (int a = 0; a < contacts.size(); a++) {
+                            contacts.set(a, contacts.get(a).split(";")[1].replaceAll("\\s+", "").replace("+98", "0"));
                         }
+                        Log.e("////////////", " ///////////: " + contacts);
+
+
                     }
+                }
 //                    Uri contactData = data.getData();
 //                    Cursor c =  getActivity().managedQuery(contactData, null, null, null, null);
 //                    if (c.moveToFirst()) {
@@ -257,7 +232,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_edit_group, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_group, container, false);
         ButterKnife.bind(this, view);
         getContactPermission();
         managersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -274,10 +249,9 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (name.getText().toString().equals(group.getName())){
+                if (name.getText().toString().equals(group.getName())) {
                     saveGroupName.setVisibility(View.INVISIBLE);
-                }
-                else{
+                } else {
                     saveGroupName.setVisibility(View.VISIBLE);
                 }
             }
@@ -290,114 +264,110 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     }
 
     public static final int REQUEST_CODE_PICK_CONTACT = 1;
-    public static final int  MAX_PICK_CONTACT= 10;
+    public static final int MAX_PICK_CONTACT = 10;
+
     @OnClick(R.id.addUserButton)
-    void addUser(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
+    void addUser() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
 //            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
 //            startActivityForResult(intent, PICK_CONTACT);
-            Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
-            phonebookIntent.putExtra("additional", "phone-multi");
-            phonebookIntent.putExtra("maxRecipientCount", MAX_PICK_CONTACT);
-            phonebookIntent.putExtra("FromMMS", true);
-            //startActivityForResult(Intent.createChooser(phonebookIntent,""), REQUEST_CODE_PICK_CONTACT);
-            //its important:
-            startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
-            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-            startActivityForResult(intent, PICK_CONTACT);
+//            Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
+//            phonebookIntent.putExtra("additional", "phone-multi");
+//            phonebookIntent.putExtra("maxRecipientCount", MAX_PICK_CONTACT);
+//            phonebookIntent.putExtra("FromMMS", true);
+//            //startActivityForResult(Intent.createChooser(phonebookIntent,""), REQUEST_CODE_PICK_CONTACT);
+//            //its important:
+//            startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
+//            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+//            startActivityForResult(intent, PICK_CONTACT);
 //            Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
 //            phonebookIntent.putExtra("additional", "phone-multi");
 //            phonebookIntent.putExtra("maxRecipientCount", MAX_PICK_CONTACT);
 //            phonebookIntent.putExtra("FromMMS", true);
 //            startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
-        }
-        else getContactPermission();
+            PhoneContactListBottomSheetFragment phoneContactListFragment =new PhoneContactListBottomSheetFragment().newInstance("EditGroupFragment");
+            phoneContactListFragment.show(getActivity().getSupportFragmentManager(), phoneContactListFragment.getTag());
+
+        } else getContactPermission();
 
     }
 
     @OnClick(R.id.addManagerButton)
-    void addManager(){
+    void addManager() {
         UsersListDialogFragment usersListDialogFragment = UsersListDialogFragment.newInstance(group);
         usersListDialogFragment.show(getActivity().getSupportFragmentManager(), "usersList");
     }
 
-    public void init(Group group){
+    public void init(Group group) {
         name.setText(group.getName());
         devicesRecyclerViewAdapter.setItems(group.getDevices());
         usersRecyclerViewAdapter.setItems(group.getHumanUsers());
         managersRecyclerViewAdapter.setItems(group.getAdmins());
     }
 
-    public void getContactPermission(){
+    public void getContactPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
         }
     }
+
     @Override
     public void onRemoveUserClicked(User user) {
-        userId=user.getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment1","حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر هستید؟");
+        userId = user.getId();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment1", "حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     @OnClick(R.id.saveGroupName)
-    void saveGroupName(){
-        editGroupFragmentViewModel.editGroup(name.getText().toString(),group.getId()).observe(this, baseResponse -> {
-            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("Invalid group_id")){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شماره گروه نادرست است");
-            }
-            else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter group_id")){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شماره گروه را وارد کنید");
-            }
-            else if (baseResponse.getStatus().getCode().equals("200")){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"گروه با موفقیت اصلاح شد");
+    void saveGroupName() {
+        editGroupFragmentViewModel.editGroup(name.getText().toString(), group.getId()).observe(this, baseResponse -> {
+            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("Invalid group_id")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شماره گروه نادرست است");
+            } else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter group_id")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شماره گروه را وارد کنید");
+            } else if (baseResponse.getStatus().getCode().equals("200")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "گروه با موفقیت اصلاح شد");
                 editGroupFragmentViewModel.getGroups();
                 saveGroupName.setVisibility(View.INVISIBLE);
-            }
-            else
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
+            } else
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
         });
     }
 
-//    @OnClick(R.id.leaveGroup_btn)
-    void clickOnLeaveGroup(){
-        userId=RayanApplication.getPref().getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment3","ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟" );
+    //    @OnClick(R.id.leaveGroup_btn)
+    void clickOnLeaveGroup() {
+        userId = RayanApplication.getPref().getId();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment3", "ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     @Override
     public void onRemoveAdminClicked(User user) {
-        userId=user.getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment2","حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
+        userId = user.getId();
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment2", "حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     public void clickOnRemoveUserSubmit() {
         editGroupFragmentViewModel.deleteUser(userId, group.getId()).observe(this, baseResponse -> {
-            Log.e("remove user code",baseResponse.getStatus().getCode());
+            Log.e("remove user code", baseResponse.getStatus().getCode());
 //            Toast.makeText(getActivity(), "remove user code"+baseResponse.getStatus().getCode()+" "+ baseResponse.getData().getMessage(), Toast.LENGTH_SHORT).show();
-            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"این کاربر وجود ندارد");
-            }
-            else if (baseResponse.getStatus().getCode().equals("404")){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"حذف این کاربر امکان پذیر نیست");
-            }
-            else if (baseResponse.getStatus().getCode().equals("403")){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما قادر به حذف این کاربر نیستید");
-            }
-            else if (baseResponse.getStatus().getCode().equals("204")){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"کاربر با موفقیت از گروه حذف شد");
+            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "این کاربر وجود ندارد");
+            } else if (baseResponse.getStatus().getCode().equals("404")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "حذف این کاربر امکان پذیر نیست");
+            } else if (baseResponse.getStatus().getCode().equals("403")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شما قادر به حذف این کاربر نیستید");
+            } else if (baseResponse.getStatus().getCode().equals("204")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "کاربر با موفقیت از گروه حذف شد");
 //                ((DoneWithFragment)getActivity()).operationDone();
                 editGroupFragmentViewModel.getGroups();
-            }
-            else if (baseResponse.getStatus().getCode().equals("200")){
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"کاربر با موفقیت از گروه حذف شد");
+            } else if (baseResponse.getStatus().getCode().equals("200")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "کاربر با موفقیت از گروه حذف شد");
 //                ((DoneWithFragment)getActivity()).operationDone();
                 editGroupFragmentViewModel.getGroups();
-            }
-            else
-            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
+            } else
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
         });
     }
 
@@ -414,45 +384,74 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
         });
     }
-    public void clickOnLeaveGroupSubmit(){
-        for(int i=0;i<=admins.size()-1;i++){
+
+    public void clickOnLeaveGroupSubmit() {
+        for (int i = 0; i <= admins.size() - 1; i++) {
             adminsUserNames.add(admins.get(i).getUsername());
         }
-        if (adminsUserNames.contains(RayanApplication.getPref().getUsername())){
+        if (adminsUserNames.contains(RayanApplication.getPref().getUsername())) {
             if (admins.size() == 1) {
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "بدلیل اینکه تنها مدیر این گروه هستید امکان ترک گروه برای شما وجود ندارد");
-            }else{ doLeaveGroup(userId, group.getId());}
-        }else{
+            } else {
+                doLeaveGroup(userId, group.getId());
+            }
+        } else {
             doLeaveGroup(userId, group.getId());
-    }}
+        }
+    }
+
     public static EditGroupFragment getInstance() {
         return instance;
     }
-public void doLeaveGroup(String id, String groupId){
-    editGroupFragmentViewModel.deleteUser(id, groupId).observe(this, baseResponse -> {
-        Log.e("remove user code",baseResponse.getStatus().getCode());
+
+    public void doLeaveGroup(String id, String groupId) {
+        editGroupFragmentViewModel.deleteUser(id, groupId).observe(this, baseResponse -> {
+            Log.e("remove user code", baseResponse.getStatus().getCode());
 //            Toast.makeText(getActivity(), "remove user code"+baseResponse.getStatus().getCode()+" "+ baseResponse.getData().getMessage(), Toast.LENGTH_SHORT).show();
-        if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")){
-            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"این کاربر وجود ندارد");
-        }
-        else if (baseResponse.getStatus().getCode().equals("404")){
-            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"حذف این کاربر امکان پذیر نیست");
-        }
-        else if (baseResponse.getStatus().getCode().equals("403")){
-            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما قادر به حذف این کاربر نیستید");
-        }
-        else if (baseResponse.getStatus().getCode().equals("204")){
-            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما با موفقیت از گروه خارج شدید");
+            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "این کاربر وجود ندارد");
+            } else if (baseResponse.getStatus().getCode().equals("404")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "حذف این کاربر امکان پذیر نیست");
+            } else if (baseResponse.getStatus().getCode().equals("403")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شما قادر به حذف این کاربر نیستید");
+            } else if (baseResponse.getStatus().getCode().equals("204")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شما با موفقیت از گروه خارج شدید");
 //                ((DoneWithFragment)getActivity()).operationDone();
-            getActivity().onBackPressed();
-        }
-        else if (baseResponse.getStatus().getCode().equals("200")){
-            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما با موفقیت از گروه خارج شدید");
+                getActivity().onBackPressed();
+            } else if (baseResponse.getStatus().getCode().equals("200")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شما با موفقیت از گروه خارج شدید");
 //                ((DoneWithFragment)getActivity()).operationDone();
-            getActivity().onBackPressed();
+                getActivity().onBackPressed();
+            } else
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
+        });
+    }
+
+    public void doAddUserFromPhone(ArrayList<PhoneContact> selectedContacts){
+        ArrayList<String> contacts=new ArrayList<>();
+        for (int i=0;i<=selectedContacts.size()-1;i++){
+            contacts.add(selectedContacts.get(i).getNumbers());
         }
-        else
-            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
-    });
-}
+        editGroupFragmentViewModel.addUserByMobile(contacts, group.getId()).observe(getActivity(), baseResponse -> {
+            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")) {
+                // TODO: 2/23/2019 user not found or nouser??
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "کاربری با این شماره وجود ندارد");
+            } else if (baseResponse.getStatus().getCode().equals("403") && baseResponse.getData().getMessage().equals("forbidden")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شما مجاز به اضافه کردن کاربر نیستید");
+            } else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "این کاربر هم‌اکنون عضو گروه است");
+            } else if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nogroup")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "این گروه وجود ندارد");
+            } else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter mobiles")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شماره تلفن ها را وارد کنید");
+            } else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter group_id")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شماره گروه را وارد کنید");
+            } else if (baseResponse.getStatus().getCode().equals("200")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "کاربر با موفقیت اضافه شد");
+                editGroupFragmentViewModel.getGroups();
+            } else
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
+        });
+
+    }
 }

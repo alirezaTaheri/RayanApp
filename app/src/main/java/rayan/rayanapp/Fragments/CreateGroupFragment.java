@@ -1,27 +1,20 @@
 package rayan.rayanapp.Fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +23,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
-import rayan.rayanapp.Data.Contact;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -47,9 +39,9 @@ public class CreateGroupFragment extends Fragment {
     String nameTxt;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    UsersRecyclerViewAdapter usersRecyclerViewAdapter;
-    private List<User> users = new ArrayList<>();
-    private ArrayList<String> numbers = new ArrayList<>();
+    public UsersRecyclerViewAdapter usersRecyclerViewAdapter;
+    public List<User> users = new ArrayList<>();
+    public ArrayList<String> numbers = new ArrayList<>();
     public static CreateGroupFragment newInstance() {
         return new CreateGroupFragment();
     }
@@ -74,45 +66,45 @@ public class CreateGroupFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case (PICK_CONTACT):
-                if (resultCode == Activity.RESULT_OK) {
-                    Uri contactData = data.getData();
-                    Cursor c =  getActivity().managedQuery(contactData, null, null, null, null);
-                    if (c.moveToFirst()) {
-                        String id =c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-                        String hasPhone =c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-                        if (hasPhone.equalsIgnoreCase("1")) {
-                            Cursor phones = getActivity().getContentResolver().query(
-                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
-                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,
-                                    null, null);
-                            phones.moveToFirst();
-                            String cNumber;
-                            cNumber = phones.getString(phones.getColumnIndex("data1"));
-                            cNumber = cNumber.trim();
-                            while (cNumber.contains(" "))
-                                cNumber = cNumber.replace(" ", "");
-                            cNumber = cNumber.replace("+98","0");
-                            String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                            Contact contact = new Contact();
-                            contact.setName(name);
-                            contact.setNumbers(cNumber);
-                            User user = new User();
-                            user.setContactName(name);
-                            user.setUsername(cNumber);
-                            users.add(user);
-                            numbers.add(cNumber);
-                            usersRecyclerViewAdapter.setItems(users);
-                        }
-                    }
-                }
-                break;
-        }
-    }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch (requestCode) {
+//            case (PICK_CONTACT):
+//                if (resultCode == Activity.RESULT_OK) {
+//                    Uri contactData = data.getData();
+//                    Cursor c =  getActivity().managedQuery(contactData, null, null, null, null);
+//                    if (c.moveToFirst()) {
+//                        String id =c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+//                        String hasPhone =c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+//                        if (hasPhone.equalsIgnoreCase("1")) {
+//                            Cursor phones = getActivity().getContentResolver().query(
+//                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
+//                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,
+//                                    null, null);
+//                            phones.moveToFirst();
+//                            String cNumber;
+//                            cNumber = phones.getString(phones.getColumnIndex("data1"));
+//                            cNumber = cNumber.trim();
+//                            while (cNumber.contains(" "))
+//                                cNumber = cNumber.replace(" ", "");
+//                            cNumber = cNumber.replace("+98","0");
+//                            String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+//                            Contact contact = new Contact();
+//                            contact.setName(name);
+//                            contact.setNumbers(cNumber);
+//                            User user = new User();
+//                            user.setContactName(name);
+//                            user.setUsername(cNumber);
+//                            users.add(user);
+//                            numbers.add(cNumber);
+//                            usersRecyclerViewAdapter.setItems(users);
+//                        }
+//                    }
+//                }
+//                break;
+//        }
+//    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -124,8 +116,10 @@ public class CreateGroupFragment extends Fragment {
     @OnClick(R.id.addUserButton)
     void addUser(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
-            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-            startActivityForResult(intent, PICK_CONTACT);
+//            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+//            startActivityForResult(intent, PICK_CONTACT);
+            PhoneContactListBottomSheetFragment phoneContactListFragment =new PhoneContactListBottomSheetFragment().newInstance("CreateGroupFragment");
+            phoneContactListFragment.show(getActivity().getSupportFragmentManager(), phoneContactListFragment.getTag());
         }
         else getContactPermission();
 
