@@ -26,17 +26,20 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:configChanges="layoutDirection|locale"
         android:name=".App.RayanApplication"
         android:allowBackup="true"
+        android:configChanges="layoutDirection|locale"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Activities.ForgetPasswordActivity" />
-        <activity android:name=".Activities.SignUpUserActivity" />
+        <activity android:name=".Activities.StartUpSplashActivity"></activity>
+        <activity android:name=".Activities.ForgetPasswordActivity"
+         android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".Activities.SignUpUserActivity"
+            android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".Activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,8 +47,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.LoginActivity"
-            android:windowSoftInputMode="adjustResize"/>
+        <activity
+            android:name=".Activities.LoginActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <service android:name=".Services.udp.UDPServerService" />
         <service android:name="org.eclipse.paho.android.service.MqttService" />
@@ -57,8 +61,7 @@
         <activity
             android:name=".Activities.GroupsActivity"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".Activities.ProfileActivity"
             android:parentActivityName=".Activities.MainActivity"
@@ -70,9 +73,7 @@
         <activity
             android:name=".Activities.SettingsActivity"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-        <!-- this metadata is for crashlytics -->
+            android:theme="@style/AppTheme.NoActionBar" /> <!-- this metadata is for crashlytics -->
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="ad3a16c7f3170306882d8f85a367d63fdf8e0ab5" />

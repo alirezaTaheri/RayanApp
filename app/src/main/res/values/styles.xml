@@ -26,6 +26,11 @@
         <!--<item name="android:windowTranslucentStatus">true</item>-->
         <!--<item name="android:windowTranslucentNavigation">true</item>-->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="colorAccent">@android:color/white</item>
+        <item name="colorControlNormal">#aaa</item>
+        <item name="android:textColorHint">#aaa</item>
+        <item name="colorControlActivated">#1da1f3</item>
+        <item name="colorControlHighlight">#1da1f3</item>
     </style>
 
     <style name="DrawerArrowStyle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
@@ -77,4 +82,5 @@
         <!--dialog background-->
         <!--<item name="android:windowBackground">@drawable/background_dialog</item>-->
     </style>
+
 </resources>

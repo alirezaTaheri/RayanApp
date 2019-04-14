@@ -15,8 +15,10 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.KeyboardUtil;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.ForgetPasswordViewModel;
 
@@ -37,6 +39,7 @@ public class ForgetPasswordFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_forget__password, container, false);
         ButterKnife.bind(this, view);
+        new KeyboardUtil(getActivity(), view.findViewById(R.id.forgetPassLayout));
         return view;
     }
 
@@ -75,5 +78,13 @@ public class ForgetPasswordFragment extends Fragment {
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
                 }
             });
+    }
+    @OnFocusChange(R.id.phone_forgetpass_EditText)
+    void onPhoneEditTextFocusChange(){
+        phone_forgetpass_EditText.setHint("09xxxxxxxxx");
+    }
+    @OnFocusChange(R.id.email_forgetpass_EditText)
+    void onEmailEditTextFocusChange(){
+        phone_forgetpass_EditText.setHint("");
     }
 }

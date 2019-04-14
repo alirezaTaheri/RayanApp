@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!RayanApplication.getPref().isLoggedIn()) {
-            Intent intent = new Intent(this, LoginActivity.class);
+            Intent intent = new Intent(this, StartUpSplashActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();

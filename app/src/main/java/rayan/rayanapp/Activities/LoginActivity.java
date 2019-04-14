@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -15,11 +16,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
+import butterknife.OnTouch;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -30,16 +34,14 @@ import rayan.rayanapp.ViewModels.LoginViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity {
-    final static public String PREFS_NAME = "PREFS_NAME";
-    final static private String PREF_KEY_SHORTCUT_ADDED = "PREF_KEY_SHORTCUT_ADDED";
     private final String TAG = LoginActivity.class.getSimpleName();
-    FragmentManager fragmentManager;
-    FragmentTransaction transaction;
     LoginViewModel loginViewModel;
     @BindView(R.id.phoneNumberEditText)
     EditText phoneEditText;
     @BindView(R.id.passwordEditText)
     EditText passwordInput;
+    @BindView(R.id.forgotPasswordTextView)
+    TextView forgotPasswordTextView;
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
@@ -50,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
         new KeyboardUtil(this, findViewById(R.id.nestedScrollView));
+        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)){
             SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content),"دستگاه به اینترنت متصل نیست");
         }
@@ -101,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
-        phoneEditText.setHint("09xxxxxxxxx");
+
 
 //        loginViewModel.getLoginResponse().observe(this, baseResponse -> {
 //            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
@@ -128,14 +131,17 @@ public class LoginActivity extends AppCompatActivity {
 //            }
 //        });
     }
-    @OnClick(R.id.signUpLayout)
-    void clickOnSignUp(){
-        startActivity(new Intent(this, SignUpUserActivity.class));
+@OnFocusChange(R.id.phoneNumberEditText)
+void onPhoneEditTextFocusChange(){
+    phoneEditText.setHint("09xxxxxxxxx");
+}
+    @OnFocusChange(R.id.passwordEditText)
+    void onPasswordEditTextFocusChange(){
+        phoneEditText.setHint("");
     }
-    @OnClick(R.id.forgotPasswordlayout)
+    @OnClick(R.id.forgotPasswordTextView)
     void clickOnforgetPass(){
       //  ShortcutIcon();
-
         startActivity(new Intent(this, ForgetPasswordActivity.class));
     }
 
@@ -175,13 +181,5 @@ public class LoginActivity extends AppCompatActivity {
             }} else {
             SnackBarSetup.snackBarSetup(findViewById(android.R.id.content),"لطفا اتصال خود به اینترنت را چک کنید");
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        moveTaskToBack(true);
-       // android.os.Process.killProcess(Process.myPid());
-        System.exit(0);
     }
 }
