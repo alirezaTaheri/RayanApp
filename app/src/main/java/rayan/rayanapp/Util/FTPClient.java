@@ -28,7 +28,7 @@ public class FTPClient {
                 try {
                     con = new org.apache.commons.net.ftp.FTPClient();
                     e.onNext("Connecting To: " + ip);
-                    con.connect("192.168.1.109", AppConstants.FTP_PORT);
+                    con.connect(ip, AppConstants.FTP_PORT);
                     e.onNext("Connected To: " + ip);
                     if (con.login(username, password)) {
                         con.enterLocalPassiveMode(); // important!
