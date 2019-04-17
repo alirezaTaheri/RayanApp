@@ -64,25 +64,35 @@
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:focusableInTouchMode="true"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical"
+        android:layout_below="@+id/loginLinear"
+        android:id="@+id/forgetPassLinear">
         <TextView
             android:id="@+id/forgotPasswordTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/loginLinear"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="20dp"
             android:text="@string/text_forgot_pass_hint"
             android:textColor="@color/grey_dark_1"
             android:textSize="17sp" />
-
+    <View
+        android:background="@color/grey"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/rayanimage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/forgotPasswordTextView"
+        android:layout_below="@+id/forgetPassLinear"
         android:layout_marginTop="50dp"
         app:srcCompat="@drawable/ic_rayan" />
 
@@ -94,7 +104,7 @@
         android:layout_marginRight="30dp"
         android:layout_marginBottom="20dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/button_radus"
+        android:background="@drawable/button_backgrand"
         android:padding="12dp"
         android:text="@string/text_sign_in_button"
         android:textColor="@color/white"

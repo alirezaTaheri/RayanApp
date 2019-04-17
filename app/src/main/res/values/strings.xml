@@ -22,7 +22,7 @@
     <string name="text_confirm_code_button">تایید و ورود</string>
     <string name="hint_sign_in_password">رمز عبور</string>
     <string name="text_sign_in_button">ورود</string>
-    <string name="text_forgot_pass_hint"><u>بازیابی رمز عبور</u></string>
+    <string name="text_forgot_pass_hint">بازیابی رمز عبور</string>
     <string name="text_sign_up_button">ثبت نام</string>
     <string name="drawer_groups">مدیریت گروه\u200cها</string>
     <string name="leave_group_button">ترک گروه</string>
