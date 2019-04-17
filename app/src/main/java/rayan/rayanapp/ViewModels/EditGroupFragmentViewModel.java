@@ -45,7 +45,6 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         super(application);
         groupDatabase = new GroupDatabase(application);
     }
-
     public LiveData<Group> getGroupLive(String id){
         return groupDatabase.getGroupLive(id);
     }
@@ -58,8 +57,10 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         return groupDatabase.getGroup(id).getHumanUsers();
     }
 
-    public LiveData<BaseResponse> addUserByMobile(ArrayList<String> phones, String groupId){
+    public LiveData<BaseResponse> addUserByMobile(String phone, String groupId){
         final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
+        List<String> phones = new ArrayList<>();
+        phones.add(phone);
         addUserByMobileObservable(new AddUserByMobileRequest(phones, groupId)).subscribe(addUserByMobileObserver(results));
         return results;
     }
@@ -301,100 +302,33 @@ public String getContactNameFromPhone(final String phoneNumber, Context context)
     }
     return contactName;
 }
+    public Bitmap getContactImageFromPhone(String phoneNumber, Context context) {
+        Uri phoneUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        Uri photoUri = null;
+        ContentResolver cr = context.getContentResolver();
+        Cursor contact = cr.query(phoneUri,
+                new String[] { ContactsContract.Contacts._ID }, null, null, null);
 
-    public Bitmap getContactImageFromPhone(final String phoneNumber, Context context) {
-        ContentResolver contentResolver = context.getContentResolver();
-        String contactId = null;
-        InputStream inputStream=null;
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        if (contact.moveToFirst()) {
+            long userId = contact.getLong(contact.getColumnIndex(ContactsContract.Contacts._ID));
+            photoUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, userId);
 
-        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup._ID};
-
-        Cursor cursor =
-                contentResolver.query(
-                        uri,
-                        projection,
-                        null,
-                        null,
-                        null);
-
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup._ID));
-            }
-            cursor.close();
         }
-
-        Bitmap photo = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_person);
-
-        try {
-            if (contactId!=null) {
-                 inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
-                        ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.valueOf(contactId)));
-            }
-            if (inputStream != null) {
-                photo = BitmapFactory.decodeStream(inputStream);
-            }
-
-            assert inputStream != null;
-            if (contactId!=null) {
-                inputStream.close();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        else {
+            Bitmap defaultPhoto = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_report_image);
+            return defaultPhoto;
         }
-        return photo;
+        if (photoUri != null) {
+            InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(
+                    cr, photoUri);
+            if (input != null) {
+                return BitmapFactory.decodeStream(input);
+            }
+        } else {
+            Bitmap defaultPhoto = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_report_image);
+            return defaultPhoto;
+        }
+        Bitmap defaultPhoto = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_report_image);
+        return defaultPhoto;
     }
-    public static Bitmap retrieveContactPhoto(String number, Context context) {
-        ContentResolver contentResolver = context.getContentResolver();
-        String contactId = null;
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-
-        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup._ID};
-
-        Cursor cursor =
-                contentResolver.query(
-                        uri,
-                        projection,
-                        null,
-                        null,
-                        null);
-
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup._ID));
-            }
-            cursor.close();
-        }
-
-        Bitmap photo = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_person);
-
-
-
-
-
-        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(contactId));
-        Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
-        cursor = context.getContentResolver().query(photoUri,
-                new String[]{ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
-        if (cursor == null) {
-            return null;
-        }
-        try {
-            if (cursor.moveToFirst()) {
-                byte[] data = cursor.getBlob(0);
-                if (data != null) {
-                    return  BitmapFactory.decodeStream( new ByteArrayInputStream(data));
-                }
-            }
-        } finally {
-            cursor.close();
-        }
-        return null;
-    }
-
-
 }

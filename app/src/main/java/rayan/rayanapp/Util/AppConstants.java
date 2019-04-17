@@ -71,8 +71,6 @@ public class AppConstants {
     public final static String DEVICE_STANDALONE_STYLE = "standalone";
     public final static String FACTORY_RESET = "factory_reset";
     public final static String FACTORY_RESET_DONE = "factory_reseted";
-//<<<<<<< HEAD
-//<<<<<<< HEAD
     public final static String DEVICE_PRIMARY_PASSWORD = "12345678";
     public final static String DEVICE_TYPE_SWITCH_1 = "switch_1";
     public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";

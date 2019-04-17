@@ -19,10 +19,17 @@
                                   <option name="values">
                                     <map>
 <<<<<<< HEAD
+<<<<<<< HEAD
                                       <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_refresh_black_24dp.xml" />
 =======
                                       <entry key="url" value="jar:file:/E:/Android_Studio/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_person_black_24dp.xml" />
 >>>>>>> dbaa4a11f3e847430be55d46eb397ce08f9d03f6
+=======
+                                      <entry key="url" value="jar:file:/E:/Android_Studio/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_person_black_24dp.xml" />
+=======
+                                      <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_refresh_black_24dp.xml" />
+>>>>>>> ede371d9860846cb38015c4b1a867e30c9d1722b
+>>>>>>> 8879010ca1d758aa5539fa1da573617514ec0713
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -33,6 +40,7 @@
                         <option name="values">
                           <map>
 <<<<<<< HEAD
+<<<<<<< HEAD
                             <entry key="outputName" value="ic_refresh" />
                             <entry key="sourceFile" value="C:\Users\Alireza" />
 =======
@@ -40,6 +48,15 @@
                             <entry key="outputName" value="ic_person_black_24dp" />
                             <entry key="sourceFile" value="C:\Users\Milad" />
 >>>>>>> dbaa4a11f3e847430be55d46eb397ce08f9d03f6
+=======
+                            <entry key="color" value="ffffff" />
+                            <entry key="outputName" value="ic_person_black_24dp" />
+                            <entry key="sourceFile" value="C:\Users\Milad" />
+=======
+                            <entry key="outputName" value="ic_refresh" />
+                            <entry key="sourceFile" value="C:\Users\Alireza" />
+>>>>>>> ede371d9860846cb38015c4b1a867e30c9d1722b
+>>>>>>> 8879010ca1d758aa5539fa1da573617514ec0713
                           </map>
                         </option>
                       </PersistentState>

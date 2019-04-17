@@ -14,7 +14,9 @@ import com.stepstone.stepper.viewmodel.StepViewModel;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Fragments.FinishAddNewDeviceFragment;
 import rayan.rayanapp.Fragments.NewDevicePhysicalVerificationFragment;
+import rayan.rayanapp.Fragments.NewDeviceSetAccessPoint;
 import rayan.rayanapp.Fragments.NewDeviceSetConfigurationFragment;
+import rayan.rayanapp.Fragments.NewDeviceSetGroupFragment;
 import rayan.rayanapp.Fragments.NewDevice_Plug_PhysicalVerificationFragment;
 import rayan.rayanapp.Fragments.NewDevice_Switch_PhysicalVerificationFragment;
 import rayan.rayanapp.Fragments.NewDevicesListFragment;
@@ -39,8 +41,10 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
             case 0:
                 return NewDevicesListFragment.newInstance();
             case 1:
-                return NewDeviceSetConfigurationFragment.newInstance();
+                return NewDeviceSetGroupFragment.newInstance();
             case 2:
+                return NewDeviceSetAccessPoint.newInstance();
+            case 3:
 //                Log.e("CCCCCCCCCCC", "COuntER: " + AddNewDeviceActivity.counter);
 //                if (AddNewDeviceActivity.counter %2 == 0){
 //                    Log.e("CCCCCCCCCCC", "NewDevice_Switch_PhysicalVerificationFragment: " + AddNewDeviceActivity.counter);
@@ -63,7 +67,7 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
 //            }
 //            Log.e("iiiiiiiiiii", "iiiiiiiiii: " + physicalFragment);
                 return NewDevicePhysicalVerificationFragment.newInstance();
-            case 3:
+            case 4:
                 return FinishAddNewDeviceFragment.newInstance();
         }
         return  null;
@@ -83,6 +87,6 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
 
     @Override
     public int getCount() {
-        return 4;
+        return 5;
     }
 }

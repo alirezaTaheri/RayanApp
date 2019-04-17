@@ -159,13 +159,13 @@ public class UDPServerService extends Service {
                                 device.setStyle(style);
                                 deviceDatabase.updateDevice(device);
                             }
-                            else{
-                                device = new Device(src, new String(decodedName, "UTF-8"), "", type, "", new Topic(), "","");
-                                device.setSsid(ssid);
-                                device.setStyle(style);
-                                device.setIp(senderIP);
-                                deviceDatabase.addDevice(device);
-                            }
+//                            else{
+//                                device = new Device(src, new String(decodedName, "UTF-8"), "", type, "", new Topic(), "","");
+//                                device.setSsid(ssid);
+//                                device.setStyle(style);
+//                                device.setIp(senderIP);
+//                                deviceDatabase.addDevice(device);
+//                            }
                             JsonObject jsonObject = new JsonObject();
                             jsonObject.addProperty("cmd",AppConstants.TO_DEVICE_TLMS);
                             jsonObject.addProperty("src",RayanApplication.getPref().getId());

@@ -6,19 +6,24 @@
     android:layout_height="match_parent"
     android:layoutDirection="rtl">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="42dp">
+        android:layout_marginTop="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="86dp">
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -39,7 +44,7 @@
                     android:layout_marginTop="15dp"
                     android:gravity="right"
                     android:hint="@string/hint_edituser_phoneNumber"
-                    android:imeOptions="actionDone"
+                    android:imeOptions="actionNext"
                     android:inputType="phone"
                     android:maxLines="1"
                     android:textSize="16sp" />
@@ -74,7 +79,7 @@
                     android:layout_marginTop="15dp"
                     android:gravity="right"
                     android:hint="@string/hint_edituser_email"
-                    android:imeOptions="actionDone"
+                    android:imeOptions="actionNext"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:textSize="16sp" />
@@ -110,7 +115,7 @@
                     android:layout_marginTop="15dp"
                     android:gravity="right"
                     android:hint="@string/register_password"
-                    android:imeOptions="actionDone"
+                    android:imeOptions="actionNext"
                     android:inputType="textPassword"
                     android:maxLines="1"
                     android:textSize="16sp" />
@@ -176,5 +181,5 @@
                 tools:layout_editor_absoluteY="260dp" />
         </LinearLayout>
     </LinearLayout>
-
+    </ScrollView>
 </android.support.constraint.ConstraintLayout>

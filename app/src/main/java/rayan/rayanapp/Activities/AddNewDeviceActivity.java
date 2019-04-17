@@ -125,6 +125,7 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
                 wifiReceiver,
                 new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
         );
+        Log.e("=========---", "status Check: " + (ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED));
         if (ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
             statusCheck();
             wifiHandler.scan();
@@ -134,7 +135,9 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        Log.e("=========---", "status Check: " + manager);
+        Log.e("=========---", "status Check: " + (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)));
+        if (!(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))) {
             buildAlertMessageNoGps();
         }
     }

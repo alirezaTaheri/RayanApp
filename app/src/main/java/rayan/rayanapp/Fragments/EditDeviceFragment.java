@@ -204,39 +204,42 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     @OnClick(R.id.factoryReset)
     void toDeviceFactoryReset(){
 //<<<<<<< HEAD
-        editDeviceFragmentViewModel.internetProvided().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe((aBoolean, throwable) -> {
-                    if (aBoolean)
-                        editDeviceFragmentViewModel.toDeviceFactoryReset(device).observe(this, s -> {
-                            assert s != null;
-                            switch (s){
-                                case AppConstants.FACTORY_RESET_DONE:
-                                    Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
-                                    setDeviceTopicStatus(TopicStatus.CHANGED);
-                                    break;
-                                case AppConstants.SOCKET_TIME_OUT:
-                                    setDeviceTopicStatus(TopicStatus.CHANGED);
-                                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
-                                    break;
-                            }
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
+        bottomSheetFragment.submitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editDeviceFragmentViewModel.internetProvided().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((aBoolean, throwable) -> {
+                            if (aBoolean)
+                                editDeviceFragmentViewModel.toDeviceFactoryReset(device).observe(EditDeviceFragment.this, s -> {
+                                    assert s != null;
+                                    switch (s){
+                                        case AppConstants.FACTORY_RESET_DONE:
+                                            Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
+                                            setDeviceTopicStatus(TopicStatus.CHANGED);
+                                            break;
+                                        case AppConstants.SOCKET_TIME_OUT:
+                                            setDeviceTopicStatus(TopicStatus.CHANGED);
+                                            Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        case AppConstants.ERROR:
+                                            Toast.makeText(getActivity(), "خطایی رخ داد", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        case AppConstants.USER_NOT_FOUND_RESPONSE:
+                                            Toast.makeText(getActivity(), "دستگاهی با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
+                                            break;
+                                    }
+                                });
+                            else ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
                         });
-                    else ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
-                });
-
-//=======
-//        setDeviceTopicStatus(TopicStatus.CHANGING);
-//        editDeviceFragmentViewModel.toDeviceFactoryReset(device.getIp()).observe(this, s -> {
-//            assert s != null;
-//                switch (s){
-//                    case AppConstants.DEVICE_READY_FOR_UPDATE:
-//
-//                        break;
-//                    case AppConstants.SOCKET_TIME_OUT:
-//                        setDeviceTopicStatus(TopicStatus.CHANGED); SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
-//                        break;
-//                }
-//        });
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+            }
+        });
+        bottomSheetFragment.cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetFragment.dismiss();
+            }
+        });
     }
 
     @OnClick(R.id.deviceUpdate)

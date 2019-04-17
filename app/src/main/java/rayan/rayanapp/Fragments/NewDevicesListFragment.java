@@ -3,6 +3,7 @@ package rayan.rayanapp.Fragments;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -11,10 +12,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.stepstone.stepper.BlockingStep;
@@ -57,6 +60,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     ConnectionStatus connectionStatus;
     WifiManager wifiManager;
     WifiInfo wifiInfo;
+    @BindView(R.id.name)
+    EditText nameEditText;
     private String targetSSID;
     private String currentSSID;
     public static NewDevicesListFragment newInstance() {
@@ -103,7 +108,9 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
                     this.idle();
                     List<AccessPoint> newDevices = new ArrayList<>();
                     for (int a = 0;a<scanResults.size();a++)
-                        newDevices.add(new AccessPoint(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities,scanResults.get(a).level));
+//                        if (!isItemExist(scanResults.get(a).BSSID, scanResults.get(a).SSID,scanResults))
+                            newDevices.add(new AccessPoint(scanResults.get(a).SSID, scanResults.get(a).BSSID, scanResults.get(a).capabilities,scanResults.get(a).level));
+                    Log.e(TAG,"Found SSIDs:" + newDevices);
                     newDevicesRecyclerViewAdapter.setItems(newDevices);
                 });
         viewModel.scan();
@@ -145,19 +152,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     public void successful(String targetSSID) {
         Log.e(TAG, "Successfully connected to: " + targetSSID);
         connectionStatus = ConnectionStatus.SUCCESSFUL;
-//<<<<<<< HEAD
-//<<<<<<< HEAD
-        Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
-//        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
-//=======
-//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"باموفقیت متصل شد");
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-//=======
-        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"باموفقیت متصل شد");
         Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
         TestDeviceFragment.newInstance(targetSSID).show(getActivity().getSupportFragmentManager(), "testDevice");
-
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     }
 
     @Override
@@ -181,18 +177,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     @Override
     public void connectToSame(String targetSSID) {
         Log.e(TAG, "Already connected to: " + targetSSID);
-//<<<<<<< HEAD
-//<<<<<<< HEAD
-//        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
-//        TestDeviceFragment.newInstance().show(getActivity().getSupportFragmentManager(), "testDevice");
-//=======
-        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"در حال حاضر به این دستگاه متصل هستید");
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-//=======
-//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"در حال حاضر به این دستگاه متصل هستید");
-//        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
         TestDeviceFragment.newInstance(targetSSID).show(getActivity().getSupportFragmentManager(), "testDevice");
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     }
 
     @Override
@@ -227,6 +213,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
+        if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
+        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام دستگاه را وارد کنید");
         if (selectedAccessPoint == null)
             Toast.makeText(getContext(), "لطفا یک دستگاه را انتخاب کنید", Toast.LENGTH_SHORT).show();
         else{
@@ -278,5 +266,11 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
             currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
         }
         return currentSSID;
+    }
+    private boolean isItemExist(String BSSID, String SSID, List<ScanResult> items){
+        for (int a = 0;a<items.size();a++)
+            if (BSSID.equals(items.get(a).BSSID) && SSID.equals(items.get(a).SSID))
+                return true;
+        return false;
     }
 }

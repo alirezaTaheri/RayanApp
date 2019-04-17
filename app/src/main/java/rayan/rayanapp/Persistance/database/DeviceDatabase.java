@@ -32,9 +32,7 @@ public class DeviceDatabase {
         deviceDAO.add(device);
     }
 
-    public void addDevices(List<Device> devices){
-        deviceDAO.addAll(devices);
-    }
+    public void addDevices(List<Device> devices){ deviceDAO.addAll(devices); }
 
     public void updateDevice(Device device){
         deviceDAO.updateDevice(device);
@@ -53,10 +51,16 @@ public class DeviceDatabase {
     public void deleteDevices(List<Device> devices){
         deviceDAO.deleteDevices(devices);
     }
+
     public void updateDevices(List<Device> devices){
         deviceDAO.updateDevices(devices);
     }
+
     public LiveData<List<Device>> getFavoriteDevices(){
         return deviceDAO.getAllFavoritesLive();
+    }
+
+    public List<Device> getFavorates(){
+        return deviceDAO.getAllFavorites();
     }
 }

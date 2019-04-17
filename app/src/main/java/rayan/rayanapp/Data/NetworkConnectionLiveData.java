@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -78,8 +80,12 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
                             break;
                     }
                 } else {
-                    Log.e("seekbarthis","in thw switch type is nothing: ");
+                    Log.e("seekbarthis","in thw switch type is nothing:tytyty " + activeNetwork.getType());
                     ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.Status.NOT_CONNECTED);
+                    if (activeNetwork.getType() == ConnectivityManager.TYPE_VPN){
+                        Log.e(NetworkConnectionLiveData.class.getSimpleName(),"Connection is disconnected and sending vpn" + activeNetwork.getType());
+                        postValue(new NetworkConnection(AppConstants.VPN_NETWORK,false));
+                    }else
                     postValue(new NetworkConnection(0,false));
                 }
             }

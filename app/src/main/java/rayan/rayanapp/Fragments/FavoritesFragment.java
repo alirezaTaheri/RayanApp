@@ -2,6 +2,7 @@ package rayan.rayanapp.Fragments;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -10,16 +11,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
@@ -36,6 +41,8 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     FavoritesFragmentViewModel favoritesFragmentViewModel;
     DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     Activity activity;
+    LiveData<List<Device>> favoritesObservable;
+    Observer<List<Device>> favoritesObserver;
     public FavoritesFragment() {
     }
 
@@ -51,14 +58,42 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
         super.onCreate(savedInstanceState);
         activity = getActivity();
         favoritesFragmentViewModel = ViewModelProviders.of(getActivity()).get(FavoritesFragmentViewModel.class);
-        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices);
-        devicesRecyclerViewAdapter.setListener(this);
-        favoritesFragmentViewModel.getAllDevices().observe(this, new Observer<List<Device>>() {
+        favoritesObservable = favoritesFragmentViewModel.getAllDevices();
+        favoritesObserver = new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {
-                devicesRecyclerViewAdapter.updateItems(devices);
+                List<Device> finalDevices = new ArrayList<>();
+                String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
+                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(0, devices.size()/3));
+                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
+                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3*2, devices.size()));
+                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"currentGroup: " + currentGroup);
+                if (currentGroup != null)
+                    for (int a = 0; a<devices.size();a++){
+                        if (devices.get(a).getGroupId().equals(currentGroup)){
+                            finalDevices.add(devices.get(a));
+                        }
+                    }
+                else finalDevices = devices;
+                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
+                Collections.sort(finalDevices, new Comparator<Device>(){
+                    public int compare(Device obj1, Device obj2) {
+                        // ## Ascending order
+//                    return obj1.firstName.compareToIgnoreCase(obj2.firstName); // To compare string values
+                        return Integer.compare(obj1.getPosition(), obj2.getPosition()); // To compare integer values
+                        // ## Descending order
+                        // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
+                        // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
+                    }
+                });
+                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"ShowingDevices: " + finalDevices);
+                devicesRecyclerViewAdapter.updateItems(finalDevices);
+                FavoritesFragment.this.devices = finalDevices;
             }
-        });
+        };
+        favoritesObservable.observe(this,favoritesObserver);
+        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices);
+        devicesRecyclerViewAdapter.setListener(this);
     }
 
     @Override
@@ -68,6 +103,8 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
         ButterKnife.bind(this, view);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
         return view;
     }
 
@@ -171,5 +208,94 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
             if (chipId.equals(devices.get(a).getChipId())) return a;
         return -1;
     }
+    private ItemTouchHelper.Callback dragCallback = new ItemTouchHelper.Callback() {
 
+        int dragFrom = -1;
+        int dragTo = -1;
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(ItemTouchHelper.UP|ItemTouchHelper.DOWN|ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT,
+                    0);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+
+            Log.e("///////////" , "onMove : " + viewHolder);
+            Log.e("///////////" , "onMove : " + target);
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+            Log.e("///////////" , "onMove:new List:: " + devices);
+
+            Log.e("///////////" , "onMove From: " + fromPosition);
+            Log.e("///////////" , "onMove to: " + toPosition);
+
+
+            if(dragFrom == -1) {
+                dragFrom =  fromPosition;
+            }
+            dragTo = toPosition;
+
+            devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
+
+            return true;
+        }
+
+        private void reallyMoved(int from, int to) {
+            Log.e("///////////" , "reallyMoved From: " + from);
+            Log.e("///////////" , "reallyMoved To: " + to);
+            Log.e("oooooooooooo" , "reallyMoved: oldList:: " + devices);
+            if (from < to) {
+                for (int i = from; i < to; i++) {
+                    Device d = devices.get(i);
+                    d.setPosition(i+1);
+                    Device d1 = devices.get(i+1);
+                    d1.setPosition(i);
+                    Collections.swap(devices, i, i + 1);
+                    favoritesFragmentViewModel.updateDevice(d);
+                    favoritesFragmentViewModel.updateDevice(d1);
+                }
+            } else {
+                for (int i = from; i > to; i--) {
+                    Device d = devices.get(i);
+                    d.setPosition(i-1);
+                    Device d2 = devices.get(i-1);
+                    d2.setPosition(i);
+                    Collections.swap(devices, i, i - 1);
+                    favoritesFragmentViewModel.updateDevice(d);
+                    favoritesFragmentViewModel.updateDevice(d2);
+                }
+            }
+            Log.e("nnnnnnnnnnnnn" , "reallyMoved: NewList:: " + devices);
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            Log.e("///////////" , "////////onSwiped: " + direction);
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            Log.e("///////////" , "isLongPressDragEnabled"+devices);
+            return true;
+        }
+
+        @Override
+        public boolean isItemViewSwipeEnabled() {
+            Log.e("///////////" , "isItemViewSwipeEnabled");
+            return false;
+        }
+
+        @Override
+        public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            Log.e("///////////" , "////////clearView: ");
+            super.clearView(recyclerView, viewHolder);
+            if(dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+                reallyMoved(dragFrom, dragTo);
+            }
+            dragFrom = dragTo = -1;
+        }
+
+    };
 }

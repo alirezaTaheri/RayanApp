@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -57,8 +56,8 @@ import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Fragments.DevicesFragment;
+import rayan.rayanapp.Helper.NsdHelper;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
@@ -85,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.drawerLayout)
     DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
-//    @BindView(R.id.navigationView)
-//    NavigationView navigationView;
     @BindView(R.id.bottom_navigation_view)
     BottomNavigationView bottomNavigationView;
     MenuItem prevMenuItem;
@@ -136,16 +133,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        requestRecordAudioPermission();
         ButterKnife.bind(this);
         mqttStatus = this;
-//        setSupportActionBar(toolbar_main);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getIsNotificationOn());
-//        navigationView.bringToFront();
-//        navigationView.invalidate();
-//        navigationView.bringToFront();
-//        navigationView.invalidate();
-//        navigationView.setNavigationItemSelectedListener(this);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
             switch (connection.getStatus()) {
@@ -192,13 +183,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             break;
                     }
                 });
+                if (networkConnection.getType() == AppConstants.VPN_NETWORK) {
+                    Log.e(MainActivity.this.getClass().getSimpleName(), "Vpn is Disconnected so toggling wifi");
+                    WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    wifi.setWifiEnabled(false);
+                    wifi.setWifiEnabled(true);
+                }
                 RayanApplication.getPref().saveProtocol(AppConstants.UDP);
 //                actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.yellow_acc_4));
                 statusIcon.setVisibility(View.INVISIBLE);
                 actionBarStatus.setText("عدم اتصال به اینترنت");
             } else
-                if (MainActivityViewModel.connection.getValue() == null || MainActivityViewModel.connection.getValue().getClient() != null && !Objects.requireNonNull(MainActivityViewModel.connection.getValue()).isConnected() && !MainActivityViewModel.connection.getValue().getStatus().equals(Connection.ConnectionStatus.CONNECTING))
-            {
+                if (MainActivityViewModel.connection.getValue() == null || MainActivityViewModel.connection.getValue().getClient() != null && !Objects.requireNonNull(MainActivityViewModel.connection.getValue()).isConnected() && !MainActivityViewModel.connection.getValue().getStatus().equals(Connection.ConnectionStatus.CONNECTING)) {
                 Log.e("///////////////", "////connecting to mqtt");
                 mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
                     MainActivityViewModel.connection.postValue(connection);
@@ -641,52 +637,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setupBottomNavigationViewPager(ViewPager viewPager) {
         BottomNavigationViewPagerAdapter adapter = new BottomNavigationViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
-     //   viewPager.beginFakeDrag();
+        //   viewPager.beginFakeDrag();
         TypedValue tv = new TypedValue();
-        if (this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-        {
+        if (this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, this.getResources().getDisplayMetrics());
         }
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
-        lp.bottomMargin += actionBarHeight+15;
+        lp.bottomMargin += actionBarHeight + 15;
         viewPager.setCurrentItem(RayanApplication.getPref().getBottomNavigationIndexKey());
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
+
             @Override
             public void onPageSelected(int position) {
                 if (prevMenuItem != null) {
                     prevMenuItem.setChecked(false);
-                }
-                else
-                {
+                } else {
                     bottomNavigationView.getMenu().getItem(1).setChecked(false);
                 }
-                Log.d("page", "onPageSelected: "+position);
+                Log.d("page", "onPageSelected: " + position);
                 RayanApplication.getPref().setBottomNavigationIndexKey(position);
-              //  Toast.makeText(MainActivity.this,RayanApplication.getPref().getBottomNavigationIndexKey()+ "", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this,RayanApplication.getPref().getBottomNavigationIndexKey()+ "", Toast.LENGTH_SHORT).show();
                 bottomNavigationView.getMenu().getItem(position).setChecked(true);
                 prevMenuItem = bottomNavigationView.getMenu().getItem(position);
             }
+
             @Override
             public void onPageScrollStateChanged(int state) {
             }
         });
+    }
 //        nsdHelper = new NsdHelper(this);
 //        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
 
-    }
-
-//    NsdHelper nsdHelper;
-
-    //    @Override
-//    public void onBackPressed() {
-//        publish(MainActivityViewModel.connection.getValue(), null, "message", 0, false);
-//    }
-
-    //    String key = "q7tt0yk18nrjrqur";
+    NsdHelper nsdHelper;
+//    String key = "q7tt0yk18nrjrqur";
 //    String textToDecrypt = "xpq/VGgyD0pAf94O1fmSgg==";
 //    String secretOfAkbar = "8nro4q0emv8k1uv5";
 

@@ -5,18 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.design.widget.Snackbar;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.BindView;
@@ -24,16 +22,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
-//<<<<<<< HEAD
 import rayan.rayanapp.Util.AppConstants;
-//=======
+import rayan.rayanapp.Util.KeyboardUtil;
+import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.Util.SnackBarSetup;
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import rayan.rayanapp.ViewModels.LoginViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity {
-
+    final static public String PREFS_NAME = "PREFS_NAME";
+    final static private String PREF_KEY_SHORTCUT_ADDED = "PREF_KEY_SHORTCUT_ADDED";
     private final String TAG = LoginActivity.class.getSimpleName();
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
@@ -51,6 +49,10 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
+        new KeyboardUtil(this, findViewById(R.id.nestedScrollView));
+        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)){
+            SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content),"دستگاه به اینترنت متصل نیست");
+        }
         ButterKnife.bind(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -58,40 +60,49 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
-//<<<<<<< HEAD
-//<<<<<<< HEAD
         loginViewModel.getLoginResponse().observe(this, baseResponse -> {
-            if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
-                if (baseResponse.getData().getUser().getRegistered().equals("true")) {
-                    RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
-                    RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-                }
-                else
-                    Toast.makeText(this, "کاربری شما تایید نشده است", Toast.LENGTH_SHORT).show();
-            }
-            else
-            switch (baseResponse.getData().getMessage()){
-                case AppConstants.SOCKET_TIME_OUT:
-                    Toast.makeText(this, "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                    break;
-                case AppConstants.USER_NOT_FOUND_RESPONSE:
-                    Toast.makeText(this, "کاربری با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
-                    break;
-                case AppConstants.WRONG_PASSWORD_RESPONSE:
-                    Toast.makeText(this, "رمز عبور اشتباه است", Toast.LENGTH_SHORT).show();
-                    break;
-                case AppConstants.SUCCESS_DESCRIPTION:
+            if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)){
+                SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content),"دستگاه به اینترنت متصل نیست");
+            }else {
+                if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)) {
+                    if (baseResponse.getData().getUser().getRegistered().equals("true")) {
+                        RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
+                        RayanApplication.getPref().createSession(baseResponse.getData().getUser().getId(), baseResponse.getData().getUser().getUsername(), passwordInput.getText().toString(), baseResponse.getData().getUser().getUserInfo(), baseResponse.getData().getUser().getEmail());
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    } else
+                        Toast.makeText(this, "کاربری شما تایید نشده است", Toast.LENGTH_SHORT).show();
+                } else
+                    switch (baseResponse.getData().getMessage()) {
+                        case AppConstants.SOCKET_TIME_OUT:
+                            Toast.makeText(this, "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.USER_NOT_FOUND_RESPONSE:
+                            Toast.makeText(this, "کاربری با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.WRONG_PASSWORD_RESPONSE:
+                            Toast.makeText(this, "رمز عبور اشتباه است", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.SUCCESS_DESCRIPTION:
 
-                    break;
+                            break;
+                    }
+            }  });
+
+
+        phoneEditText.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if(phoneEditText.getText().toString().length()==11)     //size as per your requirement
+                {
+                    passwordInput.requestFocus();
+                }
+                return false;
             }
         });
-//=======
-//=======
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
+        phoneEditText.setHint("09xxxxxxxxx");
+
 //        loginViewModel.getLoginResponse().observe(this, baseResponse -> {
 //            if (baseResponse.getData().getUser().getRegistered().equals("true")) {
 //                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
@@ -116,15 +127,15 @@ public class LoginActivity extends AppCompatActivity {
 //                startActivity(intent);
 //            }
 //        });
-
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     }
-    @OnClick(R.id.signUpTextView)
+    @OnClick(R.id.signUpLayout)
     void clickOnSignUp(){
         startActivity(new Intent(this, SignUpUserActivity.class));
     }
-    @OnClick(R.id.forgotPasswordTextView)
+    @OnClick(R.id.forgotPasswordlayout)
     void clickOnforgetPass(){
+      //  ShortcutIcon();
+
         startActivity(new Intent(this, ForgetPasswordActivity.class));
     }
 
@@ -166,4 +177,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+       // android.os.Process.killProcess(Process.myPid());
+        System.exit(0);
+    }
 }

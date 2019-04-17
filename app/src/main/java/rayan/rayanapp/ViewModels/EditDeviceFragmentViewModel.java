@@ -261,10 +261,12 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .flatMap(deviceBaseResponse -> {
                     if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
                         return toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET), device.getIp());
-                    else {
-                        results.postValue(AppConstants.ERROR_DESCRIPTION);
+                    else if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.ERROR_DESCRIPTION) &&
+                            deviceBaseResponse.getData().getMessage().equals(AppConstants.USER_NOT_FOUND_RESPONSE)){
+                        results.postValue(AppConstants.USER_NOT_FOUND_RESPONSE);
                         return null;
                     }
+                    return null;
                 }).subscribe(toDeviceFactoryResetObserver(results));
 //        toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
         return results;
@@ -473,8 +475,8 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     public String getDeviceAddress(String ip){
-       return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-//       return "http://192.168.1.105/test.php";
+//       return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+       return "http://192.168.137.1/test.php";
     }
 
     public void writeToFile(String mycode) {

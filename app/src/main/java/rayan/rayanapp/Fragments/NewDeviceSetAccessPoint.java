@@ -1,5 +1,6 @@
 package rayan.rayanapp.Fragments;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.wifi.WifiManager;
@@ -31,46 +32,34 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDeviceSetConfigurationFragmentViewModel;
 
-public class NewDeviceSetConfigurationFragment extends BackHandledFragment implements BlockingStep {
+public class NewDeviceSetAccessPoint extends BackHandledFragment implements BlockingStep {
 
     private NewDeviceSetConfigurationFragmentViewModel mViewModel;
     @BindView(R.id.changeAccessPoint)
     TextView changeAccessPoint;
-    @BindView(R.id.changeGroup)
-    TextView changeGroup;
-    @BindView(R.id.name)
-    EditText nameEditText;
     DoneWithFragment listener;
 
-    public static NewDeviceSetConfigurationFragment newInstance() {
-        return new NewDeviceSetConfigurationFragment();
+    public static NewDeviceSetAccessPoint newInstance() {
+        return new NewDeviceSetAccessPoint();
     }
-    //id: 2131296496
-    //TAG: android:switcher:2131296496:1
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Log.e("TATTTTTT", "TAG is: " + getTag());
-        Log.e("TATTTTTT", "IIIIIIIIIIIIID is: " + getId());
-        View view =  inflater.inflate(R.layout.new_device_set_configuration_fragment, container, false);
+        View view =  inflater.inflate(R.layout.fragment_new_device_set_access_point, container, false);
         ButterKnife.bind(this,view);
         return view;
     }
+
     @OnClick(R.id.changeAccessPoint)
     void changeAccessPoint(){
         ChangeDeviceAccessPointFragment.newInstance(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid()).show(getActivity().getSupportFragmentManager(), "changeAccessPoint");
     }
 
-    @OnClick(R.id.changeGroup)
-    void changeGroup(){
-        ChangeGroupFragment.newInstance().show(getActivity().getSupportFragmentManager(), "changeGroup");
-    }
 
     @Override
     public boolean onBackPressed() {
@@ -99,9 +88,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     public void onError(@NonNull VerificationError error) {
 
     }
-    public void setGroupTitle(String title){
-        changeGroup.setText(title);
-    }
+
     public void setAccessPointTitle(String title){
         changeAccessPoint.setText(title);
         View view = getActivity().getCurrentFocus();
@@ -123,26 +110,14 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
         listener = null;
     }
 
-    public void groupCreated(){
-        ChangeGroupFragment changeGroupFragment = (ChangeGroupFragment)getChildFragmentManager().findFragmentByTag("changeGroup");
-        for (int a = 0; a<getActivity().getSupportFragmentManager().getFragments().size();a++){
-            Log.e("TAGGGGG: " , "TAG of: " +a+" Is: "+ getActivity().getSupportFragmentManager().getFragments().get(a).getTag());
-            Log.e("TAGGGGG: " , "Activity of: " +a+" Is: "+ getActivity().getSupportFragmentManager().getFragments().get(a).getActivity());
-            Log.e("TAGGGGG: " , "Id of: " +a+" Is: "+ getActivity().getSupportFragmentManager().getFragments().get(a).getId());
-            Log.e("TAGGGGG: " , "Parent Fragment of: " +a+" Is: "+ getActivity().getSupportFragmentManager().getFragments().get(a).getParentFragment());
-        }
-//        changeGroupFragment.selectGroupMode();
-    }
-
+    @SuppressLint("CheckResult")
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
-//        if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
-//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام دستگاه را وارد کنید");
-//        else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getId().trim().length()<1)
-//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک گروه را انتخاب کنید");
-//        else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid().trim().length()<1)
-//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مودم را انتخاب کنید");
-//        else{
+        if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid().trim().length()<1)
+            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مودم را انتخاب کنید");
+        else{
+            callback.goToNextStep();
+
 //            mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
 //                if (aBoolean){
 //                    ProgressDialog progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
@@ -156,7 +131,6 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 //                        }
 //                    });
 //                    callback.getStepperLayout().showProgress("درحال برقراری ارتباط با دستگاه"+"\n"+"لطفا کمی صبرکنید");
-//                    ((AddNewDeviceActivity) getActivity()).getNewDevice().setName(nameEditText.getText().toString());
 //                    mViewModel.registerDeviceSendToDevice(
 //                            (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
 //                            ((AddNewDeviceActivity)getActivity()),new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(),((AddNewDeviceActivity) getActivity()).getNewDevice().getName() , ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
@@ -183,7 +157,8 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 //                    ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
 //                }
 //            });
-        callback.goToNextStep();
+
+        }
     }
 
     @Override

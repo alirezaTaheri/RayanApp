@@ -1,8 +1,6 @@
 package rayan.rayanapp.App;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -12,22 +10,18 @@ import android.util.Log;
 import android.support.multidex.MultiDexApplication;
 import io.fabric.sdk.android.Fabric;
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Locale;
 
-import rayan.rayanapp.Activities.LoginActivity;
 import rayan.rayanapp.Data.NetworkConnectionLiveData;
 //<<<<<<< HEAD
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
 import rayan.rayanapp.Helper.RequestManager;
 import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
-import rayan.rayanapp.Receivers.LanguageDetailsChecker;
-import rayan.rayanapp.Receivers.NetworkStateChangeReceiver;
 import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
 //=======
 import rayan.rayanapp.R;
@@ -98,7 +92,6 @@ public class RayanApplication extends MultiDexApplication {
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
-
     }
 
     public MessageTransmissionDecider getMtd() {
