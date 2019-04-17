@@ -46,7 +46,7 @@ public class ChangePasswordFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_change_password, container, false);
         ButterKnife.bind(this, view);
-        new KeyboardUtil(getActivity(), view.findViewById(R.id.changepassLayout));
+    //    new KeyboardUtil(getActivity(), view.findViewById(R.id.changepassLayout));
         bundle = this.getArguments();
         if(bundle != null) {
             username = bundle.getString("user");

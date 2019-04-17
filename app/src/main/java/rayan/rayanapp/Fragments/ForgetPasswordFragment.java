@@ -39,7 +39,7 @@ public class ForgetPasswordFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_forget__password, container, false);
         ButterKnife.bind(this, view);
-        new KeyboardUtil(getActivity(), view.findViewById(R.id.forgetPassLayout));
+       // new KeyboardUtil(getActivity(), view.findViewById(R.id.forgetPassLayout));
         return view;
     }
 

@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
@@ -94,7 +95,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TextView actionBarStatus;
     @BindView(R.id.statusIcon)
     ImageView statusIcon;
+    @BindView(R.id.drawerrrrr)
+    View drawerrrrr;
     ///////////////////////////////////////////////////////
+    @BindView(R.id.expand_arrow_icon)
+    ImageView expand_arrow_icon;
     @BindView(R.id.expandable_layout)
     ExpandableLayout expandableLayout;
     @BindView(R.id.groupsActivity)
@@ -111,10 +116,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout drawer_profile;
     @BindView(R.id.parent)
     LinearLayout drawer_parent;
-    @BindView(R.id.version)
-    TextView version;
     @BindView(R.id.groupsRecyclerView)
     RecyclerView drawer_groupsRecyclerView;
+    @BindView(R.id.drawer_userImage)
+    ImageView drawer_userImage;
+    @BindView(R.id.drawer_userName)
+    TextView drawer_userName;
     SortByGroupRecyclerViewAdapter drawer_groupsRecyclerViewAdapter;
     int connectionRetries;
     @Override
@@ -264,7 +271,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         initializeBottomNavigation();
     }
-
+    if (RayanApplication.getPref().isLoggedIn()) {
+        int width = (getResources().getDisplayMetrics().widthPixels*4)/6;
+        DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) drawerrrrr.getLayoutParams();
+        params.width = width;
+        drawerrrrr.setLayoutParams(params);
+        if (RayanApplication.getPref().getGenderKey().equals("Male")) {
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
+        } else if (RayanApplication.getPref().getGenderKey().equals("Female")) {
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.woman));
+        } else {
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
+        }
+        if (RayanApplication.getPref().getNameKey().isEmpty() && RayanApplication.getPref().getNameKey() == null) {
+            drawer_userName.setText("Rayan App");
+        } else {
+            drawer_userName.setText(RayanApplication.getPref().getNameKey());
+        }
+    }
 }
 
 
@@ -285,12 +309,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer_sortByGroup.setOnClickListener(this);
         drawer_deviceManagementActivity.setOnClickListener(this);
         drawer_parent.setOnClickListener(this);
-        try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version.setText(pInfo.versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        //app version
+//        try {
+//            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+//            version.setText(pInfo.versionName);
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -728,6 +753,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
                 case R.id.sortByGroup:
                     expandableLayout.toggle();
+                    if(expandableLayout.isExpanded()){
+                        expand_arrow_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_up));
+                    }else {expand_arrow_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_down)); }
                     if (drawer_groupsRecyclerViewAdapter == null) {
                         drawer_groupsRecyclerViewAdapter = new SortByGroupRecyclerViewAdapter(this, new ArrayList<>());
                         drawer_groupsRecyclerViewAdapter.setItems(mainActivityViewModel.getAllGroups());

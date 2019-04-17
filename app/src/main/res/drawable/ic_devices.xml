@@ -1,8 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" >
-    <solid android:color="#000000" />
-    <size android:width="4dp"/>
-    <padding android:bottom="0dp" android:left="0dp" android:right="0dp" android:top="0dp"/>
-    <corners android:topLeftRadius="5dp" android:bottomLeftRadius="5dp"
-        android:topRightRadius="0.1dp" android:bottomRightRadius="0.1dp"/>
-</shape>
+<vector android:height="24dp" android:viewportHeight="635"
+    android:viewportWidth="635" android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M476,212c29,0 53,-24 53,-53 0,-29 -24,-53 -53,-53 -29,0 -53,24 -53,53 0,29 24,53 53,53z"/>
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M476,265c-29,0 -53,23 -53,53 0,29 24,52 53,52 29,0 53,-23 53,-52 0,-30 -24,-53 -53,-53z"/>
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M476,423c-29,0 -53,24 -53,53 0,29 24,53 53,53 29,0 53,-24 53,-53 0,-29 -24,-53 -53,-53z"/>
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M212,476c0,29 -24,53 -53,53 -29,0 -53,-24 -53,-53 0,-29 24,-53 53,-53 29,0 53,24 53,53z"/>
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M159,265c-29,0 -53,23 -53,53 0,29 24,52 53,52 29,0 53,-23 53,-52 0,-30 -24,-53 -53,-53z"/>
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M159,106c-29,0 -53,24 -53,53 0,29 24,53 53,53 29,0 53,-24 53,-53 0,-29 -24,-53 -53,-53z"/>
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M318,212c29,0 52,-24 52,-53 0,-29 -23,-53 -52,-53 -30,0 -53,24 -53,53 0,29 23,53 53,53z"/>
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M318,265c-30,0 -53,23 -53,53 0,29 23,52 53,52 29,0 52,-23 52,-52 0,-30 -23,-53 -52,-53z"/>
+    <path android:fillColor="@color/grey_dark_2" android:pathData="M318,423c-30,0 -53,24 -53,53 0,29 23,53 53,53 29,0 52,-24 52,-53 0,-29 -23,-53 -52,-53z"/>
+</vector>

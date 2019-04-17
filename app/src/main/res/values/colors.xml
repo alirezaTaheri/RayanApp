@@ -3,7 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="baseColor">#FFB300</color>
+    <color name="baseColor">#1da1f3</color>
     <color name="primary_dark2">#e6b449</color>
 
     <color name="red_light_5">#ffebee</color>
@@ -209,7 +209,7 @@
     <color name="amber">#ffc107</color>
     <color name="amber_dark_1">#ffb300</color>
     <color name="amber_dark_2">#ffa000</color>
-    <color name="baseColor2">#ffa000</color>
+    <color name="baseColor2">#1da1f3</color>
     <color name="amber_dark_3">#ff8f00</color>
     <color name="amber_dark_4">#ff6f00</color>
     <color name="amber_acc_1">#050401</color>

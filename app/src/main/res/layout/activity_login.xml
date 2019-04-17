@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 app:passwordToggleContentDescription="Description"
                 app:passwordToggleEnabled="true"
-                app:passwordToggleTint="#1da1f3">
+                app:passwordToggleTint="@color/baseColor">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/passwordEditText"

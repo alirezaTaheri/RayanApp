@@ -49,7 +49,7 @@ public class RegisterUserFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register_user, container, false);
         ButterKnife.bind(this, view);
-        new KeyboardUtil(getActivity(), view.findViewById(R.id.registerUserLayout));
+       // new KeyboardUtil(getActivity(), view.findViewById(R.id.registerUserLayout));
         if (NetworkUtil.getConnectivityStatusString(getContext()).equals(AppConstants.NOT_CONNECTED)){
             SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه به اینترنت متصل نیست");
         }

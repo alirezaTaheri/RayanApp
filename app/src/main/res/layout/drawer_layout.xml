@@ -4,7 +4,7 @@
     android:background="@color/white"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
@@ -15,116 +15,11 @@
         <include layout="@layout/nav_header"
             android:layout_width="match_parent"
             android:layout_height="130dp"/>
-    <LinearLayout
-        android:layout_marginRight="4dp"
-        android:padding="10dp"
-        android:id="@+id/groupsActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            app:srcCompat="@drawable/ic_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    <TextView
-        android:text="@string/drawer_groups"
-        android:textSize="14sp"
-        android:layout_marginRight="8dp"
-        android:gravity="right"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
-    <View
-        android:background="@color/grey"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
-    <LinearLayout
-        android:id="@+id/addNewDeviceActivity"
-        android:layout_marginRight="4dp"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            app:srcCompat="@drawable/ic_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    <TextView
-        android:text="افزودن دستگاه"
-        android:textSize="14sp"
-        android:layout_marginRight="8dp"
-        android:gravity="right"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
-    <View
-        android:background="@color/grey"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
-    <LinearLayout
-        android:id="@+id/devicesManagementActivity"
-        android:layout_marginRight="4dp"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            app:srcCompat="@drawable/ic_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    <TextView
-        android:text="مدیریت دستگاه‌ها"
-        android:textSize="14sp"
-        android:layout_marginRight="8dp"
-        android:gravity="right"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
-    <View
-        android:background="@color/grey"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
-    <LinearLayout
-        android:id="@+id/profileActivity"
-        android:layout_marginRight="4dp"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            app:srcCompat="@drawable/ic_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    <TextView
-        android:text="پروفایل"
-        android:textSize="14sp"
-        android:layout_marginRight="8dp"
-        android:gravity="right"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
-    <View
-        android:background="@color/grey"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
-    <LinearLayout
-        android:id="@+id/settingsActivity"
-        android:layout_marginRight="4dp"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            app:srcCompat="@drawable/ic_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    <TextView
-        android:text="تنظیمات"
-        android:textSize="14sp"
-        android:layout_marginRight="8dp"
-        android:gravity="right"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
-    <View
-        android:background="@color/grey"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        <View
+            android:background="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
         <RelativeLayout
             android:id="@+id/sortByGroup"
             android:layout_marginRight="4dp"
@@ -133,44 +28,179 @@
             android:layout_height="wrap_content">
             <ImageView
                 android:id="@+id/icon"
-                android:layout_alignParentRight="true"
-                app:srcCompat="@drawable/ic_group"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                app:srcCompat="@drawable/ic_device_by_groups" />
             <TextView
                 android:id="@+id/title"
                 android:layout_toLeftOf="@+id/icon"
                 android:layout_alignParentTop="true"
-                android:text="نمایش دستگاه‌ها براساس گروه"
+                android:text="دستگاه‌ها براساس گروه"
+                android:textSize="14sp"
+                android:layout_marginRight="10dp"
+                android:gravity="right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/expand_arrow_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                app:srcCompat="@drawable/ic_arrow_down" />
+            <net.cachapa.expandablelayout.ExpandableLayout
+                android:layout_toLeftOf="@+id/icon"
+                android:layout_below="@+id/title"
+                android:id="@+id/expandable_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:el_duration="300"
+                app:el_parallax="0.5">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/groupsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </net.cachapa.expandablelayout.ExpandableLayout>
+        </RelativeLayout>
+        <View
+            android:background="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+        <LinearLayout
+            android:id="@+id/devicesManagementActivity"
+            android:layout_marginRight="4dp"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_devices_manage" />
+            <TextView
+                android:text="مدیریت دستگاه‌ها"
                 android:textSize="14sp"
                 android:layout_marginRight="8dp"
                 android:gravity="right"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-    <net.cachapa.expandablelayout.ExpandableLayout
-        android:layout_toLeftOf="@+id/icon"
-        android:layout_below="@+id/title"
-        android:id="@+id/expandable_layout"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    <LinearLayout
+        android:layout_marginRight="4dp"
+        android:padding="10dp"
+        android:id="@+id/groupsActivity"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:el_duration="300"
-        app:el_parallax="0.5">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/groupsRecyclerView"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_groups" />
+    <TextView
+        android:text="@string/drawer_groups"
+        android:textSize="14sp"
+        android:layout_marginRight="8dp"
+        android:gravity="right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/addNewDeviceActivity"
+            android:layout_marginRight="4dp"
+            android:padding="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </net.cachapa.expandablelayout.ExpandableLayout>
-        </RelativeLayout>
+            android:layout_height="wrap_content">
+            <ImageView
+                app:srcCompat="@drawable/ic_add_new_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="اضافه کردن دستگاه جدید"
+                android:textSize="14sp"
+                android:layout_marginRight="8dp"
+                android:gravity="right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     <View
         android:background="@color/grey"
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/settingsActivity"
+            android:layout_marginRight="4dp"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_settings" />
+            <TextView
+                android:text="تنظیمات"
+                android:textSize="14sp"
+                android:layout_marginRight="8dp"
+                android:gravity="right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    <LinearLayout
+        android:id="@+id/profileActivity"
+        android:layout_marginRight="4dp"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_user" />
     <TextView
-        android:id="@+id/version"
-        android:text="Version"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_width="wrap_content"
+        android:text="حساب کاربری"
+        android:textSize="14sp"
+        android:layout_marginRight="8dp"
+        android:gravity="right"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/instructionActivity"
+            android:layout_marginRight="4dp"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_question" />
+            <TextView
+                android:text="آموزش"
+                android:textSize="14sp"
+                android:layout_marginRight="8dp"
+                android:gravity="right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/eboutUsActivity"
+            android:layout_marginRight="4dp"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_ebout_us" />
+            <TextView
+                android:text="درباره ما"
+                android:textSize="14sp"
+                android:layout_marginRight="8dp"
+                android:gravity="right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>
