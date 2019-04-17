@@ -43,6 +43,7 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.FTPClient;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
@@ -244,8 +245,11 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟");
-        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+        FTPClient ftpClient = new FTPClient();
+        Log.e(this.getClass().getSimpleName(), "Updating device: " + device);
+        ftpClient.uploadFile(getContext(), device.getIp(), device.getChipId(), device.getSecret());
+//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟");
+//        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
 

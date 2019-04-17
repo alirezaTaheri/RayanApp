@@ -5,11 +5,13 @@ public class AppConstants {
     public final static String UDP = "udp";
     public final static int UDP_SEND_PORT = 2000;
     public final static int UDP_RECEIVE_PORT = 3000;
+    public final static int FTP_PORT = 21;
     public final static int HTTP_TO_DEVICE_PORT = 3000;
     public final static int UDP_MESSAGING_TIMEOUT = 4000;
     public final static int MQTT_MESSAGING_TIMEOUT = 4000;
     public final static int HTTP_MESSAGING_TIMEOUT = 4000;
     public final static int TOGGLE_ANIMATION_TIMEOUT = 4000;
+
 //    public final static String MQTT_HOST = "api.rayansmarthome.ir";
 //    public final static int MQTT_PORT = 1883;
 //    public final static String MQTT_HOST = "api2.mahdiesrafili.ir";

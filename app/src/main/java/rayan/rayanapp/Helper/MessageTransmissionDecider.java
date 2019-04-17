@@ -138,10 +138,12 @@ public class MessageTransmissionDecider {
 //                else return communicationRoutes.get(a).get(0).toString();
 //            }
         List<PROTOCOL> p = communicationRoutes.get(device.getChipId());
-        if (p.size() == 0)
-            return "NONE";
-        else
-        return p.get(0).toString();
+        if (p != null) {
+            if (p.size() == 0)
+                return "NONE";
+            else
+                return p.get(0).toString();
+        }return "NONE";
     }
 
     public List<PROTOCOL> getListOfAvailableRouts(String chipId){
