@@ -1,6 +1,5 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.opengl.Visibility;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,7 +9,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
-import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 

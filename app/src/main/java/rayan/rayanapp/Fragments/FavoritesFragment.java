@@ -64,10 +64,10 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
             public void onChanged(@Nullable List<Device> devices) {
                 List<Device> finalDevices = new ArrayList<>();
                 String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
-                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(0, devices.size()/3));
-                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
-                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3*2, devices.size()));
-                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"currentGroup: " + currentGroup);
+//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(0, devices.size()/3));
+//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
+//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3*2, devices.size()));
+//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"currentGroup: " + currentGroup);
                 if (currentGroup != null)
                     for (int a = 0; a<devices.size();a++){
                         if (devices.get(a).getGroupId().equals(currentGroup)){
@@ -75,7 +75,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                         }
                     }
                 else finalDevices = devices;
-                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
+//                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
                 Collections.sort(finalDevices, new Comparator<Device>(){
                     public int compare(Device obj1, Device obj2) {
                         // ## Ascending order
@@ -86,7 +86,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                         // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
                     }
                 });
-                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"ShowingDevices: " + finalDevices);
+                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"ShowingFavoriteDevices: " + finalDevices);
                 devicesRecyclerViewAdapter.updateItems(finalDevices);
                 FavoritesFragment.this.devices = finalDevices;
             }
@@ -298,4 +298,9 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
         }
 
     };
+
+    @Override
+    public void onAccessPointChanged(Device item) {
+        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
+    }
 }

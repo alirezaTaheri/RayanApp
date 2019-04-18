@@ -82,6 +82,16 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
 //            Log.e(this.getClass().getSimpleName(), "GoodBye pin 2 was detected");
             b.putString("pin2", newDevice.getPin2());
         }
+//        if ((newDevice.getSsid() != null &&oldDevice.getSsid()!= null&& !newDevice.getSsid().equals(oldDevice.getSsid()))
+//                || (newDevice.getSsid() != null && oldDevice.getSsid() == null)){
+////            Log.e(this.getClass().getSimpleName(), "GoodBye pin 2 was detected");
+//            b.putString("ssid", newDevice.getSsid());
+//        }
+//        if ((newDevice.getIp() != null && oldDevice.getIp()!= null && !newDevice.getIp().equals(oldDevice.getIp()))
+//                || (newDevice.getIp() != null && oldDevice.getIp() == null)){
+////            Log.e(this.getClass().getSimpleName(), "GoodBye pin 2 was detected");
+//            b.putString("ip", newDevice.getIp());
+//        }
         if (!newDevice.isLocallyAccessibility() == (oldDevice.isLocallyAccessibility()))
             b.putBoolean("la", newDevice.isLocallyAccessibility());
 //        if (newDevice.getIp() != null && !newDevice.getIp().equals(oldDevice.getIp()))

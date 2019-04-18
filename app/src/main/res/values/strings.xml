@@ -9,6 +9,8 @@
     <string name="hint_edituser_email">ایمیل(اختیاری)</string>
     <string name="edituser_submitbtn">تایید</string>
     <string name="edituser_change_passwordbtn">تغییر رمز عبور</string>
+    <string name="selectContact_confirmbtn">انتخاب</string>
+
 
     <string name="change_password_current_pass">کد یا رمز عبور فعلی</string>
     <string name="change_password_new_pass">رمز عبور جدید</string>
@@ -17,12 +19,12 @@
     <string name="register_password">رمز عبور(حداقل به طول 8)</string>
     <string name="register_password2">تکرار رمز عبور</string>
     <string name="confirm_code">کد تایید</string>
-    <string name="text_confirm_code_button">ورود</string>
+    <string name="text_confirm_code_button">تایید و ورود</string>
     <string name="hint_sign_in_password">رمز عبور</string>
     <string name="text_sign_in_button">ورود</string>
     <string name="text_forgot_pass_hint">بازیابی رمز عبور</string>
     <string name="text_sign_up_button">ثبت نام</string>
-    <string name="drawer_groups">گروه ها</string>
+    <string name="drawer_groups">مدیریت گروه\u200cها</string>
     <string name="leave_group_button">ترک گروه</string>
     <string name="title_deviceManagementActivity">مدیریت دستگاه‌ها</string>
 
@@ -57,9 +59,9 @@
         <item name="qos_2">2</item>
     </string-array>
 
-    <string name="bottom_navigation_item1">مورد علاقه ها</string>
-    <string name="bottom_navigation_item2">سناریو ها</string>
-    <string name="bottom_navigation_item3">دستگاه ها</string>
+    <string name="bottom_navigation_item1">مورد علاقه\u200cها</string>
+    <string name="bottom_navigation_item2">سناریو\u200cها</string>
+    <string name="bottom_navigation_item3">دستگاه\u200cها</string>
 
     <string name="action_add_connection">Add Connection</string>
     <string name="add_connection_general_label">General</string>

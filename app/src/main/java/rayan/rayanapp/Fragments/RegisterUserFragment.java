@@ -18,9 +18,11 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.KeyboardUtil;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditUserViewModel;
@@ -47,6 +49,7 @@ public class RegisterUserFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register_user, container, false);
         ButterKnife.bind(this, view);
+       // new KeyboardUtil(getActivity(), view.findViewById(R.id.registerUserLayout));
         if (NetworkUtil.getConnectivityStatusString(getContext()).equals(AppConstants.NOT_CONNECTED)){
             SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه به اینترنت متصل نیست");
         }
@@ -135,5 +138,21 @@ public class RegisterUserFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
        // clickOnRegisterBtn = null;
+    }
+    @OnFocusChange(R.id.phone_register_EditText)
+    void onPhone_register_EditTextFocusChange(){
+        phone_register_EditText.setHint("09xxxxxxxxx");
+    }
+    @OnFocusChange(R.id.email_register_EditText)
+    void onEmail_register_EditTextFocusChange(){
+        phone_register_EditText.setHint("");
+    }
+    @OnFocusChange(R.id.password_register_EditText)
+    void onPassword_register_EditTextFocusChange(){
+        phone_register_EditText.setHint("");
+    }
+    @OnFocusChange(R.id.passwordReapet_register_EditText)
+    void onPasswordReapet_register_EditTextFocusChange(){
+        phone_register_EditText.setHint("");
     }
 }

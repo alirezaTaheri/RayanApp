@@ -14,6 +14,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,12 +59,13 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     public LiveData<BaseResponse> addUserByMobile(String phone, String groupId){
-        final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
         List<String> phones = new ArrayList<>();
         phones.add(phone);
+        final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
         addUserByMobileObservable(new AddUserByMobileRequest(phones, groupId)).subscribe(addUserByMobileObserver(results));
         return results;
     }
+
     private Observable<BaseResponse> addUserByMobileObservable(AddUserByMobileRequest addUserByMobileRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService

@@ -20,6 +20,7 @@ import butterknife.OnClick;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.KeyboardUtil;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.ChangePasswordViewModel;
 import rayan.rayanapp.ViewModels.LoginViewModel;
@@ -45,6 +46,7 @@ public class ChangePasswordFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_change_password, container, false);
         ButterKnife.bind(this, view);
+    //    new KeyboardUtil(getActivity(), view.findViewById(R.id.changepassLayout));
         bundle = this.getArguments();
         if(bundle != null) {
             username = bundle.getString("user");

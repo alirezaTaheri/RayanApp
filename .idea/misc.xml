@@ -2,10 +2,17 @@
 <project version="4">
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="JDK" project-jdk-type="JavaSDK">
 =======
 >>>>>>> 8879010ca1d758aa5539fa1da573617514ec0713
+=======
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="JDK" project-jdk-type="JavaSDK">
+=======
+=======
+>>>>>>> 2f7fb1d49b64f18fe58e4015f7b1292bff24ee59
+>>>>>>> bbeaca6f63043ce582d53908e585c77dd8f4e3f8
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />
@@ -43,12 +50,21 @@
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="JDK" project-jdk-type="JavaSDK">
 >>>>>>> dbaa4a11f3e847430be55d46eb397ce08f9d03f6
 =======
 >>>>>>> ede371d9860846cb38015c4b1a867e30c9d1722b
 >>>>>>> 8879010ca1d758aa5539fa1da573617514ec0713
+=======
+>>>>>>> ede371d9860846cb38015c4b1a867e30c9d1722b
+=======
+=======
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="JDK" project-jdk-type="JavaSDK">
+>>>>>>> dbaa4a11f3e847430be55d46eb397ce08f9d03f6
+>>>>>>> 2f7fb1d49b64f18fe58e4015f7b1292bff24ee59
+>>>>>>> bbeaca6f63043ce582d53908e585c77dd8f4e3f8
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

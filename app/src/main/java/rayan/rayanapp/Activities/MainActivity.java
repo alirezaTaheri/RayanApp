@@ -24,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
@@ -93,7 +94,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TextView actionBarStatus;
     @BindView(R.id.statusIcon)
     ImageView statusIcon;
+    @BindView(R.id.drawerrrrr)
+    View drawerrrrr;
     ///////////////////////////////////////////////////////
+    @BindView(R.id.expand_arrow_icon)
+    ImageView expand_arrow_icon;
     @BindView(R.id.expandable_layout)
     ExpandableLayout expandableLayout;
     @BindView(R.id.groupsActivity)
@@ -110,10 +115,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout drawer_profile;
     @BindView(R.id.parent)
     LinearLayout drawer_parent;
-    @BindView(R.id.version)
-    TextView version;
     @BindView(R.id.groupsRecyclerView)
     RecyclerView drawer_groupsRecyclerView;
+    @BindView(R.id.drawer_userImage)
+    ImageView drawer_userImage;
+    @BindView(R.id.drawer_userName)
+    TextView drawer_userName;
     SortByGroupRecyclerViewAdapter drawer_groupsRecyclerViewAdapter;
     int connectionRetries;
     @Override
@@ -125,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!RayanApplication.getPref().isLoggedIn()) {
-            Intent intent = new Intent(this, LoginActivity.class);
+            Intent intent = new Intent(this, StartUpSplashActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
@@ -138,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getIsNotificationOn());
+
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
             switch (connection.getStatus()) {
@@ -195,6 +203,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 statusIcon.setVisibility(View.INVISIBLE);
                 actionBarStatus.setText("عدم اتصال به اینترنت");
             } else
+                for (int a = 0;a<getSupportFragmentManager().getFragments().size();a++)
+                    if (getSupportFragmentManager().getFragments().get(a) instanceof DevicesFragment){
+                        ((DevicesFragment)getSupportFragmentManager().getFragments().get(a)).devicesFragmentViewModel.getGroups();
+                    }
                 if (MainActivityViewModel.connection.getValue() == null || MainActivityViewModel.connection.getValue().getClient() != null && !Objects.requireNonNull(MainActivityViewModel.connection.getValue()).isConnected() && !MainActivityViewModel.connection.getValue().getStatus().equals(Connection.ConnectionStatus.CONNECTING)) {
                 Log.e("///////////////", "////connecting to mqtt");
                 mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
@@ -256,7 +268,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         initializeBottomNavigation();
     }
-
+    if (RayanApplication.getPref().isLoggedIn()) {
+        int width = (getResources().getDisplayMetrics().widthPixels*4)/6;
+        DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) drawerrrrr.getLayoutParams();
+        params.width = width;
+        drawerrrrr.setLayoutParams(params);
+        if (RayanApplication.getPref().getGenderKey().equals("Male")) {
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
+        } else if (RayanApplication.getPref().getGenderKey().equals("Female")) {
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.woman));
+        } else {
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
+        }
+        if (RayanApplication.getPref().getNameKey().isEmpty() && RayanApplication.getPref().getNameKey() == null) {
+            drawer_userName.setText("Rayan App");
+        } else {
+            drawer_userName.setText(RayanApplication.getPref().getNameKey());
+        }
+    }
 }
 
 
@@ -277,12 +306,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer_sortByGroup.setOnClickListener(this);
         drawer_deviceManagementActivity.setOnClickListener(this);
         drawer_parent.setOnClickListener(this);
-        try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version.setText(pInfo.versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        //app version
+//        try {
+//            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+//            version.setText(pInfo.versionName);
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -689,62 +719,65 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 //        return secretKeySpec;
 //    }
-    public static SecretKeySpec secretKeySpec;
+        public static SecretKeySpec secretKeySpec;
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.groupsActivity:
-                startActivity(new Intent(this, GroupsActivity.class));
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.devicesManagementActivity:
-                startActivity(new Intent(this, DeviceManagementActivity.class));
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.profileActivity:
-                startActivity(new Intent(this, ProfileActivity.class));
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.addNewDeviceActivity:
-                startActivity(new Intent(this, AddNewDeviceActivity.class));
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.settingsActivity:
-                startActivity(new Intent(this, SettingsActivity.class));
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.sortByGroup:
-                expandableLayout.toggle();
-                if (drawer_groupsRecyclerViewAdapter == null){
-                    drawer_groupsRecyclerViewAdapter = new SortByGroupRecyclerViewAdapter(this, new ArrayList<>());
-                    drawer_groupsRecyclerViewAdapter.setItems(mainActivityViewModel.getAllGroups());
-                    Group g = new Group();
-                    g.setDevices(mainActivityViewModel.getAllDevices());
-                    g.setName("همه");
-                    drawer_groupsRecyclerViewAdapter.addItemToFirst(g);
-                    drawer_groupsRecyclerView.setAdapter(drawer_groupsRecyclerViewAdapter);
-                    drawer_groupsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-                    drawer_groupsRecyclerViewAdapter.setListener(this);
-                }
-                break;
-            case R.id.parent:
-                break;
+        @Override
+        public void onClick (View v){
+            switch (v.getId()) {
+                case R.id.groupsActivity:
+                    startActivity(new Intent(this, GroupsActivity.class));
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    break;
+                case R.id.devicesManagementActivity:
+                    startActivity(new Intent(this, DeviceManagementActivity.class));
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    break;
+                case R.id.profileActivity:
+                    startActivity(new Intent(this, ProfileActivity.class));
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    break;
+                case R.id.addNewDeviceActivity:
+                    startActivity(new Intent(this, AddNewDeviceActivity.class));
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    break;
+                case R.id.settingsActivity:
+                    startActivity(new Intent(this, SettingsActivity.class));
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    break;
+                case R.id.sortByGroup:
+                    expandableLayout.toggle();
+                    if(expandableLayout.isExpanded()){
+                        expand_arrow_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_up));
+                    }else {expand_arrow_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_down)); }
+                    if (drawer_groupsRecyclerViewAdapter == null) {
+                        drawer_groupsRecyclerViewAdapter = new SortByGroupRecyclerViewAdapter(this, new ArrayList<>());
+                        drawer_groupsRecyclerViewAdapter.setItems(mainActivityViewModel.getAllGroups());
+                        Group g = new Group();
+                        g.setDevices(mainActivityViewModel.getAllDevices());
+                        g.setName("همه");
+                        drawer_groupsRecyclerViewAdapter.addItemToFirst(g);
+                        drawer_groupsRecyclerView.setAdapter(drawer_groupsRecyclerViewAdapter);
+                        drawer_groupsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+                        drawer_groupsRecyclerViewAdapter.setListener(this);
+                    }
+                    break;
+                case R.id.parent:
+                    break;
+            }
         }
-    }
 
-    @Override
-    public void onGroupClicked(Group item) {
-        drawerLayout.closeDrawer(GravityCompat.START);
-        ((DevicesFragment)getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item.getId());
-        drawer_groupsRecyclerViewAdapter.notifyDataSetChanged();
-    }
+        @Override
+        public void onGroupClicked (Group item){
+            drawerLayout.closeDrawer(GravityCompat.START);
+            ((DevicesFragment) getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item.getId());
+            drawer_groupsRecyclerViewAdapter.notifyDataSetChanged();
+        }
 
-    @Override
-    public void onGroupLongPress(Group Item) {
-    }
+        @Override
+        public void onGroupLongPress (Group Item){
+        }}
 
-    //    @Override
+        //    @Override
 //    public void onBackPressed() {
 ////        secretKeySpec = new SecretKeySpec("8nro4q0emv8k1uv5".getBytes(), "AES");
 //        secretKeySpec = new SecretKeySpec("1234567812345678".getBytes(), "AES");
@@ -762,7 +795,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////            e.printStackTrace();
 ////        }
 //    }//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
-}//{"src":"14337767","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
+//}//{"src":"14337767","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
 //{"text":"yxEX1vOqupgRIiIE6mi11szCSG6glHizIdaPimHgGJoMk5B5jC/aTuoLF5p7MTJlz/yIH4seE3HatSek9ipis8JNmUzJX7tnKI7E14ur5jZ7y9Xr0TUIv3HQcU0sfMf3", "cmd":"en", "src":""}
 //{"text":"ILaSCiqVbgCucFnGJEuKJ+XqOHxmaaDeeLj2H625xQM=", "cmd":"de", "src":""}
 //{"text":"G9DU4Dr/jyMuH6OTchlQebccrrbqa7JrIfGuKZ8RurU=", "cmd":"de", "src":""}

@@ -4,26 +4,26 @@
         <shape android:shape="rectangle"
             xmlns:android="http://schemas.android.com/apk/res/android" >
             <gradient
-                android:startColor="#966c01"
-                android:centerColor="#9a7109"
-                android:endColor="#966c01"
+                android:startColor="@color/blue_dark_2"
+                android:centerColor="@color/blue_dark_2"
+                android:endColor="@color/blue_dark_2"
                 android:type="linear"
                 android:angle="90"
                 />
-            <corners android:radius="7dp"/>
+            <corners android:radius="30dp"/>
         </shape>
     </item>
     <item android:state_pressed="false">
 <shape android:shape="rectangle"
     xmlns:android="http://schemas.android.com/apk/res/android" >
     <gradient
-        android:startColor="#f9d20f"
-        android:centerColor="#f9d20f"
-        android:endColor="#f9d20f"
+        android:startColor="@color/baseColor"
+        android:centerColor="@color/baseColor"
+        android:endColor="@color/baseColor"
         android:type="linear"
         android:angle="90"
         />
-    <corners android:radius="7dp"/>
+    <corners android:radius="30dp"/>
     </shape>
     </item>
 </selector>

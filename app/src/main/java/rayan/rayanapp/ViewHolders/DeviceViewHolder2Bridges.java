@@ -132,4 +132,8 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
             pin2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));
         }
     }
+
+    public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
+        l.onAccessPointChanged(device);
+    }
 }

@@ -527,13 +527,13 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return code;
     }
 
-    public LiveData<String> toDeviceUpdate(String ip ){
+    public LiveData<String> toDeviceReady4Update(String ip ){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        toDeviceUpdateObservable(new BaseRequest(AppConstants.DEVICE_IS_READY_FOR_UPDATE),ip).subscribe(toDeviceUpdateObserver(results));
+        toDeviceReady4UpdateObservable(new BaseRequest(AppConstants.DEVICE_IS_READY_FOR_UPDATE),ip).subscribe(toDeviceReady4UpdateObserver(results));
         return results;
     }
 
-    private Observable<DeviceBaseResponse> toDeviceUpdateObservable(BaseRequest baseRequest, String ip){
+    private Observable<DeviceBaseResponse> toDeviceReady4UpdateObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .deviceUpdate(getDeviceAddress(ip), baseRequest)
@@ -541,7 +541,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private DisposableObserver<DeviceBaseResponse> toDeviceUpdateObserver(MutableLiveData<String> results){
+    private DisposableObserver<DeviceBaseResponse> toDeviceReady4UpdateObserver(MutableLiveData<String> results){
         return new DisposableObserver<DeviceBaseResponse>() {
 
             @Override

@@ -20,6 +20,7 @@
                                     <map>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                                       <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_refresh_black_24dp.xml" />
 =======
                                       <entry key="url" value="jar:file:/E:/Android_Studio/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_person_black_24dp.xml" />
@@ -30,6 +31,9 @@
                                       <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_refresh_black_24dp.xml" />
 >>>>>>> ede371d9860846cb38015c4b1a867e30c9d1722b
 >>>>>>> 8879010ca1d758aa5539fa1da573617514ec0713
+=======
+                                      <entry key="url" value="jar:file:/E:/Android_Studio/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/social/ic_people_outline_black_24dp.xml" />
+>>>>>>> bbeaca6f63043ce582d53908e585c77dd8f4e3f8
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -41,6 +45,7 @@
                           <map>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                             <entry key="outputName" value="ic_refresh" />
                             <entry key="sourceFile" value="C:\Users\Alireza" />
 =======
@@ -57,6 +62,11 @@
                             <entry key="sourceFile" value="C:\Users\Alireza" />
 >>>>>>> ede371d9860846cb38015c4b1a867e30c9d1722b
 >>>>>>> 8879010ca1d758aa5539fa1da573617514ec0713
+=======
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="ic_add_new_device" />
+                            <entry key="sourceFile" value="C:\Users\Milad\Downloads\Telegram Desktop\add-device-4.svg" />
+>>>>>>> bbeaca6f63043ce582d53908e585c77dd8f4e3f8
                           </map>
                         </option>
                       </PersistentState>

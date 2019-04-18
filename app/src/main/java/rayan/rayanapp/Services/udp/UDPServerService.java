@@ -149,7 +149,7 @@ public class UDPServerService extends Service {
                             type = jsonMessage.getString("type");
                             decodedName = Base64.decode(name, Base64.DEFAULT);
                             device = deviceDatabase.getDevice(src);
-                            Log.d(TAG, "YESYESYES"+ src);
+                            Log.d(TAG, "YESYESYES"+ device);
                             if (device != null){
                                 ((RayanApplication)getApplication()).getDevicesAccessibilityBus().send(src);
                                 device.setLocallyAccessibility(true);

@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.util.DiffUtil;
+import android.support.v7.util.ListUpdateCallback;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -45,12 +47,13 @@ import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.model.Subscription;
+import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
 public class DevicesFragment extends Fragment implements OnToggleDeviceListener<Device>,ToggleDeviceAnimationProgress {
-    DevicesFragmentViewModel devicesFragmentViewModel;
+    public DevicesFragmentViewModel devicesFragmentViewModel;
     Activity activity;
 
     public DevicesFragment() {}
@@ -90,7 +93,6 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                         }
                 }
                         else finalDevices = devices;
-                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
             Collections.sort(finalDevices, new Comparator<Device>(){
                 public int compare(Device obj1, Device obj2) {
                     // ## Ascending order
@@ -101,6 +103,31 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                     // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
                 }
             });
+//                DevicesDiffCallBack c = new DevicesDiffCallBack(finalDevices, DevicesFragment.this.devices);
+//                DiffUtil.DiffResult d = DiffUtil.calculateDiff(c);
+//                List<Device> finalDevices1 = finalDevices;
+//                d.dispatchUpdatesTo(new ListUpdateCallback() {
+//                    @Override
+//                    public void onInserted(int i, int i1) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onRemoved(int i, int i1) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onMoved(int i, int i1) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChanged(int i, int i1, @Nullable Object o) {
+//                        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices1.subList(i, i + i1));
+//                    }
+//                });
+                ((RayanApplication)getActivity().getApplication()).getMtd().setDevices(finalDevices);
                 Log.e(TAG ,"ShowingDevices: " + finalDevices);
                 devicesRecyclerViewAdapter.updateItems(finalDevices);
                 DevicesFragment.this.devices = finalDevices;
@@ -181,6 +208,11 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
         }
 
+    @Override
+    public void onAccessPointChanged(Device item) {
+        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
+    }
+
 
     @Override
     public void startToggleAnimationPin1(String chipId, int position) {
@@ -237,7 +269,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     @Override
     public void onResume() {
         super.onResume();
-        devicesFragmentViewModel.getGroups();
+//        devicesFragmentViewModel.getGroups();
         ((RayanApplication)getActivity().getApplication()).getNetworkStatus().observe(getActivity(), networkConnection -> {
             devicesRecyclerViewAdapter.updateItems(devices);
         });

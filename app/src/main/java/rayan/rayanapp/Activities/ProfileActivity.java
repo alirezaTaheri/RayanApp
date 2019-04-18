@@ -92,9 +92,9 @@ editUserFragment=EditUserFragment.newInstance("", "");
         switch (tag) {
             case "EditUserFragment":
                 RayanApplication.getPref().removeSession();
-                Intent intent = new Intent(this,LoginActivity.class);
+                Intent intent = new Intent(this,StartUpSplashActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(intent);
                 finish();

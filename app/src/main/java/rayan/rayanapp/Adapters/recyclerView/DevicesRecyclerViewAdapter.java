@@ -72,6 +72,12 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                     if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2))
                         ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
                 }
+//                if (key.equals("ssid")){
+//                    holder.accessPointChanged(getItem(position), getListener());
+//                }
+//                if (key.equals("ip")){
+//                    holder.accessPointChanged(getItem(position), getListener());
+//                }
                 if (key.equals("startTogglingPin1")){
                     ValueAnimator v;
                     if (b.getString("status").equals(AppConstants.ON_STATUS))

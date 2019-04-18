@@ -41,6 +41,7 @@ import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
+import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.FTPClient;
@@ -49,7 +50,7 @@ import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
-public class EditDeviceFragment extends BackHandledFragment implements DoneWithSelectAccessPointFragment {
+public class EditDeviceFragment extends BackHandledFragment implements DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
     private static EditDeviceFragment instance = null;
     String readFromFileResult;
     private ArrayList<String> codeList= new ArrayList<>();
@@ -245,11 +246,8 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
-        FTPClient ftpClient = new FTPClient();
-        Log.e(this.getClass().getSimpleName(), "Updating device: " + device);
-        ftpClient.uploadFile(getContext(), device.getIp(), device.getChipId(), device.getSecret());
-//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟");
-//        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟");
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
 
@@ -304,8 +302,8 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
         editDeviceFragmentViewModel.toDeviceChangeAccessPoint(device, ssid, pass).observe(this, s -> {
             assert s != null;
                 switch (s){
-                    case AppConstants.FACTORY_RESET_DONE:
-                        Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
+                    case AppConstants.CHANGE_WIFI:
+                        Toast.makeText(getActivity(), "دستگاه در‌حال اعمال تغییرات می‌باشد", Toast.LENGTH_SHORT).show();
                         setDeviceTopicStatus(TopicStatus.CHANGED);
                         break;
                     case AppConstants.SOCKET_TIME_OUT:
@@ -314,6 +312,14 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
                         break;
                 }
         });
+    }
+
+    @Override
+    public void submitClicked(String tag) {
+//        editDeviceFragmentViewModel.toDeviceReady4Update(device.getIp()).
+        FTPClient ftpClient = new FTPClient();
+        Log.e(this.getClass().getSimpleName(), "Updating device: " + device);
+        ftpClient.uploadFile(getContext(), device.getIp(), device.getChipId(), device.getSecret());
     }
 
     public enum TopicStatus{

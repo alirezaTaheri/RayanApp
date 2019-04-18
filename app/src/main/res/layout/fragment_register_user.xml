@@ -1,40 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layoutDirection="rtl">
+    android:layoutDirection="rtl"
+    android:background="@color/white"
+    android:id="@+id/registerUserLayout">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="20dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="12dp"
-                app:srcCompat="@drawable/ic_email" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColorHint="@color/blue_dark_2">
+                android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/phone_register_EditText"
@@ -49,27 +32,10 @@
                     android:maxLines="1"
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
-        </LinearLayout>
 
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="86dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="12dp"
-                app:srcCompat="@drawable/ic_email" />
-
-            <android.support.design.widget.TextInputLayout
+       <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColorHint="@color/blue_dark_2">
+                android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/email_register_EditText"
@@ -84,28 +50,13 @@
                     android:maxLines="1"
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="178dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="12dp"
-                app:srcCompat="@drawable/ic_password" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColorHint="@color/blue_dark_2"
                 app:passwordToggleContentDescription="Description"
                 app:passwordToggleEnabled="true"
-                app:passwordToggleTint="@color/baseColor2">
+                app:passwordToggleTint="@color/baseColor">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/password_register_EditText"
@@ -120,27 +71,13 @@
                     android:maxLines="1"
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="260dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="12dp"
-                app:srcCompat="@drawable/ic_password" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColorHint="@color/blue_dark_2"
                 app:passwordToggleContentDescription="Description"
                 app:passwordToggleEnabled="true"
-                app:passwordToggleTint="@color/baseColor2">
+                app:passwordToggleTint="@color/baseColor">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/passwordReapet_register_EditText"
@@ -156,30 +93,19 @@
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="260dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="260dp">
-
-            <Button
-                android:id="@+id/register_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/baseColor"
-                android:text="@string/text_sign_up_button"
-                tools:layout_editor_absoluteX="0dp"
-                tools:layout_editor_absoluteY="260dp" />
-        </LinearLayout>
     </LinearLayout>
-    </ScrollView>
-</android.support.constraint.ConstraintLayout>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/register_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentBottom="true"
+            android:background="@drawable/button_backgrand"
+        android:padding="12dp"
+        android:text="@string/text_sign_up_button"
+        android:textColor="@color/white"
+        android:textSize="19dp" />
+</RelativeLayout>
