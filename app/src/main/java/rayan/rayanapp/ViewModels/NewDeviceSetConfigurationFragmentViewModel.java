@@ -199,7 +199,10 @@ Log.d(TAG,"Completed");
                         Device d = deviceResponse.getData().getDevice();
                         activity.getNewDevice().setId(d.getId());
                         activity.getNewDevice().setUsername(d.getUsername());
-                        activity.getNewDevice().setPassword(d.getPassword());
+                        if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR) && deviceResponse.getData().getMessage() != null && deviceResponse.getData().getMessage().equals(AppConstants.DUPLICATE_USER))
+                            activity.getNewDevice().setPassword(d.getDevicePassword());
+                        else
+                            activity.getNewDevice().setPassword(d.getPassword());
                         return addDeviceToGroupObservable(new AddDeviceToGroupRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId()));
                 })
                 .flatMap(baseResponse -> editDeviceObservable(new EditDeviceRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getName(), activity.getNewDevice().getType(), activity.getNewDevice().getSsid())))

@@ -113,7 +113,7 @@ public class ChangeGroupFragment extends BottomSheetDialogFragment implements On
     void confirm(){
         if (selectedGroup != null){
             ((AddNewDeviceActivity)getActivity()).getNewDevice().setGroup(selectedGroup);
-            ((NewDeviceSetGroupFragment)((AddNewDeviceActivity)getActivity()).getStepperAdapter().findStep(1)).setGroupTitle(selectedGroup.getName());
+            ((NewDeviceSetConfigurationFragment)((AddNewDeviceActivity)getActivity()).getStepperAdapter().findStep(1)).setGroupTitle(selectedGroup.getName());
 
             dismiss();
         }

@@ -56,8 +56,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Log.e("TATTTTTT", "TAG is: " + getTag());
-        Log.e("TATTTTTT", "IIIIIIIIIIIIID is: " + getId());
+        Log.e(this.getClass().getSimpleName(), "TAG is: " + getTag() + " Id Is: " + getId());
         View view =  inflater.inflate(R.layout.new_device_set_configuration_fragment, container, false);
         ButterKnife.bind(this,view);
         return view;
@@ -136,54 +135,56 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
-//        if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
-//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام دستگاه را وارد کنید");
-//        else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getId().trim().length()<1)
-//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک گروه را انتخاب کنید");
-//        else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid() == null || ((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid().trim().length()<1)
-//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک مودم را انتخاب کنید");
-//        else{
-//            mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
-//                if (aBoolean){
-//                    ProgressDialog progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
-//                    progressDialog.show();
-//                    progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Log.e(getClass().getSimpleName(),">>>>>>>>>>>>>>>>>Canceling The Process");
-//                            mViewModel.getConfigDeviceDisposable().dispose();
-//                            progressDialog.dismiss();
-//                        }
-//                    });
-//                    callback.getStepperLayout().showProgress("درحال برقراری ارتباط با دستگاه"+"\n"+"لطفا کمی صبرکنید");
-//                    ((AddNewDeviceActivity) getActivity()).getNewDevice().setName(nameEditText.getText().toString());
-//                    mViewModel.registerDeviceSendToDevice(
-//                            (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
-//                            ((AddNewDeviceActivity)getActivity()),new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(),((AddNewDeviceActivity) getActivity()).getNewDevice().getName() , ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
-//                            ,AppConstants.NEW_DEVICE_IP)
-//                            .observe(this, s -> {
-//                                switch (s.getCmd()){
-//                                    case AppConstants.NEW_DEVICE_TOGGLE_CMD:
-//                                        ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
-//                                        ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
-//                                        callback.goToNextStep();
-//                                        break;
-//                                    case AppConstants.NEW_DEVICE_PHV_START:
-//                                        callback.goToNextStep();
-//                                        break;
-//                                    case AppConstants.SOCKET_TIME_OUT:
-//                                        Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-//                                        break;
-//                                }
-//                                callback.getStepperLayout().hideProgress();
-//                                progressDialog.dismiss();
-//                            });
-//                }
-//                else{
-//                    ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
-//                }
-//            });
-        callback.goToNextStep();
+        if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
+            Toast.makeText(getContext(), "لطفا نام دستگاه را وارد کنید", Toast.LENGTH_SHORT).show();
+//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "لطفا نام دستگاه را وارد کنید");
+        else if (((AddNewDeviceActivity) getActivity()).getNewDevice().getGroup() == null || ((AddNewDeviceActivity) getActivity()).getNewDevice().getGroup().getId().trim().length() < 1)
+            Toast.makeText(getContext(), "لطفا یک گروه را انتخاب کنید", Toast.LENGTH_SHORT).show();
+//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "لطفا یک گروه را انتخاب کنید");
+        else if (((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid() == null || ((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid().trim().length() < 1)
+            Toast.makeText(getContext(), "لطفا یک مودم را انتخاب کنید", Toast.LENGTH_SHORT).show();
+//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "لطفا یک مودم را انتخاب کنید");
+        else {
+            mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
+                if (aBoolean) {
+                    ProgressDialog progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
+                    progressDialog.show();
+                    progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.e(getClass().getSimpleName(), ">>>>>>>>>>>>>>>>>Canceling The Process");
+                            mViewModel.getConfigDeviceDisposable().dispose();
+                            progressDialog.dismiss();
+                        }
+                    });
+                    callback.getStepperLayout().showProgress("درحال برقراری ارتباط با دستگاه" + "\n" + "لطفا کمی صبرکنید");
+                    ((AddNewDeviceActivity) getActivity()).getNewDevice().setName(nameEditText.getText().toString());
+                    mViewModel.registerDeviceSendToDevice(
+                            (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
+                            ((AddNewDeviceActivity) getActivity()), new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getName(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
+                            , AppConstants.NEW_DEVICE_IP)
+                            .observe(this, s -> {
+                                switch (s.getCmd()) {
+                                    case AppConstants.NEW_DEVICE_TOGGLE_CMD:
+                                        ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
+                                        ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
+                                        callback.goToNextStep();
+                                        break;
+                                    case AppConstants.NEW_DEVICE_PHV_START:
+                                        callback.goToNextStep();
+                                        break;
+                                    case AppConstants.SOCKET_TIME_OUT:
+                                        Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                                        break;
+                                }
+                                callback.getStepperLayout().hideProgress();
+                                progressDialog.dismiss();
+                            });
+                } else {
+                    ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
+                }
+            });
+        }
     }
 
     @Override

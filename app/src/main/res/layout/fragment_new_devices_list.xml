@@ -7,20 +7,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
-        android:layout_margin="20dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <EditText
-        android:id="@+id/name"
-        android:inputType="text"
-        android:maxLength="15"
-        android:imeOptions="actionDone"
-        android:hint="نام دستگاه"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 <android.support.v7.widget.RecyclerView
-    android:layout_marginTop="15dp"
     android:id="@+id/recyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"/>

@@ -110,7 +110,7 @@ public class ChangeDeviceAccessPointFragment extends BottomSheetDialogFragment i
         } else {
             listener.accessPointSelected(selectedAccessPoint.getSSID(), password.getText().toString());
             if (getActivity() instanceof AddNewDeviceActivity)
-                ((NewDeviceSetAccessPoint)((AddNewDeviceActivity)getActivity()).getStepperAdapter().findStep(2)).setAccessPointTitle(selectedAccessPoint.getSSID());
+                ((NewDeviceSetConfigurationFragment)((AddNewDeviceActivity)getActivity()).getStepperAdapter().findStep(1)).setAccessPointTitle(selectedAccessPoint.getSSID());
             dismiss();
         }
     }

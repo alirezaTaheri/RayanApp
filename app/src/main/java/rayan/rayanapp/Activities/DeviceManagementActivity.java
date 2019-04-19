@@ -10,19 +10,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
+import rayan.rayanapp.Fragments.ProvideInternetFragment;
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.DevicesManagementActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -31,7 +36,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    EditDeviceFragment editDeviceFragment;
+    public EditDeviceFragment editDeviceFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
@@ -101,11 +106,15 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
     public void accessPointSelected(String ssid, String pass) {
         ((EditDeviceFragment)getSupportFragmentManager().getFragments().get(0)).accessPointSelected(ssid, pass);
     }
+
     public void submitClicked(String tag) {
         Log.e("tag of fragment",tag);
         switch (tag){
             case "EditDeviceFragment":
                 editDeviceFragment.clickOnDeviceUpdateSubmit();
+                break;
+            case "resetDevice":
+                editDeviceFragment.resetDevice();
                 break;
             default:
                 break;

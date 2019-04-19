@@ -108,7 +108,7 @@ public class NewDevicePhysicalVerificationFragment extends Fragment implements B
 
     @Override
     public void onSelected() {
-        if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1)|| ((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_2)){
+        if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1)|| ((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_2) || ((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_TOUCH_2)){
             Log.e("aaaaaa","NewDevice_Switch_PhysicalVerificationFragment:");
             FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             if (currentFragment != null)

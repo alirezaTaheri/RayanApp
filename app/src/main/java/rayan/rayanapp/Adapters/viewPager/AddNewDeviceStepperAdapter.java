@@ -20,6 +20,7 @@ import rayan.rayanapp.Fragments.NewDeviceSetGroupFragment;
 import rayan.rayanapp.Fragments.NewDevice_Plug_PhysicalVerificationFragment;
 import rayan.rayanapp.Fragments.NewDevice_Switch_PhysicalVerificationFragment;
 import rayan.rayanapp.Fragments.NewDevicesListFragment;
+import rayan.rayanapp.R;
 
 public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
 
@@ -41,10 +42,10 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
             case 0:
                 return NewDevicesListFragment.newInstance();
             case 1:
-                return NewDeviceSetGroupFragment.newInstance();
-            case 2:
-                return NewDeviceSetAccessPoint.newInstance();
-            case 3:
+                return NewDeviceSetConfigurationFragment.newInstance();
+//            case 2:
+//                return NewDeviceSetAccessPoint.newInstance();
+//            case 3:
 //                Log.e("CCCCCCCCCCC", "COuntER: " + AddNewDeviceActivity.counter);
 //                if (AddNewDeviceActivity.counter %2 == 0){
 //                    Log.e("CCCCCCCCCCC", "NewDevice_Switch_PhysicalVerificationFragment: " + AddNewDeviceActivity.counter);
@@ -66,8 +67,9 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
 //                    physicalFragment = NewDevice_Plug_PhysicalVerificationFragment.newInstance();
 //            }
 //            Log.e("iiiiiiiiiii", "iiiiiiiiii: " + physicalFragment);
+            case 2:
                 return NewDevicePhysicalVerificationFragment.newInstance();
-            case 4:
+            case 3:
                 return FinishAddNewDeviceFragment.newInstance();
         }
         return  null;
@@ -76,7 +78,32 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
     @NonNull
     @Override
     public StepViewModel getViewModel(int position) {
-        return super.getViewModel(position);
+        StepViewModel.Builder builder = new StepViewModel.Builder(context);
+        switch (position){
+            case 0:
+                    builder.setTitle("انتخاب دستگاه")
+                        .setEndButtonVisible(true)
+                        .setBackButtonLabel("بازگشت به صفحه‌اصلی")
+                        .setEndButtonLabel("بعدی");
+                break;
+            case 1:
+                builder.setTitle("تنظیمات")
+                        .setBackButtonLabel("قبلی")
+                        .setEndButtonLabel("بعدی");
+                break;
+            case 2:
+                builder.setTitle("دسترسی‌فیزیکی")
+                        .setBackButtonLabel("قبلی")
+                        .setEndButtonLabel("بعدی");
+                break;
+            case 3:
+                builder.setTitle("پایان")
+                        .setBackButtonLabel("قبلی")
+                        .setEndButtonLabel("بازگشت به صفحه‌اصلی");
+                break;
+
+        }
+        return builder.create();
     }
 
     @Override
@@ -87,6 +114,6 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
 
     @Override
     public int getCount() {
-        return 5;
+        return 4;
     }
 }

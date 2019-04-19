@@ -108,7 +108,7 @@ public class UDPServerService extends Service {
 //                            break;
                         case "de":
                             String b = jsonMessage.getString("text");
-                            Log.e("Decrypting","Decrypted is: " + Encryptor.decrypt(b,"8nro4q0emv8k1uv5"));
+                            Log.e("Decrypting","Decrypted is: " + Encryptor.decrypt(b,jsonMessage.getString("k")));
 //                            Log.e("Decrypting","Decrypted22 is: " + AESCrypt.decrypt("8nro4q0emv8k1uv5",b));
                             break;
                         case "TLMSDONE":
@@ -127,11 +127,17 @@ public class UDPServerService extends Service {
                                     device.setName1(new String(decodedName, "UTF-8"));
                                     device.setPin1(pin1);
                                     device.setPin2(pin2);
-                                    Log.e(getClass().getSimpleName(), "Received Stword: " + statusWord);
-                                    Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
-
-                                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
-                                    Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
+                                    try {
+                                        Log.e(getClass().getSimpleName(), "Received Stword: " + statusWord + " Decoding with Key: " + device.getSecret());
+                                        Log.e("Decrypting","Plain text Decrypted is: " + Encryptor.decrypt(statusWord,device.getSecret()));
+                                        Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
+                                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
+                                        Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
+                                    }
+                                    catch (Exception e){
+                                        Log.e(TAG, "Error in Decrypting: " + e);
+                                        e.printStackTrace();
+                                    }
                                     deviceDatabase.updateDevice(device);
                                 } else {
                                     JsonObject jsonObject = new JsonObject();

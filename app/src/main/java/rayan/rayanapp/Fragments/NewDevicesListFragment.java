@@ -60,8 +60,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     ConnectionStatus connectionStatus;
     WifiManager wifiManager;
     WifiInfo wifiInfo;
-    @BindView(R.id.name)
-    EditText nameEditText;
+//    @BindView(R.id.name)
+//    EditText nameEditText;
     private String targetSSID;
     private String currentSSID;
     public static NewDevicesListFragment newInstance() {
@@ -213,8 +213,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
-        if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
-        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام دستگاه را وارد کنید");
+//        if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
+//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا نام دستگاه را وارد کنید");
         if (selectedAccessPoint == null)
             Toast.makeText(getContext(), "لطفا یک دستگاه را انتخاب کنید", Toast.LENGTH_SHORT).show();
         else{
@@ -232,6 +232,9 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
             else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_2))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_2);
+
+            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_TOUCH_2))
+                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_TOUCH_2);
 
             else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_PLUG))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_PLUG);

@@ -269,7 +269,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     @Override
     public void onResume() {
         super.onResume();
-//        devicesFragmentViewModel.getGroups();
+        devicesFragmentViewModel.getGroups();
         ((RayanApplication)getActivity().getApplication()).getNetworkStatus().observe(getActivity(), networkConnection -> {
             devicesRecyclerViewAdapter.updateItems(devices);
         });

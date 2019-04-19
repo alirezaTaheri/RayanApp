@@ -59,8 +59,8 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     private SetPrimaryConfigRequest setPrimaryConfigRequest;
     private NewDevice newDevice;
     GroupsListFragmentViewModel viewModel;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+//    @BindView(R.id.toolbar)
+//    Toolbar toolbar;
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
@@ -74,15 +74,15 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         initNewDevice();
         setPrimaryConfigRequest = new SetPrimaryConfigRequest();
         ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("");
+//        setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setTitle("");
         stepperAdapter = new AddNewDeviceStepperAdapter(getSupportFragmentManager(), this);
         stepperLayout.setAdapter(stepperAdapter);
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
-        setActionBarTitle("");
+//        setActionBarTitle("");
         wifiReceiver = new WifiScanReceiver();
         wifiHandler = new WifiHandler();
 //        if (savedInstanceState == null) {
