@@ -9,8 +9,8 @@
     <TextView
         android:text="name"
         android:id="@+id/name"
-        android:layout_centerInParent="true"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="24dp"
+        android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
