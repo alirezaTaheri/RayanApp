@@ -26,6 +26,6 @@
         android:text="Rayan"
         android:id="@+id/drawer_userName"
         android:textAlignment="center"
-        android:textColor="@color/baseColor2"
+        android:textColor="@color/baseColor"
         android:textSize="17sp" />
 </LinearLayout>

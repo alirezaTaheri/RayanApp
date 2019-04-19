@@ -22,7 +22,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_forget_password);
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.forgetpass_frameLayout, ForgetPasswordFragment.newInstance("", ""));
+        transaction.replace(R.id.forgetpass_frameLayout, ForgetPasswordFragment.newInstance());
         transaction.commit();
     }
 }

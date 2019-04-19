@@ -3,6 +3,7 @@ package rayan.rayanapp.ViewHolders;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -15,8 +16,8 @@ public class GroupViewHolder  extends BaseViewHolder<Group, OnGroupClicked<Group
 
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.icon)
-    ImageView icon;
+    @BindView(R.id.group_item_layout)
+    RelativeLayout groupItemLayout;
 
     public GroupViewHolder(View itemView) {
         super(itemView);
@@ -26,10 +27,6 @@ public class GroupViewHolder  extends BaseViewHolder<Group, OnGroupClicked<Group
     @Override
     public void onBind(Group item, @Nullable OnGroupClicked<Group> listener) {
         name.setText(item.getName());
-        icon.setOnClickListener((v)-> listener.onGroupClicked(item));
-        icon.setOnLongClickListener(v -> {
-            listener.onGroupLongPress(item);
-            return true;
-        });
+        groupItemLayout.setOnClickListener((v)-> listener.onGroupClicked(item));
     }
 }

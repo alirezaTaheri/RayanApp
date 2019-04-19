@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:id="@+id/nestedscrolview"
         android:layout_marginBottom="5dp"
+        android:background="@color/grey_light_4"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
@@ -18,41 +19,11 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_marginRight="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_gravity="center_vertical"
-                android:layout_height="wrap_content">
-        <android.support.design.widget.TextInputLayout
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-            <EditText
-                android:id="@+id/name"
-                android:imeOptions="actionDone"
-                android:hint="نام گروه"
-                android:textDirection="rtl"
-                android:inputType="text"
-                android:textColorHint="#676767"
-                android:textSize="17sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </android.support.design.widget.TextInputLayout>
-            <TextView
-                android:visibility="invisible"
-                android:id="@+id/saveGroupName"
-                android:textColor="@color/grey_dark_4"
-                android:padding="5dp"
-                android:background="@drawable/background_save_group_name"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:layout_alignParentLeft="true"
-                android:textSize="12sp"
-                android:text="ذخیره"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            </RelativeLayout>
+            android:background="@color/white"
+            android:layout_height="match_parent">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:padding="10dp"
@@ -64,99 +35,39 @@
                     android:layout_marginLeft="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:tint="#bc8e23"
-                    app:srcCompat="@drawable/ic_group_manager"/>
+                    android:tint="@color/baseColor"
+                    app:srcCompat="@drawable/ic_add_member"/>
                 <TextView
-                    android:text="مدیران"
+                    android:text="اضافه کردن کاربر به گروه"
                     android:layout_gravity="center"
-                    android:textColor="#d47c00"
+                    android:textColor="@color/baseColor"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:id="@+id/groupMangers"
+                    android:id="@+id/addUserToGroup"
+                    android:layout_marginRight="10dp"
                     android:textSize="15sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
-                <ImageView
-                    android:id="@+id/addManagerButton"
-                    app:srcCompat="@drawable/ic_add"
-                    android:layout_gravity="center"
-                    android:background="?selectableItemBackground"
-                    android:layout_centerVertical="true"
-                    android:tint="@color/baseColor"
-                    android:padding="5dp"
-                    android:layout_toLeftOf="@+id/groupClients"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp" />
             </LinearLayout>
             <View
                 android:layout_width="match_parent"
-                android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:background="#fc9400"
-                android:layout_height="1.5dp"/>
+                android:background="@color/grey"
+                android:layout_height="1dp"/>
 
             <android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
-                android:layout_marginLeft="20dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="20dp"
                 android:id="@+id/managersRecyclerView"
                 android:layout_height="wrap_content"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:padding="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="20dp"
-                android:layoutDirection="rtl"
-                android:layout_height="wrap_content">
-                <!--<ImageView-->
-                <!--android:layout_marginLeft="5dp"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--app:srcCompat="@drawable/ic_group_members"/>-->
-
-                <ImageView
-                    android:layout_marginLeft="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:tint="#bc8e23"
-                    app:srcCompat="@drawable/ic_group"/>
-                <TextView
-                    android:text="اعضا"
-                    android:layout_gravity="center"
-                    android:textColor="#d47c00"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:id="@+id/groupClients"
-                    android:textSize="15sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <ImageView
-                    android:id="@+id/addUserButton"
-                    app:srcCompat="@drawable/ic_add"
-                    android:layout_gravity="center"
-                    android:background="?selectableItemBackground"
-                    android:layout_centerVertical="true"
-                    android:tint="@color/baseColor"
-                    android:padding="5dp"
-                    android:layout_toLeftOf="@+id/groupClients"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp" />
-            </LinearLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:background="#fc9400"
-                android:layout_height="1.5dp"/>
-
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="20dp"
-                android:id="@+id/usersRecyclerView"
-                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@color/white"
+            android:layout_height="match_parent">
             <LinearLayout
                 android:padding="10dp"
                 android:layout_marginTop="20dp"
@@ -166,14 +77,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageView
-                    android:tint="@color/orange"
                     app:srcCompat="@drawable/ic_device"
                     android:layout_gravity="center"
+                    android:tint="@color/baseColor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <TextView
                     android:text="دستگاه ها"
-                    android:textColor="#d47c00"
+                    android:textColor="@color/baseColor"
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:layout_marginRight="2dp"
@@ -186,8 +97,8 @@
                 android:layout_width="match_parent"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:background="#fc9400"
-                android:layout_height="1.5dp"/>
+                android:background="@color/grey"
+                android:layout_height="1dp"/>
             <android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_marginLeft="20dp"
@@ -195,16 +106,8 @@
                 android:id="@+id/devicesRecyclerView"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+        </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
 </RelativeLayout>
-    <!--<android.support.v7.widget.AppCompatButton-->
-        <!--android:id="@+id/leaveGroup_btn"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:visibility="invisible"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@color/baseColor"-->
-        <!--android:focusable="true"-->
-        <!--android:focusableInTouchMode="true"-->
-        <!--android:text="@string/leave_group_button" />-->
+

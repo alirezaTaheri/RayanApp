@@ -37,44 +37,6 @@ public class GroupsListFragmentViewModel extends DevicesFragmentViewModel {
     }
 
 
-    public LiveData<BaseResponse> deleteGroup(String groupId){
-        final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
-        deleteGroupObservable(new DeleteGroupRequest(groupId)).subscribe(deleteGroupObserver(results));
-        return results;
-    }
-
-    private Observable<BaseResponse> deleteGroupObservable(DeleteGroupRequest deleteGroupRequest){
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .deleteGroup(RayanApplication.getPref().getToken(), deleteGroupRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    private DisposableObserver<BaseResponse> deleteGroupObserver(MutableLiveData<BaseResponse> results){
-        return new DisposableObserver<BaseResponse>() {
-
-            @Override
-            public void onNext(@NonNull BaseResponse baseResponse) {
-                Log.e(TAG,"OnNext "+baseResponse);
-                results.postValue(baseResponse);
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
-                e.printStackTrace();
-                if (e.toString().contains("Unauthorized"))
-                    login();
-
-            }
-
-            @Override
-            public void onComplete() {
-                Log.d(TAG,"Completed");
-            }
-        };
-    }
 
 
 }

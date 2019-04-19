@@ -29,9 +29,8 @@ public class ForgetPasswordFragment extends Fragment {
     EditText phone_forgetpass_EditText;
     @BindView(R.id.email_forgetpass_EditText)
     EditText email_forgetpass_EditText;
-    public static ForgetPasswordFragment newInstance(String param1, String param2) {
+    public static ForgetPasswordFragment newInstance() {
         ForgetPasswordFragment fragment = new ForgetPasswordFragment();
-        fragment.setArguments(new Bundle());
         return fragment;
     }
     @Override

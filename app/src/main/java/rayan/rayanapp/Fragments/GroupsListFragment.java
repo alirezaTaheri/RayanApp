@@ -12,6 +12,7 @@ import android.support.v4.content.pm.ShortcutInfoCompat;
 import android.support.v4.content.pm.ShortcutManagerCompat;
 import android.support.v4.graphics.drawable.IconCompat;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -78,9 +79,9 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         ButterKnife.bind(this, view);
 
         if (isTablet(getActivity())) {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),200)));
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
         } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
         }
         recyclerView.setAdapter(groupsRecyclerViewAdapter);
         return view;
@@ -89,13 +90,6 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
     @Override
     public void onGroupClicked(Group item) {
         clickOnGroup.clickOnGroup(item);
-    }
-
-    @Override
-    public void onGroupLongPress(Group Item) {
-        groupId=Item.getId();
-       YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("GroupsListFragment","حذف گروه", "بازگشت", "آیا مایل به حذف این گروه هستید؟");
-       bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     @OnClick(R.id.createGroup)
@@ -130,25 +124,7 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         groupsListFragmentViewModel.getGroups();
     }
 
-    public void clickOnSubmit() {
-        Log.e("itemid",groupId);
-            groupsListFragmentViewModel.deleteGroup(groupId).observe(this, baseResponse -> {
-                Log.e("baseResponse",baseResponse.getStatus().getCode());
-                if (baseResponse.getStatus().getCode().equals("404")){
-                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"این گروه وجود ندارد");
-                }
-                else if (baseResponse.getStatus().getCode().equals("403")){
-                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما قادر به حذف این گروه نیستید");
 
-                }
-                else if (baseResponse.getStatus().getCode().equals("204")){
-                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"گروه با موفقیت حذف شد");
-                    groupsListFragmentViewModel.getGroups();
-                }
-                else
-                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");
-            });
-    }
     public static GroupsListFragment getInstance() {
         return instance;
     }

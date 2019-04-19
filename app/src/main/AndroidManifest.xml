@@ -35,11 +35,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Activities.StartUpSplashActivity"></activity>
-        <activity android:name=".Activities.ForgetPasswordActivity"
-         android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".Activities.SignUpUserActivity"
-            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".Activities.SettingssActivity" />
+        <activity android:name=".Activities.StartUpSplashActivity" />
+        <activity
+            android:name=".Activities.ForgetPasswordActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".Activities.SignUpUserActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".Activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,7 +64,7 @@
         <activity
             android:name=".Activities.GroupsActivity"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.ProfileActivity"
             android:parentActivityName=".Activities.MainActivity"
@@ -70,10 +73,8 @@
             android:name=".Activities.AddNewDeviceActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activities.SettingsActivity"
-            android:supportsRtl="true"
-            android:theme="@style/AppTheme.NoActionBar" /> <!-- this metadata is for crashlytics -->
+
+        <!-- this metadata is for crashlytics -->
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="ad3a16c7f3170306882d8f85a367d63fdf8e0ab5" />

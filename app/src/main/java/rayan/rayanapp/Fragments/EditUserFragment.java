@@ -136,7 +136,7 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.leaveMenu){
+        if(id == R.id.editGroupBasic){
             clickOnSignOut();
         return true;
         }
@@ -146,7 +146,7 @@ public class EditUserFragment extends Fragment implements MaterialSpinner.OnItem
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.leave_menu, menu);
-        menu.findItem(R.id.leaveMenu).setTitle("خروج از حساب کاربری");
+      //  menu.findItem(R.id.leaveMenu).setTitle("خروج از حساب کاربری");
         // Use filter.xml from step 1
     }
 

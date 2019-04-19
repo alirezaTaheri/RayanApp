@@ -4,8 +4,8 @@ import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,7 +23,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
@@ -57,7 +56,6 @@ import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Fragments.DevicesFragment;
-import rayan.rayanapp.Helper.NsdHelper;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
@@ -152,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        navigationView.bringToFront();
 //        navigationView.invalidate();
 //        navigationView.setNavigationItemSelectedListener(this);
-        Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getIsNotificationOn());
+       // Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getIsNotificationOn());
 //        navigationView.bringToFront();
 //        navigationView.invalidate();
 //        navigationView.bringToFront();
@@ -272,10 +270,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initializeBottomNavigation();
     }
     if (RayanApplication.getPref().isLoggedIn()) {
-        int width = (getResources().getDisplayMetrics().widthPixels*4)/6;
+        int width = (getResources().getDisplayMetrics().widthPixels*6)/8;
         DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) drawerrrrr.getLayoutParams();
         params.width = width;
         drawerrrrr.setLayoutParams(params);
+        drawerLayout.setScrimColor(Color.parseColor("#33000000"));
+
         if (RayanApplication.getPref().getGenderKey().equals("Male")) {
             drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
         } else if (RayanApplication.getPref().getGenderKey().equals("Female")) {
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(this, AddNewDeviceActivity.class));
                 break;
             case R.id.settingsActivity:
-                startActivity(new Intent(this, SettingsActivity.class));
+                startActivity(new Intent(this, SettingssActivity.class));
                 break;
         }
 //        drawerLayout.closeDrawer(GravityCompat.START);
@@ -748,7 +748,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     drawerLayout.closeDrawer(GravityCompat.START);
                     break;
                 case R.id.settingsActivity:
-                    startActivity(new Intent(this, SettingsActivity.class));
+                    startActivity(new Intent(this, SettingssActivity.class));
                     drawerLayout.closeDrawer(GravityCompat.START);
                     break;
                 case R.id.sortByGroup:
@@ -780,9 +780,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawer_groupsRecyclerViewAdapter.notifyDataSetChanged();
         }
 
-        @Override
-        public void onGroupLongPress (Group Item){
-        }}
+}
 
         //    @Override
 //    public void onBackPressed() {

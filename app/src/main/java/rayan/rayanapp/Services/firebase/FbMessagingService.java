@@ -52,10 +52,7 @@ Bitmap bitmap;
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.e(TAG, "From: " + remoteMessage.getFrom());
-Log.e(TAG,RayanApplication.getPref().getIsNotificationOn()+"");
         // Check if message contains a data payload.
-        if (!RayanApplication.getPref().getIsNotificationOn()) {
-        }else {
         if (remoteMessage.getData().size() > 0) {
             Log.e(TAG, "Message data payload: " + remoteMessage.getData());
             Map<String, String> data = remoteMessage.getData();
@@ -88,7 +85,7 @@ Log.e(TAG,RayanApplication.getPref().getIsNotificationOn()+"");
                     showNotification(this, remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(), Intent.createChooser(showUrl, "انتخاب مرورگر"));
                     break;
             }}
-        }
+
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {

@@ -16,8 +16,8 @@ public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
     private final String TAG = UserViewHolder.class.getSimpleName();
     @BindView(R.id.contactName)
     TextView contactName;
-    @BindView(R.id.deleteUser)
-    ImageView delete;
+//    @BindView(R.id.deleteUser)
+//    ImageView delete;
     @BindView(R.id.contactImage)
     ImageView contactImage;
     public UserViewHolder(View itemView) {
@@ -35,15 +35,15 @@ public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
             }
         }
 
-        if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
-            delete.setVisibility(View.INVISIBLE);
-        }
-        if (RayanApplication.getPref().getIsGroupAdminKey()){
-        }else{
-            delete.setVisibility(View.INVISIBLE);
-        }
-        delete.setOnClickListener(v -> {
-            listener.onRemoveUserClicked(item);
-        });
+//        if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
+//            delete.setVisibility(View.INVISIBLE);
+//        }
+//        if (RayanApplication.getPref().getIsGroupAdminKey()){
+//        }else{
+//            delete.setVisibility(View.INVISIBLE);
+//        }
+//        delete.setOnClickListener(v -> {
+//            listener.onRemoveUserClicked(item);
+//        });
     }
 }

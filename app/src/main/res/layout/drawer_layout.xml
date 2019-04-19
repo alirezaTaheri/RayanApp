@@ -18,12 +18,18 @@
         <View
             android:background="@color/grey"
             android:layout_width="match_parent"
-            android:layout_height="1dp"/>
-
+            android:layout_height="0.3dp"/>
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
         <RelativeLayout
             android:id="@+id/sortByGroup"
             android:layout_marginRight="4dp"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
@@ -36,9 +42,11 @@
                 android:id="@+id/title"
                 android:layout_toLeftOf="@+id/icon"
                 android:layout_alignParentTop="true"
+                android:textStyle="bold"
                 android:text="دستگاه‌ها براساس گروه"
-                android:textSize="14sp"
-                android:layout_marginRight="10dp"
+                android:textSize="15sp"
+                android:layout_marginRight="20dp"
+                android:textColor="@color/ms_black"
                 android:gravity="right"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -65,11 +73,11 @@
         <View
             android:background="@color/grey"
             android:layout_width="match_parent"
-            android:layout_height="1dp"/>
+            android:layout_height="0.3dp"/>
         <LinearLayout
             android:id="@+id/devicesManagementActivity"
             android:layout_marginRight="4dp"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -79,35 +87,39 @@
                 app:srcCompat="@drawable/ic_devices_manage" />
             <TextView
                 android:text="مدیریت دستگاه‌ها"
-                android:textSize="14sp"
-                android:layout_marginRight="8dp"
+                android:textSize="15sp"
+                android:layout_marginRight="20dp"
                 android:gravity="right"
+                android:textStyle="bold"
+                android:textColor="@color/ms_black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-    <LinearLayout
-        android:layout_marginRight="4dp"
-        android:padding="10dp"
-        android:id="@+id/groupsActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_marginRight="4dp"
+            android:padding="12dp"
+            android:id="@+id/groupsActivity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_groups" />
-    <TextView
-        android:text="@string/drawer_groups"
-        android:textSize="14sp"
-        android:layout_marginRight="8dp"
-        android:gravity="right"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_groups" />
+            <TextView
+                android:text="@string/drawer_groups"
+                android:textSize="15sp"
+                android:textColor="@color/ms_black"
+                android:layout_marginRight="20dp"
+                android:gravity="right"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/addNewDeviceActivity"
             android:layout_marginRight="4dp"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
@@ -116,20 +128,22 @@
                 android:layout_height="wrap_content" />
             <TextView
                 android:text="اضافه کردن دستگاه جدید"
-                android:textSize="14sp"
-                android:layout_marginRight="8dp"
+                android:textSize="15sp"
+                android:layout_marginRight="20dp"
                 android:gravity="right"
+                android:textStyle="bold"
+                android:textColor="@color/ms_black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-    <View
-        android:background="@color/grey"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        <View
+            android:background="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"/>
         <LinearLayout
             android:id="@+id/settingsActivity"
             android:layout_marginRight="4dp"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -139,35 +153,39 @@
                 app:srcCompat="@drawable/ic_settings" />
             <TextView
                 android:text="تنظیمات"
-                android:textSize="14sp"
-                android:layout_marginRight="8dp"
+                android:textColor="@color/ms_black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginRight="20dp"
                 android:gravity="right"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-    <LinearLayout
-        android:id="@+id/profileActivity"
-        android:layout_marginRight="4dp"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/profileActivity"
+            android:layout_marginRight="4dp"
+            android:padding="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_user" />
-    <TextView
-        android:text="حساب کاربری"
-        android:textSize="14sp"
-        android:layout_marginRight="8dp"
-        android:gravity="right"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    </LinearLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_user" />
+            <TextView
+                android:text="حساب کاربری"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/ms_black"
+                android:layout_marginRight="20dp"
+                android:gravity="right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/instructionActivity"
             android:layout_marginRight="4dp"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -177,16 +195,18 @@
                 app:srcCompat="@drawable/ic_question" />
             <TextView
                 android:text="آموزش"
-                android:textSize="14sp"
-                android:layout_marginRight="8dp"
+                android:textSize="15sp"
+                android:textColor="@color/ms_black"
+                android:layout_marginRight="20dp"
                 android:gravity="right"
+                android:textStyle="bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/eboutUsActivity"
             android:layout_marginRight="4dp"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -196,11 +216,15 @@
                 app:srcCompat="@drawable/ic_ebout_us" />
             <TextView
                 android:text="درباره ما"
-                android:textSize="14sp"
-                android:layout_marginRight="8dp"
+                android:textColor="@color/ms_black"
+                android:textSize="15sp"
+                android:layout_marginRight="20dp"
                 android:gravity="right"
+                android:textStyle="bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
 </RelativeLayout>
