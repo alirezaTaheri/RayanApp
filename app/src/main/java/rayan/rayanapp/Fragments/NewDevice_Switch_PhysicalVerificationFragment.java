@@ -85,21 +85,20 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
 
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
-        callback.goToNextStep();
-//        viewModel.toDeviceITET().observe(this, deviceBaseResponse -> {
-//            switch (deviceBaseResponse.getCmd()){
-//                case AppConstants.PRIMARY_CONFIG_TRUE:
-//                    Toast.makeText(getActivity(), "دسترسی شما با موفقیت تایید شد", Toast.LENGTH_SHORT).show();
-//                    callback.goToNextStep();
-//                    break;
-//                case AppConstants.PRIMARY_CONFIG_FALSE:
-//                    Toast.makeText(getActivity(), "دسترسی شما تایید نشد\nدوباره تلاش کنید", Toast.LENGTH_SHORT).show();
-//                    break;
-//                case AppConstants.EXPIRED:
-//                    Toast.makeText(getActivity(), "زمان شما به اتمام رسیده است", Toast.LENGTH_SHORT).show();
-//                    break;
-//            }
-//        });
+        viewModel.toDeviceITET().observe(this, deviceBaseResponse -> {
+            switch (deviceBaseResponse.getCmd()){
+                case AppConstants.PRIMARY_CONFIG_TRUE:
+                    Toast.makeText(getActivity(), "دسترسی شما با موفقیت تایید شد", Toast.LENGTH_SHORT).show();
+                    callback.goToNextStep();
+                    break;
+                case AppConstants.PRIMARY_CONFIG_FALSE:
+                    Toast.makeText(getActivity(), "دسترسی شما تایید نشد\nدوباره تلاش کنید", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.EXPIRED:
+                    Toast.makeText(getActivity(), "زمان شما به اتمام رسیده است", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
     }
 
     @Override
