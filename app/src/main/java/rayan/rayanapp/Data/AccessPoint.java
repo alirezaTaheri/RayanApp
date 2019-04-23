@@ -42,4 +42,8 @@ public class AccessPoint {
     public void setSSID(String SSID) {
         this.SSID = SSID;
     }
+
+    public String getBSSID() {
+        return BSSID;
+    }
 }

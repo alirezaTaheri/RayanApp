@@ -232,6 +232,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 public void onInserted(int i, int i1) {
 //                    Log.e("ABC", "OnInserted: from: "+i+" To: " + i+i1 + " Count: " + i1);
                     addDevices(newDevices.subList(i, i+i1));
+//                    ((RayanApplication)getApplication()).getMtd().addDevices(newDevices.subList(i, i+i1));
                 }
 
                 @Override

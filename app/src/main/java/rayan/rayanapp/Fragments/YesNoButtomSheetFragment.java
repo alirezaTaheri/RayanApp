@@ -25,9 +25,9 @@ public class YesNoButtomSheetFragment extends BottomSheetDialogFragment {
     private String sheetTxt;
    private String tag;
     @BindView(R.id.submitBtn)
-    AppCompatButton submitBtn;
+    public AppCompatButton submitBtn;
     @BindView(R.id.cancelBtn)
-    AppCompatButton cancelBtn;
+    public AppCompatButton cancelBtn;
     @BindView(R.id.bottomSheetText)
     AppCompatTextView bottomSheetText;
     public static YesNoButtomSheetFragment instance(String tag, String submitTxt, String cancelTxt, String sheetTxt) {

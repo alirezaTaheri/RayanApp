@@ -462,9 +462,10 @@ public class SendMessageToDevice {
     }
 
     public void toggleDevicePin1(ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
-        Log.e(TAG,"Be Chi Befrestam? : " + rayanApplication.getMtd().sendMessage(device));
-        Toast.makeText(rayanApplication, rayanApplication.getMtd().sendMessage(device), Toast.LENGTH_SHORT).show();
-        switch (rayanApplication.getMtd().sendMessage(device)){
+        String cr = rayanApplication.getMtd().sendMessage(device);
+        Log.e(TAG,"Be Chi Befrestam? : " + cr);
+        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+        switch (cr){
             case "UDP":
                 sendUdpPin1(device, rayanApplication,fragment, position);
                 break;
@@ -483,9 +484,10 @@ public class SendMessageToDevice {
         }
     }
     public void toggleDevicePin2(ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
-        Log.e(TAG,"Be Chi Befrestam2? : " + rayanApplication.getMtd().sendMessage(device));
-        Toast.makeText(rayanApplication, rayanApplication.getMtd().sendMessage(device), Toast.LENGTH_SHORT).show();
-        switch (rayanApplication.getMtd().sendMessage(device)){
+        String cr = rayanApplication.getMtd().sendMessage(device);
+        Log.e(TAG,"Be Chi Befrestam2? : " + cr);
+        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+        switch (cr){
             case "UDP":
                 sendUdpPin2(device, rayanApplication,fragment, position);
                 break;

@@ -128,7 +128,6 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
 
     @Override
     public void addUserToGroupSubmitClicked(ArrayList<PhoneContact> SelectedContacts, String Tag) {
-
         Log.e("tag of fragment", Tag);
         switch (Tag) {
             case "CreateGroupFragment":
@@ -143,9 +142,9 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
                 }
                 createGroupFragment.usersRecyclerViewAdapter.setItems(createGroupFragment.users);
                 break;
-            case "EditGroupFragment":
-                editGroupFragment.doAddUserFromPhone(SelectedContacts);
-                break;
+//            case "EditGroupFragment":
+//                editGroupFragment.doAddUserFromPhone(SelectedContacts);
+//                break;
             default:
                 break;
     }

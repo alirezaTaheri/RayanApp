@@ -43,6 +43,9 @@ public class Device implements Parcelable {
     @SerializedName("ssid")
     @Expose
     private String ssid;
+    @SerializedName("device_pass")
+    @Expose
+    private String devicePassword;
     private String ip;
     private String password;
     private boolean favorite;
@@ -83,6 +86,14 @@ public class Device implements Parcelable {
         ip = in.readString();
         password = in.readString();
         favorite = in.readByte() != 0;
+    }
+
+    public String getDevicePassword() {
+        return devicePassword;
+    }
+
+    public void setDevicePassword(String devicePassword) {
+        this.devicePassword = devicePassword;
     }
 
     public static final Creator<Device> CREATOR = new Creator<Device>() {

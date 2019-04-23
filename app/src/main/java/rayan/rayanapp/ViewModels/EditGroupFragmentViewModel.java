@@ -59,11 +59,14 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         return groupDatabase.getGroup(id).getHumanUsers();
     }
 
-    public LiveData<BaseResponse> addUserByMobile(ArrayList<String> phones, String groupId){
+    public LiveData<BaseResponse> addUserByMobile(String phone, String groupId){
+        List<String> phones = new ArrayList<>();
+        phones.add(phone);
         final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
         addUserByMobileObservable(new AddUserByMobileRequest(phones, groupId)).subscribe(addUserByMobileObserver(results));
         return results;
     }
+
     private Observable<BaseResponse> addUserByMobileObservable(AddUserByMobileRequest addUserByMobileRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
@@ -343,7 +346,6 @@ public String getContactNameFromPhone(final String phoneNumber, Context context)
     }
     return contactName;
 }
-
     public Bitmap getContactImageFromPhone(String phoneNumber, Context context) {
         Uri phoneUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Uri photoUri = null;
@@ -373,5 +375,4 @@ public String getContactNameFromPhone(final String phoneNumber, Context context)
         Bitmap defaultPhoto = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_report_image);
         return defaultPhoto;
     }
-
 }

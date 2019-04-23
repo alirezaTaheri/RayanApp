@@ -261,10 +261,12 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .flatMap(deviceBaseResponse -> {
                     if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
                         return toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET), device.getIp());
-                    else {
-                        results.postValue(AppConstants.ERROR_DESCRIPTION);
+                    else if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.ERROR_DESCRIPTION) &&
+                            deviceBaseResponse.getData().getMessage().equals(AppConstants.USER_NOT_FOUND_RESPONSE)){
+                        results.postValue(AppConstants.USER_NOT_FOUND_RESPONSE);
                         return null;
                     }
+                    return null;
                 }).subscribe(toDeviceFactoryResetObserver(results));
 //        toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
         return results;
@@ -474,7 +476,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     public String getDeviceAddress(String ip){
        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-//       return "http://192.168.1.105/test.php";
+//       return "http://192.168.137.1/test.php";
     }
 
     public void writeToFile(String mycode) {
@@ -525,13 +527,13 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return code;
     }
 
-    public LiveData<String> toDeviceUpdate(String ip ){
+    public LiveData<String> toDeviceReady4Update(String ip ){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        toDeviceUpdateObservable(new BaseRequest(AppConstants.DEVICE_IS_READY_FOR_UPDATE),ip).subscribe(toDeviceUpdateObserver(results));
+        toDeviceReady4UpdateObservable(new BaseRequest(AppConstants.DEVICE_IS_READY_FOR_UPDATE),ip).subscribe(toDeviceReady4UpdateObserver(results));
         return results;
     }
 
-    private Observable<DeviceBaseResponse> toDeviceUpdateObservable(BaseRequest baseRequest, String ip){
+    private Observable<DeviceBaseResponse> toDeviceReady4UpdateObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .deviceUpdate(getDeviceAddress(ip), baseRequest)
@@ -539,7 +541,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private DisposableObserver<DeviceBaseResponse> toDeviceUpdateObserver(MutableLiveData<String> results){
+    private DisposableObserver<DeviceBaseResponse> toDeviceReady4UpdateObserver(MutableLiveData<String> results){
         return new DisposableObserver<DeviceBaseResponse>() {
 
             @Override

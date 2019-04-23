@@ -59,8 +59,8 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     private SetPrimaryConfigRequest setPrimaryConfigRequest;
     private NewDevice newDevice;
     GroupsListFragmentViewModel viewModel;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+//    @BindView(R.id.toolbar)
+//    Toolbar toolbar;
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
@@ -74,15 +74,15 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         initNewDevice();
         setPrimaryConfigRequest = new SetPrimaryConfigRequest();
         ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("");
+//        setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setTitle("");
         stepperAdapter = new AddNewDeviceStepperAdapter(getSupportFragmentManager(), this);
         stepperLayout.setAdapter(stepperAdapter);
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
-        setActionBarTitle("");
+//        setActionBarTitle("");
         wifiReceiver = new WifiScanReceiver();
         wifiHandler = new WifiHandler();
 //        if (savedInstanceState == null) {
@@ -125,6 +125,7 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
                 wifiReceiver,
                 new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
         );
+        Log.e("=========---", "status Check: " + (ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED));
         if (ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
             statusCheck();
             wifiHandler.scan();
@@ -134,7 +135,9 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        Log.e("=========---", "status Check: " + manager);
+        Log.e("=========---", "status Check: " + (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)));
+        if (!(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))) {
             buildAlertMessageNoGps();
         }
     }

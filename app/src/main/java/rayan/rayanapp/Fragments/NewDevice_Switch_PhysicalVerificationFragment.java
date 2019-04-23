@@ -85,42 +85,7 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
 
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
-//<<<<<<< HEAD
-//<<<<<<< HEAD
-        viewModel.toDeviceITET().observe(this, deviceBaseResponse -> {
-            switch (deviceBaseResponse.getCmd()){
-                case AppConstants.PRIMARY_CONFIG_TRUE:
-                    Toast.makeText(getActivity(), "دسترسی شما با موفقیت تایید شد", Toast.LENGTH_SHORT).show();
-                    callback.goToNextStep();
-                    break;
-                case AppConstants.PRIMARY_CONFIG_FALSE:
-                    Toast.makeText(getActivity(), "دسترسی شما تایید نشد\nدوباره تلاش کنید", Toast.LENGTH_SHORT).show();
-                    break;
-                case AppConstants.EXPIRED:
-                    Toast.makeText(getActivity(), "زمان شما به اتمام رسیده است", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        });
-//=======
-//=======
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
-//        viewModel.toDeviceITET().observe(this, deviceBaseResponse -> {
-//            switch (deviceBaseResponse.getCmd()){
-//                case AppConstants.PRIMARY_CONFIG_TRUE:
-//                    Toast.makeText(getActivity(), "دسترسی شما با موفقیت تایید شد", Toast.LENGTH_SHORT).show();
-//                    break;
-//                case AppConstants.PRIMARY_CONFIG_FALSE:
-//                    Toast.makeText(getActivity(), "دسترسی شما تایید نشد\nدوباره تلاش کنید", Toast.LENGTH_SHORT).show();
-//                    break;
-//                case AppConstants.EXPIRED:
-//                    Toast.makeText(getActivity(), "زمان شما به اتمام رسیده است", Toast.LENGTH_SHORT).show();
-//                    break;
-//
-//            }
-//        });
-//<<<<<<< HEAD
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-//=======
+        callback.goToNextStep();
 //        viewModel.toDeviceITET().observe(this, deviceBaseResponse -> {
 //            switch (deviceBaseResponse.getCmd()){
 //                case AppConstants.PRIMARY_CONFIG_TRUE:
@@ -135,30 +100,12 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
 //                    break;
 //            }
 //        });
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
     }
 
     @Override
     public void onBackClicked() {
         ((AddNewDeviceActivity)getContext()).setStepperPosition(1);
     }
-
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        mListener = null;
-//    }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name

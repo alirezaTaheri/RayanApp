@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -64,12 +65,12 @@ import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.CustomViewPager;
+import rayan.rayanapp.Util.FTPClient;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus, View.OnClickListener, OnGroupClicked<Group> {
-    int bottomNavigationHeight;
     @BindView(R.id.accessModeSwitch)
     IconSwitch accessModeSwitch;
     @BindView(R.id.progress_bar)
@@ -83,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.drawerLayout)
     DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
-    //@BindView(R.id.navigationView)
-   // NavigationView navigationView;
     @BindView(R.id.bottom_navigation_view)
     BottomNavigationView bottomNavigationView;
     MenuItem prevMenuItem;
@@ -140,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        requestRecordAudioPermission();
         ButterKnife.bind(this);
         mqttStatus = this;
-//        setSupportActionBar(toolbar_main);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
@@ -202,13 +200,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             break;
                     }
                 });
+                if (networkConnection.getType() == AppConstants.VPN_NETWORK) {
+                    Log.e(MainActivity.this.getClass().getSimpleName(), "Vpn is Disconnected so toggling wifi");
+                    WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    wifi.setWifiEnabled(false);
+                    wifi.setWifiEnabled(true);
+                }
                 RayanApplication.getPref().saveProtocol(AppConstants.UDP);
 //                actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.yellow_acc_4));
                 statusIcon.setVisibility(View.INVISIBLE);
                 actionBarStatus.setText("عدم اتصال به اینترنت");
             } else
-                if (MainActivityViewModel.connection.getValue() == null || MainActivityViewModel.connection.getValue().getClient() != null && !Objects.requireNonNull(MainActivityViewModel.connection.getValue()).isConnected() && !MainActivityViewModel.connection.getValue().getStatus().equals(Connection.ConnectionStatus.CONNECTING))
-            {
+                for (int a = 0;a<getSupportFragmentManager().getFragments().size();a++)
+                    if (getSupportFragmentManager().getFragments().get(a) instanceof DevicesFragment){
+                        ((DevicesFragment)getSupportFragmentManager().getFragments().get(a)).devicesFragmentViewModel.getGroups();
+                    }
+                if (MainActivityViewModel.connection.getValue() == null || MainActivityViewModel.connection.getValue().getClient() != null && !Objects.requireNonNull(MainActivityViewModel.connection.getValue()).isConnected() && !MainActivityViewModel.connection.getValue().getStatus().equals(Connection.ConnectionStatus.CONNECTING)) {
                 Log.e("///////////////", "////connecting to mqtt");
                 mainActivityViewModel.connectToMqtt(MainActivity.this).observe(this, connection -> {
                     MainActivityViewModel.connection.postValue(connection);
@@ -702,17 +709,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onPageScrollStateChanged(int state) {
             }
-        });}
+        });
+    }
 //        nsdHelper = new NsdHelper(this);
 //        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
-//    NsdHelper nsdHelper;
 
-        //    @Override
-//    public void onBackPressed() {
-//        publish(MainActivityViewModel.connection.getValue(), null, "message", 0, false);
-//    }
-
-        //    String key = "q7tt0yk18nrjrqur";
+  //  NsdHelper nsdHelper;
+//    String key = "q7tt0yk18nrjrqur";
 //    String textToDecrypt = "xpq/VGgyD0pAf94O1fmSgg==";
 //    String secretOfAkbar = "8nro4q0emv8k1uv5";
 
@@ -805,8 +808,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //{"text":"ILaSCiqVbgCucFnGJEuKJ+XqOHxmaaDeeLj2H625xQM=", "cmd":"de", "src":""}
 //{"text":"G9DU4Dr/jyMuH6OTchlQebccrrbqa7JrIfGuKZ8RurU=", "cmd":"de", "src":""}
 //{"text":"xpq/VGgyD0pAf94O1fmSgg==", "cmd":"de", "src":"","k":"8nro4q0emv8k1uv5"}
-//{"text":"WJywYCPo75GyPxMPPSTKFg==", "cmd":"de", "src":""}
+//{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}
 //{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "cmd":"de", "src":""}
 //{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "cmd":"de", "src":"", "k":"8nro4q0emv8k1uv5"}
 //{"text":"28#", "cmd":"en", "src":"", "k":"q7tt0yk18nrjrqur"}
 //{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"TJpYO/lEqtn6Yg6L8uBkIQ=="}
+//{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}

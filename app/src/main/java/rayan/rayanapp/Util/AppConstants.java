@@ -5,11 +5,13 @@ public class AppConstants {
     public final static String UDP = "udp";
     public final static int UDP_SEND_PORT = 2000;
     public final static int UDP_RECEIVE_PORT = 3000;
+    public final static int FTP_PORT = 21;
     public final static int HTTP_TO_DEVICE_PORT = 3000;
     public final static int UDP_MESSAGING_TIMEOUT = 4000;
     public final static int MQTT_MESSAGING_TIMEOUT = 4000;
     public final static int HTTP_MESSAGING_TIMEOUT = 4000;
     public final static int TOGGLE_ANIMATION_TIMEOUT = 4000;
+
 //    public final static String MQTT_HOST = "api.rayansmarthome.ir";
 //    public final static int MQTT_PORT = 1883;
 //    public final static String MQTT_HOST = "api2.mahdiesrafili.ir";
@@ -74,6 +76,7 @@ public class AppConstants {
     public final static String DEVICE_PRIMARY_PASSWORD = "12345678";
     public final static String DEVICE_TYPE_SWITCH_1 = "switch_1";
     public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";
+    public final static String DEVICE_TYPE_TOUCH_2 = "touch_2";
     public final static String DEVICE_TYPE_PLUG = "plug";
 
     /**

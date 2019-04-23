@@ -63,30 +63,36 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                 }
                 if (key.equals("pin2")){
                     Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge2" + items.get(position));
-                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2))
+                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2))
                         ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
                 }
                 if (key.equals("name")){
                     holder.changeName(b.getString("name"));
                     holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
-                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2))
+                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)|| items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2))
                         ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
                 }
+//                if (key.equals("ssid")){
+//                    holder.accessPointChanged(getItem(position), getListener());
+//                }
+//                if (key.equals("ip")){
+//                    holder.accessPointChanged(getItem(position), getListener());
+//                }
                 if (key.equals("startTogglingPin1")){
                     ValueAnimator v;
                     if (b.getString("status").equals(AppConstants.ON_STATUS))
-                        v = ValueAnimator.ofInt(getItemViewType(position) == 2 ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth(), 0);
+                        v = ValueAnimator.ofInt(getItem(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || getItem(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2) ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth(), 0);
                     else
-                        v = ValueAnimator.ofInt(0, getItemViewType(position) == 2 ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth());
+                        v = ValueAnimator.ofInt(0, getItem(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || getItem(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2) ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth());
                     animatorMap.put(b.getString("chipId")+"1", v);
                     holder.startToggleAnimationPin1(v);
                 }
                 if (key.equals("startTogglingPin2")){
                     ValueAnimator v;
                     if (b.getString("status").equals(AppConstants.ON_STATUS))
-                        v = ValueAnimator.ofInt(getItemViewType(position) == 2 ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth(), 0);
+                        v = ValueAnimator.ofInt(getItem(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || getItem(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth(), 0);
                     else
-                        v = ValueAnimator.ofInt(0, getItemViewType(position) == 2 ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth());
+                        v = ValueAnimator.ofInt(0, getItem(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || getItem(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2) ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth());
                     animatorMap.put(b.getString("chipId")+"2", v);
                     ((DeviceViewHolder2Bridges)holder).startToggleAnimationPin2(v);
                 }
@@ -105,8 +111,8 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
     public int getItemViewType(int position) {
         if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1))
             return 1;
-        else if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2))
+        else if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2))
             return 2;
-        else return 3;
+        return 3;
     }
 }
