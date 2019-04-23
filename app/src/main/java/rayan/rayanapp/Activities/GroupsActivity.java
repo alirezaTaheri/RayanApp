@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -16,8 +17,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.PhoneContact;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
+import rayan.rayanapp.Fragments.EditGroupAdminsFragment;
 import rayan.rayanapp.Fragments.EditGroupFragment;
 import rayan.rayanapp.Fragments.EditGroupFragment2;
+import rayan.rayanapp.Fragments.EditGroupUsersFragment;
 import rayan.rayanapp.Fragments.GroupsListFragment;
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
@@ -28,16 +31,20 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class GroupsActivity extends AppCompatActivity implements GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked, OnAddUserToGroupSubmitClicked {
+public class GroupsActivity extends AppCompatActivity implements EditGroupFragment2.ClickOnButton, GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked, OnAddUserToGroupSubmitClicked {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.status)
+    TextView status;
     GroupsListFragment groupsListFragment;
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
     EditGroupFragment editGroupFragment;
     CreateGroupFragment createGroupFragment;
+    EditGroupAdminsFragment editGroupAdminsFragment;
+    EditGroupUsersFragment editGroupUsersFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
-    EditGroupFragment2 editGroupFragment2=EditGroupFragment2.newInstance();
+    EditGroupFragment2 editGroupFragment2;
 
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -52,6 +59,7 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("");
+        changeToolbarTitle("گروه\u200cها");
         yesNoButtomSheetFragment = new YesNoButtomSheetFragment();
         yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
         fragmentManager = getSupportFragmentManager();
@@ -109,11 +117,11 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
             case "CreateGroupFragment":
                 createGroupFragment.clickOnSubmit();
                 break;
-            case "EditGroupFragment1":
-                editGroupFragment.clickOnRemoveUserSubmit();
+            case "EditGroupUsersFragmentRemoveUser":
+                editGroupUsersFragment.clickOnRemoveUserSubmit();
                 break;
-            case "EditGroupFragment2":
-                editGroupFragment.clickOnRemoveAdminSubmit();
+            case "EditGroupAdminsFragmentRemoveAdmin":
+                editGroupAdminsFragment.clickOnRemoveAdminSubmit();
                 break;
             case "EditGroupFragment3":
                 editGroupFragment.clickOnLeaveGroupSubmit();
@@ -148,4 +156,28 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
             default:
                 break;
     }
-}}
+}
+
+    @Override
+    public void OnAdminButtonClicked() {
+        transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+        editGroupAdminsFragment = EditGroupAdminsFragment.newInstance();
+        transaction.replace(R.id.frameLayout, editGroupAdminsFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void onUserButtonClicked() {
+        transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+        editGroupUsersFragment = EditGroupUsersFragment.newInstance();
+        transaction.replace(R.id.frameLayout, editGroupUsersFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+    public void changeToolbarTitle(String name){
+        status.setText(name);
+    }
+}

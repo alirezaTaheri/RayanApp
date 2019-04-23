@@ -8,7 +8,6 @@
     android:clickable="true"
     app:cardElevation="4dp"
     android:layout_height="wrap_content"
-    app:cardElevation="5dp"
     app:cardCornerRadius="7dp">
     <FrameLayout
         android:id="@+id/frameLayout"

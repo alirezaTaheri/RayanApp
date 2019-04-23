@@ -284,11 +284,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.setScrimColor(Color.parseColor("#33000000"));
 
         if (RayanApplication.getPref().getGenderKey().equals("Male")) {
-            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_man));
         } else if (RayanApplication.getPref().getGenderKey().equals("Female")) {
-            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.woman));
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_woman));
         } else {
-            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_man));
         }
         if (RayanApplication.getPref().getNameKey().isEmpty() && RayanApplication.getPref().getNameKey() == null) {
             drawer_userName.setText("Rayan App");

@@ -31,8 +31,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:foregroundGravity="top"
-                    app:sparkbutton_activeImage="@drawable/ic_lamp_on"
-                    app:sparkbutton_inActiveImage="@drawable/ic_lamp_off"
+                    app:sparkbutton_activeImage="@drawable/ic_plug_on_1"
+                    app:sparkbutton_inActiveImage="@drawable/ic_plug_off_1"
                     app:sparkbutton_iconSize="50dp"
                     app:sparkbutton_primaryColor="@color/baseColor"
                     app:sparkbutton_secondaryColor="@color/primary_dark2" />
@@ -60,6 +60,8 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_width="match_parent"
             android:layout_height="5dp"
+            android:background="@color/baseColor2"
+
             />
         <ImageView
             android:visibility="invisible"

@@ -18,7 +18,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="مدیر گروه"
             android:textColor="@color/baseColor"
             android:layout_marginStart="15dp"
             android:visibility="gone"
@@ -33,8 +32,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="30dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
             android:text="hello"
             android:layout_toLeftOf="@id/card"
             android:textAlignment="center" />
@@ -64,8 +63,8 @@
         </android.support.v7.widget.CardView>
     <View
         android:layout_width="wrap_content"
-        android:layout_height="0.7dp"
-        android:layout_marginRight="30dp"
+        android:layout_height="0.5dp"
+        android:layout_marginRight="20dp"
         android:layout_alignParentBottom="true"
         android:background="@color/grey_light_1"
         android:layout_toLeftOf="@id/card"/>

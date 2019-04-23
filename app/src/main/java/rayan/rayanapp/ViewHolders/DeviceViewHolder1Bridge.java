@@ -35,7 +35,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     @Override
     public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
         Log.e(TAG, "Processing this Device: " + item);
-        bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.devices_bottom_strip));
+        bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         name.setText(item.getName1());
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setChecked(true);

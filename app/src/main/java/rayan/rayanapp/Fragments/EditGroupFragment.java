@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +39,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.GroupDevicesRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
@@ -52,7 +54,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
-public class EditGroupFragment extends Fragment implements OnUserClicked<User>, OnAdminClicked<User> {
+public class EditGroupFragment extends Fragment {
     static final int PICK_CONTACT = 1;
     public static Group group;
     private String userId;
@@ -66,18 +68,9 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     RecyclerView managersRecyclerView;
     @BindView(R.id.devicesRecyclerView)
     RecyclerView devicesRecyclerView;
-//    @BindView(R.id.name)
-//    EditText name;
-  //  UsersRecyclerViewAdapter usersRecyclerViewAdapter;
     AdminsRecyclerViewAdapter managersRecyclerViewAdapter;
     GroupDevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     EditGroupFragmentViewModel editGroupFragmentViewModel;
-
-//    @BindView(R.id.addManagerButton)
-//    ImageView addManagerButton;
-//    @BindView(R.id.saveGroupName)
-//    TextView saveGroupName;
-
     public EditGroupFragment() {
     }
 
@@ -122,30 +115,15 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
                         humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(), getActivity()));
                     }
                 } else getContactPermission();
-               // usersRecyclerViewAdapter.setItems(humanUsers);
                 managersRecyclerViewAdapter.setItems(humanUsers);
                 devicesRecyclerViewAdapter.setItems(group1.getDevices());
             });
         }
-       // usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
-      //  usersRecyclerViewAdapter.setListener(this);
-        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames);
-        managersRecyclerViewAdapter.setListener(this);
+        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"");
+
         devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(getActivity(), new ArrayList<>());
         setHasOptionsMenu(true);
     }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                                           int[] grantResults) {
-//        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
-//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//            } else {
-//            }
-//        }
-//    }
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -158,7 +136,7 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
                         .commit();
                 break;
             case R.id.leaveGroup :
-                clickOnLeaveGroupSubmit();
+                clickOnLeaveGroup();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -168,12 +146,12 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
         inflater.inflate(R.menu.leave_menu, menu);
         MenuItem editGroupBasic = menu.findItem(R.id.editGroupBasic);
         editGroupBasic.setVisible(RayanApplication.getPref().getIsGroupAdminKey());
-        // Use filter.xml from step 1
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        String cNumber;
         switch (requestCode) {
             case (PICK_CONTACT):
                 if (resultCode == Activity.RESULT_OK) {
@@ -227,30 +205,9 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
         getContactPermission();
         managersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         managersRecyclerView.setAdapter(managersRecyclerViewAdapter);
-       // usersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-       // usersRecyclerView.setAdapter(usersRecyclerViewAdapter);
         devicesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         devicesRecyclerView.setAdapter(devicesRecyclerViewAdapter);
         init(group);
-      //  name.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                if (name.getText().toString().equals(group.getName())) {
-//                    saveGroupName.setVisibility(View.INVISIBLE);
-//                } else {
-//                    saveGroupName.setVisibility(View.VISIBLE);
-//                }
-//            }
-//
-//            @Override
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//            }
-//        });
         return view;
     }
 
@@ -289,17 +246,8 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 //        } else getContactPermission();
 
     }
-
-    //@OnClick(R.id.addManagerButton)
-    void addManager() {
-        UsersListDialogFragment usersListDialogFragment = UsersListDialogFragment.newInstance(group);
-        usersListDialogFragment.show(getActivity().getSupportFragmentManager(), "usersList");
-    }
-
     public void init(Group group) {
-      //  name.setText(group.getName());
         devicesRecyclerViewAdapter.setItems(group.getDevices());
-       // usersRecyclerViewAdapter.setItems(group.getHumanUsers());
         managersRecyclerViewAdapter.setItems(group.getAdmins());
     }
 
@@ -309,24 +257,10 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
         }
     }
 
-    @Override
-    public void onRemoveUserClicked(User user) {
-        userId = user.getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment1", "حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر هستید؟");
-        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
-    }
-
     //    @OnClick(R.id.leaveGroup_btn)
     void clickOnLeaveGroup() {
         userId = RayanApplication.getPref().getId();
         YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment3", "ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟");
-        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
-    }
-
-    @Override
-    public void onRemoveAdminClicked(User user) {
-        userId = user.getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment2", "حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
@@ -353,24 +287,10 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
         });
     }
 
-    public void clickOnRemoveAdminSubmit() {
-
-        editGroupFragmentViewModel.deleteAdmin(userId, group.getId()).observe(this, baseResponse -> {
-            Log.e("remove admin code", baseResponse.getStatus().getCode());
-            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")) {
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "این کاربر وجود ندارد");
-            } else if (baseResponse.getStatus().getCode().equals("200")) {
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مدیر با موفقیت حذف شد");
-                editGroupFragmentViewModel.getGroups();
-            } else
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
-        });
-    }
-
     public void clickOnLeaveGroupSubmit() {
         if (adminsUserNames.contains(RayanApplication.getPref().getUsername())) {
             if (admins.size() == 1) {
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "بدلیل اینکه تنها مدیر این گروه هستید امکان ترک گروه برای شما وجود ندارد");
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "هر گروه نیاز به یک مدیر دارد");
             } else {
                 doLeaveGroup(userId, group.getId());
             }
