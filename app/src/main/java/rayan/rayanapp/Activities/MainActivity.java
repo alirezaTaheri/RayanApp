@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.graphics.Color;
+import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -271,11 +273,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.setScrimColor(Color.parseColor("#33000000"));
 
         if (RayanApplication.getPref().getGenderKey().equals("Male")) {
-            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_man));
         } else if (RayanApplication.getPref().getGenderKey().equals("Female")) {
-            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.woman));
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_woman));
         } else {
-            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
+            drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_man));
         }
         if (RayanApplication.getPref().getNameKey().isEmpty() && RayanApplication.getPref().getNameKey() == null) {
             drawer_userName.setText("Rayan App");
@@ -688,8 +690,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 //        nsdHelper = new NsdHelper(this);
 //        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
-
-//    NsdHelper nsdHelper;
 //    String key = "q7tt0yk18nrjrqur";
 //    String textToDecrypt = "xpq/VGgyD0pAf94O1fmSgg==";
 //    String secretOfAkbar = "8nro4q0emv8k1uv5";

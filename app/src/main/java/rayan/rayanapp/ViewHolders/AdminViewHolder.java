@@ -1,6 +1,8 @@
 package rayan.rayanapp.ViewHolders;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.v7.content.res.AppCompatResources;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +16,8 @@ import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 
+import static rayan.rayanapp.App.RayanApplication.getContext;
+
 public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> {
     private final String TAG = AdminViewHolder.class.getSimpleName();
 
@@ -23,11 +27,13 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
     TextView contactName;
     @BindView(R.id.adminTxt)
     TextView adminTxt;
-    ArrayList<String> adminsPhoneNumber=new ArrayList<>();
-    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber) {
+    String parentFragment;
+    ArrayList<String> adminsPhoneNumber;
+    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber, String parentFragment) {
         super(itemView);
         ButterKnife.bind(this,itemView);
         this.adminsPhoneNumber=adminsPhoneNumber;
+        this.parentFragment=parentFragment;
     }
 
     @Override
@@ -41,9 +47,17 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
        }
         if (adminsPhoneNumber.contains(item.getUsername())){
             adminTxt.setVisibility(View.VISIBLE);
+            adminTxt.setText("مدیر");
         }
-//        delete.setOnClickListener(v -> {
-//            listener.onRemoveAdminClicked(item);
-//        });
+        if (parentFragment.equals("admins_users")){
+            adminTxt.setVisibility(View.VISIBLE);
+            adminTxt.setText("");
+            Drawable drawableTop = AppCompatResources.getDrawable(getContext(), R.drawable.ic_more);
+            adminTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableTop, null);
+            adminTxt.setOnClickListener(v -> {
+                listener.onRemoveAdminClicked(item);
+            });
+        }
+
     }
 }
