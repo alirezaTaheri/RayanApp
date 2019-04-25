@@ -11,8 +11,8 @@
 
     <style name="CustomTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/baseColor2</item>
-        <item name="colorPrimaryDark">@color/baseColor2</item>
+        <item name="colorPrimary">@color/baseColor</item>
+        <item name="colorPrimaryDark">@color/baseColor</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/white</item>
     </style>
@@ -75,7 +75,7 @@
 
     <style name="ProgressDialogTheme" parent="android:Theme.DeviceDefault">
         <!--buttons color-->
-        <item name="colorAccent">@color/baseColor2</item>
+        <item name="colorAccent">@color/baseColor</item>
         <item name="android:statusBarColor">@color/background_progress_bar</item>
         <!--title and message color-->
         <!--<item name="android:textColorPrimary">@android:color/holo_red_dark</item>-->

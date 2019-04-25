@@ -139,7 +139,7 @@ public class MessageTransmissionDecider {
     }
 
     private void computeCommunicationRoutes(List<Device> devices){
-        Log.e(TAG,"Starting Computing for "+devices.size()+" Devices: Current SSID:" + currentSSID);
+        Log.e(TAG,"Starting Computing for "+devices.size()+" Devices: Current SSID:" + currentSSID +" Status: " + status);
         Map<String ,List<PROTOCOL>> cr = new HashMap<>();
         for (int a = 0;a<devices.size();a++){
             Log.e(TAG,"-------------------------------------------------------------------------------");
@@ -149,8 +149,8 @@ public class MessageTransmissionDecider {
                 case WIFI:
                     Log.e(TAG,"switch is wifi "+ status+
                             "<!>equality of ssids "+ (devices.get(a).getSsid().equals(currentSSID))+
-                            "<!>ip != nulL? "+ (devices.get(a).getIp() != null)+
-                            "<!>mqttConnected "+ (mqttConnected)+
+                            "<!>ip != nulL? " + (devices.get(a).getIp() != null)+
+                            "<!>mqttConnected " + (mqttConnected)+
                             "<!>devices.get(a).getTopic()!= null? "+ (devices.get(a).getTopic()!= null)+
                             "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
                     );

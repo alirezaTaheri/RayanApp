@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.Data.PhoneContact;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Fragments.EditGroupFragment;
+import rayan.rayanapp.Fragments.EditGroupFragment2;
 import rayan.rayanapp.Fragments.GroupsListFragment;
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
@@ -36,6 +37,7 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
     EditGroupFragment editGroupFragment;
     CreateGroupFragment createGroupFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
+    EditGroupFragment2 editGroupFragment2=EditGroupFragment2.newInstance();
 
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -104,9 +106,6 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
     public void submitClicked(String tag) {
         Log.e("tag of fragment", tag);
         switch (tag) {
-            case "GroupsListFragment":
-                groupsListFragment.clickOnSubmit();
-                break;
             case "CreateGroupFragment":
                 createGroupFragment.clickOnSubmit();
                 break;
@@ -118,6 +117,9 @@ public class GroupsActivity extends AppCompatActivity implements GroupsListFragm
                 break;
             case "EditGroupFragment3":
                 editGroupFragment.clickOnLeaveGroupSubmit();
+                break;
+            case "EditGroupFragment2_DeleteGroup":
+                editGroupFragment2.clickOnDeleteGroupSubmit();
                 break;
             default:
                 break;

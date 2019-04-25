@@ -31,7 +31,7 @@ public class TestDeviceFragmentViewModel extends AndroidViewModel {
     private Observable<ToggleDeviceResponse> toDeviceToggleObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .toggle(getDeviceAddress(ip), baseRequest)
+                .toggle(AppConstants.getDeviceAddress(ip), baseRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -55,10 +55,5 @@ public class TestDeviceFragmentViewModel extends AndroidViewModel {
                 Log.d(TAG,"Completed");
             }
         };
-    }
-
-
-    public String getDeviceAddress(String ip){
-        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
     }
 }

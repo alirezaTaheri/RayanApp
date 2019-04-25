@@ -471,7 +471,7 @@ public class WifiHandler implements WifiHelper{
         return connect;
     }
 
-    public static void connectToSSID(Context context, String ssid, String password){
+    public static int connectToSSID(Context context, String ssid, String password){
         WifiManager wifiManager;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiConfiguration conf = new WifiConfiguration();
@@ -482,5 +482,19 @@ public class WifiHandler implements WifiHelper{
         wifiManager.enableNetwork(netId, true);
         wifiManager.reconnect();
         Log.d("MainActivity"," on thread " + Thread.currentThread().getName());
+        return netId;
+    }
+
+    public static void removeNetwork(Context context,String ssid){
+        WifiManager wifiManager;
+        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        for( WifiConfiguration i : list ) {
+            Log.e("WifiHandler" , "Comparing: " + ssid + " Checking this to forget: "+ i.SSID);
+            if (i.SSID.contains(ssid)){
+                Log.e("WifiHandler" , "Matched: "+ i.SSID);
+                wifiManager.removeNetwork(i.networkId);
+            }
+        }
     }
 }

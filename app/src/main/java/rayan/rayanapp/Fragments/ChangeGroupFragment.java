@@ -97,9 +97,7 @@ public class ChangeGroupFragment extends BottomSheetDialogFragment implements On
         SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),""+item.getName());
     }
 
-    @Override
-    public void onGroupLongPress(Group Item) {
-    }
+
 
 //    @OnClick(R.id.createGroup)
 //    void createGroup(){

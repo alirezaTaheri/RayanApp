@@ -48,6 +48,7 @@ public class AppConstants {
     public final static String MOBILE = "MOBILE";
     public final static String WIFI = "WIFI";
     public final static String NOT_CONNECTED = "NOT_CONNECTED";
+    public final static String NO_HTTP = "no_http";
 
     //Operations
     public final static String ON_1 = "turn_on_1";
@@ -92,14 +93,19 @@ public class AppConstants {
 //=======
 //>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 
-    public final static String DEVICE_IS_READY_FOR_UPDATE = "ready4update?";
-    public final static String DEVICE_READY_FOR_UPDATE = "ready4update";
+    public final static String DEVICE_IS_READY_FOR_UPDATE = "update";
+    public final static String DEVICE_READY_FOR_UPDATE = "update";
     public final static String DEVICE_UPDATE_CODE_WROTE = "codes_wrote";
     public final static String DEVICE_UPDATE_END = "update_end";
     public final static String DEVICE_UPDATE_DONE = "updating_done";
     public final static String DEVICE_DO_UPDATE = "update";
     public final static String DEVICE_ALL_FILES_LIST = "all_files_list";
     public final static String DEVICE_SEND_FILES_PERMIT = "send_files_to_device?";
+
+    /**
+     * Dialog Types
+     */
+    public final static String DIALOG_PROVIDE_INTERNET = "dialog_provide_internet";
 //<<<<<<< HEAD
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 //=======
@@ -111,4 +117,8 @@ public class AppConstants {
 
 //>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 
+    public static String getDeviceAddress(String ip){
+        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+//        return "http://192.168.137.1/test.php";
+    }
 }

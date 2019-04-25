@@ -7,12 +7,12 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:clickable="true"
+    app:cardElevation="4dp"
     android:layout_height="wrap_content"
     app:cardCornerRadius="7dp">
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:background="@drawable/cardview_edge"
         android:layout_height="match_parent">
         <LinearLayout
             android:id="@+id/wholeLayout1"
@@ -43,6 +43,7 @@
                     android:id="@+id/name"
                     android:layout_below="@+id/pin1"
                     android:gravity="center"
+                    android:textColor="@color/ms_black"
                     android:layout_marginBottom="4dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -52,9 +53,6 @@
             android:layout_gravity="center_horizontal|bottom"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"
-            android:layout_marginBottom="2dp"
             android:background="@color/grey_light_3"
             />
         <View
@@ -62,9 +60,6 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"
-            android:layout_marginBottom="2dp"
             />
         <ImageView
             android:visibility="invisible"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RayanApp</string>
+    <string name="app_name">Rayan</string>
     <string name="app_name_fa">رایان</string>
     <string name="hint_sign_in_phoneNumber">شماره موبایل</string>
 
@@ -225,6 +225,7 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="title_activity_settingss">Settings</string>
 
 
 </resources>

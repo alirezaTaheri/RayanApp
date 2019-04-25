@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
@@ -19,11 +21,13 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
     ImageView contactImage;
     @BindView(R.id.contactName)
     TextView contactName;
-    @BindView(R.id.deleteUser)
-    ImageView delete;
-    public AdminViewHolder(View itemView) {
+    @BindView(R.id.adminTxt)
+    TextView adminTxt;
+    ArrayList<String> adminsPhoneNumber=new ArrayList<>();
+    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber) {
         super(itemView);
         ButterKnife.bind(this,itemView);
+        this.adminsPhoneNumber=adminsPhoneNumber;
     }
 
     @Override
@@ -35,15 +39,11 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
                 contactName.setText(item.getContactNameOnPhone());
             }
        }
-        if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
-            delete.setVisibility(View.INVISIBLE);
+        if (adminsPhoneNumber.contains(item.getUsername())){
+            adminTxt.setVisibility(View.VISIBLE);
         }
-        if (RayanApplication.getPref().getIsGroupAdminKey()){
-        }else{
-            delete.setVisibility(View.INVISIBLE);
-        }
-        delete.setOnClickListener(v -> {
-            listener.onRemoveAdminClicked(item);
-        });
+//        delete.setOnClickListener(v -> {
+//            listener.onRemoveAdminClicked(item);
+//        });
     }
 }

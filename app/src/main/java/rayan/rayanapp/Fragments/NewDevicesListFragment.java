@@ -227,16 +227,16 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setChip_id(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-1]);
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setStatus(NewDevice.NodeStatus.IDLE);
             }
-            if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
+            if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_1);
 
-            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_2))
+            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_SWITCH_2))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_2);
 
-            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_TOUCH_2))
+            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_TOUCH_2))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_TOUCH_2);
 
-            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_PLUG))
+            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_PLUG))
                 ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_PLUG);
 
             Log.e("//////////" , "Device is:  " + ((AddNewDeviceActivity) getActivity()).getNewDevice());

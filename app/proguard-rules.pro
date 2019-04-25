@@ -96,3 +96,6 @@
 -dontwarn javax.annotation.ParametersAreNonnullByDefault
 -dontwarn org.jetbrains.annotations.NonNls
 -dontwarn org.jetbrains.annotations.NotNull
+-keep class rayan.rayanapp.Data.** { *; }
+-keep class rayan.rayanapp.Retrofit.** { *; }
+-keep class rayan.rayanapp.Retrofit.Models.** { *; }

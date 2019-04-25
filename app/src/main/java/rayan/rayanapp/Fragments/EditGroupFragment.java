@@ -3,14 +3,9 @@ package rayan.rayanapp.Fragments;
 import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,8 +13,6 @@ import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,12 +20,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,10 +30,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.GroupDevicesRecyclerViewAdapter;
-import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Contact;
-import rayan.rayanapp.Data.PhoneContact;
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
@@ -55,10 +42,10 @@ import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupFragment extends Fragment implements OnUserClicked<User>, OnAdminClicked<User> {
     static final int PICK_CONTACT = 1;
-    private Group group;
+    public static Group group;
     private String userId;
-    private List<User> admins;
-    private List<User> humanUsers;
+    public static List<User> admins;
+    public static List<User> humanUsers;
     ArrayList<String> adminsUserNames = new ArrayList<>();
     private final String TAG = EditGroupFragment.class.getSimpleName();
     String cNumber;
@@ -66,21 +53,19 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     private static EditGroupFragment instance = null;
     @BindView(R.id.managersRecyclerView)
     RecyclerView managersRecyclerView;
-    @BindView(R.id.usersRecyclerView)
-    RecyclerView usersRecyclerView;
     @BindView(R.id.devicesRecyclerView)
     RecyclerView devicesRecyclerView;
-    @BindView(R.id.name)
-    EditText name;
-    UsersRecyclerViewAdapter usersRecyclerViewAdapter;
+//    @BindView(R.id.name)
+//    EditText name;
+  //  UsersRecyclerViewAdapter usersRecyclerViewAdapter;
     AdminsRecyclerViewAdapter managersRecyclerViewAdapter;
     GroupDevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     EditGroupFragmentViewModel editGroupFragmentViewModel;
 
-    @BindView(R.id.addManagerButton)
-    ImageView addManagerButton;
-    @BindView(R.id.saveGroupName)
-    TextView saveGroupName;
+//    @BindView(R.id.addManagerButton)
+//    ImageView addManagerButton;
+//    @BindView(R.id.saveGroupName)
+//    TextView saveGroupName;
 
     public EditGroupFragment() {
     }
@@ -113,6 +98,9 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
                 this.group = group1;
                 admins = group1.getAdmins();
                 humanUsers = group1.getHumanUsers();
+                for (int i = 0; i <= admins.size() - 1; i++) {
+                    adminsUserNames.add(admins.get(i).getUsername());
+                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                     for (int i = 0; i <= admins.size() - 1; i++) {
                         admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(), getActivity()));
@@ -123,14 +111,14 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
                         humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(), getActivity()));
                     }
                 } else getContactPermission();
-                usersRecyclerViewAdapter.setItems(humanUsers);
-                managersRecyclerViewAdapter.setItems(admins);
+               // usersRecyclerViewAdapter.setItems(humanUsers);
+                managersRecyclerViewAdapter.setItems(humanUsers);
                 devicesRecyclerViewAdapter.setItems(group1.getDevices());
             });
         }
-        usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
-        usersRecyclerViewAdapter.setListener(this);
-        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity());
+       // usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
+      //  usersRecyclerViewAdapter.setListener(this);
+        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames);
         managersRecyclerViewAdapter.setListener(this);
         devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(getActivity(), new ArrayList<>());
         setHasOptionsMenu(true);
@@ -150,18 +138,25 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.leaveMenu) {
-            clickOnLeaveGroup();
-            return true;
+        switch (id){
+            case R.id.editGroupBasic:
+                EditGroupFragment2 editGroupFragment2= EditGroupFragment2.newInstance();
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frameLayout, editGroupFragment2)
+                        .addToBackStack(null)
+                        .commit();
+                break;
+            case R.id.leaveGroup :
+                clickOnLeaveGroupSubmit();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.leave_menu, menu);
-        menu.findItem(R.id.leaveMenu).setTitle("ترک کردن گروه");
+        MenuItem editGroupBasic = menu.findItem(R.id.editGroupBasic);
+        editGroupBasic.setVisible(RayanApplication.getPref().getIsGroupAdminKey());
         // Use filter.xml from step 1
     }
 
@@ -221,36 +216,37 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
         getContactPermission();
         managersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         managersRecyclerView.setAdapter(managersRecyclerViewAdapter);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        usersRecyclerView.setAdapter(usersRecyclerViewAdapter);
+       // usersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+       // usersRecyclerView.setAdapter(usersRecyclerViewAdapter);
         devicesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         devicesRecyclerView.setAdapter(devicesRecyclerViewAdapter);
         init(group);
-        name.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (name.getText().toString().equals(group.getName())) {
-                    saveGroupName.setVisibility(View.INVISIBLE);
-                } else {
-                    saveGroupName.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
+      //  name.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                if (name.getText().toString().equals(group.getName())) {
+//                    saveGroupName.setVisibility(View.INVISIBLE);
+//                } else {
+//                    saveGroupName.setVisibility(View.VISIBLE);
+//                }
+//            }
+//
+//            @Override
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
         return view;
     }
 
     public static final int REQUEST_CODE_PICK_CONTACT = 1;
     public static final int MAX_PICK_CONTACT = 10;
 
-    @OnClick(R.id.addUserButton)
+    @OnClick(R.id.addUserToGroup)
     void addUser() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
             Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
@@ -283,16 +279,16 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
 
     }
 
-    @OnClick(R.id.addManagerButton)
+    //@OnClick(R.id.addManagerButton)
     void addManager() {
         UsersListDialogFragment usersListDialogFragment = UsersListDialogFragment.newInstance(group);
         usersListDialogFragment.show(getActivity().getSupportFragmentManager(), "usersList");
     }
 
     public void init(Group group) {
-        name.setText(group.getName());
+      //  name.setText(group.getName());
         devicesRecyclerViewAdapter.setItems(group.getDevices());
-        usersRecyclerViewAdapter.setItems(group.getHumanUsers());
+       // usersRecyclerViewAdapter.setItems(group.getHumanUsers());
         managersRecyclerViewAdapter.setItems(group.getAdmins());
     }
 
@@ -307,22 +303,6 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
         userId = user.getId();
         YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment1", "حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
-    }
-
-    @OnClick(R.id.saveGroupName)
-    void saveGroupName() {
-        editGroupFragmentViewModel.editGroup(name.getText().toString(), group.getId()).observe(this, baseResponse -> {
-            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("Invalid group_id")) {
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شماره گروه نادرست است");
-            } else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter group_id")) {
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شماره گروه را وارد کنید");
-            } else if (baseResponse.getStatus().getCode().equals("200")) {
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "گروه با موفقیت اصلاح شد");
-                editGroupFragmentViewModel.getGroups();
-                saveGroupName.setVisibility(View.INVISIBLE);
-            } else
-                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
-        });
     }
 
     //    @OnClick(R.id.leaveGroup_btn)
@@ -377,9 +357,6 @@ public class EditGroupFragment extends Fragment implements OnUserClicked<User>, 
     }
 
     public void clickOnLeaveGroupSubmit() {
-        for (int i = 0; i <= admins.size() - 1; i++) {
-            adminsUserNames.add(admins.get(i).getUsername());
-        }
         if (adminsUserNames.contains(RayanApplication.getPref().getUsername())) {
             if (admins.size() == 1) {
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "بدلیل اینکه تنها مدیر این گروه هستید امکان ترک گروه برای شما وجود ندارد");

@@ -4,9 +4,9 @@ import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -24,7 +24,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
@@ -58,7 +57,6 @@ import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Fragments.DevicesFragment;
-import rayan.rayanapp.Helper.NsdHelper;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
@@ -67,7 +65,6 @@ import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.CustomViewPager;
-import rayan.rayanapp.Util.FTPClient;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -93,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.status)
     TextView actionBarStatus;
     @BindView(R.id.statusIcon)
-    ImageView statusIcon;
+    ImageView retryIcon;
     @BindView(R.id.drawerrrrr)
     View drawerrrrr;
     ///////////////////////////////////////////////////////
@@ -144,8 +141,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getIsNotificationOn());
-
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
             switch (connection.getStatus()) {
@@ -200,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 RayanApplication.getPref().saveProtocol(AppConstants.UDP);
 //                actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.yellow_acc_4));
-                statusIcon.setVisibility(View.INVISIBLE);
+                retryIcon.setVisibility(View.INVISIBLE);
                 actionBarStatus.setText("عدم اتصال به اینترنت");
             } else
                 for (int a = 0;a<getSupportFragmentManager().getFragments().size();a++)
@@ -269,10 +264,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initializeBottomNavigation();
     }
     if (RayanApplication.getPref().isLoggedIn()) {
-        int width = (getResources().getDisplayMetrics().widthPixels*4)/6;
+        int width = (getResources().getDisplayMetrics().widthPixels*6)/8;
         DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) drawerrrrr.getLayoutParams();
         params.width = width;
         drawerrrrr.setLayoutParams(params);
+        drawerLayout.setScrimColor(Color.parseColor("#33000000"));
+
         if (RayanApplication.getPref().getGenderKey().equals("Male")) {
             drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.man));
         } else if (RayanApplication.getPref().getGenderKey().equals("Female")) {
@@ -341,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(this, AddNewDeviceActivity.class));
                 break;
             case R.id.settingsActivity:
-                startActivity(new Intent(this, SettingsActivity.class));
+                startActivity(new Intent(this, SettingssActivity.class));
                 break;
         }
 //        drawerLayout.closeDrawer(GravityCompat.START);
@@ -376,76 +373,64 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttConnecting() {
-//        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.yellow_acc_4));
         actionBarStatus.setText("درحال اتصال");
-        statusIcon.setVisibility(View.INVISIBLE);
-//        accessModeSwitch.setVisibility(View.INVISIBLE);
+        retryIcon.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
-//        Toast.makeText(this, "CONNECTING", Toast.LENGTH_SHORT).show();
-        Log.e(TAG, "Mqtt Status: CONNECTING");
+        Log.e(TAG, "Mqtt Status: CONNECTING Connection Retries:" + connectionRetries);
         ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
     }
 
     @Override
     public void mqttConnected() {
-//        connectionRetries = 0;
-//        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.orange_acc_4));
+        connectionRetries = 0;
         actionBarStatus.setText("رایان");
-        statusIcon.setVisibility(View.INVISIBLE);
-//        accessModeSwitch.setVisibility(View.VISIBLE);
+        retryIcon.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
-        accessModeSwitch.setChecked(IconSwitch.Checked.RIGHT);
         RayanApplication.getPref().saveProtocol(AppConstants.MQTT);
-//        Toast.makeText(this, "CONNECTED", Toast.LENGTH_SHORT).show();
-        Log.e(TAG, "Mqtt Status: CONNECTED");
+        Log.e(TAG, "Mqtt Status: ERROR Connection Retries: " + connectionRetries);
         ((RayanApplication)getApplication()).getMtd().updateMqttStatus(true);
     }
 
     @Override
     public void mqttDisconnected() {
-//        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.red_acc_4));
-        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)){
+        Log.e(TAG, "Mqtt Status: DISCONNECTED Connection Retries: " + connectionRetries);
+        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
+            connectionRetries = 0;
             actionBarStatus.setText("عدم اتصال به اینترنت");
-            statusIcon.setVisibility(View.INVISIBLE);
+            retryIcon.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
         }
-        else{
-            actionBarStatus.setText("عدم اتصال");
-            statusIcon.setVisibility(View.VISIBLE);
-
+        else {
+            if (connectionRetries > 8) {
+                actionBarStatus.setText("عدم اتصال");
+                retryIcon.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+            else {onRetryMqtt(); //connectionRetries++;
+                 }
         }
-//        accessModeSwitch.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
-        accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
-        RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-//        Toast.makeText(this, "DISCONNECTED", Toast.LENGTH_SHORT).show();
-        Log.e(TAG, "Mqtt Status: DISCONNECTED");
-        ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
+            RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+            ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
     }
 
     @Override
     public void mqttError() {
-        connectionRetries++;
-//        if (connectionRetries>2){
-//            connectionRetries = 0;
-//        actionBarStatus.setTextColor(ContextCompat.getColor(this,R.color.red_acc_4));
+        Log.e(TAG, "Mqtt Status: ERROR Connection Retries: " + connectionRetries);
         if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
+            connectionRetries = 0;
             actionBarStatus.setText("عدم اتصال به اینترنت");
-            statusIcon.setVisibility(View.INVISIBLE);
-        } else {
-            actionBarStatus.setText("عدم اتصال");
-            statusIcon.setVisibility(View.VISIBLE);
-
+            retryIcon.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+        }else {
+            if (connectionRetries > 8) {
+                actionBarStatus.setText("عدم اتصال");
+                retryIcon.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+            else {onRetryMqtt(); connectionRetries++;}
         }
-        statusIcon.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
-//        accessModeSwitch.setVisibility(View.VISIBLE);
-        accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
-        RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-        ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
-//    }
-//    else onRetryMqtt();
-//        Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
-        Log.e(TAG, "Mqtt Status: ERROR");
+            RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+            ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
     }
 
     public boolean isExternalStorageWritable() {
@@ -704,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        nsdHelper = new NsdHelper(this);
 //        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
 
-    NsdHelper nsdHelper;
+//    NsdHelper nsdHelper;
 //    String key = "q7tt0yk18nrjrqur";
 //    String textToDecrypt = "xpq/VGgyD0pAf94O1fmSgg==";
 //    String secretOfAkbar = "8nro4q0emv8k1uv5";
@@ -741,7 +726,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     drawerLayout.closeDrawer(GravityCompat.START);
                     break;
                 case R.id.settingsActivity:
-                    startActivity(new Intent(this, SettingsActivity.class));
+                    startActivity(new Intent(this, SettingssActivity.class));
                     drawerLayout.closeDrawer(GravityCompat.START);
                     break;
                 case R.id.sortByGroup:
@@ -769,13 +754,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public void onGroupClicked (Group item){
             drawerLayout.closeDrawer(GravityCompat.START);
-            ((DevicesFragment) getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item.getId());
+            for (int a = 0;a<getSupportFragmentManager().getFragments().size();a++)
+                if (getSupportFragmentManager().getFragments().get(a) instanceof DevicesFragment)
+                    ((DevicesFragment) getSupportFragmentManager().getFragments().get(a)).sortDevicesByGroup(item.getId());
             drawer_groupsRecyclerViewAdapter.notifyDataSetChanged();
         }
 
-        @Override
-        public void onGroupLongPress (Group Item){
-        }}
+}
 
         //    @Override
 //    public void onBackPressed() {
@@ -794,7 +779,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////        } catch (UnsupportedEncodingException e) {
 ////            e.printStackTrace();
 ////        }
-//    }//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
+//    }//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"yyz+4yK0mByoiYrkw1D3pA=="}
 //}//{"src":"14337767","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"fYvqm//fo28GymbrTqhbuA=="}
 //{"text":"yxEX1vOqupgRIiIE6mi11szCSG6glHizIdaPimHgGJoMk5B5jC/aTuoLF5p7MTJlz/yIH4seE3HatSek9ipis8JNmUzJX7tnKI7E14ur5jZ7y9Xr0TUIv3HQcU0sfMf3", "cmd":"en", "src":""}
 //{"text":"ILaSCiqVbgCucFnGJEuKJ+XqOHxmaaDeeLj2H625xQM=", "cmd":"de", "src":""}
@@ -803,6 +788,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}
 //{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "cmd":"de", "src":""}
 //{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "cmd":"de", "src":"", "k":"8nro4q0emv8k1uv5"}
-//{"text":"28#", "cmd":"en", "src":"", "k":"q7tt0yk18nrjrqur"}
-//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"TJpYO/lEqtn6Yg6L8uBkIQ=="}
+//{"text":"28#", "cmd":"en", "src":"", "k":"0ewnhmtj57j936gl"}
+//{"src":"000000","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"DoUWn/Dlm0iz+nNAAlCoEA=="}
 //{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}
+

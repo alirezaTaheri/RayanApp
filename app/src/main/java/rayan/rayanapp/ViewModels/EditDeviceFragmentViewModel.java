@@ -49,6 +49,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitRespo
 import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Util.AppConstants;
 
 public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
@@ -226,7 +227,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<ChangeNameResponse> toDeviceChangeNameObservable(ChangeNameRequest changeNameRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .changeName(getDeviceAddress(ip), changeNameRequest)
+                .changeName(AppConstants.getDeviceAddress(ip), changeNameRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -284,7 +285,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<DeviceBaseResponse> toDeviceFactoryResetObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .factoryReset(getDeviceAddress(ip), baseRequest)
+                .factoryReset(AppConstants.getDeviceAddress(ip), baseRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -367,7 +368,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<DeviceBaseResponse> toDeviceChangeAccessPointObservable(ChangeAccessPointRequest changeAccessPointRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .changeAccessPoint(getDeviceAddress(ip), changeAccessPointRequest)
+                .changeAccessPoint(AppConstants.getDeviceAddress(ip), changeAccessPointRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -405,7 +406,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     public Observable<DeviceBaseResponse> toDeviceMqttObservable(MqttTopicRequest mqttTopicRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .sendMqtt(getDeviceAddress(ip), mqttTopicRequest)
+                .sendMqtt(AppConstants.getDeviceAddress(ip), mqttTopicRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -442,7 +443,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<DeviceBaseResponse> toDeviceEndSettingsObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .endSettings(getDeviceAddress(ip), baseRequest)
+                .endSettings(AppConstants.getDeviceAddress(ip), baseRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -472,11 +473,6 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     public void updateDevice(Device device){
         deviceDatabase.updateDevice(device);
-    }
-
-    public String getDeviceAddress(String ip){
-       return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-//       return "http://192.168.137.1/test.php";
     }
 
     public void writeToFile(String mycode) {
@@ -536,7 +532,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<DeviceBaseResponse> toDeviceReady4UpdateObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .deviceUpdate(getDeviceAddress(ip), baseRequest)
+                .deviceUpdate(AppConstants.getDeviceAddress(ip), baseRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -567,6 +563,39 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
 
+    public MutableLiveData<VersionResponse> getDeviceVersion(Device device){
+        MutableLiveData<VersionResponse> results = new MutableLiveData<>();
+        ApiUtils.getApiService().getVersion(AppConstants.getDeviceAddress(device.getIp()), new BaseRequest(AppConstants.GET_VERSION))
+                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<VersionResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.e(TAG, "Getting device version onSubscribe: ");
+                    }
+
+                    @Override
+                    public void onNext(VersionResponse versionResponse) {
+                        Log.e(TAG, "Getting device version on next: " + versionResponse);
+                        results.postValue(versionResponse);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "Getting device version onError: " + e);
+                        if (e instanceof SocketTimeoutException)
+                            results.postValue(new VersionResponse());
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "Getting device version onComplete: ");
+                    }
+                });
+        return results;
+    }
+
+
     @SuppressLint("CheckResult")
     public LiveData<String> toDeviceDoUpdate(String cmd, List<String> codeList, String ip){
         final MutableLiveData<String> results = new MutableLiveData<>();
@@ -584,7 +613,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     private Observable<DeviceBaseResponse> toDeviceDoUpdateObservable(UpdateDeviceRequest updateDeviceRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
-        return apiService.deviceDoUpdate(getDeviceAddress(ip), updateDeviceRequest)
+        return apiService.deviceDoUpdate(AppConstants.getDeviceAddress(ip), updateDeviceRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

@@ -118,7 +118,7 @@ public class CreateGroupFragment extends Fragment {
         instance=this;
         createGroupViewModel = ViewModelProviders.of(this).get(CreateGroupViewModel.class);
     }
-    @OnClick(R.id.addUserButton)
+    @OnClick(R.id.addUserToGroup)
     void addUser(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
             Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);

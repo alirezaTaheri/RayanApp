@@ -30,4 +30,17 @@ public class VersionResponse extends DeviceBaseResponse{
     public String getSerial() {
         return serial;
     }
+
+    @Override
+    public String toString() {
+        return "VersionResponse{" +
+                "type='" + type + '\'' +
+                ", nodetype='" + nodetype + '\'' +
+                ", sv='" + sv + '\'' +
+                ", fv='" + fv + '\'' +
+                ", hv='" + hv + '\'' +
+                ", mand='" + mand + '\'' +
+                ", serial='" + serial + '\'' +
+                '}';
+    }
 }

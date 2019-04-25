@@ -9,37 +9,35 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <android.support.v7.widget.CardView
+        <android.support.design.widget.AppBarLayout
+            android:layoutDirection="rtl"
+            android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_marginLeft="7dp"
-            android:layout_marginRight="7dp"
-            android:layout_marginBottom="4dp"
-            app:cardCornerRadius="12dp"
-            card_view:cardElevation="3dp"
-            android:layout_marginTop="4dp"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardElevation="3dp">
-            <android.support.design.widget.AppBarLayout
-                android:layoutDirection="rtl"
-                android:id="@+id/appbar"
+            android:layout_height="wrap_content"
+            android:background="@drawable/main_toolbar_border"
+            android:theme="@style/AppTheme">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                app:contentInsetStartWithNavigation="-10dp"
+                app:contentInsetLeft="-10dp"
+                app:contentInsetStart="-10dp"
+                app:layout_collapseMode="pin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/main_toolbar_border"
-                android:theme="@style/AppTheme">
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    app:contentInsetStartWithNavigation="-10dp"
-                    app:contentInsetLeft="-10dp"
-                    app:contentInsetStart="-10dp"
-                    app:layout_collapseMode="pin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:popupTheme="@style/AppTheme">
-                </android.support.v7.widget.Toolbar>
-            </android.support.design.widget.AppBarLayout>
-        </android.support.v7.widget.CardView>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                app:popupTheme="@style/AppTheme">
+                <TextView
+                    android:id="@+id/status"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:text="دستگاه\u200cها"
+                    android:textSize="17sp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_height="wrap_content" />
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.AppBarLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"

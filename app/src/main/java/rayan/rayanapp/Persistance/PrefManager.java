@@ -13,9 +13,8 @@ public class PrefManager {
     private  PrefManager prefManager;
 
    // private final String KEY_GROUPSACTIVITY_FIRSTLAUNCH = "KEY_GROUPSACTIVITY_FIRSTLAUNCH";
-    private final String KEY_NOTIFICATION = "KEY_NOTIFICATION";
+    private final String KEY_NODE_SOUND = "KEY_NODE_SOUND";
     private final String KEY_APPLICATION_LANGUAGE = "KEY_APPLICATION_LANGUAGE";
-    private final String KEY_THEME = "KEY_THEME";
     private final String KEY_PROTOCOL = "KEY_PROTOCOL";
     private final String KEY_EMAIL = "KEY_EMAIL";
     private final String KEY_NAME = "KEY_NAME";
@@ -114,16 +113,6 @@ public class PrefManager {
     public String getLocalBroadcastAddress(){
         return pref.getString(KEY_LOCAL_BROADCAST_ADDRESS,null);
     }
-
-
-    public void setThemeKey(Integer themeKey){
-        editor.putInt(KEY_THEME,themeKey);
-        editor.commit();
-    }
-    public Integer getThemeKey(){
-        return pref.getInt(KEY_THEME,0);
-    }
-
     public void setNameKey(String name){
         editor.putString(KEY_NAME,name);
         editor.commit();
@@ -162,12 +151,12 @@ public class PrefManager {
     public Integer getBottomNavigationIndexKey(){
         return pref.getInt(KEY_BOTTOM_NAVIGATION_INDEX,1);
     }
-public void setIsNotificationOn(Boolean isNotificationOn){
-    editor.putBoolean(KEY_NOTIFICATION, isNotificationOn);
+public void setIsNodeSoundOn(Boolean nodeSoundOn){
+    editor.putBoolean(KEY_NODE_SOUND, nodeSoundOn);
     editor.commit();
 }
-    public Boolean getIsNotificationOn(){
-        return pref.getBoolean(KEY_NOTIFICATION,true);
+    public Boolean getIsNodeSoundOn(){
+        return pref.getBoolean(KEY_NODE_SOUND,true);
     }
 
     public void setApplicationLanguage(String language){

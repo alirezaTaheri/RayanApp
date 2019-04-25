@@ -3,6 +3,8 @@ package rayan.rayanapp.Adapters.recyclerView;
 import android.content.Context;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
@@ -11,12 +13,14 @@ import rayan.rayanapp.ViewHolders.AdminViewHolder;
 
 public class AdminsRecyclerViewAdapter extends GenericRecyclerViewAdapter<User,OnAdminClicked<User>, AdminViewHolder>  {
 
-    public AdminsRecyclerViewAdapter(Context context) {
+    ArrayList<String> adminsPhoneNumber=new ArrayList<>();
+    public AdminsRecyclerViewAdapter(Context context, ArrayList<String> adminsPhoneNumber) {
         super(context);
+        this.adminsPhoneNumber=adminsPhoneNumber;
     }
 
     @Override
     public AdminViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AdminViewHolder(inflate(R.layout.item_user, parent));
+        return new AdminViewHolder(inflate(R.layout.item_user, parent),adminsPhoneNumber);
     }
 }

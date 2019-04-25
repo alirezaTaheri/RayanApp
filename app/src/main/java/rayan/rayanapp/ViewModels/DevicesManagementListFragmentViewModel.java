@@ -79,7 +79,7 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
     }
 
     public Observable<Ready4SettingsResponse> setReady4SettingsObservable(Device device){
-        return ApiUtils.getApiService().settings(getDeviceAddress(device.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
+        return ApiUtils.getApiService().settings(AppConstants.getDeviceAddress(device.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
                 .subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     }
     @SuppressLint("CheckResult")
@@ -174,9 +174,4 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
         deviceDatabase.updateDevice(device);
     }
 
-
-    public String getDeviceAddress(String ip){
-        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-//        return "http://"+"192.168.137.1"+":"+"80"+"/test.php";
-    }
 }

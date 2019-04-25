@@ -27,6 +27,7 @@ import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
@@ -43,6 +44,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     Activity activity;
     LiveData<List<Device>> favoritesObservable;
     Observer<List<Device>> favoritesObserver;
+    DialogPresenter dp;
     public FavoritesFragment() {
     }
 
@@ -57,6 +59,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = getActivity();
+        dp = new DialogPresenter(getActivity().getSupportFragmentManager());
         favoritesFragmentViewModel = ViewModelProviders.of(getActivity()).get(FavoritesFragmentViewModel.class);
         favoritesObservable = favoritesFragmentViewModel.getAllDevices();
         favoritesObserver = new Observer<List<Device>>() {
@@ -111,47 +114,16 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
 
     @Override
     public void onPin1Clicked(Device device, int position) {
-        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
-            if (device.isLocallyAccessibility())
-                favoritesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
-            else{
-                favoritesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
-//                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else {
-            if (device.isOnlineAccessibility()){
-                favoritesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
-            }
-            else{
-                favoritesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
-//                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-            }
-        }
-
+        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
+        Log.e(this.getClass().getSimpleName()," Pin1 Is Touching: " + "Device: " +device);
+        favoritesFragmentViewModel.togglePin1(dp,this, position, ((RayanApplication) getActivity().getApplication()), device);
     }
 
     @Override
     public void onPin2Clicked(Device device, int position) {
-//        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
-        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
-            if (device.isLocallyAccessibility())
-                favoritesFragmentViewModel.togglePin2(this,position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
-            else{
-//                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-                favoritesFragmentViewModel.togglePin2(this, position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
-            }
-        }
-        else {
-            if (device.isOnlineAccessibility()){
-                favoritesFragmentViewModel.togglePin2(this,position, ((RayanApplication) getActivity().getApplication()), device, false);
-            }
-            else{
-                favoritesFragmentViewModel.togglePin2(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
-//                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-            }
-        }
-
+        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
+        Log.e(this.getClass().getSimpleName()," Pin1 Is Touching: " + "Device: " +device);
+        favoritesFragmentViewModel.togglePin2(dp,this,position, (RayanApplication) getActivity().getApplication(),device);
     }
 
 

@@ -33,6 +33,7 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
@@ -249,7 +250,48 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
     }
 
 
-//    public LiveData<List<Contact>> getContacts(){
+    public LiveData<BaseResponse> deleteGroup(String groupId){
+        final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
+        deleteGroupObservable(new DeleteGroupRequest(groupId)).subscribe(deleteGroupObserver(results));
+        return results;
+    }
+
+    private Observable<BaseResponse> deleteGroupObservable(DeleteGroupRequest deleteGroupRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deleteGroup(RayanApplication.getPref().getToken(), deleteGroupRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private DisposableObserver<BaseResponse> deleteGroupObserver(MutableLiveData<BaseResponse> results){
+        return new DisposableObserver<BaseResponse>() {
+
+            @Override
+            public void onNext(@NonNull BaseResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+                if (e.toString().contains("Unauthorized"))
+                    login();
+
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+
+
+    //    public LiveData<List<Contact>> getContacts(){
 //        return contacts;
 //    }
 //

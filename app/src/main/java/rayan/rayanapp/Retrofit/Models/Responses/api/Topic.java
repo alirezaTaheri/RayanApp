@@ -81,10 +81,10 @@ public class Topic implements Parcelable {
     public String toString() {
         return "Topic{" +
                 "topic='" + topic + '\'' +
-                ", type='" + type + '\'' +
-                ", domain='" + domain + '\'' +
-                ", name='" + name + '\'' +
-                ", id='" + id + '\'' +
+//                ", type='" + type + '\'' +
+//                ", domain='" + domain + '\'' +
+//                ", name='" + name + '\'' +
+//                ", id='" + id + '\'' +
                 '}';
     }
 

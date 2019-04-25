@@ -1,15 +1,17 @@
 package rayan.rayanapp.App;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 import android.support.multidex.MultiDexApplication;
-import io.fabric.sdk.android.Fabric;
-import com.crashlytics.android.Crashlytics;
+//import io.fabric.sdk.android.Fabric;
+//import com.crashlytics.android.Crashlytics;
 
 import org.json.JSONObject;
 
@@ -33,7 +35,7 @@ import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.JsonMaker;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
-public class RayanApplication extends MultiDexApplication {
+public class RayanApplication extends Application {
     private static Context context;
     private UDPMessageRxBus bus;
     private WifiScanResultsBus wifiBus;
@@ -59,8 +61,7 @@ public class RayanApplication extends MultiDexApplication {
             config.locale = locale;
             getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
         }
-
-        Fabric.with(this, new Crashlytics());
+//        Fabric.with(this, new Crashlytics());
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/IRANSans1.ttf")
                 .setFontAttrId(R.attr.fontPath)
@@ -193,6 +194,11 @@ public class RayanApplication extends MultiDexApplication {
             Locale.setDefault(locale);
             getBaseContext().getResources().updateConfiguration(newConfig, getBaseContext().getResources().getDisplayMetrics());
         }
+    }
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
 
