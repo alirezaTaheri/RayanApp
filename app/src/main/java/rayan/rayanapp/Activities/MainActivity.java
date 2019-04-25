@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -71,6 +74,7 @@ import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus, View.OnClickListener, OnGroupClicked<Group> {
+    private static final int REQUEST_PHONE_CALL = 1;
     @BindView(R.id.accessModeSwitch)
     IconSwitch accessModeSwitch;
     @BindView(R.id.progress_bar)
@@ -119,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ImageView drawer_userImage;
     @BindView(R.id.drawer_userName)
     TextView drawer_userName;
+    @BindView(R.id.supportActivity)
+    LinearLayout drawer_support;
     SortByGroupRecyclerViewAdapter drawer_groupsRecyclerViewAdapter;
     int connectionRetries;
     @Override
@@ -277,11 +283,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initializeBottomNavigation();
     }
     if (RayanApplication.getPref().isLoggedIn()) {
-        int width = (getResources().getDisplayMetrics().widthPixels*6)/8;
+        int width = (getResources().getDisplayMetrics().widthPixels*7)/9;
         DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) drawerrrrr.getLayoutParams();
         params.width = width;
         drawerrrrr.setLayoutParams(params);
-        drawerLayout.setScrimColor(Color.parseColor("#33000000"));
+        drawerLayout.setScrimColor(Color.parseColor("#99000000"));
 
         if (RayanApplication.getPref().getGenderKey().equals("Male")) {
             drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_man));
@@ -316,6 +322,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer_sortByGroup.setOnClickListener(this);
         drawer_deviceManagementActivity.setOnClickListener(this);
         drawer_parent.setOnClickListener(this);
+        drawer_support.setOnClickListener(this);
         //app version
 //        try {
 //            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -771,18 +778,56 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         drawer_groupsRecyclerViewAdapter.setListener(this);
                     }
                     break;
+                case R.id.supportActivity:
+
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE},REQUEST_PHONE_CALL);
+                    }
+                    else
+                    {
+                        Intent callIntent = new Intent(Intent.ACTION_CALL);
+                        callIntent.setData(Uri.parse("tel:09190596520"));
+                        startActivity(callIntent);
+                    }
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    break;
                 case R.id.parent:
                     break;
             }
         }
+
 
         @Override
         public void onGroupClicked (Group item){
             drawerLayout.closeDrawer(GravityCompat.START);
             ((DevicesFragment) getSupportFragmentManager().getFragments().get(0)).sortDevicesByGroup(item.getId());
             drawer_groupsRecyclerViewAdapter.notifyDataSetChanged();
-        }
+            if (item.getName().equals("همه")){
+                actionBarStatus.setText("رایان");
+            }else{
 
+                actionBarStatus.setText(item.getName());
+            }
+
+        }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PHONE_CALL: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    callIntent.setData(Uri.parse("tel:09190596520"));
+                    startActivity(callIntent);
+                }
+                else
+                {
+                    Toast.makeText(this, "برای تماس با پشتیبانی اجازه دسترسی لازم است", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+        }
+    }
 }
 
         //    @Override

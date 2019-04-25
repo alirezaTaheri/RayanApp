@@ -26,6 +26,7 @@ import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
+import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
@@ -35,6 +36,7 @@ import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<User> {
     private List<User> users;
+    OnToolbarNameChange onToolbarNameChange;
     private String userId;
     Group group;
     ArrayList<String> userNames = new ArrayList<>();
@@ -76,6 +78,8 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
         });
         usersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),userNames,"admins_users");
         usersRecyclerViewAdapter.setListener(this);
+        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+        onToolbarNameChange.toolbarNameChanged("کاربران گروه");
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -123,6 +127,11 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
             } else
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
         });
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        onToolbarNameChange.toolbarNameChanged("کاربران گروه");
     }
 }
 

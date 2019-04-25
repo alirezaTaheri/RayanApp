@@ -43,7 +43,7 @@
                 android:layout_toLeftOf="@+id/icon"
                 android:layout_alignParentTop="true"
                 android:textStyle="bold"
-                android:text="دستگاه‌ها براساس گروه"
+                android:text="@string/drawer_devices_by_group"
                 android:textSize="15sp"
                 android:layout_marginRight="20dp"
                 android:textColor="@color/ms_black"
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_devices_manage" />
             <TextView
-                android:text="مدیریت دستگاه‌ها"
+                android:text="@string/drawer_devices"
                 android:textSize="15sp"
                 android:layout_marginRight="20dp"
                 android:gravity="right"
@@ -105,9 +105,10 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:tint="@color/grey_dark_1"
                 app:srcCompat="@drawable/ic_groups" />
             <TextView
-                android:text="@string/drawer_groups"
+                android:text="@string/drawer_groups_manage"
                 android:textSize="15sp"
                 android:textColor="@color/ms_black"
                 android:layout_marginRight="20dp"
@@ -127,7 +128,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
-                android:text="اضافه کردن دستگاه جدید"
+                android:text="@string/drawer_add_new_device"
                 android:textSize="15sp"
                 android:layout_marginRight="20dp"
                 android:gravity="right"
@@ -152,7 +153,7 @@
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_settings" />
             <TextView
-                android:text="تنظیمات"
+                android:text="@string/drawer_setting"
                 android:textColor="@color/ms_black"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -173,7 +174,7 @@
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_user" />
             <TextView
-                android:text="حساب کاربری"
+                android:text="@string/drawer_profile"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@color/ms_black"
@@ -192,9 +193,9 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_question" />
+                app:srcCompat="@drawable/ic_ebout_us" />
             <TextView
-                android:text="آموزش"
+                android:text="@string/drawer_learning"
                 android:textSize="15sp"
                 android:textColor="@color/ms_black"
                 android:layout_marginRight="20dp"
@@ -204,7 +205,7 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/eboutUsActivity"
+            android:id="@+id/supportActivity"
             android:layout_marginRight="4dp"
             android:padding="12dp"
             android:layout_width="match_parent"
@@ -213,9 +214,10 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_ebout_us" />
+                android:tint="@color/grey_dark_1"
+                app:srcCompat="@drawable/ic_support" />
             <TextView
-                android:text="درباره ما"
+                android:text="@string/drawer_support"
                 android:textColor="@color/ms_black"
                 android:textSize="15sp"
                 android:layout_marginRight="20dp"

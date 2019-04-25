@@ -13,17 +13,18 @@ import rayan.rayanapp.ViewHolders.GroupDevicesViewHolder;
 
 public class GroupDevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnDeviceClickListenerManagement<Device>, GroupDevicesViewHolder> {
 
-
+Context context;
     public GroupDevicesRecyclerViewAdapter(Context context, List<Device> devices) {
         super(context);
         this.items = devices;
+        this.context=context;
     }
 
 
     @NonNull
     @Override
     public GroupDevicesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new GroupDevicesViewHolder(inflate(R.layout.item_device_management, parent));
+            return new GroupDevicesViewHolder(inflate(R.layout.item_device_management, parent),context);
     }
 
 }

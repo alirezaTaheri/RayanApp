@@ -68,7 +68,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="36dp"
         android:focusableInTouchMode="true"
         android:layout_alignParentLeft="true"
         android:orientation="vertical"

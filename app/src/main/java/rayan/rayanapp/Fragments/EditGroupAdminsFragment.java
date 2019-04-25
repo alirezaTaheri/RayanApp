@@ -24,6 +24,7 @@ import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
+import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -31,6 +32,7 @@ import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<User> {
+    OnToolbarNameChange onToolbarNameChange;
     private List<User> admins;
     private String userId;
     Group group;
@@ -69,6 +71,8 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
         });
      managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"admins_users");
      managersRecyclerViewAdapter.setListener(this);
+        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+        onToolbarNameChange.toolbarNameChanged("مدیران گروه");
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -116,5 +120,10 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
                 doRemoveAdmin();
             }
         }
+    @Override
+    public void onResume() {
+        super.onResume();
+        onToolbarNameChange.toolbarNameChanged("مدیران گروه");
+    }
     }
 

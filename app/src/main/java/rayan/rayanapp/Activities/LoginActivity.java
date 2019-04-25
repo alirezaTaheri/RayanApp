@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
             }  });
 
-
+        phoneEditText.requestFocus();
         phoneEditText.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if(phoneEditText.getText().toString().length()==11)     //size as per your requirement

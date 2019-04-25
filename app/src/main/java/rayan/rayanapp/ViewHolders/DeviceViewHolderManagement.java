@@ -1,5 +1,6 @@
 package rayan.rayanapp.ViewHolders;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
@@ -24,13 +25,17 @@ public class DeviceViewHolderManagement extends BaseViewHolder<Device, OnDeviceC
     TextView name;
     @BindView(R.id.favoriteIcon)
     SparkButton favoriteIcon;
-    private List<String> waiting = new ArrayList<>();
+    private List<String> waiting;
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
-    public DeviceViewHolderManagement(View itemView, List<String> waiting) {
+    Context context;
+    @BindView(R.id.deviceImage)
+    ImageView deviceImage;
+    public DeviceViewHolderManagement(View itemView, List<String> waiting, Context context) {
         super(itemView);
         ButterKnife.bind(this,itemView);
         this.waiting = waiting;
+        this.context=context;
     }
 
     @Override
@@ -46,5 +51,11 @@ public class DeviceViewHolderManagement extends BaseViewHolder<Device, OnDeviceC
         });
         favoriteIcon.setOnClickListener(v -> {
             listener.onFavoriteIconClicked(item);});
+        if (item.getType().equals("switch_1")){ deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
+        }else if (item.getType().equals("switch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
+        }else if (item.getType().equals("touch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
+        }else if (item.getType().equals("plug")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_plug_off_1));
+        }else { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_device));
+        }
     }
 }

@@ -74,6 +74,15 @@
             android:text="فعال و غیر فعال کردن دریافت نوتیفیکیشن"
             android:textColor="@color/grey_dark_1"
             android:textSize="12sp" />
+        <View
+            android:layout_width="0.4dp"
+            android:layout_height="30dp"
+            android:background="@color/grey"
+            android:layout_marginTop="13dp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@id/soundbasetitle"
+            android:layout_toRightOf="@+id/soundswitch"
+            />
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/soundswitch"
             android:layout_width="wrap_content"
@@ -82,7 +91,6 @@
             android:layout_alignParentLeft="true"
             android:layout_marginTop="15dp"
             android:textSize="13sp"
-
             android:layout_height="wrap_content" />
     </RelativeLayout>
     <View

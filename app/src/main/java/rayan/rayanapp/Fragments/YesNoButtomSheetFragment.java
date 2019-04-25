@@ -1,6 +1,8 @@
 package rayan.rayanapp.Fragments;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -45,6 +47,7 @@ public class YesNoButtomSheetFragment extends BottomSheetDialogFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.confirm_action_bottomsheet, container,
                 false);
+        view.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         ButterKnife.bind(this,view);
         submitBtn.setText(submitTxt);
         cancelBtn.setText(cancelTxt);

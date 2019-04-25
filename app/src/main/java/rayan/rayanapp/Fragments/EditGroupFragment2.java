@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,6 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Activities.GroupsActivity;
+import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -31,6 +33,7 @@ import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupFragment2 extends Fragment{
     private Group group;
+    OnToolbarNameChange onToolbarNameChange;
     private String groupId;
     private List<User> admins;
     private List<User> humanUsers;
@@ -66,6 +69,8 @@ public class EditGroupFragment2 extends Fragment{
             adminCount.setText(String.valueOf(admins.size()));
             userCount.setText(String.valueOf(humanUsers.size()));
         });
+        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+        onToolbarNameChange.toolbarNameChanged(group.getName());
     }
 
     @Override
@@ -120,7 +125,6 @@ public class EditGroupFragment2 extends Fragment{
     }
 
     public void clickOnDeleteGroupSubmit(){
-        // TODO: 4/23/2019 group id returns null in this method but its work if we dont use bottomsheet
         editGroupFragmentViewModel.deleteGroup(groupId).observe(this, baseResponse -> {
             Log.e("baseResponse", baseResponse.getStatus().getCode());
             if (baseResponse.getStatus().getCode().equals("404")) {
@@ -131,8 +135,9 @@ public class EditGroupFragment2 extends Fragment{
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "گروه با موفقیت حذف شد");
                 Intent intent=new Intent(getContext(), GroupsActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 startActivity(intent);
-                editGroupFragmentViewModel.getGroups();
             } else
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
         });
@@ -151,6 +156,7 @@ public class EditGroupFragment2 extends Fragment{
         void onUserButtonClicked();
     }
     ClickOnButton clickOnButton;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -167,5 +173,9 @@ public class EditGroupFragment2 extends Fragment{
         super.onDetach();
         clickOnButton = null;
     }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        onToolbarNameChange.toolbarNameChanged(group.getName());
+    }
 }

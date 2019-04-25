@@ -18,6 +18,7 @@ public class AdminsRecyclerViewAdapter extends GenericRecyclerViewAdapter<User,O
         super(context);
         this.adminsPhoneNumber=adminsPhoneNumber;
         this.parentFragment=parentFragment;
+
     }
 
     @Override
