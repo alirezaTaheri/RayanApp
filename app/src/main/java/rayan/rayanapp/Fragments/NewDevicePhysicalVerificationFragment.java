@@ -108,7 +108,7 @@ public class NewDevicePhysicalVerificationFragment extends Fragment implements B
 
     @Override
     public void onSelected() {
-        if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_1)|| ((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_SWITCH_2) || ((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().contains(AppConstants.DEVICE_TYPE_TOUCH_2)){
+        if (((AddNewDeviceActivity)getActivity()).getNewDevice().getType().contains(AppConstants.DEVICE_TYPE_SWITCH_1)|| ((AddNewDeviceActivity)getActivity()).getNewDevice().getType().contains(AppConstants.DEVICE_TYPE_SWITCH_2) || ((AddNewDeviceActivity)getActivity()).getNewDevice().getType().contains(AppConstants.DEVICE_TYPE_TOUCH_2)){
             Log.e("aaaaaa","NewDevice_Switch_PhysicalVerificationFragment:");
             FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             if (currentFragment != null)
@@ -118,7 +118,7 @@ public class NewDevicePhysicalVerificationFragment extends Fragment implements B
             transaction.add(R.id.frameLayout, (Fragment) currentFragment, "switchVerification");
             transaction.commit();
         }
-        else{
+        else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getType().contains(AppConstants.DEVICE_TYPE_PLUG)){
             Log.e("aaaaaa","NewDevice_Plug_PhysicalVerificationFragment:");
             FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             if (currentFragment != null)
@@ -127,6 +127,17 @@ public class NewDevicePhysicalVerificationFragment extends Fragment implements B
             currentFragment = NewDevice_Plug_PhysicalVerificationFragment.newInstance();
             transaction.add(R.id.frameLayout, (Fragment) currentFragment, "plugVerification");
             transaction.commit();
+        }
+        else {
+            Log.e("aaaaaa","NewDevice_Plug_PhysicalVerificationFragment:");
+            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            if (currentFragment != null)
+                transaction.remove((Fragment) currentFragment).commitNow();
+//            getChildFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            currentFragment = NewDevice_Plug_PhysicalVerificationFragment.newInstance();
+            transaction.add(R.id.frameLayout, (Fragment) currentFragment, "plugVerification");
+            transaction.commit();
+            Toast.makeText(getActivity(), "نوع دستگاه ناشناخته است", Toast.LENGTH_SHORT).show();
         }
     }
 

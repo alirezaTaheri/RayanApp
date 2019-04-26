@@ -1,16 +1,15 @@
 package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
@@ -26,12 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,17 +34,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
+import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.FTPClient;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
-import static android.content.Context.CLIPBOARD_SERVICE;
-
-public class EditDeviceFragment extends BackHandledFragment implements DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
+public class EditDeviceFragment extends BackHandledFragment implements DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked, YesNoDialogListener {
     private static EditDeviceFragment instance = null;
     String readFromFileResult;
     private ArrayList<String> codeList= new ArrayList<>();
@@ -238,8 +233,9 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditDeviceFragment","بروز رسانی دستگاه", "بازگشت", "آیا مایل به بروزرسانی دستگاه هستید؟");
-        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+        editDeviceFragmentViewModel.getDeviceVersion(device).observe(this, s -> Toast.makeText(getActivity(), ""+s, Toast.LENGTH_SHORT).show());
+        YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this);
+        yesNoDialog.show();
     }
 
 
@@ -312,6 +308,34 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
         FTPClient ftpClient = new FTPClient();
         Log.e(this.getClass().getSimpleName(), "Updating device: " + device);
         ftpClient.uploadFile(getContext(), device.getIp(), device.getChipId(), device.getSecret());
+    }
+
+    @Override
+    public void onYesClicked(YesNoDialog yesNoDialog) {
+        editDeviceFragmentViewModel.toDeviceReady4Update(device.getIp()).observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                switch (s){
+                    case AppConstants.DEVICE_READY_FOR_UPDATE:
+                        Toast.makeText(getActivity(), "شروع بروزرسانی", Toast.LENGTH_SHORT).show();
+                        FTPClient ftpClient = new FTPClient();
+                        Log.e(this.getClass().getSimpleName(), "Updating device: " + device);
+                        ftpClient.uploadFile(getContext(), device.getIp(), device.getChipId(), device.getSecret());
+                        break;
+                    case AppConstants.SOCKET_TIME_OUT:
+                        Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+                        break;
+                        default:
+                            Toast.makeText(getActivity(), "پاسخ نامرتبط دریافت شد", Toast.LENGTH_SHORT).show();
+                }
+                yesNoDialog.dismiss();
+            }
+        });
+    }
+
+    @Override
+    public void onNoClicked(YesNoDialog yesNoDialog) {
+        yesNoDialog.dismiss();
     }
 
     public enum TopicStatus{

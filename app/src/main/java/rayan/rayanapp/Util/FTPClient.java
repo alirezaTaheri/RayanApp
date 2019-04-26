@@ -34,26 +34,27 @@ public class FTPClient {
                         con.enterLocalPassiveMode(); // important!
                         e.onNext("Entered Passive Mode");
                         con.setFileType(FTP.BINARY_FILE_TYPE);
-                        String data = Environment.getExternalStorageDirectory() +File.separator+ "abc.txt";
-                        FileInputStream in = new FileInputStream(new File(data));
-                        e.onNext("Stream is: " + in);
-                        boolean result = con.storeFile("abc.txt",in);
-                        e.onNext("Results isabc: " + result);
-                        in.close();
-                        if (result) {
-                            Log.v("upload result", "succeeded abc");
-                            e.onNext("succeeded abc");
-                        }else e.onNext("failed abc");
                         String data2 = Environment.getExternalStorageDirectory() +File.separator+ "def.txt";
                         FileInputStream in2 = new FileInputStream(new File(data2));
                         e.onNext("Stream is def: " + in2);
                         boolean result2 = con.storeFile("def.txt",in2);
                         e.onNext("Results is def: " + result2);
-                        in.close();
+//                        in2.close();
                         if (result2) {
                             Log.v("upload result", "succeeded def");
                             e.onNext("succeeded def");
                         }else e.onNext("failed def");
+                        String data = Environment.getExternalStorageDirectory() +File.separator+ "abc.txt";
+                        in2 = new FileInputStream(new File(data));
+                        e.onNext("Stream is: " + in2);
+                        boolean result = con.storeFile("abc.txt",in2);
+                        e.onNext("Results isabc: " + result);
+                        in2.close();
+                        if (result) {
+                            Log.v("upload result", "succeeded abc");
+                            e.onNext("succeeded abc");
+                        }else e.onNext("failed abc");
+
                         con.logout();
                         con.disconnect();
                         e.onComplete();

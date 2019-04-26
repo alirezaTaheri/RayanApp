@@ -42,6 +42,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
@@ -55,7 +56,7 @@ import rayan.rayanapp.Util.AppConstants;
 public class DevicesFragment extends Fragment implements OnToggleDeviceListener<Device>,ToggleDeviceAnimationProgress {
     public DevicesFragmentViewModel devicesFragmentViewModel;
     Activity activity;
-
+    DialogPresenter dp;
     public DevicesFragment() {}
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -74,6 +75,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         super.onCreate(savedInstanceState);
         devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices);
         devicesRecyclerViewAdapter.setListener(this);
+        dp = new DialogPresenter(getActivity().getSupportFragmentManager());
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
 //        sortDevicesByGroup(RayanApplication.getPref().getCurrentShowingGroup());
         devicesObservable = devicesFragmentViewModel.getAllDevices();
@@ -162,11 +164,12 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void onPin1Clicked(Device device, int position) {
-        if (!((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().isWaitingPin1(device.getChipId()))
+        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
             Log.e("Pin1 Is Touching: " , "Device: " +device);
+//        if (!((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().isWaitingPin1(device.getChipId()))
 //        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
 //            if (device.getIp() != null)
-                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
+                devicesFragmentViewModel.togglePin1(dp,this, position, ((RayanApplication) getActivity().getApplication()), device);
 //            else{
 ////                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
@@ -186,11 +189,12 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void onPin2Clicked(Device device, int position) {
-//        Log.e("Pin2 Is Touching: " , "Device: " +device);
+        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
+        Log.e("Pin2 Is Touching: " , "Device: " +device);
 ////        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
 //        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
 //            if (device.getIp()!= null)
-                devicesFragmentViewModel.togglePin2(this,position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
+                devicesFragmentViewModel.togglePin2(dp,this,position, (RayanApplication) getActivity().getApplication(),device);
 //            else{
 //                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
 ////                devicesFragmentViewModel.togglePin2(this, position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));

@@ -83,7 +83,7 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
                     Log.e("seekbarthis","in thw switch type is nothing:tytyty " + activeNetwork.getType());
                     ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.Status.NOT_CONNECTED);
                     if (activeNetwork.getType() == ConnectivityManager.TYPE_VPN){
-                        Log.e(NetworkConnectionLiveData.class.getSimpleName(),"Connection is disconnected and sending vpn" + activeNetwork.getType());
+                        Log.e(this.getClass().getSimpleName(),"Connection is disconnected and sending vpn" + activeNetwork.getType());
                         postValue(new NetworkConnection(AppConstants.VPN_NETWORK,false));
                     }else
                     postValue(new NetworkConnection(0,false));

@@ -23,12 +23,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Listeners.StepperItemSimulation;
+import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.NewDevicePhysicalVerificationViewModel;
 
-public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implements StepperItemSimulation {
+public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implements StepperItemSimulation, YesNoDialogListener {
     private OnFragmentInteractionListener mListener;
     NewDevicePhysicalVerificationViewModel viewModel;
     @BindView(R.id.responses)
@@ -75,7 +78,9 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                     Toast.makeText(getActivity(), "درست", Toast.LENGTH_SHORT).show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_FALSE:
-                    Toast.makeText(getActivity(), "غلط", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), "غلط", Toast.LENGTH_SHORT).show();
+                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this);
+                    yesNoDialog.show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_TIMEOUT:
                     Toast.makeText(getActivity(), "زمان شما به پایان رسیده است", Toast.LENGTH_SHORT).show();
@@ -99,7 +104,9 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                     Toast.makeText(getActivity(), "درست", Toast.LENGTH_SHORT).show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_FALSE:
-                    Toast.makeText(getActivity(), "غلط", Toast.LENGTH_SHORT).show();
+                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this);
+                    yesNoDialog.show();
+//                    Toast.makeText(getActivity(), "غلط", Toast.LENGTH_SHORT).show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_TIMEOUT:
                     Toast.makeText(getActivity(), "زمان شما به پایان رسیده است", Toast.LENGTH_SHORT).show();
@@ -131,6 +138,37 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
     @Override
     public void onBackClicked() {
         ((AddNewDeviceActivity)getContext()).setStepperPosition(1);
+    }
+
+    @Override
+    public void onYesClicked(YesNoDialog yesNoDialog) {
+        viewModel.toDeviceFirstConfig(
+                new SetPrimaryConfigRequest(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid(),
+                        ((AddNewDeviceActivity)getActivity()).getNewDevice().getPwd(),
+                        ((AddNewDeviceActivity)getActivity()).getNewDevice().getName(),
+                        AppConstants.MQTT_HOST,
+                        String.valueOf(AppConstants.MQTT_PORT),
+                        ((AddNewDeviceActivity)getActivity()).getNewDevice().getTopic().getTopic(),
+                        ((AddNewDeviceActivity)getActivity()).getNewDevice().getUsername(),
+                        ((AddNewDeviceActivity)getActivity()).getNewDevice().getPassword(),
+                        AppConstants.DEVICE_CONNECTED_STYLE,
+                        ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getSecret())).observe(this, configResponse -> {
+            switch (configResponse.getCmd()) {
+                case AppConstants.NEW_DEVICE_PHV_START:
+                    yesNoDialog.dismiss();
+                    break;
+                case AppConstants.SOCKET_TIME_OUT:
+                    Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                    break;
+                default: Toast.makeText(getContext(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onNoClicked(YesNoDialog yesNoDialog) {
+        getActivity().onBackPressed();
+        yesNoDialog.dismiss();
     }
 
 //    @Override

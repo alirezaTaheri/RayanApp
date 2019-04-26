@@ -37,6 +37,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -107,7 +108,7 @@ public interface ApiService {
     @POST
     Observable<DeviceBaseResponse> ITET(@Url String url, @Body BaseRequest baseRequest);
     @POST
-    Observable<DeviceBaseResponse> getVersion(@Url String url, @Body BaseRequest baseRequest);
+    Observable<VersionResponse> getVersion(@Url String url, @Body BaseRequest baseRequest);
     @POST
     Observable<DeviceBaseResponse> plugStatusVerification(@Url String url, @Body PlugPhysicalVerificationRequest request);
     @POST

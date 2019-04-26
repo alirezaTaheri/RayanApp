@@ -21,7 +21,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Util.AppConstants;
 
-public class NewDevicePhysicalVerificationViewModel extends NewDevicesListViewModel {
+public class NewDevicePhysicalVerificationViewModel extends NewDeviceSetConfigurationFragmentViewModel {
     private final String TAG = NewDevicePhysicalVerificationViewModel.class.getSimpleName();
     public NewDevicePhysicalVerificationViewModel(@NonNull Application application) {
         super(application);
@@ -36,7 +36,7 @@ public class NewDevicePhysicalVerificationViewModel extends NewDevicesListViewMo
     private Observable<DeviceBaseResponse> toDeviceITETObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .ITET(getDeviceAddress(ip), baseRequest)
+                .ITET(AppConstants.getDeviceAddress(ip), baseRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -70,7 +70,7 @@ public class NewDevicePhysicalVerificationViewModel extends NewDevicesListViewMo
     private Observable<DeviceBaseResponse> toDeviceStatusObservable(PlugPhysicalVerificationRequest request, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .plugStatusVerification(getDeviceAddress(ip), request)
+                .plugStatusVerification(AppConstants.getDeviceAddress(ip), request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

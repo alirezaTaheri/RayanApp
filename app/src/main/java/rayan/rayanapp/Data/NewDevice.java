@@ -19,6 +19,7 @@ public class NewDevice {
     private String pin1;
     private String pin2;
     private NodeStatus status;
+    private int networkId;
     public enum NodeStatus {
             IDLE,
             NEW
