@@ -33,7 +33,7 @@ import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupFragment2 extends Fragment{
     private Group group;
-    OnToolbarNameChange onToolbarNameChange;
+   // OnToolbarNameChange onToolbarNameChange;
     private String groupId;
     private List<User> admins;
     private List<User> humanUsers;
@@ -69,8 +69,9 @@ public class EditGroupFragment2 extends Fragment{
             adminCount.setText(String.valueOf(admins.size()));
             userCount.setText(String.valueOf(humanUsers.size()));
         });
-        onToolbarNameChange=(OnToolbarNameChange)getActivity();
-        onToolbarNameChange.toolbarNameChanged(group.getName());
+//        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+//        onToolbarNameChange.toolbarNameChanged(group.getName());
+        ((GroupsActivity) getActivity()).toolbarNameChanged("مدیریت گروه");
     }
 
     @Override
@@ -176,6 +177,7 @@ public class EditGroupFragment2 extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        onToolbarNameChange.toolbarNameChanged(group.getName());
+//        onToolbarNameChange.toolbarNameChanged(group.getName());
+        ((GroupsActivity) getActivity()).toolbarNameChanged("مدیریت گروه");
     }
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
@@ -32,7 +33,7 @@ import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<User> {
-    OnToolbarNameChange onToolbarNameChange;
+   // OnToolbarNameChange onToolbarNameChange;
     private List<User> admins;
     private String userId;
     Group group;
@@ -69,10 +70,12 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
                 }
             managersRecyclerViewAdapter.setItems(admins);
         });
-     managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"admins_users");
+     managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,adminsUserNames.get(admins.size()-1),"admins_users");
      managersRecyclerViewAdapter.setListener(this);
-        onToolbarNameChange=(OnToolbarNameChange)getActivity();
-        onToolbarNameChange.toolbarNameChanged("مدیران گروه");
+//        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+//        onToolbarNameChange.toolbarNameChanged("مدیران گروه");
+
+        ((GroupsActivity) getActivity()).toolbarNameChanged("مدیران گروه");
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -123,7 +126,9 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
     @Override
     public void onResume() {
         super.onResume();
-        onToolbarNameChange.toolbarNameChanged("مدیران گروه");
+
+        ((GroupsActivity) getActivity()).toolbarNameChanged("مدیران گروه");
+       // onToolbarNameChange.toolbarNameChanged("مدیران گروه");
     }
     }
 

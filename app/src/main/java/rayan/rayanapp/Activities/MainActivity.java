@@ -336,6 +336,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         if (RayanApplication.getPref().isLoggedIn()) {
+            if (RayanApplication.getPref().getGenderKey().equals("Male")) {
+                drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_man));
+            } else if (RayanApplication.getPref().getGenderKey().equals("Female")) {
+                drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_woman));
+            } else {
+                drawer_userImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_man));
+            }
+            if (RayanApplication.getPref().getNameKey().isEmpty() && RayanApplication.getPref().getNameKey() == null) {
+                drawer_userName.setText("Rayan App");
+            } else {
+                drawer_userName.setText(RayanApplication.getPref().getNameKey());
+            }
             startService(new Intent(this, UDPServerService.class));
             RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
             mainActivityViewModel.sendNodeToAll();
@@ -785,7 +797,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     else
                     {
-                        Intent callIntent = new Intent(Intent.ACTION_CALL);
+                        Intent callIntent = new Intent(Intent.ACTION_DIAL);
                         callIntent.setData(Uri.parse("tel:09190596520"));
                         startActivity(callIntent);
                     }
@@ -816,7 +828,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (requestCode) {
             case REQUEST_PHONE_CALL: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    Intent callIntent = new Intent(Intent.ACTION_DIAL);
                     callIntent.setData(Uri.parse("tel:09190596520"));
                     startActivity(callIntent);
                 }

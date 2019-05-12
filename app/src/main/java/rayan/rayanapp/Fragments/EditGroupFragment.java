@@ -57,12 +57,13 @@ import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupFragment extends Fragment {
-    OnToolbarNameChange onToolbarNameChange;
+   // OnToolbarNameChange onToolbarNameChange;
     static final int PICK_CONTACT = 1;
     public static Group group;
     private String userId;
     public static List<User> admins;
     public static List<User> humanUsers;
+    public static List<User> groupUsers;
     ArrayList<String> adminsUserNames = new ArrayList<>();
     private final String TAG = EditGroupFragment.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
@@ -71,6 +72,7 @@ public class EditGroupFragment extends Fragment {
     RecyclerView managersRecyclerView;
     @BindView(R.id.devicesRecyclerView)
     RecyclerView devicesRecyclerView;
+
     AdminsRecyclerViewAdapter managersRecyclerViewAdapter;
     GroupDevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     EditGroupFragmentViewModel editGroupFragmentViewModel;
@@ -108,7 +110,7 @@ public class EditGroupFragment extends Fragment {
                 for (int i = 0; i <= admins.size() - 1; i++) {
                     adminsUserNames.add(admins.get(i).getUsername());
                 }
-                Toast.makeText(getContext(), adminsUserNames.get(0), Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(getContext(), adminsUserNames.get(0), Toast.LENGTH_SHORT).show();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                     for (int i = 0; i <= admins.size() - 1; i++) {
                         admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(), getActivity()));
@@ -123,12 +125,14 @@ public class EditGroupFragment extends Fragment {
                 devicesRecyclerViewAdapter.setItems(group1.getDevices());
             });
         }
-
-        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"");
+        groupUsers=editGroupFragmentViewModel.getUsers(getArguments().getString("id"));
+      //  Toast.makeText(getContext(), groupUsers.get(groupUsers.size()-1).getUsername(), Toast.LENGTH_SHORT).show();
+        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,groupUsers.get(groupUsers.size()-1).getUsername(),"");
         devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(getActivity(), new ArrayList<>());
         setHasOptionsMenu(true);
-        onToolbarNameChange=(OnToolbarNameChange)getActivity();
-        onToolbarNameChange.toolbarNameChanged(group.getName());
+//        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+//        onToolbarNameChange.toolbarNameChanged(group.getName());
+        ((GroupsActivity) getActivity()).toolbarNameChanged(group.getName());
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -325,7 +329,9 @@ public class EditGroupFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        onToolbarNameChange.toolbarNameChanged(group.getName());
+       // onToolbarNameChange.toolbarNameChanged(group.getName());
+
+        ((GroupsActivity) getActivity()).toolbarNameChanged(group.getName());
     }
 //    public void doAddUserFromPhone(ArrayList<PhoneContact> selectedContacts){
 //        ArrayList<String> contacts=new ArrayList<>();

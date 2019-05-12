@@ -17,18 +17,18 @@
         android:layout_height="match_parent"/>
 <RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="?attr/actionBarSize">
        <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation_view"
         app:theme="@style/NavigationDrawerStyle"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
+           android:background="@color/grey_light_4"
         android:layout_alignParentBottom="true"
-        app:elevation="8dp"
+        app:elevation="7dp"
         android:clipChildren="false"
         android:layoutDirection="ltr"
-        android:background="?android:attr/windowBackground"
         app:menu="@menu/bottom_navigation_menu" />
 
 </RelativeLayout>
