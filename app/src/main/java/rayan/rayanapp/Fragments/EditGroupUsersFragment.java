@@ -22,6 +22,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
@@ -36,7 +37,7 @@ import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<User> {
     private List<User> users;
-    OnToolbarNameChange onToolbarNameChange;
+    //OnToolbarNameChange onToolbarNameChange;
     private String userId;
     Group group;
     ArrayList<String> userNames = new ArrayList<>();
@@ -48,6 +49,8 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
     TextView addToGrouptxt;
     @BindView(R.id.addToGroupLayout)
     LinearLayout addToGroupLayout;
+    @BindView(R.id.addToGroupLine)
+    View addToGroupLine;
 
 
     public static EditGroupUsersFragment newInstance() {
@@ -76,10 +79,12 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
             }
             usersRecyclerViewAdapter.setItems(users);
         });
-        usersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),userNames,"admins_users");
+        usersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),userNames,userNames.get(users.size()-1),"admins_users");
         usersRecyclerViewAdapter.setListener(this);
-        onToolbarNameChange=(OnToolbarNameChange)getActivity();
-        onToolbarNameChange.toolbarNameChanged("کاربران گروه");
+//        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+//        onToolbarNameChange.toolbarNameChanged("کاربران گروه");
+
+        ((GroupsActivity) getActivity()).toolbarNameChanged("کاربران گروه");
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -89,6 +94,7 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
         usersRecyclerView.setAdapter(usersRecyclerViewAdapter);
         addToGrouptxt.setVisibility(View.GONE);
         addToGroupLayout.setVisibility(View.GONE);
+        addToGroupLine.setVisibility(View.GONE);
         init(group);
         return view;
     }
@@ -131,7 +137,9 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
     @Override
     public void onResume() {
         super.onResume();
-        onToolbarNameChange.toolbarNameChanged("کاربران گروه");
+
+        ((GroupsActivity) getActivity()).toolbarNameChanged("کاربران گروه");
+       // onToolbarNameChange.toolbarNameChanged("کاربران گروه");
     }
 }
 

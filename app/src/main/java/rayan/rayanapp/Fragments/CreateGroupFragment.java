@@ -63,6 +63,7 @@ public class CreateGroupFragment extends Fragment {
         usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(getActivity());
         usersRecyclerViewAdapter.setItems(users);
         recyclerView.setAdapter(usersRecyclerViewAdapter);
+        ((GroupsActivity) getActivity()).toolbarNameChanged("گروه جدید");
         return view;
     }
 
@@ -164,5 +165,11 @@ public class CreateGroupFragment extends Fragment {
     }
     public static CreateGroupFragment getInstance() {
         return instance;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((GroupsActivity) getActivity()).toolbarNameChanged("گروه جدید");
     }
 }

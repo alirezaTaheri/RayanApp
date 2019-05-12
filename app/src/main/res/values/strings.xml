@@ -49,7 +49,7 @@
     </string-array>
 
 
-    <string name="drawer_devices_by_group"><b>دستگاه‌ها براساس گروه</b></string>
+    <string name="drawer_devices_by_group"><b>گروه‌ها</b></string>
     <string name="drawer_devices"><b>مدیریت دستگاه‌ها</b></string>
     <string name="drawer_groups_manage"><b>مدیریت گروه‌ها</b></string>
     <string name="drawer_add_new_device"><b>اضافه کردن دستگاه جدید</b></string>

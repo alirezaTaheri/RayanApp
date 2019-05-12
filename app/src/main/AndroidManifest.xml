@@ -28,14 +28,15 @@
 
     <application
         android:name=".App.RayanApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:configChanges="layoutDirection|locale"
         android:icon="@drawable/rayan_logo"
         android:roundIcon="@drawable/rayan_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
-        tools:ignore="GoogleAppIndexingWarning,InnerclassSeparator">
+        tools:ignore="GoogleAppIndexingWarning,InnerclassSeparator"
+        tools:replace="android:allowBackup">
         <activity android:name=".Activities.SettingssActivity" />
         <activity android:name=".Activities.StartUpSplashActivity" />
         <activity

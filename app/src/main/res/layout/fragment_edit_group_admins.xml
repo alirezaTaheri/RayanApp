@@ -51,6 +51,7 @@
                 </LinearLayout>
                 <View
                     android:layout_width="match_parent"
+                    android:id="@+id/addToGroupLine"
                     android:layout_marginRight="20dp"
                     android:background="@color/grey"
                     android:layout_height="1dp"/>

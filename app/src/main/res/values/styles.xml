@@ -68,9 +68,9 @@
     </style>
 
     <style name="NavigationDrawerStyle" parent="Base.TextAppearance.AppCompat">
-
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
+
 
         <!--<item name="android:listPreferredItemHeightSmall">40dp</item>-->
         <!--<item name="listPreferredItemHeightSmall">40dp</item>-->
