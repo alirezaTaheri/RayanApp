@@ -1,11 +1,10 @@
 package rayan.rayanapp.Helper;
 
-import android.content.Context;
 import android.support.v4.app.FragmentManager;
 
-import java.util.List;
+import java.util.Map;
 
-import io.reactivex.subjects.PublishSubject;
+import rayan.rayanapp.Fragments.AlertBottomSheetFragment;
 import rayan.rayanapp.Fragments.ProvideInternetFragment;
 import rayan.rayanapp.Util.AppConstants;
 
@@ -15,11 +14,15 @@ public class DialogPresenter {
         this.fm = fm;
     }
 
-    public void showDialog(String type, List<String> params){
+    public void showDialog(String type, Object o){
         switch (type){
             case AppConstants.DIALOG_PROVIDE_INTERNET:
                 ProvideInternetFragment p = ProvideInternetFragment.newInstance();
                 p.show(fm, "");
+                break;
+            case AppConstants.DIALOG_ALERT:
+                AlertBottomSheetFragment h = AlertBottomSheetFragment.instance(((Map<String, String>)o).get("message"));
+                h.show(fm,"");
                 break;
         }
     }

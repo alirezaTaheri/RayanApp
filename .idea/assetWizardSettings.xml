@@ -3,32 +3,9 @@
   <component name="WizardSettings">
     <option name="children">
       <map>
-        <entry key="vectorWizard">
+        <entry key="imageWizard">
           <value>
-            <PersistentState>
-              <option name="children">
-                <map>
-                  <entry key="vectorAssetStep">
-                    <value>
-                      <PersistentState>
-                        <option name="values">
-                          <map>
-                            <entry key="assetSourceType" value="FILE" />
-<<<<<<< HEAD
-                            <entry key="outputName" value="ic_alert" />
-                            <entry key="sourceFile" value="C:\Users\Alireza\Downloads\exclamation-mark.svg" />
-=======
-                            <entry key="outputName" value="ic_more" />
-                            <entry key="sourceFile" value="C:\Users\Milad\Downloads\baseline-more_vert-24px.svg" />
->>>>>>> 508458ffe9c500ff7a4120449782cf5c5666672d
-                          </map>
-                        </option>
-                      </PersistentState>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </PersistentState>
+            <PersistentState />
           </value>
         </entry>
       </map>

@@ -2,6 +2,7 @@ package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,9 +18,12 @@ import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
+import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -104,12 +108,13 @@ public class FinishAddNewDeviceFragment extends Fragment implements BlockingStep
 
     @Override
     public void onCompleteClicked(StepperLayout.OnCompleteClickedCallback callback) {
-        getActivity().onBackPressed();
+        Objects.requireNonNull(getActivity()).onBackPressed();
     }
 
     @Override
     public void onBackClicked(StepperLayout.OnBackClickedCallback callback) {
-        callback.goToPrevStep();
+        startActivity(new Intent(getActivity(), MainActivity.class));
+        Objects.requireNonNull(getActivity()).finish();
     }
 
     @Nullable

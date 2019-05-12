@@ -24,7 +24,6 @@
     <string name="text_sign_in_button">ورود</string>
     <string name="text_forgot_pass_hint">بازیابی رمز عبور</string>
     <string name="text_sign_up_button">ثبت نام</string>
-    <string name="drawer_groups">مدیریت گروه\u200cها</string>
     <string name="leave_group_button">ترک گروه</string>
     <string name="title_deviceManagementActivity">مدیریت دستگاه‌ها</string>
 
@@ -48,6 +47,17 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
+
+    <string name="drawer_devices_by_group"><b>دستگاه‌ها براساس گروه</b></string>
+    <string name="drawer_devices"><b>مدیریت دستگاه‌ها</b></string>
+    <string name="drawer_groups_manage"><b>مدیریت گروه‌ها</b></string>
+    <string name="drawer_add_new_device"><b>اضافه کردن دستگاه جدید</b></string>
+    <string name="drawer_setting"><b>تنظیمات</b></string>
+    <string name="drawer_profile"><b>حساب کاربری</b></string>
+    <string name="drawer_learning"><b>آموزش</b></string>
+    <string name="drawer_support"><b>پشتیبانی</b></string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

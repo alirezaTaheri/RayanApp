@@ -1,10 +1,16 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.varunest.sparkbutton.SparkButton;
 
@@ -24,9 +30,11 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     @BindView(R.id.name)
     TextView name;
     @BindView(R.id.pin1)
-    SparkButton pin1;
+    ImageView pin1;
     @BindView(R.id.bottomStrip)
     View bottomStrip;
+    @BindView(R.id.clickableLayout)
+    LinearLayout clickableLayout;
     public DeviceViewHolder1Bridge(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
@@ -38,7 +46,8 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         name.setText(item.getName1());
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
-            pin1.setChecked(true);
+            pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on));
+//            pin1.setChecked(true);
             itemView.post(new Runnable() {
                 @Override
                 public void run(){
@@ -48,18 +57,20 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
             });
         }
         else {
-            pin1.setChecked(false);
+            pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
+//            pin1.setChecked(false);
             bottomStrip.getLayoutParams().width = 0;
             bottomStrip.requestLayout();
         }
 
-        if (listener != null)
-            pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+        if (listener != null){
+            clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+        }
     }
 
     public void startToggleAnimationPin1(ValueAnimator v){
         Log.e("<<<<<<<<<<<<<<<<","<Starting bridge1");
-        pin1.setEnabled(false);
+        AppConstants.disableEnableControls(false, (ViewGroup) clickableLayout);
         v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -73,7 +84,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     public void stopToggleAnimationPin1(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
         Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge1" + item);
-        pin1.setEnabled(true);
+        AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
         if (v != null) {
             v.cancel();
             if (item.getPin1().equals(AppConstants.ON_STATUS)) {
@@ -103,9 +114,11 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         }
             v.setDuration(300);
             v.start();
-            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
-        if (listener != null)
-            pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+        pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
+//            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
+        if (listener != null){
+            clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+        }
     }
 
     public void changeName(String name){
@@ -116,6 +129,11 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         return itemView.getWidth();
     }
 
+    public void changePosition(Device item, OnToggleDeviceListener<Device> listener){
+        if (listener != null){
+            clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+        }
+    }
     public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
         l.onAccessPointChanged(device);
     }

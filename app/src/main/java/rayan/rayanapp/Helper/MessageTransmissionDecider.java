@@ -9,6 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.NetworkUtil;
@@ -20,7 +26,8 @@ public class MessageTransmissionDecider {
     public enum Status {
         NOT_CONNECTED,
         WIFI,
-        MOBILE
+        MOBILE,
+        VPN
     }
     public enum PROTOCOL{
         HTTP,
@@ -48,6 +55,9 @@ public class MessageTransmissionDecider {
             case "MOBILE":
                 status = Status.MOBILE;
                 break;
+            case "VPN":
+                status = Status.VPN;
+                break;
         }
         Log.e(TAG, "I am created Going to Compute...Devices: " + devices + "\nStatus: " + status);
         computeCommunicationRoutes(devices);
@@ -74,58 +84,104 @@ public class MessageTransmissionDecider {
     }
 
     public void updateDevice(Device device){
-        List<PROTOCOL> protocols = new ArrayList<>();
-        Log.e(TAG, "Updating 1 device: " + device);
-        for (int a = 0;a<this.devices.size();a++)
-            if (devices.get(a).getChipId().equals(device.getChipId()))
-                devices.set(a, device);
-
-        switch (status){
-            case WIFI:
-                Log.e(TAG,"switch is wifi "+ status+
-                        "<!>equality of ssids "+ (device.getSsid().equals(currentSSID))+
-                        "<!>ip != nulL? "+ (device.getIp() != null)+
-                        "<!>mqttConnected "+ (mqttConnected)+
-                        "<!>devices.get(a).getTopic()!= null? "+ (device.getTopic()!= null)+
-                        "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
-                );
-                if (MainActivityViewModel.connection.getValue() != null )
-                    Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
-                if (device.getSsid().equals(currentSSID) && device.getIp() != null) {
-                    Log.e(TAG,"switch is wifi "+ status);
-                    protocols.add(PROTOCOL.HTTP);
-                    protocols.add(PROTOCOL.UDP);
-                    Log.e(TAG,"http addeddd ");
-                }
-                if (mqttConnected && device.getTopic()!= null && MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().isConnected()){
-                    protocols.add(PROTOCOL.MQTT);
-                    Log.e(TAG,"mqtt addeddd");
-                }
-                break;
-            case MOBILE:
-                Log.e(TAG,"switch in mobile "+
-                        "<!>equality of ssids "+ (device.getSsid().equals(currentSSID))+
-                        "<!>ip nulL? "+ (device.getIp() != null)+
-                        "<!>mqttConnected "+ (mqttConnected)+
-                        "<!>devices.get(a).getTopic()!= null? "+ (device.getTopic()!= null)+
-                        "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
-                );
-                if (MainActivityViewModel.connection.getValue() != null )
-                    Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
-                if (mqttConnected && device.getTopic()!= null && MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
-                    protocols.add(PROTOCOL.MQTT);
-                    Log.e(TAG,"mqtt addeddd ");
-                }
-                break;
-            case NOT_CONNECTED:
-                Log.e(TAG,"switch in not connected");
+        Observable.create(new ObservableOnSubscribe<Object>() {
+            @Override
+            public void subscribe(ObservableEmitter<Object> e) throws Exception {
+                List<PROTOCOL> protocols = new ArrayList<>();
+                Log.e(TAG, "Updating 1 device: " + device);
+                for (int a = 0;a<MessageTransmissionDecider.this.devices.size();a++)
+                    if (devices.get(a).getChipId().equals(device.getChipId()))
+                        devices.set(a, device);
+                switch (status){
+                    case WIFI:
+                        Log.e(TAG,"switch is wifi "+ status+
+                                "<!>equality of ssids "+ (device.getSsid().equals(currentSSID))+
+                                "<!>ip != nulL? "+ (device.getIp() != null)+
+                                "<!>mqttConnected "+ (mqttConnected)+
+                                "<!>devices.get(a).getTopic()!= null? "+ (device.getTopic()!= null)+
+                                "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
+                        );
+                        if (MainActivityViewModel.connection.getValue() != null )
+                            Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
+                        if (device.getSsid().equals(currentSSID) && device.getIp() != null) {
+                            protocols.add(PROTOCOL.HTTP);
+                            protocols.add(PROTOCOL.UDP);
+                            Log.e(TAG,"http addeddd ");
+                        }
+                        if (mqttConnected && device.getTopic()!= null && MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().isConnected()){
+                            protocols.add(PROTOCOL.MQTT);
+                            Log.e(TAG,"mqtt addeddd");
+                        }
+                        break;
+                    case MOBILE:
+                        Log.e(TAG,"switch in mobile "+
+                                "<!>equality of ssids "+ (device.getSsid().equals(currentSSID))+
+                                "<!>ip nulL? "+ (device.getIp() != null)+
+                                "<!>mqttConnected "+ (mqttConnected)+
+                                "<!>devices.get(a).getTopic()!= null? "+ (device.getTopic()!= null)+
+                                "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
+                        );
+                        if (MainActivityViewModel.connection.getValue() != null )
+                            Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
+                        if (mqttConnected && device.getTopic()!= null && MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
+                            protocols.add(PROTOCOL.MQTT);
+                            Log.e(TAG,"mqtt addeddd ");
+                        }
+                        break;
+                    case NOT_CONNECTED:
+                        Log.e(TAG,"switch in not connected");
 //                    if (!devices.get(a).getSsid().equals(AppConstants.UNKNOWN_SSID) && devices.get(a).getStyle().equals(AppConstants.DEVICE_STANDALONE_STYLE))
 //                        protocols.add(PROTOCOL.STANDALONE);
-                Log.e(TAG,"STANDALONESTANDALONEcomputeCommunicationRoutes ");
-                break;
-        }
-        communicationRoutes.put(device.getChipId(),protocols);
+                        Log.e(TAG,"STANDALONESTANDALONEcomputeCommunicationRoutes ");
+                        break;
+                    case VPN:
+                        Log.e(TAG,"switch is VPN "+ status+
+                                "<!>equality of ssids "+ (device.getSsid().equals(currentSSID))+
+                                "<!>ip != nulL? "+ (device.getIp() != null)+
+                                "<!>mqttConnected "+ (mqttConnected)+
+                                "<!>devices.get(a).getTopic()!= null? "+ (device.getTopic()!= null)+
+                                "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
+                        );
+                        if (MainActivityViewModel.connection.getValue() != null )
+                            Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
+                        if (device.getSsid().equals(currentSSID) && device.getIp() != null) {
+                            protocols.add(PROTOCOL.HTTP);
+                            protocols.add(PROTOCOL.UDP);
+                            Log.e(TAG,"http addeddd ");
+                        }
+                        if (mqttConnected && device.getTopic()!= null && MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().isConnected()){
+                            protocols.add(PROTOCOL.MQTT);
+                            Log.e(TAG,"mqtt addeddd");
+                        }
+                        break;
+                }
+                communicationRoutes.put(device.getChipId(),protocols);
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+        .subscribe(new Observer<Object>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
     }
+
     public void updateStatus(Status status){
         Log.e(TAG,"Updating Status: "+ status+" Going to Compute...? " + !status.equals(this.status));
         if (!status.equals(this.status)) {
@@ -139,61 +195,106 @@ public class MessageTransmissionDecider {
     }
 
     private void computeCommunicationRoutes(List<Device> devices){
-        Log.e(TAG,"Starting Computing for "+devices.size()+" Devices: Current SSID:" + currentSSID +" Status: " + status);
-        Map<String ,List<PROTOCOL>> cr = new HashMap<>();
-        for (int a = 0;a<devices.size();a++){
-            Log.e(TAG,"-------------------------------------------------------------------------------");
-            List<PROTOCOL> protocols = new ArrayList<>();
-            Log.e(TAG,"Checking This Device: " + devices.get(a));
-            switch (status){
-                case WIFI:
-                    Log.e(TAG,"switch is wifi "+ status+
-                            "<!>equality of ssids "+ (devices.get(a).getSsid().equals(currentSSID))+
-                            "<!>ip != nulL? " + (devices.get(a).getIp() != null)+
-                            "<!>mqttConnected " + (mqttConnected)+
-                            "<!>devices.get(a).getTopic()!= null? "+ (devices.get(a).getTopic()!= null)+
-                            "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
-                    );
-                    if (MainActivityViewModel.connection.getValue() != null )
-                    Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
-                    if (devices.get(a).getSsid().equals(currentSSID) && devices.get(a).getIp() != null) {
-                        Log.e(TAG,"switch is wifi "+ status);
-                        protocols.add(PROTOCOL.HTTP);
-                        protocols.add(PROTOCOL.UDP);
-                        Log.e(TAG,"http addeddd ");
-                    }
-                    if (mqttConnected && devices.get(a).getTopic()!= null && MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().isConnected()){
-                        protocols.add(PROTOCOL.MQTT);
-                        Log.e(TAG,"mqtt addeddd");
-                    }
-                    break;
-                case MOBILE:
-                    Log.e(TAG,"switch in mobile "+
-                            "<!>equality of ssids "+ (devices.get(a).getSsid().equals(currentSSID))+
-                            "<!>ip nulL? "+ (devices.get(a).getIp() != null)+
-                            "<!>mqttConnected "+ (mqttConnected)+
-                            "<!>devices.get(a).getTopic()!= null? "+ (devices.get(a).getTopic()!= null)+
-                            "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
-                    );
-                    if (MainActivityViewModel.connection.getValue() != null )
-                    Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
-                    if (mqttConnected && devices.get(a).getTopic()!= null && MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
-                        protocols.add(PROTOCOL.MQTT);
-                        Log.e(TAG,"mqtt addeddd ");
-                    }
-                    break;
-                case NOT_CONNECTED:
-                    Log.e(TAG,"switch in not connected");
+        Observable.create(new ObservableOnSubscribe<Object>() {
+            @Override
+            public void subscribe(ObservableEmitter<Object> e) throws Exception {
+                Log.e(TAG,"Starting Computing for "+devices.size()+" Devices: Current SSID:" + currentSSID +" Status: " + status);
+                Map<String ,List<PROTOCOL>> cr = new HashMap<>();
+                for (int a = 0;a<devices.size();a++){
+                    Log.e(TAG,"-------------------------------------------------------------------------------");
+                    List<PROTOCOL> protocols = new ArrayList<>();
+                    Log.e(TAG,"Checking This Device: " + devices.get(a));
+                    switch (status){
+                        case WIFI:
+                            Log.e(TAG,"switch is wifi "+ status+
+                                    "<!>equality of ssids "+ (devices.get(a).getSsid().equals(currentSSID))+
+                                    "<!>ip != nulL? " + (devices.get(a).getIp() != null)+
+                                    "<!>mqttConnected " + (mqttConnected)+
+                                    "<!>devices.get(a).getTopic()!= null? "+ (devices.get(a).getTopic()!= null)+
+                                    "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
+                            );
+                            if (MainActivityViewModel.connection.getValue() != null )
+                                Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
+                            if (devices.get(a).getSsid().equals(currentSSID) && devices.get(a).getIp() != null) {
+                                protocols.add(PROTOCOL.HTTP);
+                                protocols.add(PROTOCOL.UDP);
+                                Log.e(TAG,"http addeddd ");
+                            }
+                            if (mqttConnected && devices.get(a).getTopic()!= null && MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().isConnected()){
+                                protocols.add(PROTOCOL.MQTT);
+                                Log.e(TAG,"mqtt addeddd");
+                            }
+                            break;
+                        case MOBILE:
+                            Log.e(TAG,"switch in mobile "+
+                                    "<!>equality of ssids "+ (devices.get(a).getSsid().equals(currentSSID))+
+                                    "<!>ip nulL? "+ (devices.get(a).getIp() != null)+
+                                    "<!>mqttConnected "+ (mqttConnected)+
+                                    "<!>devices.get(a).getTopic()!= null? "+ (devices.get(a).getTopic()!= null)+
+                                    "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
+                            );
+                            if (MainActivityViewModel.connection.getValue() != null )
+                                Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
+                            if (mqttConnected && devices.get(a).getTopic()!= null && MainActivityViewModel.connection != null && MainActivityViewModel.connection.getValue().isConnected()){
+                                protocols.add(PROTOCOL.MQTT);
+                                Log.e(TAG,"mqtt addeddd ");
+                            }
+                            break;
+                        case VPN:
+                            Log.e(TAG,"switch is VPN "+ status+
+                                    "<!>equality of ssids "+ (devices.get(a).getSsid().equals(currentSSID))+
+                                    "<!>ip != nulL? " + (devices.get(a).getIp() != null)+
+                                    "<!>mqttConnected " + (mqttConnected)+
+                                    "<!>devices.get(a).getTopic()!= null? "+ (devices.get(a).getTopic()!= null)+
+                                    "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
+                            );
+                            if (MainActivityViewModel.connection.getValue() != null )
+                                Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
+                            if (devices.get(a).getSsid().equals(currentSSID) && devices.get(a).getIp() != null) {
+                                protocols.add(PROTOCOL.HTTP);
+                                protocols.add(PROTOCOL.UDP);
+                                Log.e(TAG,"http addeddd ");
+                            }
+                            if (mqttConnected && devices.get(a).getTopic()!= null && MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().isConnected()){
+                                protocols.add(PROTOCOL.MQTT);
+                                Log.e(TAG,"mqtt addeddd");
+                            }
+                            break;
+                        case NOT_CONNECTED:
+                            Log.e(TAG,"switch in not connected");
 //                    if (!devices.get(a).getSsid().equals(AppConstants.UNKNOWN_SSID) && devices.get(a).getStyle().equals(AppConstants.DEVICE_STANDALONE_STYLE))
 //                        protocols.add(PROTOCOL.STANDALONE);
-                    Log.e(TAG,"STANDALONESTANDALONEcomputeCommunicationRoutes ");
-                    break;
-            }
-            cr.put(devices.get(a).getChipId(),protocols);
-        }
+                            Log.e(TAG,"STANDALONESTANDALONEcomputeCommunicationRoutes ");
+                            break;
+                    }
+                    cr.put(devices.get(a).getChipId(),protocols);
+                }
 //        communicationRoutes.clear();
-        communicationRoutes.putAll(cr);
-        Log.e(TAG,"Finishing Computing: ");
+                communicationRoutes.putAll(cr);
+                Log.e(TAG,"Finishing Computing: ");
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Observer<Object>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
     }
 
     public String sendMessage(Device device){

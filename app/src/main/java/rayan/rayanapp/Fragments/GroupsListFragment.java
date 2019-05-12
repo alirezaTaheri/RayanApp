@@ -31,6 +31,7 @@ import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.Adapters.recyclerView.GroupsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnGroupClicked;
+import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Util.SnackBarSetup;
@@ -38,7 +39,7 @@ import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 public class GroupsListFragment extends Fragment implements OnGroupClicked<Group> {
     private final String TAG = CreateGroupFragment.class.getSimpleName();
-
+    OnToolbarNameChange onToolbarNameChange;
     GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     GroupsListFragmentViewModel groupsListFragmentViewModel;
     String groupId;
@@ -69,7 +70,8 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
             groupsRecyclerViewAdapter.updateItems(groups);
         });
 
-
+       onToolbarNameChange=(OnToolbarNameChange)getActivity();
+        onToolbarNameChange.toolbarNameChanged("گروه\u200cها");
     }
 
     @Override
@@ -122,6 +124,7 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
     public void onResume() {
         super.onResume();
         groupsListFragmentViewModel.getGroups();
+        onToolbarNameChange.toolbarNameChanged("گروه\u200cها");
     }
 
 
@@ -161,4 +164,5 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
             Toast.makeText(getContext(), R.string.shortcut_not_supported, Toast.LENGTH_LONG).show();
         }
     }
+
 }

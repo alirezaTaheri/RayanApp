@@ -474,6 +474,17 @@ public class WifiHandler implements WifiHelper{
     public static int connectToSSID(Context context, String ssid, String password){
         WifiManager wifiManager;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+//        int currentNetId = wifiManager.getConnectionInfo().getNetworkId();
+//        for (WifiConfiguration wc : wifiManager.getConfiguredNetworks()){
+//            if (wc.SSID.equals("\""+ssid+"\"")){
+//                Log.e("AccessPoint Matched...." , "wc is: " + wc.SSID);
+//                wifiManager.disconnect();
+//                wifiManager.disableNetwork(currentNetId);
+//                wifiManager.enableNetwork(wc.networkId, true);
+//                wifiManager.reconnect();
+//                return wc.networkId;
+//            }
+//        }
         WifiConfiguration conf = new WifiConfiguration();
         conf.SSID = String.format("\"%s\"", ssid);
         conf.preSharedKey = String.format("\"%s\"", password);
@@ -489,11 +500,13 @@ public class WifiHandler implements WifiHelper{
         WifiManager wifiManager;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        if (list != null)
         for( WifiConfiguration i : list ) {
             Log.e("WifiHandler" , "Comparing: " + ssid + " Checking this to forget: "+ i.SSID);
             if (i.SSID.contains(ssid)){
-                Log.e("WifiHandler" , "Matched: "+ i.SSID);
+                Log.e("WifiHandler" , "Matched: "+ i.SSID + i.networkId);
                 wifiManager.removeNetwork(i.networkId);
+                wifiManager.saveConfiguration();
             }
         }
     }

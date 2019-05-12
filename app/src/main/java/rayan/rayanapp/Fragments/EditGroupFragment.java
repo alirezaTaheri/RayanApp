@@ -3,6 +3,7 @@ package rayan.rayanapp.Fragments;
 import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -11,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -34,6 +36,7 @@ import rayan.rayanapp.Adapters.recyclerView.GroupDevicesRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Contact;
 import rayan.rayanapp.Listeners.OnAdminClicked;
+import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
@@ -42,6 +45,7 @@ import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class EditGroupFragment extends Fragment {
+    OnToolbarNameChange onToolbarNameChange;
     static final int PICK_CONTACT = 1;
     public static Group group;
     private String userId;
@@ -93,6 +97,7 @@ public class EditGroupFragment extends Fragment {
                 for (int i = 0; i <= admins.size() - 1; i++) {
                     adminsUserNames.add(admins.get(i).getUsername());
                 }
+                Toast.makeText(getContext(), adminsUserNames.get(0), Toast.LENGTH_SHORT).show();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                     for (int i = 0; i <= admins.size() - 1; i++) {
                         admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(), getActivity()));
@@ -107,21 +112,19 @@ public class EditGroupFragment extends Fragment {
                 devicesRecyclerViewAdapter.setItems(group1.getDevices());
             });
         }
-        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"");
 
+        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"");
         devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(getActivity(), new ArrayList<>());
         setHasOptionsMenu(true);
+        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+        onToolbarNameChange.toolbarNameChanged(group.getName());
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id){
             case R.id.editGroupBasic:
-                EditGroupFragment2 editGroupFragment2= EditGroupFragment2.newInstance();
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frameLayout, editGroupFragment2)
-                        .addToBackStack(null)
-                        .commit();
+                clickOnEditGroupButton.OnEditGroupButtonClicked();
                 break;
             case R.id.leaveGroup :
                 clickOnLeaveGroup();
@@ -239,12 +242,6 @@ public class EditGroupFragment extends Fragment {
         managersRecyclerViewAdapter.setItems(group.getAdmins());
     }
 
-    public void getContactPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
-        }
-    }
-
     //    @OnClick(R.id.leaveGroup_btn)
     void clickOnLeaveGroup() {
         userId = RayanApplication.getPref().getId();
@@ -314,6 +311,11 @@ public class EditGroupFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        onToolbarNameChange.toolbarNameChanged(group.getName());
+    }
 //    public void doAddUserFromPhone(ArrayList<PhoneContact> selectedContacts){
 //        ArrayList<String> contacts=new ArrayList<>();
 //        for (int i=0;i<=selectedContacts.size()-1;i++){
@@ -341,4 +343,55 @@ public class EditGroupFragment extends Fragment {
 //        });
 //
 //    }
+    public interface ClickOnEditGroupButton{
+        void OnEditGroupButtonClicked();
+    }
+    ClickOnEditGroupButton clickOnEditGroupButton;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof ClickOnEditGroupButton) {
+            clickOnEditGroupButton = (ClickOnEditGroupButton) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        clickOnEditGroupButton = null;
+    }
+
+    public void getContactPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_READ_CONTACTS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    for (int i = 0; i <= admins.size() - 1; i++) {
+                        admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(), getActivity()));
+                        admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(), getActivity()));
+                    }
+                    for (int i = 0; i <= humanUsers.size() - 1; i++) {
+                        humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(), getActivity()));
+                        humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(), getActivity()));
+                    }
+                managersRecyclerViewAdapter.setItems(humanUsers);
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "اپلیکیشن به اجازه دسترسی به کانتکت ها نیاز دارد", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+        }
+    }
 }

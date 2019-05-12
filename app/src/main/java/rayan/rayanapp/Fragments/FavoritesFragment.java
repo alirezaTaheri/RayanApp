@@ -89,7 +89,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                         // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
                     }
                 });
-                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"ShowingFavoriteDevices: " + finalDevices);
+//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"ShowingFavoriteDevices: " + finalDevices);
                 devicesRecyclerViewAdapter.updateItems(finalDevices);
                 FavoritesFragment.this.devices = finalDevices;
             }

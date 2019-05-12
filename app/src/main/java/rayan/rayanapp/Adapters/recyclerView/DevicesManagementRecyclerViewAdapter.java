@@ -16,10 +16,12 @@ import rayan.rayanapp.ViewHolders.DeviceViewHolderManagement;
 
 public class DevicesManagementRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnDeviceClickListenerManagement<Device>, DeviceViewHolderManagement>  {
     private List<String> waiting;
+    Context context;
     public DevicesManagementRecyclerViewAdapter(Context context, List<Device> devices, List<String> waiting) {
         super(context);
         this.items = devices;
         this.waiting = waiting;
+        this.context=context;
     }
 
     public void updateItems(List<Device> items){
@@ -36,6 +38,6 @@ public class DevicesManagementRecyclerViewAdapter extends GenericRecyclerViewAda
 
     @Override
     public DeviceViewHolderManagement onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new DeviceViewHolderManagement(inflate(R.layout.item_device_management, parent), waiting);
+        return new DeviceViewHolderManagement(inflate(R.layout.item_device_management, parent), waiting, context);
     }
 }

@@ -27,9 +27,11 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
     TextView contactName;
     @BindView(R.id.adminTxt)
     TextView adminTxt;
+    @BindView(R.id.itemLine)
+    View itemLine;
     String parentFragment;
     ArrayList<String> adminsPhoneNumber;
-    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber, String parentFragment) {
+    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber, String parentFragment ) {
         super(itemView);
         ButterKnife.bind(this,itemView);
         this.adminsPhoneNumber=adminsPhoneNumber;
@@ -49,15 +51,13 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
             adminTxt.setVisibility(View.VISIBLE);
             adminTxt.setText("مدیر");
         }
+
         if (parentFragment.equals("admins_users")){
             adminTxt.setVisibility(View.VISIBLE);
             adminTxt.setText("");
             Drawable drawableTop = AppCompatResources.getDrawable(getContext(), R.drawable.ic_more);
             adminTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableTop, null);
-            adminTxt.setOnClickListener(v -> {
-                listener.onRemoveAdminClicked(item);
-            });
+            adminTxt.setOnClickListener(v -> listener.onRemoveAdminClicked(item));
         }
-
     }
 }

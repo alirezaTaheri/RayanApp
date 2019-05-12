@@ -137,7 +137,11 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         byte[] data = name.getBytes();
         String baseName = Base64.encodeToString(data, Base64.DEFAULT);
         Observable.zip(
-                toDeviceChangeNameObservable(new ChangeNameRequest(baseName),ip).subscribeOn(Schedulers.io()).doOnNext(changeNameResponse -> {
+                toDeviceChangeNameObservable(new ChangeNameRequest(baseName),ip).subscribeOn(Schedulers.io())
+                        .doOnError(throwable -> {
+                            Log.e(TAG, "error occurred: "+throwable);
+                        })
+                        .doOnNext(changeNameResponse -> {
                     Log.e(TAG, " 00000000 ChangeNameResponse: " + changeNameResponse);
                 }),
                 editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {

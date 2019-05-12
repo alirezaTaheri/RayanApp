@@ -23,4 +23,7 @@ public interface LocallyChangesDAO extends BaseDAO<LocallyChange>{
 
     @Delete
     void deleteItem(LocallyChange item);
+
+    @Query("DELETE FROM LocallyChange")
+    void deleteAll();
 }

@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.varunest.sparkbutton.SparkButton;
@@ -22,11 +25,13 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     @BindView(R.id.name)
     TextView name;
     @BindView(R.id.pin1)
-    SparkButton pin1;
+    ImageView pin1;
     @BindView(R.id.pin2)
-    SparkButton pin2;
+    ImageView pin2;
     @BindView(R.id.bottomStrip2)
     View bottomStrip2;
+    @BindView(R.id.clickableLayout2)
+    LinearLayout clickableLayout2;
     public DeviceViewHolder2Bridges(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
@@ -41,7 +46,8 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
 //        else
             bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
-            pin1.setChecked(true);
+            pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on));
+//            pin1.setChecked(true);
             itemView.post(new Runnable() {
                 @Override
                 public void run(){
@@ -54,10 +60,11 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
         else {
             bottomStrip.getLayoutParams().width = 0;
             bottomStrip.requestLayout();
-            pin1.setChecked(false);
+            pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
+//            pin1.setChecked(false);
         }
         if (item.getPin2().equals(AppConstants.ON_STATUS)){
-            pin2.setChecked(true);
+            pin2.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on));
             itemView.post(new Runnable() {
                 @Override
                 public void run(){
@@ -70,16 +77,18 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
         else {
             bottomStrip2.getLayoutParams().width = 0;
             bottomStrip2.requestLayout();
-            pin2.setChecked(false);
+            pin2.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
         }
         if (listener != null){
-            pin1.setOnClickListener(v -> listener.onPin1Clicked(item, getAdapterPosition()));
-            pin2.setOnClickListener(v -> listener.onPin2Clicked(item, getAdapterPosition()));
+            clickableLayout.setOnClickListener(v -> listener.onPin1Clicked(item, getAdapterPosition()));
+            clickableLayout2.setOnClickListener(v -> listener.onPin2Clicked(item, getAdapterPosition()));
+            name.setOnClickListener(null);
         }
     }
 
 
     public void startToggleAnimationPin2(ValueAnimator v){
+        AppConstants.disableEnableControls(false, (ViewGroup) clickableLayout2);
         Log.e("<<<<<<<<<<<<<<<<","<Starting bridge2 ");
         pin2.setEnabled(false);
         v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -94,6 +103,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     }
 
     public void stopToggleAnimationPin2(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
+        AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout2);
         Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge2" + item);
         pin2.setEnabled(true);
         if (v != null) {
@@ -125,15 +135,24 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
         }
         v.setDuration(300);
         v.start();
-        pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
-        pin2.setChecked(item.getPin2().equals(AppConstants.ON_STATUS));
+//        pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
+        pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)?ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
+        pin2.setImageDrawable(item.getPin2().equals(AppConstants.ON_STATUS)?ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
+//        pin2.setChecked();
         if (listener != null){
-            pin1.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
-            pin2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));
+            clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+            clickableLayout2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));
+            name.setOnClickListener(null);
         }
     }
 
     public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
         l.onAccessPointChanged(device);
+    }
+    public void changePosition(Device item, OnToggleDeviceListener<Device> listener){
+        if (listener != null){
+            clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+            clickableLayout2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));
+        }
     }
 }

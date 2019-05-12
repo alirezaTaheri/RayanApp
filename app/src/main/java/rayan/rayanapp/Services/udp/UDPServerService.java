@@ -79,7 +79,7 @@ public class UDPServerService extends Service {
                                 Log.e(TAG, "Couldn't find this Device: " + src);
                             else{
                                 ((RayanApplication)getApplication()).getDevicesAccessibilityBus().send(src);
-                                device.setLocallyAccessibility(true);
+//                                device.setLocallyAccessibility(true);
                                 device.setPin1(pin1);
                                 device.setPin2(pin2);
                                 device.setIp(senderIP);

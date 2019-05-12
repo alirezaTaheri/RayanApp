@@ -267,24 +267,24 @@ public class Device implements Parcelable {
         return "Device{" +
                 "chipId='" + chipId + '\'' +
                 ", name1='" + name1 + '\'' +
-                ", name2='" + name2 + '\'' +
-                ", pin1='" + pin1 + '\'' +
-                ", pin2='" + pin2 + '\'' +
-                ", id='" + id + '\'' +
-                ", type='" + type + '\'' +
-                ", username='" + username + '\'' +
-                ", topic=" + topic +
-                ", groupId='" + groupId + '\'' +
-                ", style='" + style + '\'' +
-                ", ssid='" + ssid + '\'' +
-                ", ip='" + ip + '\'' +
-                ", password='" + password + '\'' +
-                ", favorite=" + favorite +
-                ", locallyAccessibility=" + locallyAccessibility +
-                ", onlineAccessibility=" + onlineAccessibility +
-                ", statusWord='" + statusWord + '\'' +
-                ", secret='" + secret + '\'' +
                 ", position=" + position +
+//                ", name2='" + name2 + '\'' +
+//                ", pin1='" + pin1 + '\'' +
+//                ", pin2='" + pin2 + '\'' +
+//                ", id='" + id + '\'' +
+//                ", type='" + type + '\'' +
+//                ", username='" + username + '\'' +
+//                ", topic=" + topic +
+//                ", groupId='" + groupId + '\'' +
+//                ", style='" + style + '\'' +
+//                ", ssid='" + ssid + '\'' +
+//                ", ip='" + ip + '\'' +
+//                ", password='" + password + '\'' +
+//                ", favorite=" + favorite +
+//                ", locallyAccessibility=" + locallyAccessibility +
+//                ", onlineAccessibility=" + onlineAccessibility +
+                ", statusWord='" + statusWord + '\'' +
+//                ", secret='" + secret + '\'' +
                 '}';
     }
 

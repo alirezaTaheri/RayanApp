@@ -30,6 +30,8 @@
         android:layout_margin="10dp"
         app:srcCompat="@drawable/ic_search"
         android:layout_gravity="right|bottom"
+        app:backgroundTint="@color/baseColor"
+        app:rippleColor="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </android.support.design.widget.CoordinatorLayout>
