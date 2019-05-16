@@ -14,13 +14,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-<<<<<<< HEAD
-                            <entry key="outputName" value="ic_support" />
-                            <entry key="sourceFile" value="C:\Users\Milad\Downloads\outline-contact_support-24px.svg" />
-=======
-                            <entry key="outputName" value="ic_alert" />
-                            <entry key="sourceFile" value="C:\Users\Alireza\Downloads\exclamation-mark.svg" />
->>>>>>> 7dff278ebd23e2377bc633b434f08f64a4204f19
+                            <entry key="outputName" value="ic_lamp_on" />
+                            <entry key="sourceFile" value="C:\Users\Milad\Downloads\Telegram Desktop\7-Switch-on-1.svg" />
                           </map>
                         </option>
                       </PersistentState>

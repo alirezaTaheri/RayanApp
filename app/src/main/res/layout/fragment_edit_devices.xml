@@ -168,10 +168,9 @@
             android:id="@+id/setTopicIcon"
             />
         <ProgressBar
-            android:visibility="gone"
+            android:visibility="invisible"
             android:id="@+id/setTopicProgressBar"
             android:layout_centerInParent="true"
-            android:layout_marginRight="20dp"
             android:layout_width="27dp"
             android:layout_height="27dp" />
 
@@ -235,9 +234,7 @@
         <ProgressBar
             android:visibility="invisible"
             android:id="@+id/changeAccessPointProgressBar"
-            android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
-            android:layout_marginRight="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView

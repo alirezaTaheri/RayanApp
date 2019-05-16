@@ -39,7 +39,6 @@ public class GroupDevicesViewHolder extends BaseViewHolder<Device, OnDeviceClick
         }else if (item.getType().equals("switch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
         }else if (item.getType().equals("touch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
         }else if (item.getType().equals("plug")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_plug_off_1));
-        }else { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_device));
-        }
+        }else { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_device)); }
         }
 }
