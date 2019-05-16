@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mikhaellopez.circularimageview.CircularImageView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
@@ -19,7 +21,7 @@ public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
 //    @BindView(R.id.deleteUser)
 //    ImageView delete;
     @BindView(R.id.contactImage)
-    ImageView contactImage;
+CircularImageView contactImage;
     public UserViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);

@@ -4,14 +4,16 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:padding="5dp"
+    android:layout_marginTop="6dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:text="name"
         android:id="@+id/name"
-        android:layout_marginRight="24dp"
+        android:layout_marginRight="10dp"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
+        android:textSize="16sp"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/number"

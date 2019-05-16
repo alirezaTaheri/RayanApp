@@ -39,7 +39,7 @@ import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 public class GroupsListFragment extends Fragment implements OnGroupClicked<Group> {
     private final String TAG = CreateGroupFragment.class.getSimpleName();
-    OnToolbarNameChange onToolbarNameChange;
+//    OnToolbarNameChange onToolbarNameChange;
     GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     GroupsListFragmentViewModel groupsListFragmentViewModel;
     String groupId;
@@ -70,8 +70,10 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
             groupsRecyclerViewAdapter.updateItems(groups);
         });
 
-       onToolbarNameChange=(OnToolbarNameChange)getActivity();
-        onToolbarNameChange.toolbarNameChanged("گروه\u200cها");
+//       onToolbarNameChange=(OnToolbarNameChange)getActivity();
+//        onToolbarNameChange.toolbarNameChanged("گروه\u200cها");
+
+        ((GroupsActivity) getActivity()).toolbarNameChanged("گروه\u200cها");
     }
 
     @Override
@@ -124,7 +126,9 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
     public void onResume() {
         super.onResume();
         groupsListFragmentViewModel.getGroups();
-        onToolbarNameChange.toolbarNameChanged("گروه\u200cها");
+     //   onToolbarNameChange.toolbarNameChanged("گروه\u200cها");
+
+        ((GroupsActivity) getActivity()).toolbarNameChanged("گروه\u200cها");
     }
 
 

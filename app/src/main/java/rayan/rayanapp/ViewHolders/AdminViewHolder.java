@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mikhaellopez.circularimageview.CircularImageView;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -22,7 +24,7 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
     private final String TAG = AdminViewHolder.class.getSimpleName();
 
     @BindView(R.id.contactImage)
-    ImageView contactImage;
+    CircularImageView contactImage;
     @BindView(R.id.contactName)
     TextView contactName;
     @BindView(R.id.adminTxt)
@@ -31,11 +33,13 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
     View itemLine;
     String parentFragment;
     ArrayList<String> adminsPhoneNumber;
-    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber, String parentFragment ) {
+    String lastItemUserName;
+    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber, String lastItemUserName, String parentFragment ) {
         super(itemView);
         ButterKnife.bind(this,itemView);
         this.adminsPhoneNumber=adminsPhoneNumber;
         this.parentFragment=parentFragment;
+        this.lastItemUserName=lastItemUserName;
     }
 
     @Override
@@ -58,6 +62,9 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
             Drawable drawableTop = AppCompatResources.getDrawable(getContext(), R.drawable.ic_more);
             adminTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableTop, null);
             adminTxt.setOnClickListener(v -> listener.onRemoveAdminClicked(item));
+        }
+        if (item.getUsername().equals(lastItemUserName)){
+            itemLine.setVisibility(View.GONE);
         }
     }
 }

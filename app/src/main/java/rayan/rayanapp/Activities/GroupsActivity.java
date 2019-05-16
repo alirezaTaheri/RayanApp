@@ -33,7 +33,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class GroupsActivity extends AppCompatActivity implements OnToolbarNameChange, EditGroupFragment.ClickOnEditGroupButton, EditGroupFragment2.ClickOnButton, GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked, OnAddUserToGroupSubmitClicked {
+public class GroupsActivity extends AppCompatActivity implements EditGroupFragment.ClickOnEditGroupButton, EditGroupFragment2.ClickOnButton, GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked, OnAddUserToGroupSubmitClicked {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.status)
@@ -178,7 +178,6 @@ public class GroupsActivity extends AppCompatActivity implements OnToolbarNameCh
         transaction.addToBackStack(null);
         transaction.commit();
     }
-    @Override
     public void toolbarNameChanged(String name) {
         status.setText(name);
     }

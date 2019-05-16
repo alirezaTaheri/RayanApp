@@ -21,6 +21,7 @@ public class DrawerSortByGroupViewHolder extends BaseViewHolder<Group, OnGroupCl
     @BindView(R.id.number)
     TextView number;
 
+
     public DrawerSortByGroupViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
