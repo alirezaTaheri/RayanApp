@@ -99,7 +99,7 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
                     break;
                 case AppConstants.PRIMARY_CONFIG_FALSE:
                     Toast.makeText(getActivity(), "دسترسی شما تایید نشد\nدوباره تلاش کنید", Toast.LENGTH_SHORT).show();
-                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this);
+                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
                     yesNoDialog.show();
                     break;
                 case AppConstants.EXPIRED:

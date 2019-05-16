@@ -48,7 +48,6 @@ public class MyMqttCallbackHandler implements MqttCallback {
 
   @Override
   public void messageArrived(String topic, MqttMessage message) throws Exception {
-//      Toast.makeText(context, message.toString(), Toast.LENGTH_SHORT).show();
       Log.e(TAG, "MQTT Message Received//: " + message.toString()+"\tTopic: " + topic);
       JSONObject jsonMessage = new JSONObject(message.toString());
       String cmd = jsonMessage.getString("cmd");
@@ -74,7 +73,7 @@ public class MyMqttCallbackHandler implements MqttCallback {
 
   @Override
   public void deliveryComplete(IMqttDeliveryToken token) {
-      Log.e(TAG, "Delivery Completed//: "+this);
+      Log.e(TAG, "Delivery Completed//: ");
   }
 
     public static boolean isJSONValid(String test) {

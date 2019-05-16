@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
@@ -95,6 +96,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
     public void updateDevice(Device device){
         deviceDatabase.updateDevice(device);
+    }
+    public void updateDevices(List<Device> devices){
+        deviceDatabase.updateDevices(devices);
     }
 
     private class GetAllDevices extends AsyncTask<Void, Void,LiveData<List<Device>>> {
@@ -197,7 +201,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 //                if (g.getDevices() != null)
 //                devices.addAll(g.getDevices());
                 if (g.getHumanUsers() != null)
-                users.addAll(g.getHumanUsers());
+                    users.addAll(g.getHumanUsers());
                 for (int b = 0;b<g.getDevices().size();b++){
                     Device u = g.getDevices().get(b);
                     Device existing = deviceDatabase.getDevice(u.getChipId());
@@ -205,8 +209,11 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
                         deviceUser.setPosition(nOd);
-                        if (deviceUser.getType()!= null && deviceUser.getName1() != null)
+//                        if (deviceUser.getType()!= null && deviceUser.getName1() != null){
                             devices.add(deviceUser);
+                            nOd++;
+//                        }
+                            Log.e("isDeviceHasEmptyPar" , "really?? " + (deviceUser.getType()!= null) + (deviceUser.getName1() != null));
                     }
                     else {
                         existing.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
@@ -216,8 +223,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         existing.setTopic(u.getTopic());
                         existing.setGroupId(g.getId());
                         devices.add(existing);
+                        nOd++;
                     }
-                    nOd++;
                 }
                 g.setDevices(devices);
                 g.setHumanUsers(users);
@@ -231,7 +238,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             diffResult.dispatchUpdatesTo(new ListUpdateCallback() {
                 @Override
                 public void onInserted(int i, int i1) {
-//                    Log.e("ABC", "OnInserted: from: "+i+" To: " + i+i1 + " Count: " + i1);
+//                    Log.e("FGHIJ", newDevices.size()+" old: " + oldDevices.size()+"OnInserted: from: "+i+" To: " + (i+i1) + " Count: " + i1);
                     addDevices(newDevices.subList(i, i+i1));
 //                    ((RayanApplication)getApplication()).getMtd().addDevices(newDevices.subList(i, i+i1));
                 }
@@ -249,8 +256,20 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
                 @Override
                 public void onChanged(int i, int i1, @Nullable Object o) {
-//                    Log.e("ABC", "onChanged: from: "+i+" To: " + i1 +1 +"Count: " + i1);
-                    deviceDatabase.updateDevices(newDevices.subList(i, i + i1));
+                    Log.e("ABCDE", "onChanged: position: "+i+" Count: " + i1 + oldDevices.size() + newDevices.size());
+                    Log.e("ABCDE", "old:" + oldDevices + o);
+                    Log.e("ABCDE", "new:" + newDevices);
+                    Log.e("ABCDE", "old at position: "+i+ oldDevices.get(i));
+                    Log.e("ABCDE", "new at position: "+i+ newDevices.get(i));
+                    if (oldDevices.get(i) != null && oldDevices.get(i).getChipId().equals(((Bundle)o).getString("chipId"))){
+                        Log.e("ABCDE", "oldIsRight is: " + oldDevices.get(i));
+                    }
+                    if (newDevices.get(i) != null && newDevices.get(i).getChipId().equals(((Bundle)o).getString("chipId"))){
+                        Log.e("ABCDE", "newIsRight is: " + newDevices.get(i));
+                        deviceDatabase.updateDevice(newDevices.get(i));
+                    }
+                    else Log.e("ABCDE", "NeighterIsRight is: ");
+
                 }
             });
             GroupsDiffCallBack groupsDiffCallBack = new GroupsDiffCallBack(serverGroups, oldGroups);
@@ -281,9 +300,14 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 }
             });
             nOd = 0;
+            try {
+
             if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {
                 Log.e(TAG, "After getting Groups mqtt connection is: " + MainActivityViewModel.connection.getValue().getClient().isConnected());
                 subscribeToAll(newDevices);
+            }
+            }catch (Exception e){
+                Log.e(TAG, AppConstants.ERROR_OCCURRED + e);
             }
 //            MainActivityViewModel.connection.getValue().getClient().subs
 //            groupDatabase.addGroups(newGroups);

@@ -79,7 +79,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                     break;
                 case AppConstants.NEW_DEVICE_PHV_FALSE:
 //                    Toast.makeText(getActivity(), "غلط", Toast.LENGTH_SHORT).show();
-                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this);
+                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
                     yesNoDialog.show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_TIMEOUT:
@@ -104,7 +104,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                     Toast.makeText(getActivity(), "درست", Toast.LENGTH_SHORT).show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_FALSE:
-                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this);
+                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
                     yesNoDialog.show();
 //                    Toast.makeText(getActivity(), "غلط", Toast.LENGTH_SHORT).show();
                     break;

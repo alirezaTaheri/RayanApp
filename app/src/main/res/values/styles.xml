@@ -92,5 +92,22 @@
         <!--dialog background-->
         <!--<item name="android:windowBackground">@drawable/background_dialog</item>-->
     </style>
-
+    <style name="AppTheme.NoActionBarListItems" parent="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="android:actionBarStyle">@style/ActionBarStyle</item>
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="colorPrimary">@color/grey</item>
+        <item name="colorPrimaryDark">@color/grey</item>
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
+        <!--<item name="android:windowTranslucentNavigation">true</item>-->
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="colorAccent">@android:color/white</item>
+        <item name="colorControlNormal">#aaa</item>
+        <item name="android:textColorHint">#aaa</item>
+        <item name="colorControlActivated">@color/grey</item>
+        <item name="colorControlHighlight">@color/grey</item>
+    </style>
 </resources>

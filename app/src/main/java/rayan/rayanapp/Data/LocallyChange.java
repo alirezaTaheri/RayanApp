@@ -11,7 +11,7 @@ public class LocallyChange {
     private String id;
     private String jsonRequest;
     private String type;
-    private String ip;
+    private String chipId;
     public enum Type {
         POSITION,
         FAVOURITE,
@@ -22,11 +22,11 @@ public class LocallyChange {
     public LocallyChange() {
     }
 
-    public LocallyChange(@NonNull String id, String jsonRequest, Type type, String ip) {
+    public LocallyChange(@NonNull String id, String jsonRequest, Type type, String chipId) {
         this.id = id;
         this.jsonRequest = jsonRequest;
         this.type = type.toString();
-        this.ip = ip;
+        this.chipId = chipId;
     }
 
     @NonNull
@@ -42,10 +42,6 @@ public class LocallyChange {
         return type;
     }
 
-    public String getIp() {
-        return ip;
-    }
-
     public void setId(@NonNull String id) {
         this.id = id;
     }
@@ -58,7 +54,21 @@ public class LocallyChange {
         this.type = type;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public String getChipId() {
+        return chipId;
+    }
+
+    public void setChipId(String chipId) {
+        this.chipId = chipId;
+    }
+
+    @Override
+    public String toString() {
+        return "LocallyChange{" +
+                "id='" + id + '\'' +
+                ", jsonRequest='" + jsonRequest + '\'' +
+                ", type='" + type + '\'' +
+                ", chipId='" + chipId + '\'' +
+                '}';
     }
 }

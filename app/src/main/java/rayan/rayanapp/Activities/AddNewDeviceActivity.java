@@ -30,12 +30,14 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.Adapters.viewPager.AddNewDeviceStepperAdapter;
 import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.ChangeGroupFragment;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
+import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.WifiScanReceiver;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
@@ -44,7 +46,7 @@ import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked {
+public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked, YesNoDialogListener {
     private final String TAG = AddNewDeviceActivity.class.getSimpleName();
     private WifiHandler wifiHandler;
     WifiScanReceiver wifiReceiver;
@@ -121,10 +123,16 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 
     protected void onResume() {
         wifiHandler.setWifiEnabled();
-        registerReceiver(
-                wifiReceiver,
-                new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-        );
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+        registerReceiver(wifiReceiver, intentFilter);
+//        registerReceiver(
+//                wifiReceiver,
+//                new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
+//        );
         Log.e("=========---", "status Check: " + (ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED));
         if (ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
             statusCheck();
@@ -135,32 +143,11 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Log.e("=========---", "status Check: " + manager);
-        Log.e("=========---", "status Check: " + (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)));
         if (!(manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))) {
             buildAlertMessageNoGps();
         }
     }
 
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("برای ادامه نیاز به سرویس Location داریم")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                        AddNewDeviceActivity.super.onBackPressed();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -252,5 +239,21 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         CreateGroupFragment createGroupFragment = (CreateGroupFragment) changeGroupFragment.getChildFragmentManager().findFragmentByTag("createGroup");
         createGroupFragment.clickOnSubmit();
 
+    }
+
+    @Override
+    public void onYesClicked(YesNoDialog yesNoDialog) {
+        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        yesNoDialog.dismiss();
+    }
+
+    @Override
+    public void onNoClicked(YesNoDialog yesNoDialog) {
+        yesNoDialog.dismiss();
+        AddNewDeviceActivity.super.onBackPressed();
+    }
+    private void buildAlertMessageNoGps() {
+        YesNoDialog yesNoDialog = new YesNoDialog(this, R.style.ProgressDialogTheme, this,"برای ادامه نیاز به سرویس Location داریم");
+        yesNoDialog.show();
     }
 }

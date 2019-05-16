@@ -5,6 +5,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
     public List<T> getItems() {
         return items;
     }
+
     public T getItem(int position) {
         return items.get(position);
     }
@@ -58,10 +60,14 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
             notifyItemRemoved(position);
         }
     }
+
     public void onItemMove(int fromPosition, int toPosition){
+        Log.e("!@#" , "old: " + items);
         items.add(toPosition, items.remove(fromPosition));
         notifyItemMoved(fromPosition, toPosition);
+        Log.e("!@#" , "new: " + items);
     }
+
     public void clear() {
         items.clear();
         notifyDataSetChanged();

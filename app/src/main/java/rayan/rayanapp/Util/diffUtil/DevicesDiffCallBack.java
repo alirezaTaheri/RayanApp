@@ -45,7 +45,7 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
         Device oldDevice = oldDevices.get(oldItemPosition);
         Device newDevice = newDevices.get(newItemPosition);
-//        Log.e(this.getClass().getSimpleName(), "GoodBye areContentsTheSame" + (oldDevice.getPin1().equals(newDevice.getPin1())
+//        Log.e(this.getClass().getSimpleName(), "GoodBye areContentsTheSame" +newDevice.getName1()+" __ "+ (oldDevice.getPosition()) + (newDevice.getPosition()));
 //                && oldDevice.getPin2().equals(newDevice.getPin2())
 //                && oldDevice.getName1().equals(newDevice.getName1())
 //                && oldDevice.isFavorite() == newDevice.isFavorite()
@@ -56,7 +56,8 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
                 && oldDevice.getName1().equals(newDevice.getName1())
                 && oldDevice.isFavorite() == newDevice.isFavorite()
                 && oldDevice.isLocallyAccessibility() == newDevice.isLocallyAccessibility()
-                && oldDevice.getSsid().equals(newDevice.getSsid());
+                && oldDevice.getSsid().equals(newDevice.getSsid())
+                && oldDevice.getPosition() == (newDevice.getPosition());
 //                && oldDevice.getState2_1().equals(newDevice.getState2_1())
 //                && oldDevice.getIp().equals(newDevice.getIp())
 //                && (oldDevice.isReadyForMqtt() == newDevice.isReadyForMqtt());
@@ -74,33 +75,20 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
         Bundle b = new Bundle();
         if (!newDevice.getName1().equals(oldDevice.getName1()))
             b.putString("name", newDevice.getName1());
+//            b.putString("chipId", newDevice.getChipId());
+        if (!newDevice.getSsid().equals(oldDevice.getSsid()))
+            b.putString("ssid", newDevice.getSsid());
         if (!newDevice.getPin1().equals(oldDevice.getPin1())){
             b.putString("pin1", newDevice.getPin1());
-//            Log.e(this.getClass().getSimpleName(), "GoodBye pin 1 was detected");
         }
         if (!newDevice.getPin2().equals(oldDevice.getPin2())){
-//            Log.e(this.getClass().getSimpleName(), "GoodBye pin 2 was detected");
             b.putString("pin2", newDevice.getPin2());
         }
-//        if ((newDevice.getSsid() != null &&oldDevice.getSsid()!= null&& !newDevice.getSsid().equals(oldDevice.getSsid()))
-//                || (newDevice.getSsid() != null && oldDevice.getSsid() == null)){
-////            Log.e(this.getClass().getSimpleName(), "GoodBye pin 2 was detected");
-//            b.putString("ssid", newDevice.getSsid());
-//        }
-//        if ((newDevice.getIp() != null && oldDevice.getIp()!= null && !newDevice.getIp().equals(oldDevice.getIp()))
-//                || (newDevice.getIp() != null && oldDevice.getIp() == null)){
-////            Log.e(this.getClass().getSimpleName(), "GoodBye pin 2 was detected");
-//            b.putString("ip", newDevice.getIp());
-//        }
+        if (newDevice.getPosition()!=(oldDevice.getPosition())){
+            b.putString("position", newDevice.getPin1());
+        }
         if (!newDevice.isLocallyAccessibility() == (oldDevice.isLocallyAccessibility()))
             b.putBoolean("la", newDevice.isLocallyAccessibility());
-//        if (newDevice.getIp() != null && !newDevice.getIp().equals(oldDevice.getIp()))
-//            b.putString("ip", newDevice.getIp());
-//        if (newDevice.getState2_1() != null && !newDevice.getState2_1().equals(oldDevice.getState2_1()))
-//            b.putString("status2_1", newDevice.getState2_1());
-//        if (newDevice.getState2_2() != null && !newDevice.getState2_2().equals(oldDevice.getState2_2()))
-//            b.putString("status2_2", newDevice.getState2_2());
-//        Log.e(this.getClass().getSimpleName(), "GoodBye Bundle is: " + b);
         if (b.size() == 0) return null;
         return b;
     }

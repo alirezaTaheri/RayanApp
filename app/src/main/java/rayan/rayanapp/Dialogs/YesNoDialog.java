@@ -19,9 +19,11 @@ import rayan.rayanapp.R;
 public class YesNoDialog extends Dialog {
 
     YesNoDialogListener listener;
-    public YesNoDialog(@NonNull Context context, int themeResId, YesNoDialogListener listener) {
+    String message;
+    public YesNoDialog(@NonNull Context context, int themeResId, YesNoDialogListener listener, String message) {
         super(context, themeResId);
         this.listener = listener;
+        this.message = message;
     }
 
     @BindView(R.id.text)
@@ -41,7 +43,7 @@ public class YesNoDialog extends Dialog {
 //        this.setCancelable(false);
         this.setContentView(R.layout.dialog_yes_no);
         ButterKnife.bind(this);
-        text.setText("دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
+        text.setText(message);
         ok.setOnClickListener(v -> listener.onYesClicked(this));
         cancel.setOnClickListener(v -> listener.onNoClicked(this));
     }

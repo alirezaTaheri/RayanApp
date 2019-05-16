@@ -7,129 +7,111 @@
     android:background="#ffffff"
     app:cardElevation="4dp"
     android:layout_height="wrap_content"
+    android:theme="@style/AppTheme.NoActionBarListItems"
     app:cardCornerRadius="7dp">
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="100dp">
+
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <LinearLayout
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <com.varunest.sparkbutton.SparkButton
-                    android:id="@+id/pin1"
-                    android:layout_alignParentTop="true"
-                    android:layout_width="0dp"
-                    android:layout_height="65dp"
-                    android:layout_weight="1"
-                    app:sparkbutton_activeImage="@drawable/ic_lamp_on"
-                    app:sparkbutton_inActiveImage="@drawable/ic_lamp_off"
-                    app:sparkbutton_iconSize="50dp"
-                    app:sparkbutton_primaryColor="@color/baseColor"
-                    app:sparkbutton_secondaryColor="@color/primary_dark2" />
-                <com.varunest.sparkbutton.SparkButton
-                    android:id="@+id/pin2"
-                    android:layout_alignParentTop="true"
-                    android:layout_width="0dp"
-                    android:layout_height="65dp"
-                    android:layout_weight="1"
-                    app:sparkbutton_activeImage="@drawable/ic_lamp_on"
-                    app:sparkbutton_inActiveImage="@drawable/ic_lamp_off"
-                    app:sparkbutton_iconSize="50dp"
-                    app:sparkbutton_primaryColor="@color/baseColor"
-                    app:sparkbutton_secondaryColor="@color/primary_dark2" />
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_marginBottom="10dp"
-                android:layout_width="match_parent"
-                android:gravity="center"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
-                android:layout_gravity="center"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/name"
-                    android:gravity="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textColor="@color/ms_black"/>
-
-                <TextView
-                    android:id="@+id/name2_2"
-                    android:gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Name 2" />
-            </LinearLayout>
-
-
-        </LinearLayout>
-        <View
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="@color/grey_light_3"
-            />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:layout_width="0dp"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/clickableLayout"
+                android:background="@drawable/background_device"
+                android:orientation="vertical"
                 android:layout_weight="1"
-                android:layout_height="wrap_content">
+                android:layout_width="0dp"
+                android:layout_height="100dp">
                 <RelativeLayout
+                    android:focusable="false"
+                    android:clickable="false"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="100dp">
+                    <ImageView
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/pin1"
+                        android:layout_width="match_parent"
+                        android:padding="3dp"
+                        android:layout_height="50dp"
+                        app:srcCompat="@drawable/ic_lamp_on"/>
+                    <View
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="@color/grey_light_3"
+                        />
                     <View
                         android:id="@+id/bottomStrip"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
                         android:layout_width="match_parent"
-                        android:layout_centerInParent="true"
                         android:background="@color/baseColor2"
                         android:layout_height="5dp"
                         />
+
                 </RelativeLayout>
             </LinearLayout>
             <LinearLayout
-                android:layout_width="0dp"
+                android:background="@drawable/background_device"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/clickableLayout2"
+                android:orientation="vertical"
                 android:layout_weight="1"
-                android:layout_height="wrap_content">
+                android:layout_width="0dp"
+                android:layout_height="100dp">
                 <RelativeLayout
+                    android:focusable="false"
+                    android:clickable="false"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <View
-                        android:layout_centerInParent="true"
-                        android:id="@+id/bottomStrip2"
+                    android:layout_height="100dp">
+                    <ImageView
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/pin2"
                         android:layout_width="match_parent"
-                        android:layout_gravity="center"
+                        android:padding="3dp"
+                        android:layout_height="50dp"
+                        app:srcCompat="@drawable/ic_lamp_on"/>
+                    <View
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="@color/grey_light_3"
+                        />
+                    <View
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:id="@+id/bottomStrip2"
+                        android:layout_centerHorizontal="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_width="match_parent"
                         android:background="@color/baseColor2"
                         android:layout_height="5dp"
                         />
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
+        <TextView
+            android:layout_gravity="center_horizontal|bottom"
+            android:id="@+id/name"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textColor="@color/ms_black"/>
 
-        <ImageView
-            android:id="@+id/aliveIndicator"
-            android:visibility="invisible"
-            app:srcCompat="@drawable/ic_circle"
-            android:tint="#4CAF50"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="4dp"
-            android:layout_gravity="top|left"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:contentDescription="Alive Indicator" />
     </FrameLayout>
-
 </android.support.v7.widget.CardView>

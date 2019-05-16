@@ -1,14 +1,32 @@
 package rayan.rayanapp.Helper;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.LocallyChange;
 import rayan.rayanapp.Persistance.database.LocallyChangesDatabase;
+import rayan.rayanapp.Retrofit.ApiService;
+import rayan.rayanapp.Retrofit.ApiUtils;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 
 public class ControlRequests {
     LocallyChangesDatabase lcd;
+    private final String TAG = this.getClass().getSimpleName();
     public ControlRequests(Context context) {
         lcd = new LocallyChangesDatabase(context);
     }
@@ -19,15 +37,52 @@ public class ControlRequests {
         return lcd.getAllRequest(type);
     }
 
-    public void requestSuccess(LocallyChange locallyChange){
-        lcd.requestSuccess(locallyChange);
-    }
-
     public void addRequest(LocallyChange locallyChange){
         lcd.addRequest(locallyChange);
     }
-
+     public void removeAll(){
+        lcd.removeAll();
+     }
     public void submitRequests(){
-        lcd.submitRequests();
+        List<LocallyChange> changes = getAllRequests();
+        for (int a = 0; a<changes.size();a++){
+            Log.e(TAG, "Applying this change: " + changes.get(a));
+        }
+    }
+
+    public LiveData<DeviceResponse> editDevice(String id, String name, String type, String groupId, String ssid){
+        final MutableLiveData<DeviceResponse> results = new MutableLiveData<>();
+        editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribe(editDeviceObserver(results));
+        return results;
+    }
+    private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .editDevice(RayanApplication.getPref().getToken(), editDeviceRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<DeviceResponse> editDeviceObserver(MutableLiveData<DeviceResponse> results){
+        return new DisposableObserver<DeviceResponse>() {
+
+            @Override
+            public void onNext(@NonNull DeviceResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+//                if (e.toString().contains("Unauthorized"))
+//                    login();
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
     }
 }

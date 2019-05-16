@@ -19,6 +19,7 @@ import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
+import rayan.rayanapp.ViewHolders.DeviceViewHolderPlug;
 
 public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,OnToggleDeviceListener<Device>, DeviceViewHolder1Bridge> {
 
@@ -34,8 +35,10 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
         if (items == null) {
             throw new IllegalArgumentException("Cannot set `null` item to the Recycler adapter");
         }
+//        Log.e("&&&&" , "old: " + this.items);
+//        Log.e("&&&&" , "new: " + items);
         DevicesDiffCallBack devicesDiffCallBack = new DevicesDiffCallBack(items, this.items);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack,false);
         diffResult.dispatchUpdatesTo(this);
             this.items.clear();
             this.items.addAll(items);
@@ -49,7 +52,7 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
         else if (viewType == 2)
             return new DeviceViewHolder2Bridges(inflate(R.layout.item_device_2_bridge, parent));
         else
-            return new DeviceViewHolder1Bridge(inflate(R.layout.item_device_plug, parent));
+            return new DeviceViewHolderPlug(inflate(R.layout.item_device_plug, parent));
     }
 
     @Override
@@ -57,6 +60,11 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
         if (!payloads.isEmpty()) {
             Bundle b = (Bundle) payloads.get(0);
             for (String key : b.keySet()) {
+                if (key.equals("position")){
+                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Change in Position detected: " + items.get(position));
+//                    holder.onBind(items.get(position),getListener());
+                    holder.changePosition(items.get(position), getListener());
+                }
                 if (key.equals("pin1")){
                     Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge1" + items.get(position));
                     holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
@@ -115,4 +123,5 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
             return 2;
         return 3;
     }
+
 }

@@ -1,18 +1,15 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.varunest.sparkbutton.SparkButton;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +21,8 @@ import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDeviceListener<Device>> {
-    private final String TAG = DeviceViewHolder1Bridge.class.getSimpleName();
+public class DeviceViewHolderPlug extends DeviceViewHolder1Bridge {
+    private final String TAG = DeviceViewHolderPlug.class.getSimpleName();
     private Map<String, ValueAnimator> animators = new HashMap<>();
     @BindView(R.id.name)
     TextView name;
@@ -35,7 +32,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     View bottomStrip;
     @BindView(R.id.clickableLayout)
     LinearLayout clickableLayout;
-    public DeviceViewHolder1Bridge(View itemView) {
+    public DeviceViewHolderPlug(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
     }
@@ -46,7 +43,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         name.setText(item.getName1());
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
-            pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on));
+            pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_plug_on_1));
 //            pin1.setChecked(true);
             itemView.post(new Runnable() {
                 @Override
@@ -57,7 +54,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
             });
         }
         else {
-            pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
+            pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_plug_off_1));
 //            pin1.setChecked(false);
             bottomStrip.getLayoutParams().width = 0;
             bottomStrip.requestLayout();
@@ -70,7 +67,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     public void startToggleAnimationPin1(ValueAnimator v){
         Log.e("<<<<<<<<<<<<<<<<","<Starting bridge1");
-        AppConstants.disableEnableControls(false, (ViewGroup) clickableLayout);
+        AppConstants.disableEnableControls(false, (ViewGroup) itemView);
         v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -84,7 +81,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     public void stopToggleAnimationPin1(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
         Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge1" + item);
-        AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
+        AppConstants.disableEnableControls(true, (ViewGroup) itemView);
         if (v != null) {
             v.cancel();
             if (item.getPin1().equals(AppConstants.ON_STATUS)) {
@@ -114,7 +111,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         }
             v.setDuration(300);
             v.start();
-        pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
+        pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_plug_on_1):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_plug_off_1));
 //            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));

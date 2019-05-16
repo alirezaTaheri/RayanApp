@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +48,7 @@ import rayan.rayanapp.ViewModels.TestDeviceFragmentViewModel;
 public class TestDeviceFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     @BindView(R.id.pin1)
-    SparkButton pin1;
+    ImageView pin1;
     @BindView(R.id.name)
     TextView name;
     NewDevice newDevice;
@@ -79,14 +81,14 @@ public class TestDeviceFragment extends BottomSheetDialogFragment implements Vie
 
     private void toggleOn(int pin){
         viewModel.toDeviceToggle(pin == 1? AppConstants.ON_1:AppConstants.ON_2).observe(this, toggleDeviceResponse -> {
-            pin1.setChecked(toggleDeviceResponse.getPin1().equals(AppConstants.ON_STATUS));
+            pin1.setImageDrawable(toggleDeviceResponse.getPin1().equals(AppConstants.ON_STATUS)? ContextCompat.getDrawable(getActivity(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(getActivity(),R.drawable.ic_lamp_off));
             newDevice.setPin1(toggleDeviceResponse.getPin1());
         });
     }
 
     private void toggleOff(int pin){
         viewModel.toDeviceToggle(pin == 1? AppConstants.OFF_1:AppConstants.OFF_2).observe(this, toggleDeviceResponse -> {
-            pin1.setChecked(toggleDeviceResponse.getPin1().equals(AppConstants.ON_STATUS));
+            pin1.setImageDrawable(toggleDeviceResponse.getPin1().equals(AppConstants.ON_STATUS)? ContextCompat.getDrawable(getActivity(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(getActivity(),R.drawable.ic_lamp_off));
             newDevice.setPin1(toggleDeviceResponse.getPin1());
         });
     }

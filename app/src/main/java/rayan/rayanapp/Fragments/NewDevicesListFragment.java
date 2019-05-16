@@ -144,7 +144,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     @Override
     public void connecting(String targetSSID) {
         this.targetSSID = targetSSID;
-        WifiHandler.connectToSSID(getActivity(),targetSSID, "12345678");
+        WifiHandler.connectToSSID(getActivity(),targetSSID, AppConstants.DEVICE_PRIMARY_PASSWORD);
         connectionStatus = ConnectionStatus.CONNECTING;
     }
 

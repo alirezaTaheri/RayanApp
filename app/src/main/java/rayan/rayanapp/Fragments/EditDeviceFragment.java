@@ -166,30 +166,35 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
         editDeviceFragmentViewModel.zipChangeName(device.getId(), name.getText().toString(), device.getType(), device.getGroupId(), device.getIp(), device.getSsid()).observe(this, s -> {
             switch (s){
                 case AppConstants.FORBIDDEN:
-                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(), device.getIp());
+                    Log.e(this.getClass().getSimpleName(), "FORBIDDEN CHANGENAME");
+//                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(), device.getIp());
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما دسترسی لازم برای تغییر نام را ندارید");
-                    name.setText(device.getName1());
+//                    name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.CHANGE_NAME_FALSE:
-                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId(), device.getSsid());
+                    Log.e(this.getClass().getSimpleName(), "CHANGE_NAME_FALSE CHANGENAME");
+//                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId(), device.getSsid());
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"امکان ویرایش نام وجود ندارد");
-                    name.setText(device.getName1());
+//                    name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.OPERATION_DONE:
+                    Log.e(this.getClass().getSimpleName(), "DONE CHANGENAME");
                     setDeviceNameStatus(NameStatus.CHANGED);
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"ویرایش نام با موفقیت انجام شد");
                     editDeviceFragmentViewModel.getGroups();
                     break;
                 case AppConstants.SOCKET_TIME_OUT:
+                    Log.e(this.getClass().getSimpleName(), "SOCKET_TIME_OUT CHANGENAME");
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
-                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(),device.getIp());
-                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId(), device.getSsid());
+//                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(),device.getIp());
+//                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId(), device.getSsid());
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.ERROR:
+                    Log.e(this.getClass().getSimpleName(), "ERROR CHANGENAME");
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطایی رخ داد");
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
@@ -234,7 +239,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
         editDeviceFragmentViewModel.getDeviceVersion(device).observe(this, s -> Toast.makeText(getActivity(), ""+s, Toast.LENGTH_SHORT).show());
-        YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this);
+        YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this, "دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
         yesNoDialog.show();
     }
 

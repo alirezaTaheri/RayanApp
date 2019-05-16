@@ -12,6 +12,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -276,11 +277,15 @@ public class SendMessageToDevice {
     HashMap<String , Disposable> mqttBackup = new HashMap<>();
     @SuppressLint("CheckResult")
     private void sendHttpPin1(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position, boolean withBackup){
+        Log.e("******",
+                        "\nsendToThisDevice " + device);
         if (withBackup && rayanApplication.getMtd().getListOfAvailableRouts(device.getChipId()).contains(MessageTransmissionDecider.PROTOCOL.MQTT))
         Observable.interval(0,700, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
             @Override
             public void onSubscribe(Disposable d) {
+                if (mqttBackup.get(device.getChipId()+"_1") != null)
+                    mqttBackup.get(device.getChipId()+"_1").dispose();
                 mqttBackup.put(device.getChipId()+"_1", d);
                 Log.e(TAG, "onSubscribe Timer executed for Mqtt Backup pin 1");
             }
@@ -325,6 +330,9 @@ public class SendMessageToDevice {
                     else{
                         device.setPin1(toggleDeviceResponse.getPin1());
                         device.setPin2(toggleDeviceResponse.getPin2());
+                        Log.e("******",
+                        "\ndataBaseDevice: " + deviceDatabase.getDevice(device.getChipId())+
+                        "\nreplacing this Device: " + device);
                         deviceDatabase.updateDevice(device);
                         fragment.stopToggleAnimationPin1(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
@@ -379,6 +387,8 @@ public class SendMessageToDevice {
                     .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
                 @Override
                 public void onSubscribe(Disposable d) {
+                    if (mqttBackup.get(device.getChipId()+"_2") != null)
+                        mqttBackup.get(device.getChipId()+"_2").dispose();
                     mqttBackup.put(device.getChipId()+"_2", d);
                     Log.e(TAG, "onSubscribe Timer executed for Mqtt Backup pin 2");
                 }
@@ -488,7 +498,9 @@ public class SendMessageToDevice {
                 sendHttpPin1(device, rayanApplication, fragment, position, RayanApplication.getPref().getIsNodeSoundOn());
                 break;
             case "NONE":
-                dp.showDialog(AppConstants.DIALOG_PROVIDE_INTERNET, null);
+                Map<String,String> params = new HashMap<>();
+                params.put("message", "دستگاه از هیچ طریقی قابل دسترسی نیست");
+                dp.showDialog(AppConstants.DIALOG_ALERT, params);
 //                Toast.makeText(rayanApplication, "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
                 break;
         }
@@ -511,7 +523,9 @@ public class SendMessageToDevice {
                 sendHttpPin2(device, rayanApplication, fragment, position, RayanApplication.getPref().getIsNodeSoundOn());
                 break;
             case "NONE":
-                dp.showDialog(AppConstants.DIALOG_PROVIDE_INTERNET, null);
+                Map<String,String> params = new HashMap<>();
+                params.put("message", "دستگاه از هیچ طریقی قابل دسترسی نیست");
+                dp.showDialog(AppConstants.DIALOG_ALERT, params);
 //                Toast.makeText(rayanApplication, "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
                 break;
         }

@@ -1,5 +1,8 @@
 package rayan.rayanapp.Util;
 
+import android.view.View;
+import android.view.ViewGroup;
+
 public class AppConstants {
     public final static String MQTT = "mqtt";
     public final static String UDP = "udp";
@@ -89,10 +92,6 @@ public class AppConstants {
     public final static String ERROR_DESCRIPTION = "error";
     public final static String USER_NOT_FOUND_RESPONSE = "User not found";
     public final static String WRONG_PASSWORD_RESPONSE = "Wrong password";
-//=======
-//=======
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
-
     public final static String DEVICE_IS_READY_FOR_UPDATE = "update";
     public final static String DEVICE_READY_FOR_UPDATE = "update";
     public final static String DEVICE_UPDATE_CODE_WROTE = "codes_wrote";
@@ -106,19 +105,23 @@ public class AppConstants {
      * Dialog Types
      */
     public final static String DIALOG_PROVIDE_INTERNET = "dialog_provide_internet";
-//<<<<<<< HEAD
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-//=======
+    public final static String DIALOG_ALERT = "dialog_alert";
 
-//    public final static String DEVICE_PRIMARY_PASSWORD = "12345678";
-//    public final static String DEVICE_TYPE_SWITCH_1 = "switch_1";
-//    public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";
-//    public final static String DEVICE_TYPE_PLUG = "plug";
 
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
+    public final static String ERROR_OCCURRED = "error_occurred";
 
     public static String getDeviceAddress(String ip){
         return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
 //        return "http://192.168.137.1/test.php";
+    }
+    public static void disableEnableControls(boolean enable, ViewGroup vg){
+        vg.setEnabled(enable);
+        for (int i = 0; i < vg.getChildCount(); i++){
+            View child = vg.getChildAt(i);
+            child.setEnabled(enable);
+            if (child instanceof ViewGroup){
+                disableEnableControls(enable, (ViewGroup)child);
+            }
+        }
     }
 }
