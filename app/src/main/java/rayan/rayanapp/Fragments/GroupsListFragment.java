@@ -67,7 +67,7 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         groupsRecyclerViewAdapter.setListener(this);
         groupsListFragmentViewModel = ViewModelProviders.of(this).get(GroupsListFragmentViewModel.class);
         groupsListFragmentViewModel.getAllGroupsLive().observe(Objects.requireNonNull(getActivity()), groups -> {
-            groupsRecyclerViewAdapter.updateItems(groups);
+            groupsRecyclerViewAdapter.updateItems(groups, groups.get(groups.size()-1).getId());
         });
 
 //       onToolbarNameChange=(OnToolbarNameChange)getActivity();
@@ -168,5 +168,6 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
             Toast.makeText(getContext(), R.string.shortcut_not_supported, Toast.LENGTH_LONG).show();
         }
     }
+
 
 }

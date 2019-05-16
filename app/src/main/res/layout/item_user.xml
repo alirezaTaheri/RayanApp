@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="5dp"
     android:layout_marginLeft="5dp"
     android:layout_marginRight="5dp"
     android:background="@color/white"
-    android:layout_marginTop="5dp"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:clickable="true"
-
-    android:layout_height="46dp">
+    android:layout_height="49dp">
     <RelativeLayout
         android:id="@+id/cardView"
         android:layout_width="match_parent"
@@ -44,18 +39,14 @@
             android:textAlignment="center" />
 
         <com.mikhaellopez.circularimageview.CircularImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
             android:src="@drawable/ic_rayan"
-            app:civ_border_color="#EEEEEE"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_marginRight="20dp"
-            app:civ_border_width="1dp"
-            app:civ_shadow_radius="1"
-            app:civ_shadow="true"
             android:id="@+id/contactImage"
-            app:civ_shadow_color="#8BC34A"/>
+            />
         <View
             android:layout_width="wrap_content"
             android:id="@+id/itemLine"

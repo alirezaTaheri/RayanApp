@@ -18,15 +18,21 @@ public class GroupViewHolder  extends BaseViewHolder<Group, OnGroupClicked<Group
     TextView name;
     @BindView(R.id.group_item_layout)
     RelativeLayout groupItemLayout;
-
-    public GroupViewHolder(View itemView) {
+    @BindView(R.id.grouplistLinee)
+    View grouplistLine;
+    String groupId;
+    public GroupViewHolder(View itemView, String groupId) {
         super(itemView);
         ButterKnife.bind(this, itemView);
+        this.groupId=groupId;
     }
 
     @Override
     public void onBind(Group item, @Nullable OnGroupClicked<Group> listener) {
         name.setText(item.getName());
         groupItemLayout.setOnClickListener((v)-> listener.onGroupClicked(item));
+        if (groupId.equals(item.getId())){
+            grouplistLine.setVisibility(View.INVISIBLE);
+        }
     }
 }
