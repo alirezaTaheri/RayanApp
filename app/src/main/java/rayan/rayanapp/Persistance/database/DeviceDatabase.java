@@ -51,6 +51,9 @@ public class DeviceDatabase {
     public void deleteDevices(List<Device> devices){
         deviceDAO.deleteDevices(devices);
     }
+    public void deleteDevice(Device device){
+        deviceDAO.deleteDevice(device);
+    }
 
     public void updateDevices(List<Device> devices){
         deviceDAO.updateDevices(devices);

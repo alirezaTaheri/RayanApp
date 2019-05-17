@@ -119,6 +119,7 @@ public class UDPServerService extends Service {
                                 statusWord = jsonMessage.getString("stword");
                                 decodedName = Base64.decode(name, Base64.DEFAULT);
                                 device = deviceDatabase.getDevice(src);
+                                String pIp = device.getIp();
                                 Log.d(TAG, "TLMSDONETLMSDONE: " + device);
                                 if (device != null) {
                                     ((RayanApplication) getApplication()).getDevicesAccessibilityBus().send(src);
@@ -137,6 +138,10 @@ public class UDPServerService extends Service {
                                     catch (Exception e){
                                         Log.e(TAG, "Error in Decrypting: " + e);
                                         e.printStackTrace();
+                                    }
+                                    if (pIp == null || !pIp.equals(senderIP)){
+                                        Log.e(TAG, "Device getting new Ip Address: " + senderIP + device);
+                                        ((RayanApplication)getApplication()).getMtd().updateDevice(device);
                                     }
                                     deviceDatabase.updateDevice(device);
                                 } else {

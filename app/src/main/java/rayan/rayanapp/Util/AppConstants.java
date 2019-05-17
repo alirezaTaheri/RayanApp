@@ -114,9 +114,10 @@ public class AppConstants {
         return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
 //        return "http://192.168.137.1/test.php";
     }
+
     public static void disableEnableControls(boolean enable, ViewGroup vg){
         vg.setEnabled(enable);
-        for (int i = 0; i < vg.getChildCount(); i++){
+        for (int i = 0; i < vg.getChildCount(); i++) {
             View child = vg.getChildAt(i);
             child.setEnabled(enable);
             if (child instanceof ViewGroup){

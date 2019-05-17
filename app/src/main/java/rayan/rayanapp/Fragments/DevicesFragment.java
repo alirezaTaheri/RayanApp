@@ -129,7 +129,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 //                        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices1.subList(i, i + i1));
 //                    }
 //                });
-                ((RayanApplication)getActivity().getApplication()).getMtd().setDevices(finalDevices);
+
+//                ((RayanApplication)getActivity().getApplication()).getMtd().setDevices(finalDevices);
                 Log.e(TAG ,"ShowingDevices: " + finalDevices);
                 devicesRecyclerViewAdapter.updateItems(finalDevices);
                 DevicesFragment.this.devices = finalDevices;

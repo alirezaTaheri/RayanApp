@@ -274,17 +274,17 @@ public class Device implements Parcelable {
 //                ", id='" + id + '\'' +
 //                ", type='" + type + '\'' +
 //                ", username='" + username + '\'' +
-//                ", topic=" + topic +
-//                ", groupId='" + groupId + '\'' +
+                ", topic=" + topic +
+                ", groupId='" + groupId + '\'' +
 //                ", style='" + style + '\'' +
-//                ", ssid='" + ssid + '\'' +
-//                ", ip='" + ip + '\'' +
+                ", ssid='" + ssid + '\'' +
+                ", ip='" + ip + '\'' +
 //                ", password='" + password + '\'' +
 //                ", favorite=" + favorite +
 //                ", locallyAccessibility=" + locallyAccessibility +
 //                ", onlineAccessibility=" + onlineAccessibility +
                 ", statusWord='" + statusWord + '\'' +
-//                ", secret='" + secret + '\'' +
+                ", secret='" + secret + '\'' +
                 '}';
     }
 

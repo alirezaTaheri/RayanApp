@@ -33,6 +33,8 @@ public interface GroupsDAO extends BaseDAO<Group> {
 
     @Delete
     void deleteGroups(List<Group> groups);
+    @Delete
+    void deleteGroup(Group group);
 
 
 }

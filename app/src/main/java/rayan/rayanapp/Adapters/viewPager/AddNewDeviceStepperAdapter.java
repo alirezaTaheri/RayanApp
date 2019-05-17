@@ -99,6 +99,7 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
             case 3:
                 builder.setTitle("پایان")
                         .setBackButtonLabel("قبلی")
+                        .setBackButtonVisible(false)
                         .setEndButtonLabel("بازگشت به صفحه‌اصلی");
                 break;
 

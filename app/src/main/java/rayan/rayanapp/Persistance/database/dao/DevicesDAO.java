@@ -45,4 +45,6 @@ public interface DevicesDAO extends BaseDAO<Device>{
 
     @Delete
     void deleteDevices(List<Device> devices);
+    @Delete
+    void deleteDevice(Device device);
 }

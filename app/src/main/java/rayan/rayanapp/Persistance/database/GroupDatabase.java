@@ -39,6 +39,9 @@ public class GroupDatabase {
     public void deleteGroups(List<Group> devices){
         groupsDAO.deleteGroups(devices);
     }
+    public void deleteGroup(Group group){
+        groupsDAO.deleteGroup(group);
+    }
     public void updateGroups(List<Group> devices){
         groupsDAO.updateGroups(devices);
     }

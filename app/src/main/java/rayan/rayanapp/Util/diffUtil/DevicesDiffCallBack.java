@@ -76,8 +76,10 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
         if (!newDevice.getName1().equals(oldDevice.getName1()))
             b.putString("name", newDevice.getName1());
 //            b.putString("chipId", newDevice.getChipId());
-        if (!newDevice.getSsid().equals(oldDevice.getSsid()))
+        if (!newDevice.getSsid().equals(oldDevice.getSsid())){
+            Log.e("TATATATA", "SSSID: " + newDevice.getSsid());
             b.putString("ssid", newDevice.getSsid());
+        }
         if (!newDevice.getPin1().equals(oldDevice.getPin1())){
             b.putString("pin1", newDevice.getPin1());
         }

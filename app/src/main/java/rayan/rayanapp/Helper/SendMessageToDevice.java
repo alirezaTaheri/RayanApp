@@ -62,12 +62,15 @@ public class SendMessageToDevice {
             IMqttActionListener iMqttActionListener = new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.e(TAG, "onSuccess Publish message" + topic);
+                    Log.e(TAG, "onSuccess Publish Topic: " +topic+" Message:"+ message);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.e(TAG, "onFailure Publish message");
+                    Log.e(TAG, "onFailure Publish message: " + topic);
+                    Log.e(TAG, "onFailure Publish Exception: " + exception);
+                    exception.printStackTrace();
+
                 }
             };
             connection.getClient().publish(topic, message.getBytes(), qos, retain, null, iMqttActionListener);

@@ -1,12 +1,14 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -41,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.polyak.iconswitch.IconSwitch;
+import com.thanosfisherman.wifiutils.WifiUtils;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -49,6 +52,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -56,6 +60,12 @@ import javax.crypto.spec.SecretKeySpec;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
@@ -138,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -233,35 +244,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(1);
         initialize();
-        if (isExternalStorageWritable()) {
-            File appDirectory = new File(Environment.getExternalStorageDirectory() + "/RayanAppFolder");
-            File logDirectory = new File(appDirectory + "/log");
-            File logFile = new File(logDirectory, "logcat" + System.currentTimeMillis() + ".txt");
-            Date currentTime = Calendar.getInstance().getTime();
-            Log.e(">>>>>>>>>", ">>>>>>>>>Date<<<<<<<< " + currentTime);
-            File logFile2 = new File(logDirectory, "logcat" + System.currentTimeMillis() + "_2.txt");
-            // create app folder
-            if (!appDirectory.exists()) {
-                appDirectory.mkdir();
-            }
-            // create log folder
-            if (!logDirectory.exists()) {
-                logDirectory.mkdir();
-            }
-            // clear the previous logcat and then write the new one to the file
-            try {
-                Process process = Runtime.getRuntime().exec("logcat -c");
-                process = Runtime.getRuntime().exec("logcat -f " + logFile);
-//                process = Runtime.getRuntime().exec("logcat -f " + logFile2 + " *:S EditDeviceFragment:E UDPServerService:E EditGroupFragmentViewModel:E");
-            } catch (IOException e) {
-                e.printStackTrace();
+        writeLog().observeOn(Schedulers.io()).subscribeOn(Schedulers.io()).subscribe(new Observer<Object>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
             }
 
-        } else if (isExternalStorageReadable()) {
-            // only readable
-        } else {
-            // not accessible
-        }
+            @Override
+            public void onNext(Object o) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
         initializeBottomNavigation();
     }
     if (RayanApplication.getPref().isLoggedIn()) {
@@ -286,6 +289,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 }
 
+    public Observable<Object> writeLog(){
+        return Observable.create(new ObservableOnSubscribe<Object>() {
+            @Override
+            public void subscribe(ObservableEmitter<Object> e) throws Exception {
+                if (isExternalStorageWritable()) {
+                    File appDirectory = new File(Environment.getExternalStorageDirectory() + "/RayanAppFolder");
+                    File logDirectory = new File(appDirectory + "/log");
+                    File logFile = new File(logDirectory, "logcat" + System.currentTimeMillis() + ".txt");
+                    Date currentTime = Calendar.getInstance().getTime();
+                    Log.e(">>>>>>>>>", ">>>>>>>>>Date<<<<<<<< " + currentTime);
+                    File logFile2 = new File(logDirectory, "logcat" + System.currentTimeMillis() + "_2.txt");
+                    // create app folder
+                    if (!appDirectory.exists()) {
+                        appDirectory.mkdir();
+                    }
+                    // create log folder
+                    if (!logDirectory.exists()) {
+                        logDirectory.mkdir();
+                    }
+                    // clear the previous logcat and then write the new one to the file
+                    try {
+                        Process process = Runtime.getRuntime().exec("logcat -c");
+                        process = Runtime.getRuntime().exec("logcat -f " + logFile);
+//                process = Runtime.getRuntime().exec("logcat -f " + logFile2 + " *:S EditDeviceFragment:E UDPServerService:E EditGroupFragmentViewModel:E");
+                    } catch (IOException error) {
+                        error.printStackTrace();
+                    }
+
+                } else if (isExternalStorageReadable()) {
+                    // only readable
+                } else {
+                    // not accessible
+                }
+            }
+        });
+    }
 
     public void initialize(){
         if (RayanApplication.getPref().getProtocol() == null){
@@ -409,6 +448,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttDisconnected() {
+        if (MainActivityViewModel.connection != null)
         Log.e(TAG, "Mqtt Status: DISCONNECTED Connection Retries: " + connectionRetries);
         if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
             connectionRetries = 0;
@@ -505,6 +545,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onDestroy();
     }
 
+    int c = 0;
     @Override
     public void onBackPressed() {
         if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -512,8 +553,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+//        WifiUtils.enableLog(true);
+//        WifiUtils.withContext(getApplicationContext()).scanWifi(this::getScanResults).start();
+//        if (c %2==0) {
+//            Log.e("mmmm", "1-8");
+//            WifiUtils.withContext(getApplicationContext())
+//                    .connectWith("Rayan_Switch_1_222222_F", "12345678")
+//                    .onConnectionResult(this::checkResult)
+//                    .start();
+//        }
+//        else
+//            WifiUtils.withContext(getApplicationContext())
+//                    .connectWith("Rayan_Switch_1_222222_F", "123456789")
+//                    .onConnectionResult(this::checkResult)
+//                    .start();
+//        c++;
     }
-
+    private void getScanResults(@NonNull final List<ScanResult> results)
+    {
+        if (results.isEmpty())
+        {
+            Log.i(TAG, "SCAN RESULTS IT'S EMPTY");
+            return;
+        }
+        Log.i(TAG, "GOT SCAN RESULTS " + results);
+    }
+    private void checkResult(boolean isSuccess) {
+        if (isSuccess)
+            Toast.makeText(MainActivity.this, "WIFI ENABLED", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(MainActivity.this, "COULDN'T ENABLE WIFI", Toast.LENGTH_SHORT).show();
+    }
     //
 //    @Override
 //    public void onBackPressed() {
@@ -820,7 +890,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 }
 
-        //    @Override
+//    @Override
 //    public void onBackPressed() {
 ////        secretKeySpec = new SecretKeySpec("8nro4q0emv8k1uv5".getBytes(), "AES");
 //        secretKeySpec = new SecretKeySpec("1234567812345678".getBytes(), "AES");
@@ -846,7 +916,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}
 //{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "cmd":"de", "src":""}
 //{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "cmd":"de", "src":"", "k":"vg4mseo0ouo2zf1j"}
-//{"text":"37#", "cmd":"en", "src":"", "k":"q916zpzn15rcimcv"}
-//{"src":"5960802","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"Drhdj8n5dN0pm++FVsGQAQ=="}
+//{"text":"37#", "cmd":"en", "src":"", "k":"33y8lnn0k6ewat8c"}
+//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"juO+H8ZKWVwZvMP8r/RQgw=="}
 //{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}
 

@@ -184,10 +184,10 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         };
     }
 
-    int nOd = 0;
+    private int nOd = 0;
     private class SyncGroups extends AsyncTask<Void, Void, Void>{
         private List<Group> serverGroups = new ArrayList<>();
-        public SyncGroups(List<Group> groups){
+        SyncGroups(List<Group> groups){
             this.serverGroups.addAll(groups);
         }
         @Override
@@ -209,10 +209,10 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
                         deviceUser.setPosition(nOd);
-//                        if (deviceUser.getType()!= null && deviceUser.getName1() != null){
+                        if (deviceUser.getType()!= null && deviceUser.getName1() != null){
                             devices.add(deviceUser);
                             nOd++;
-//                        }
+                        }
                             Log.e("isDeviceHasEmptyPar" , "really?? " + (deviceUser.getType()!= null) + (deviceUser.getName1() != null));
                     }
                     else {
@@ -233,73 +233,96 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             }
             List<Device> oldDevices = deviceDatabase.getAllDevices();
             List<Group> oldGroups = groupDatabase.getAllGroups();
-            DevicesDiffCallBack devicesDiffCallBack = new DevicesDiffCallBack(newDevices, oldDevices);
-            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack);
-            diffResult.dispatchUpdatesTo(new ListUpdateCallback() {
-                @Override
-                public void onInserted(int i, int i1) {
-//                    Log.e("FGHIJ", newDevices.size()+" old: " + oldDevices.size()+"OnInserted: from: "+i+" To: " + (i+i1) + " Count: " + i1);
-                    addDevices(newDevices.subList(i, i+i1));
-//                    ((RayanApplication)getApplication()).getMtd().addDevices(newDevices.subList(i, i+i1));
-                }
-
-                @Override
-                public void onRemoved(int i, int i1) {
-//                    Log.e("ABC", "OnRemoved: from: "+i+" To: " + (i1 +i) + " Count: " + i1);
-                    deviceDatabase.deleteDevices(oldDevices.subList(i, i + i1));
-                }
-
-                @Override
-                public void onMoved(int i, int i1) {
-//                    Log.e("ABC", "onMoved: from: "+i+" To: " + i1);
-                }
-
-                @Override
-                public void onChanged(int i, int i1, @Nullable Object o) {
-                    Log.e("ABCDE", "onChanged: position: "+i+" Count: " + i1 + oldDevices.size() + newDevices.size());
-                    Log.e("ABCDE", "old:" + oldDevices + o);
-                    Log.e("ABCDE", "new:" + newDevices);
-                    Log.e("ABCDE", "old at position: "+i+ oldDevices.get(i));
-                    Log.e("ABCDE", "new at position: "+i+ newDevices.get(i));
-                    if (oldDevices.get(i) != null && oldDevices.get(i).getChipId().equals(((Bundle)o).getString("chipId"))){
-                        Log.e("ABCDE", "oldIsRight is: " + oldDevices.get(i));
+            deviceDatabase.addDevices(newDevices);
+            ((RayanApplication)getApplication()).getMtd().setDevices(newDevices);
+            if (oldDevices != null){
+                for (int a = 0;a<oldDevices.size();a++){
+                    String cId = oldDevices.get(a).getChipId();
+                    boolean exist = false;
+                    for (int b = 0;b<newDevices.size();b++){
+                        if (cId.equals(newDevices.get(b).getChipId())) exist = true;
                     }
-                    if (newDevices.get(i) != null && newDevices.get(i).getChipId().equals(((Bundle)o).getString("chipId"))){
-                        Log.e("ABCDE", "newIsRight is: " + newDevices.get(i));
-                        deviceDatabase.updateDevice(newDevices.get(i));
+                    if (!exist) deviceDatabase.deleteDevice(oldDevices.get(a));
+                }
+            }
+            if (serverGroups != null && oldGroups != null){
+                for (int a = 0;a<oldGroups.size();a++){
+                    String cId = oldGroups.get(a).getId();
+                    boolean exist = false;
+                    for (int b = 0;b<serverGroups.size();b++){
+                        if (cId.equals(serverGroups.get(b).getId())) exist = true;
                     }
-                    else Log.e("ABCDE", "NeighterIsRight is: ");
-
+                    if (!exist) groupDatabase.deleteGroup(oldGroups.get(a));
                 }
-            });
-            GroupsDiffCallBack groupsDiffCallBack = new GroupsDiffCallBack(serverGroups, oldGroups);
-            DiffUtil.DiffResult diffResult1 = DiffUtil.calculateDiff(groupsDiffCallBack);
-            diffResult1.dispatchUpdatesTo(new ListUpdateCallback() {
-                @Override
-                public void onInserted(int i, int i1) {
-                    groupDatabase.addGroups(serverGroups.subList(i, i+i1));
-//                    Log.e("DEF", "OnInserted: from: "+i+" To: " + i+i1 + " Count: " + i1);
-                }
-
-                @Override
-                public void onRemoved(int i, int i1) {
-//                    Log.e("DEF", "OnRemoved: from: "+i+" To: " + (i1 +i) + " Count: " + i1);
-                    groupDatabase.deleteGroups(oldGroups.subList(i, i+1));
-                }
-
-                @Override
-                public void onMoved(int i, int i1) {
-//                    Log.e("DEF", "onMoved: from: "+i+" To: " + i1);
-
-                }
-
-                @Override
-                public void onChanged(int i, int i1, @Nullable Object o) {
-//                    Log.e("DEF", "onChanged: from: "+i+" To: " + (i1+i) +"Count: " + i1);
-                    groupDatabase.updateGroups(serverGroups.subList(i, i+i1));
-                }
-            });
+            }
+            groupDatabase.addGroups(serverGroups);
             nOd = 0;
+//            DevicesDiffCallBack devicesDiffCallBack = new DevicesDiffCallBack(newDevices, oldDevices);
+//            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack);
+//            diffResult.dispatchUpdatesTo(new ListUpdateCallback() {
+//                @Override
+//                public void onInserted(int i, int i1) {
+////                    Log.e("FGHIJ", newDevices.size()+" old: " + oldDevices.size()+"OnInserted: from: "+i+" To: " + (i+i1) + " Count: " + i1);
+//                    addDevices(newDevices.subList(i, i+i1));
+////                    ((RayanApplication)getApplication()).getMtd().addDevices(newDevices.subList(i, i+i1));
+//                }
+//
+//                @Override
+//                public void onRemoved(int i, int i1) {
+////                    Log.e("ABC", "OnRemoved: from: "+i+" To: " + (i1 +i) + " Count: " + i1);
+//                    deviceDatabase.deleteDevices(oldDevices.subList(i, i + i1));
+//                }
+//
+//                @Override
+//                public void onMoved(int i, int i1) {
+////                    Log.e("ABC", "onMoved: from: "+i+" To: " + i1);
+//                }
+//
+//                @Override
+//                public void onChanged(int i, int i1, @Nullable Object o) {
+//                    Log.e("ABCDE", "onChanged: position: "+i+" Count: " + i1 + oldDevices.size() + newDevices.size());
+//                    Log.e("ABCDE", "old:" + oldDevices + o);
+//                    Log.e("ABCDE", "new:" + newDevices);
+//                    Log.e("ABCDE", "old at position: "+i+ oldDevices.get(i));
+//                    Log.e("ABCDE", "new at position: "+i+ newDevices.get(i));
+//                    if (oldDevices.get(i) != null && oldDevices.get(i).getChipId().equals(((Bundle)o).getString("chipId"))){
+//                        Log.e("ABCDE", "oldIsRight is: " + oldDevices.get(i));
+//                    }
+//                    if (newDevices.get(i) != null && newDevices.get(i).getChipId().equals(((Bundle)o).getString("chipId"))){
+//                        Log.e("ABCDE", "newIsRight is: " + newDevices.get(i));
+//                        deviceDatabase.updateDevice(newDevices.get(i));
+//                    }
+//                    else Log.e("ABCDE", "NeighterIsRight is: ");
+//
+//                }
+//            });
+//            GroupsDiffCallBack groupsDiffCallBack = new GroupsDiffCallBack(serverGroups, oldGroups);
+//            DiffUtil.DiffResult diffResult1 = DiffUtil.calculateDiff(groupsDiffCallBack);
+//            diffResult1.dispatchUpdatesTo(new ListUpdateCallback() {
+//                @Override
+//                public void onInserted(int i, int i1) {
+//                    groupDatabase.addGroups(serverGroups.subList(i, i+i1));
+////                    Log.e("DEF", "OnInserted: from: "+i+" To: " + i+i1 + " Count: " + i1);
+//                }
+//
+//                @Override
+//                public void onRemoved(int i, int i1) {
+////                    Log.e("DEF", "OnRemoved: from: "+i+" To: " + (i1 +i) + " Count: " + i1);
+//                    groupDatabase.deleteGroups(oldGroups.subList(i, i+1));
+//                }
+//
+//                @Override
+//                public void onMoved(int i, int i1) {
+////                    Log.e("DEF", "onMoved: from: "+i+" To: " + i1);
+//
+//                }
+//
+//                @Override
+//                public void onChanged(int i, int i1, @Nullable Object o) {
+////                    Log.e("DEF", "onChanged: from: "+i+" To: " + (i1+i) +"Count: " + i1);
+//                    groupDatabase.updateGroups(serverGroups.subList(i, i+i1));
+//                }
+//            });
             try {
 
             if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {

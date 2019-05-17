@@ -79,7 +79,8 @@ public class Topic implements Parcelable {
 
     @Override
     public String toString() {
-        return "Topic{" +
+        return
+//                "Topic{" +
                 "topic='" + topic + '\'' +
 //                ", type='" + type + '\'' +
 //                ", domain='" + domain + '\'' +

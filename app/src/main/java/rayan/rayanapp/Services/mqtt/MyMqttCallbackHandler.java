@@ -40,9 +40,10 @@ public class MyMqttCallbackHandler implements MqttCallback {
       connection.changeConnectionStatus(Connection.ConnectionStatus.DISCONNECTED);
       MainActivityViewModel.connection.postValue(connection);
 //      Toast.makeText(context, "MQTT Connection Lost", Toast.LENGTH_SHORT).show();
-      Log.e(TAG , "Connection Lost: " + cause);
+        Log.e(TAG, "MqttCallBackHandlerConnectionLost: " + cause);
     if (cause != null) {
-        Log.e(TAG, "MqttCallBackHandler" + "ConnectionLost");
+        cause.printStackTrace();
+        Log.e(TAG , "Connection Lost: " + cause);
     }
   }
 

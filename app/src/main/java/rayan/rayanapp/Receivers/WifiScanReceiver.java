@@ -34,17 +34,32 @@ public class WifiScanReceiver extends BroadcastReceiver {
         if (action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) {
             NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf((SupplicantState)
                     intent.getParcelableExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED));
+            SupplicantState ssss=((SupplicantState)intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE));
             Log.e("+_+_+_)(**", "EXTRA_SUPPLICANT_CONNECTED: "+ state);
+            Log.e("+_+_+_)(**", "EXTRA_SUPPLICANT_CONNECTED: "+ ssss);
             changeState(state);
 
         }
+        if (action.equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
+            NetworkInfo.DetailedState state3 = WifiInfo.getDetailedStateOf((SupplicantState)
+                    intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE));
+            Log.e("+_+_+_)(**", "SUPPLICANT_STATE_CHANGED_ACTION: "+ state3);
+            SupplicantState supl_state=((SupplicantState)intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE));
+            Log.e("+_+_+_)(**", "SUPPLICANT_STATE_CHANGED_ACTION: Newww: "+ supl_state);
+        }
         if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         {
+
+            NetworkInfo.DetailedState state3 = WifiInfo.getDetailedStateOf((SupplicantState)
+                    intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE));
             NetworkInfo.DetailedState state1 = WifiInfo.getDetailedStateOf((SupplicantState)
                     intent.getParcelableExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED));
             NetworkInfo.DetailedState state=
                     ((NetworkInfo)intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO)).getDetailedState();
             Log.e("+_+_+_)(**", ">>>>>>>>>>>>>>>>>>>NETWORK_STATE_CHANGED_ACTION<<<<<<<<<<<<<<<<");
+            Log.e("+_+_+_)(**", "11111: " + state1);
+            Log.e("+_+_+_)(**", "22222: " + state);
+            Log.e("+_+_+_)(**", "33333: " + state3);
             changeState(state);
         }
 
