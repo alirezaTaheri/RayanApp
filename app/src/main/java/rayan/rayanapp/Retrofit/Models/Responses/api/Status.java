@@ -33,7 +33,7 @@ public class Status {
 
     @Override
     public String toString() {
-        return "Status{" +
+        return "ConnectionStatus{" +
                 "description='" + description + '\'' +
                 ", code='" + code + '\'' +
                 '}';

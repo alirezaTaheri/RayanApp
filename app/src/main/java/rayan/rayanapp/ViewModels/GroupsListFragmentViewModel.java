@@ -36,7 +36,4 @@ public class GroupsListFragmentViewModel extends DevicesFragmentViewModel {
         return groupDatabase.getAllGroups();
     }
 
-
-
-
 }

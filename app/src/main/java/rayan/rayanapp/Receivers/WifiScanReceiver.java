@@ -45,7 +45,9 @@ public class WifiScanReceiver extends BroadcastReceiver {
                     intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE));
             Log.e("+_+_+_)(**", "SUPPLICANT_STATE_CHANGED_ACTION: "+ state3);
             SupplicantState supl_state=((SupplicantState)intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE));
+            int supl_state55 = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
             Log.e("+_+_+_)(**", "SUPPLICANT_STATE_CHANGED_ACTION: Newww: "+ supl_state);
+            Log.e("+_+_+_)(**", "SUPPLICANT_STATE_CHANGED_ACTION: AUTHAUTHAUTH: "+ supl_state55);
         }
         if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         {

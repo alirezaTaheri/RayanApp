@@ -76,7 +76,7 @@ public class Connection {
         DISCONNECTED,
         /** Client has encountered an Error **/
         ERROR,
-        /** Status is unknown **/
+        /** ConnectionStatus is unknown **/
         NONE
     }
 

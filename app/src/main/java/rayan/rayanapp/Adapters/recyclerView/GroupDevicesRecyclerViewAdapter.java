@@ -24,7 +24,7 @@ Context context;
     @NonNull
     @Override
     public GroupDevicesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new GroupDevicesViewHolder(inflate(R.layout.item_device_management, parent),context);
+            return new GroupDevicesViewHolder(inflate(R.layout.item_device_edit_group, parent),context);
     }
 
 }

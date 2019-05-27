@@ -59,7 +59,7 @@ public class AppConstants {
     public final static String OFF_1 = "turn_off_1";
     public final static String OFF_2 = "turn_off_2";
 
-    //Status
+    //ConnectionStatus
     public final static String ON_STATUS = "on";
     public final static String OFF_STATUS = "off";
 
@@ -88,6 +88,8 @@ public class AppConstants {
      */
     public final static String DUPLICATE_USER = "duplicate user";
     public final static String UNKNOWN_SSID = "Unknown SSID";
+    public final static String NULL_SSID = "Null SSID";
+    public final static String UNKNOWN_IP = "Unknown IP";
     public final static String SUCCESS_DESCRIPTION = "success";
     public final static String ERROR_DESCRIPTION = "error";
     public final static String USER_NOT_FOUND_RESPONSE = "User not found";

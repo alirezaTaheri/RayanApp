@@ -2,12 +2,15 @@ package rayan.rayanapp.Helper;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
+import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -16,6 +19,7 @@ import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.DeviceCommunicationParams;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
@@ -23,7 +27,7 @@ import rayan.rayanapp.ViewModels.MainActivityViewModel;
 public class MessageTransmissionDecider {
 
     private final String TAG = this.getClass().getSimpleName();
-    public enum Status {
+    public enum ConnectionStatus {
         NOT_CONNECTED,
         WIFI,
         MOBILE,
@@ -35,75 +39,81 @@ public class MessageTransmissionDecider {
         MQTT,
         STANDALONE
     }
+    public enum Status {
+        NORMAL,
+        MODIFIED
+    }
+
     private String currentSSID;
     private boolean mqttConnected;
+    private ConnectionStatus connectionStatus;
     private Status status;
     private List<Device> devices;
     private Map<String ,List<PROTOCOL>> communicationRoutes;
+    private Map<String ,Pair<DeviceCommunicationParams, List<PROTOCOL>>> routes;
 
 
-    public MessageTransmissionDecider(Context context, List<Device> devices) {
+    public MessageTransmissionDecider(Context context) {
         communicationRoutes = new HashMap<>();
-        this.devices = devices;
+        devices = new ArrayList<>();
+        routes = new HashMap<>();
         switch (NetworkUtil.getConnectivityStatusString(context)){
             case "WIFI":
-                status = Status.WIFI;
+                connectionStatus = ConnectionStatus.WIFI;
                 break;
             case "NOT_CONNECTED":
-                status = Status.NOT_CONNECTED;
+                connectionStatus = ConnectionStatus.NOT_CONNECTED;
                 break;
             case "MOBILE":
-                status = Status.MOBILE;
+                connectionStatus = ConnectionStatus.MOBILE;
                 break;
             case "VPN":
-                status = Status.VPN;
+                connectionStatus = ConnectionStatus.VPN;
                 break;
         }
-        Log.e(TAG, "I am created Going to Compute...Devices: " + devices + "\nStatus: " + status);
-        computeCommunicationRoutes(devices);
+        Log.e(TAG, "I am created Going to Compute...Devices: " + devices + "\nConnectionStatus: " + connectionStatus);
+        currentSSID = AppConstants.NULL_SSID;
+//        computeCommunicationRoutes(devices);
     }
 
     public void updateMqttStatus(boolean mqttConnected){
         if (this.mqttConnected != mqttConnected){
             this.mqttConnected = mqttConnected;
-            Log.e(TAG, "mqtt Status Changed Going to Compute...");
-            computeCommunicationRoutes(this.devices);
+            Log.e(TAG, "mqtt ConnectionStatus Changed Going to Compute...");
+            this.status = Status.MODIFIED;
+//            computeCommunicationRoutes(this.devices);
         }
     }
 
-    public void addDevices(List<Device> insertedDevices){
-        this.devices.addAll(insertedDevices);
-        computeCommunicationRoutes(insertedDevices);
-    }
 
     public void setDevices(List<Device> devices){
         Log.e(TAG,"Updating Devices " +devices);
         this.devices = devices;
         Log.e(TAG, "List of devices changed Going to Compute...");
-        computeCommunicationRoutes(devices);
+//        computeCommunicationRoutes(devices);
     }
 
-    public void updateDevice(Device device){
-        Observable.create(new ObservableOnSubscribe<Object>() {
-            @Override
-            public void subscribe(ObservableEmitter<Object> e) throws Exception {
+    public List<PROTOCOL> computeRoutes(Device device){
+//        Observable.create(new ObservableOnSubscribe<Object>() {
+//            @Override
+//            public void subscribe(ObservableEmitter<Object> e) throws Exception {
+//                for (int a = 0;a<MessageTransmissionDecider.this.devices.size();a++)
+//                    if (devices.get(a).getChipId().equals(device.getChipId()))
+//                        devices.set(a, device);
                 List<PROTOCOL> protocols = new ArrayList<>();
-                Log.e(TAG, "Updating 1 device: " + device);
-                for (int a = 0;a<MessageTransmissionDecider.this.devices.size();a++)
-                    if (devices.get(a).getChipId().equals(device.getChipId()))
-                        devices.set(a, device);
-                switch (status){
+                Log.e(TAG, "start computing CurrentSSID: "+currentSSID+"for device: " + device);
+                switch (connectionStatus){
                     case WIFI:
-                        Log.e(TAG,"switch is wifi "+ status+
+                        Log.e(TAG,"switch is wifi "+ connectionStatus +
                                 "<!>equality of ssids "+ (device.getSsid().equals(currentSSID))+
-                                "<!>ip != nulL? "+ (device.getIp() != null)+
+                                "<!>!device.getIp().equals(AppConstants.UNKNOWN_IP)? "+ (!device.getIp().equals(AppConstants.UNKNOWN_IP))+
                                 "<!>mqttConnected "+ (mqttConnected)+
                                 "<!>devices.get(a).getTopic()!= null? "+ (device.getTopic()!= null)+
                                 "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
                         );
                         if (MainActivityViewModel.connection.getValue() != null )
                             Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
-                        if (device.getSsid().equals(currentSSID) && device.getIp() != null) {
+                        if (device.getSsid().equals(currentSSID) && !device.getIp().equals(AppConstants.UNKNOWN_IP)) {
                             protocols.add(PROTOCOL.HTTP);
                             protocols.add(PROTOCOL.UDP);
                             Log.e(TAG,"http addeddd ");
@@ -116,7 +126,7 @@ public class MessageTransmissionDecider {
                     case MOBILE:
                         Log.e(TAG,"switch in mobile "+
                                 "<!>equality of ssids "+ (device.getSsid().equals(currentSSID))+
-                                "<!>ip nulL? "+ (device.getIp() != null)+
+                                "<!>!device.getIp().equals(AppConstants.UNKNOWN_IP)? "+ (!device.getIp().equals(AppConstants.UNKNOWN_IP))+
                                 "<!>mqttConnected "+ (mqttConnected)+
                                 "<!>devices.get(a).getTopic()!= null? "+ (device.getTopic()!= null)+
                                 "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
@@ -135,16 +145,16 @@ public class MessageTransmissionDecider {
                         Log.e(TAG,"STANDALONESTANDALONEcomputeCommunicationRoutes ");
                         break;
                     case VPN:
-                        Log.e(TAG,"switch is VPN "+ status+
+                        Log.e(TAG,"switch is VPN "+ connectionStatus +
                                 "<!>equality of ssids "+ (device.getSsid().equals(currentSSID))+
-                                "<!>ip != nulL? "+ (device.getIp() != null)+
+                                "<!>!device.getIp().equals(AppConstants.UNKNOWN_IP)? "+ (!device.getIp().equals(AppConstants.UNKNOWN_IP))+
                                 "<!>mqttConnected "+ (mqttConnected)+
                                 "<!>devices.get(a).getTopic()!= null? "+ (device.getTopic()!= null)+
                                 "<!>MainActivityViewModel.connection.getValue() != null ? "+ (MainActivityViewModel.connection.getValue() != null )
                         );
-                        if (MainActivityViewModel.connection.getValue() != null )
+                        if (MainActivityViewModel.connection.getValue() != null)
                             Log.e(TAG,"MainActivityViewModel.connection.getValue().isConnected()? "+ (MainActivityViewModel.connection.getValue().isConnected()));
-                        if (device.getSsid().equals(currentSSID) && device.getIp() != null) {
+                        if (device.getSsid().equals(currentSSID) && !device.getIp().equals(AppConstants.UNKNOWN_IP)) {
                             protocols.add(PROTOCOL.HTTP);
                             protocols.add(PROTOCOL.UDP);
                             Log.e(TAG,"http addeddd ");
@@ -155,58 +165,63 @@ public class MessageTransmissionDecider {
                         }
                         break;
                 }
-                communicationRoutes.put(device.getChipId(),protocols);
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
-        .subscribe(new Observer<Object>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(Object o) {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
+//                communicationRoutes.put(device.getChipId(),protocols);
+                routes.put(device.getChipId(), Pair.create(new DeviceCommunicationParams(device.getSsid(), currentSSID, device.getIp(), mqttConnected), protocols));
+                return protocols;
+//            }
+//        }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+//        .subscribe(new Observer<Object>() {
+//            @Override
+//            public void onSubscribe(Disposable d) {
+//
+//            }
+//
+//            @Override
+//            public void onNext(Object o) {
+//
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//
+//            }
+//        });
 
     }
 
-    public void updateStatus(Status status){
-        Log.e(TAG,"Updating Status: "+ status+" Going to Compute...? " + !status.equals(this.status));
-        if (!status.equals(this.status)) {
-            this.status = status;
-            computeCommunicationRoutes(this.devices);
+    public void updateStatus(ConnectionStatus status){
+        Log.e(TAG,"Updating ConnectionStatus: "+ status+" Going to Compute...? " + !status.equals(this.connectionStatus));
+        if (!status.equals(this.connectionStatus)) {
+            this.connectionStatus = status;
+//            computeCommunicationRoutes(this.devices);
         }
     }
 
     public void setCurrentSSID(String currentSSID) {
-        this.currentSSID = currentSSID;
+        if (currentSSID == null)
+            this.currentSSID = AppConstants.NULL_SSID;
+        else
+            this.currentSSID = currentSSID;
     }
 
     private void computeCommunicationRoutes(List<Device> devices){
         Observable.create(new ObservableOnSubscribe<Object>() {
             @Override
             public void subscribe(ObservableEmitter<Object> e) throws Exception {
-                Log.e(TAG,"Starting Computing for "+devices.size()+" Devices: Current SSID:" + currentSSID +" Status: " + status);
+                Log.e(TAG,"Starting Computing for "+devices.size()+" Devices: Current SSID:" + currentSSID +" ConnectionStatus: " + connectionStatus);
                 Map<String ,List<PROTOCOL>> cr = new HashMap<>();
                 for (int a = 0;a<devices.size();a++){
                     Log.e(TAG,"-------------------------------------------------------------------------------");
                     List<PROTOCOL> protocols = new ArrayList<>();
                     Log.e(TAG,"Checking This Device: " + devices.get(a));
-                    switch (status){
+                    switch (connectionStatus){
                         case WIFI:
-                            Log.e(TAG,"switch is wifi "+ status+
+                            Log.e(TAG,"switch is wifi "+ connectionStatus +
                                     "<!>equality of ssids "+ (devices.get(a).getSsid().equals(currentSSID))+
                                     "<!>ip != nulL? " + (devices.get(a).getIp() != null)+
                                     "<!>mqttConnected " + (mqttConnected)+
@@ -241,7 +256,7 @@ public class MessageTransmissionDecider {
                             }
                             break;
                         case VPN:
-                            Log.e(TAG,"switch is VPN "+ status+
+                            Log.e(TAG,"switch is VPN "+ connectionStatus +
                                     "<!>equality of ssids "+ (devices.get(a).getSsid().equals(currentSSID))+
                                     "<!>ip != nulL? " + (devices.get(a).getIp() != null)+
                                     "<!>mqttConnected " + (mqttConnected)+
@@ -297,15 +312,21 @@ public class MessageTransmissionDecider {
 
     }
 
-    public String sendMessage(Device device){
-        Log.e(TAG, "getting routes: " + communicationRoutes);
-//        for (int a = 0;a<devices.size();a++)
-//            if (device.getChipId().equals(devices.get(a).getChipId())) {
-//                if (communicationRoutes.get(device.getChipId()).size() == 0)
-//                    return "NONE";
-//                else return communicationRoutes.get(a).get(0).toString();
-//            }
-        List<PROTOCOL> p = communicationRoutes.get(device.getChipId());
+    public String requestForSendMessage(Device device){
+        List<PROTOCOL> p = new ArrayList<>();
+        Log.e(TAG, "Current state is: [currentSsid: " +currentSSID +", connectionStatus: " + connectionStatus+", mqttConnected: "+mqttConnected+" ]");
+        Log.e(TAG, "DeviceState is: " + routes.get(device.getChipId()));
+        if (routes.get(device.getChipId()) == null){
+            this.devices.add(device);
+            p = computeRoutes(device);
+        }
+        else if (!Objects.requireNonNull(routes.get(device.getChipId())).first.getIp().equals(device.getIp()) ||
+                !Objects.requireNonNull(routes.get(device.getChipId())).first.getDeviceSsid().equals(device.getSsid()) ||
+                !Objects.requireNonNull(routes.get(device.getChipId())).first.getCurrentSsid().equals(currentSSID) ||
+                !Objects.requireNonNull(routes.get(device.getChipId())).first.isMqttConnected() == mqttConnected){
+            p = computeRoutes(device);
+        }
+        else p = routes.get(device.getChipId()).second;
         if (p != null) {
             if (p.size() == 0)
                 return "NONE";
@@ -315,8 +336,9 @@ public class MessageTransmissionDecider {
     }
 
     public List<PROTOCOL> getListOfAvailableRouts(String chipId){
-        Log.e(TAG, "MTD Communication Routes: for " +chipId+" "+ communicationRoutes.get(chipId));
-        return communicationRoutes.get(chipId);
+//        Log.e(TAG, "MTD Communication Routes: for " +chipId+" "+ communicationRoutes.get(chipId));
+        Log.e(TAG, "MTD Communication Routes: for " +chipId+" "+ routes.get(chipId));
+        return routes.get(chipId).second;
     }
 
 

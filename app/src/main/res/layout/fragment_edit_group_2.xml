@@ -149,8 +149,8 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="20dp"
                     android:layout_centerVertical="true"
-                    android:layout_height="wrap_content"
                     android:tint="@color/grey_dark_1"
+                    android:layout_height="wrap_content"
                     app:srcCompat="@drawable/ic_groups"/>
             </RelativeLayout>
             <View

@@ -14,17 +14,15 @@ public class AdminsRecyclerViewAdapter extends GenericRecyclerViewAdapter<User,O
 
     ArrayList<String> adminsPhoneNumber;
     String parentFragment;
-    String lastItemUserName;
-    public AdminsRecyclerViewAdapter(Context context, ArrayList<String> adminsPhoneNumber, String lastItemUserName ,String parentFragment) {
+    public AdminsRecyclerViewAdapter(Context context, ArrayList<String> adminsPhoneNumber ,String parentFragment) {
         super(context);
         this.adminsPhoneNumber=adminsPhoneNumber;
         this.parentFragment=parentFragment;
-        this.lastItemUserName=lastItemUserName;
 
     }
 
     @Override
     public AdminViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AdminViewHolder(inflate(R.layout.item_user, parent),adminsPhoneNumber, lastItemUserName, parentFragment);
+        return new AdminViewHolder(inflate(R.layout.item_user, parent),adminsPhoneNumber, parentFragment);
     }
 }

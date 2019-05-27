@@ -6,6 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -53,6 +54,7 @@ public class Device implements Parcelable {
     private boolean onlineAccessibility;
     private String statusWord;
     private String secret;
+    private boolean hidden;
     private int position;
 
     public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId, String secret) {
@@ -70,6 +72,7 @@ public class Device implements Parcelable {
         this.statusWord = "0";
     }
 
+
     protected Device(Parcel in) {
         chipId = in.readString();
         name1 = in.readString();
@@ -83,17 +86,47 @@ public class Device implements Parcelable {
         groupId = in.readString();
         style = in.readString();
         ssid = in.readString();
+        devicePassword = in.readString();
         ip = in.readString();
         password = in.readString();
         favorite = in.readByte() != 0;
+        locallyAccessibility = in.readByte() != 0;
+        onlineAccessibility = in.readByte() != 0;
+        statusWord = in.readString();
+        secret = in.readString();
+        hidden = in.readByte() != 0;
+        position = in.readInt();
     }
 
-    public String getDevicePassword() {
-        return devicePassword;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(chipId);
+        dest.writeString(name1);
+        dest.writeString(name2);
+        dest.writeString(pin1);
+        dest.writeString(pin2);
+        dest.writeString(id);
+        dest.writeString(type);
+        dest.writeString(username);
+        dest.writeParcelable(topic, flags);
+        dest.writeString(groupId);
+        dest.writeString(style);
+        dest.writeString(ssid);
+        dest.writeString(devicePassword);
+        dest.writeString(ip);
+        dest.writeString(password);
+        dest.writeByte((byte) (favorite ? 1 : 0));
+        dest.writeByte((byte) (locallyAccessibility ? 1 : 0));
+        dest.writeByte((byte) (onlineAccessibility ? 1 : 0));
+        dest.writeString(statusWord);
+        dest.writeString(secret);
+        dest.writeByte((byte) (hidden ? 1 : 0));
+        dest.writeInt(position);
     }
 
-    public void setDevicePassword(String devicePassword) {
-        this.devicePassword = devicePassword;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Device> CREATOR = new Creator<Device>() {
@@ -107,6 +140,15 @@ public class Device implements Parcelable {
             return new Device[size];
         }
     };
+
+    public String getDevicePassword() {
+        return devicePassword;
+    }
+
+    public void setDevicePassword(String devicePassword) {
+        this.devicePassword = devicePassword;
+    }
+
 
     @NonNull
     public String getChipId() {
@@ -262,6 +304,14 @@ public class Device implements Parcelable {
         this.secret = secret;
     }
 
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
     @Override
     public String toString() {
         return "Device{" +
@@ -294,30 +344,6 @@ public class Device implements Parcelable {
 
     public void setPosition(int position) {
         this.position = position;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(chipId);
-        dest.writeString(name1);
-        dest.writeString(name2);
-        dest.writeString(pin1);
-        dest.writeString(pin2);
-        dest.writeString(id);
-        dest.writeString(type);
-        dest.writeString(username);
-        dest.writeParcelable(topic, flags);
-        dest.writeString(groupId);
-        dest.writeString(style);
-        dest.writeString(ssid);
-        dest.writeString(ip);
-        dest.writeString(password);
-        dest.writeByte((byte) (favorite ? 1 : 0));
     }
 
     public boolean isReady4Mqtt(){

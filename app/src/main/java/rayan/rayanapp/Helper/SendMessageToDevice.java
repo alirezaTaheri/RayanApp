@@ -484,7 +484,7 @@ public class SendMessageToDevice {
     }
 
     public void toggleDevicePin1(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
-        String cr = rayanApplication.getMtd().sendMessage(device);
+        String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam? : " + cr);
         Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
@@ -509,7 +509,7 @@ public class SendMessageToDevice {
         }
     }
     public void toggleDevicePin2(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
-        String cr = rayanApplication.getMtd().sendMessage(device);
+        String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam2? : " + cr);
         Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){

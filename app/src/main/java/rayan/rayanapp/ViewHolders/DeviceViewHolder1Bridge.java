@@ -137,5 +137,4 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
         l.onAccessPointChanged(device);
     }
-
 }

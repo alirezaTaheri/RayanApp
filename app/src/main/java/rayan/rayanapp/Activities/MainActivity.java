@@ -9,8 +9,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,10 +29,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -43,7 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.polyak.iconswitch.IconSwitch;
-import com.thanosfisherman.wifiutils.WifiUtils;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -65,12 +60,13 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Data.LocallyChange;
+import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Helper.ControlRequests;
 import rayan.rayanapp.Helper.RetryConnectMqtt;
@@ -84,7 +80,6 @@ import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.CustomViewPager;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
-import rayan.rayanapp.Wifi.WifiHandler;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus, View.OnClickListener, OnGroupClicked<Group> {
@@ -139,10 +134,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TextView drawer_userName;
     @BindView(R.id.supportActivity)
     LinearLayout drawer_support;
+    MainActivityViewPagerAdapter viewPagerAdapter;
     ControlRequests cr;
     SortByGroupRecyclerViewAdapter drawer_groupsRecyclerViewAdapter;
     int connectionRetries;
     boolean networkConnected = false;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -167,6 +164,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.app_name, R.string.app_name);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+//         navigationView.bringToFront();
+//       navigationView.invalidate();
+//       // Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getShowNotification());
+//        navigationView.bringToFront();
+//        navigationView.invalidate();
+//        navigationView.setNavigationItemSelectedListener(this);
+       // Log.e("setting", RayanApplication.getPref().getThemeKey() + " " + RayanApplication.getPref().getIsNotificationOn());
+//        navigationView.bringToFront();
+//        navigationView.invalidate();
+//        navigationView.bringToFront();
+//        navigationView.invalidate();
+//        navigationView.setNavigationItemSelectedListener(this);
+
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         MainActivityViewModel.connection.observe(this, connection -> {
             switch (connection.getStatus()) {
@@ -240,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        MainActivityViewPagerAdapter viewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(1);
         initialize();
@@ -430,9 +441,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             actionBarStatus.setText("درحال اتصال");
             retryIcon.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
-            ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
+//            ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
         }
-        Log.e(TAG, "Mqtt Status: CONNECTING Connection Retries:" + connectionRetries);
+        Log.e(TAG, "Mqtt ConnectionStatus: CONNECTING Connection Retries:" + connectionRetries);
     }
 
     @Override
@@ -442,14 +453,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         retryIcon.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
         RayanApplication.getPref().saveProtocol(AppConstants.MQTT);
-        Log.e(TAG, "Mqtt Status: ERROR Connection Retries: " + connectionRetries);
+        Log.e(TAG, "Mqtt ConnectionStatus: ERROR Connection Retries: " + connectionRetries);
         ((RayanApplication)getApplication()).getMtd().updateMqttStatus(true);
     }
 
     @Override
     public void mqttDisconnected() {
         if (MainActivityViewModel.connection != null)
-        Log.e(TAG, "Mqtt Status: DISCONNECTED Connection Retries: " + connectionRetries);
+        Log.e(TAG, "Mqtt ConnectionStatus: DISCONNECTED Connection Retries: " + connectionRetries);
         if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
             connectionRetries = 0;
             actionBarStatus.setText("عدم اتصال به اینترنت");
@@ -471,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttError() {
-        Log.e(TAG, "Mqtt Status: ERROR Connection Retries: " + connectionRetries);
+        Log.e(TAG, "Mqtt ConnectionStatus: ERROR Connection Retries: " + connectionRetries);
         if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
             connectionRetries = 0;
             actionBarStatus.setText("عدم اتصال به اینترنت");
@@ -553,21 +564,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
-//        WifiUtils.enableLog(true);
-//        WifiUtils.withContext(getApplicationContext()).scanWifi(this::getScanResults).start();
-//        if (c %2==0) {
-//            Log.e("mmmm", "1-8");
-//            WifiUtils.withContext(getApplicationContext())
-//                    .connectWith("Rayan_Switch_1_222222_F", "12345678")
-//                    .onConnectionResult(this::checkResult)
-//                    .start();
-//        }
-//        else
-//            WifiUtils.withContext(getApplicationContext())
-//                    .connectWith("Rayan_Switch_1_222222_F", "123456789")
-//                    .onConnectionResult(this::checkResult)
-//                    .start();
-//        c++;
     }
     private void getScanResults(@NonNull final List<ScanResult> results)
     {
@@ -737,12 +733,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         BottomNavigationViewPagerAdapter adapter = new BottomNavigationViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
         //   viewPager.beginFakeDrag();
-        TypedValue tv = new TypedValue();
-        if (this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, this.getResources().getDisplayMetrics());
-        }
-        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
-        lp.bottomMargin += actionBarHeight + 15;
+//        TypedValue tv = new TypedValue();
+//        if (this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+//            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, this.getResources().getDisplayMetrics());
+//        }
+//        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
+//        lp.bottomMargin += actionBarHeight + 15;
         viewPager.setCurrentItem(RayanApplication.getPref().getBottomNavigationIndexKey());
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -768,7 +764,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+//        nsdHelper = new NsdHelper(this);
+//        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
+  //  NsdHelper nsdHelper;
+//    NsdHelper nsdHelper;
+//    String key = "q7tt0yk18nrjrqur";
+//    String textToDecrypt = "xpq/VGgyD0pAf94O1fmSgg==";
+//    String secretOfAkbar = "8nro4q0emv8k1uv5";
 
+
+//    private static SecretKeySpec generateKey(final String password) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+//        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//        byte[] bytes = password.getBytes("UTF-8");
+//        digest.update(bytes, 0, bytes.length);
+//        byte[] key = digest.digest();
+//
+//        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+//        return secretKeySpec;
+//    }
+        public static SecretKeySpec secretKeySpec;
         @Override
         public void onClick (View v){
             switch (v.getId()) {
@@ -797,21 +811,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     drawerLayout.closeDrawer(GravityCompat.START);
                     break;
                 case R.id.sortByGroup:
+//                    mainActivityViewModel.getAllDevicesFlowable().zipWith(mainActivityViewModel.getAllGroupsFlowable(), new BiFunction<List<Device>, List<Group>, Object>() {
+//                        @Override
+//                        public Object apply(List<Device> devices, List<Group> groups) throws Exception {
+//                            Log.e("111111111111111", "Object isisisigooloo: " +Thread.currentThread()+ devices);
+//                            Log.e("222222222222222", "Object isisisigooloo: " + groups);
+
+
+//                            return new Object();
+//                        }
+//                    }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Object>() {
+//                        @Override
+//                        public void accept(Object o) throws Exception {
+//                            Log.e("??????????????", "Object isisisigooloo: " + o);
+//                        }
+//                    });
                     expandableLayout.toggle();
                     if(expandableLayout.isExpanded()){
                         expand_arrow_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_up));
                     }else {expand_arrow_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_down)); }
                     if (drawer_groupsRecyclerViewAdapter == null) {
                         drawer_groupsRecyclerViewAdapter = new SortByGroupRecyclerViewAdapter(this, new ArrayList<>());
-                        drawer_groupsRecyclerViewAdapter.setItems(mainActivityViewModel.getAllGroups());
-                        Group g = new Group();
-                        g.setDevices(mainActivityViewModel.getAllDevices());
-                        g.setName("همه");
-                        drawer_groupsRecyclerViewAdapter.addItemToFirst(g);
                         drawer_groupsRecyclerView.setAdapter(drawer_groupsRecyclerViewAdapter);
                         drawer_groupsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
                         drawer_groupsRecyclerViewAdapter.setListener(this);
+                        mainActivityViewModel.getAllGroupsFlowable().subscribe(new Consumer<List<Group>>() {
+                            @Override
+                            public void accept(List<Group> groups) throws Exception {
+                                Log.e("IjustCome", "IjustCome: " + groups);
+                                List<Group> items = new ArrayList<>();
+                                Group g = new Group();
+                                g.setDevices(((DevicesFragment)viewPagerAdapter.getItem(1)).devices);
+                                g.setName("همه");
+                                items.add(g);
+                                items.addAll(groups);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        drawer_groupsRecyclerViewAdapter.setItems(items);
+                                    }
+                                });
+                            }
+                        });
                     }
+
+
                     break;
                 case R.id.supportActivity:
 
@@ -917,6 +961,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "cmd":"de", "src":""}
 //{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "cmd":"de", "src":"", "k":"vg4mseo0ouo2zf1j"}
 //{"text":"37#", "cmd":"en", "src":"", "k":"33y8lnn0k6ewat8c"}
-//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"juO+H8ZKWVwZvMP8r/RQgw=="}
+//{"src":"222222","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"juO+H8ZKWVwZvMP8r/RQgw=="}
 //{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}
 

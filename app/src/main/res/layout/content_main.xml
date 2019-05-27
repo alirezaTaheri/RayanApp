@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,7 +7,18 @@
     tools:context="rayan.rayanapp.Activities.MainActivity">
     <rayan.rayanapp.Util.CustomViewPager
         android:id="@+id/viewPager"
+        android:paddingBottom="?attr/actionBarSize"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </rayan.rayanapp.Util.CustomViewPager>
-</LinearLayout>
+        android:layout_height="match_parent"/>
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottom_navigation_view"
+        app:theme="@style/NavigationDrawerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/grey_light_4"
+        app:elevation="47dp"
+        android:layout_alignParentBottom="true"
+        android:clipChildren="false"
+        android:layoutDirection="ltr"
+        app:menu="@menu/bottom_navigation_menu" />
+</RelativeLayout>

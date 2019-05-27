@@ -1,7 +1,9 @@
 package rayan.rayanapp.Listeners;
 
+import rayan.rayanapp.Data.AccessPoint;
+
 public interface ConnectingToTarget{
-    void connecting(String targerSSID);
+    void connecting(AccessPoint targerSSID);
     void successful(String targetSSID);
     void failure();
     void searching();

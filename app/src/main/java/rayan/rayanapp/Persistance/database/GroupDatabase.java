@@ -4,6 +4,10 @@ import android.arch.lifecycle.LiveData;
 import android.content.Context;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import io.reactivex.Flowable;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.dao.GroupsDAO;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
@@ -11,9 +15,11 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 public class GroupDatabase {
     private AppDatabase appDatabase;
     private GroupsDAO groupsDAO;
+    private ExecutorService executorService;
     public GroupDatabase(Context context){
         appDatabase = AppDatabase.getInstance(context);
         groupsDAO = appDatabase.getGroupDAO();
+        executorService= Executors.newSingleThreadExecutor();
     }
     public void addGroup(Group group){
         groupsDAO.add(group);
@@ -30,17 +36,20 @@ public class GroupDatabase {
     public List<Group> getAllGroups(){
         return groupsDAO.getAll();
     }
+    public Flowable<List<Group>> getAllGroupsFlowable(){
+        return groupsDAO.getAllFlowable();
+    }
     public void addGroups(List<Group> devices){
-        groupsDAO.addAll(devices);
+        executorService.execute(()->groupsDAO.addAll(devices));
     }
     public void updateGroup(Group device){
-        groupsDAO.updateGroup(device);
+        executorService.execute(()->groupsDAO.updateGroup(device));
     }
     public void deleteGroups(List<Group> devices){
-        groupsDAO.deleteGroups(devices);
+        executorService.execute(()->groupsDAO.deleteGroups(devices));
     }
     public void deleteGroup(Group group){
-        groupsDAO.deleteGroup(group);
+        executorService.execute(()->groupsDAO.deleteGroup(group));
     }
     public void updateGroups(List<Group> devices){
         groupsDAO.updateGroups(devices);

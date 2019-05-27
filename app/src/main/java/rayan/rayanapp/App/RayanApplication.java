@@ -46,7 +46,6 @@ public class RayanApplication extends Application {
     private DevicesAccessibilityBus devicesAccessibilityBus;
     private String currentSSID;
     private MessageTransmissionDecider mtd;
-    private DeviceDatabase deviceDatabase;
     private SendMessageToDevice sendMessageToDevice;
     private RequestManager requestManager;
     private Locale locale = null;
@@ -86,8 +85,7 @@ public class RayanApplication extends Application {
         bus = new UDPMessageRxBus();
         pref = new PrefManager();
         jsonMaker = new JsonMaker();
-        deviceDatabase = new DeviceDatabase(this);
-        mtd = new MessageTransmissionDecider(this,deviceDatabase.getAllDevices());
+        mtd = new MessageTransmissionDecider(this);
         sendMessageToDevice = new SendMessageToDevice(this);
         requestManager = new RequestManager();
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);

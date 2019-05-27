@@ -141,7 +141,7 @@ public class UDPServerService extends Service {
                                     }
                                     if (pIp == null || !pIp.equals(senderIP)){
                                         Log.e(TAG, "Device getting new Ip Address: " + senderIP + device);
-                                        ((RayanApplication)getApplication()).getMtd().updateDevice(device);
+//                                        ((RayanApplication)getApplication()).getMtd().updateDevice(device);
                                     }
                                     deviceDatabase.updateDevice(device);
                                 } else {

@@ -126,10 +126,7 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
-        intentFilter.addAction(WifiManager.EXTRA_NETWORK_INFO);
-        intentFilter.addAction(WifiManager.ACTION_PICK_WIFI_NETWORK);
-        intentFilter.addAction(WifiManager.NETWORK_IDS_CHANGED_ACTION);
-        intentFilter.addAction(WifiManager.RSSI_CHANGED_ACTION);
+        intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         registerReceiver(wifiReceiver, intentFilter);

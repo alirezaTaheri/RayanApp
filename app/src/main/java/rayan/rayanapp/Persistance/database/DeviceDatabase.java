@@ -4,17 +4,23 @@ import android.arch.lifecycle.LiveData;
 import android.content.Context;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import io.reactivex.Flowable;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.dao.DevicesDAO;
 
 public class DeviceDatabase {
     private AppDatabase appDatabase;
     private DevicesDAO deviceDAO;
+    ExecutorService executorService;
     public DeviceDatabase(Context context){
         appDatabase = AppDatabase.getInstance(context);
         deviceDAO = appDatabase.getDeviceDAO();
+        executorService= Executors.newSingleThreadExecutor();
     }
     public Device getDevice(String chipId){
         return deviceDAO.getDevice(chipId);
@@ -27,15 +33,20 @@ public class DeviceDatabase {
     public List<Device> getAllDevices(){
         return deviceDAO.getAll();
     }
+    public Flowable<List<Device>> getAllDevicesFlowable(){
+        return deviceDAO.getAllFlowable();
+    }
 
     public void addDevice(Device device){
         deviceDAO.add(device);
     }
 
-    public void addDevices(List<Device> devices){ deviceDAO.addAll(devices); }
+    public void addDevices(List<Device> devices){
+        executorService.execute(()-> deviceDAO.addAll(devices));
+         }
 
     public void updateDevice(Device device){
-        deviceDAO.updateDevice(device);
+        executorService.execute(()-> deviceDAO.updateDevice(device));
     }
 
     public List<String> getAllTopics(){
@@ -52,11 +63,11 @@ public class DeviceDatabase {
         deviceDAO.deleteDevices(devices);
     }
     public void deleteDevice(Device device){
-        deviceDAO.deleteDevice(device);
+        executorService.execute(()->deviceDAO.deleteDevice(device));
     }
 
     public void updateDevices(List<Device> devices){
-        deviceDAO.updateDevices(devices);
+        executorService.execute(()->deviceDAO.updateDevices(devices));
     }
 
     public LiveData<List<Device>> getFavoriteDevices(){

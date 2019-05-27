@@ -70,7 +70,7 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
                 }
             managersRecyclerViewAdapter.setItems(admins);
         });
-     managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,adminsUserNames.get(admins.size()-1),"admins_users");
+     managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"admins_users");
      managersRecyclerViewAdapter.setListener(this);
 //        onToolbarNameChange=(OnToolbarNameChange)getActivity();
 //        onToolbarNameChange.toolbarNameChanged("مدیران گروه");

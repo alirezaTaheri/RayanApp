@@ -9,6 +9,10 @@ import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.thanosfisherman.wifiutils.WifiUtils;
+import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
 import org.reactivestreams.Subscription;
 
@@ -19,6 +23,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.internal.operators.observable.ObservableAny;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
@@ -29,6 +34,7 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
@@ -139,7 +145,18 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
             wifiManager.setWifiEnabled(true);
         if (getCurrentSSID(wifiManager).equals(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName()))
             return Observable.create(subscriber -> subscriber.onNext(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName()) );
-        WifiHandler.connectToSSID(activity.getApplicationContext(),((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName(), password);
+//        WifiHandler.connectToSSID(activity.getApplicationContext(),((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName(), password);
+        WifiUtils.enableLog(true);
+        WifiUtils.withContext(activity)
+                .connectWith(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName(), password)
+                .onConnectionResult(new ConnectionSuccessListener() {
+                    @Override
+                    public void isSuccessful(boolean isSuccess) {
+                        Log.e("isSuccessful???? " , "isisisisi: " + isSuccess);
+                        Toast.makeText(activity, ""+isSuccess, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .start();
         return ((RayanApplication)activity.getApplication()).getNetworkBus().toObservable();
     }
 
@@ -181,6 +198,13 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
         return results;
     }
 
+    private Observable<BaseResponse> deleteUserObservable(DeleteUserRequest deleteUserRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deleteUser(RayanApplication.getPref().getToken(), deleteUserRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
     Disposable disposable;
     Disposable setConfigDeviceDisposable;
 
@@ -188,28 +212,47 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
         return setConfigDeviceDisposable;
     }
     public SingleLiveEvent<SetPrimaryConfigResponse> registerDeviceSendToDevice(WifiManager wifiManager,AddNewDeviceActivity activity, RegisterDeviceRequest registerDeviceRequest, String ip){
-        if (RayanApplication.getPref().getIsNodeSoundOn())
-            WifiHandler.removeNetwork(activity, activity.getNewDevice().getAccessPointName());
+//        if (RayanApplication.getPref().getIsNodeSoundOn())
+//            WifiHandler.removeNetwork(activity, activity.getNewDevice().getAccessPointName());
         SingleLiveEvent<SetPrimaryConfigResponse> result = new SingleLiveEvent<>();
         ApiService apiService = ApiUtils.getApiService();
         apiService
                 .registerDevice(RayanApplication.getPref().getToken(),registerDeviceRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
+                .flatMap(deviceResponse -> {
+                    Log.e(TAG, "Device Registration Passed\nRemoving Device from previous group...");
+                    Device d = deviceResponse.getData().getDevice();
+                    activity.getNewDevice().setId(d.getId());
+                    activity.getNewDevice().setUsername(d.getUsername());
+                    if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR) && deviceResponse.getData().getMessage() != null && deviceResponse.getData().getMessage().equals(AppConstants.DUPLICATE_USER))
+                        activity.getNewDevice().setPassword(d.getDevicePassword());
+                    else
+                        activity.getNewDevice().setPassword(d.getPassword());
+                    Device existingDevice = deviceDatabase.getDevice(activity.getNewDevice().getChip_id());
+                    if (existingDevice != null){
+                        Log.e(TAG, "Deleting Device From previous Group: " + existingDevice);
+                        return deleteUserObservable(new DeleteUserRequest(existingDevice.getId(), existingDevice.getGroupId()));
+                    }
+                    else {
+                        Log.e(TAG, "There is no such device to delete from group ");
+                        return Observable.just(1);
+                    }
+                })
                 .flatMap(deviceResponse ->{
-                    Log.e(TAG, "Device Registration Passed\nAdding Device To Group...");
-                    Log.e(TAG, "deviceResponse: " + deviceResponse.getData().getMessage());
-                        Device d = deviceResponse.getData().getDevice();
-                        activity.getNewDevice().setId(d.getId());
-                        activity.getNewDevice().setUsername(d.getUsername());
-                        if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR) && deviceResponse.getData().getMessage() != null && deviceResponse.getData().getMessage().equals(AppConstants.DUPLICATE_USER))
-                            activity.getNewDevice().setPassword(d.getDevicePassword());
-                        else
-                            activity.getNewDevice().setPassword(d.getPassword());
-                        return addDeviceToGroupObservable(new AddDeviceToGroupRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId()));
+                    Log.e(TAG, "Device Registration Passed\nAdding Device To new Group...");
+                    return addDeviceToGroupObservable(new AddDeviceToGroupRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId()));
                 })
                 .flatMap(baseResponse -> editDeviceObservable(new EditDeviceRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getName(), activity.getNewDevice().getType(), activity.getNewDevice().getSsid())))
-                .flatMap(deviceResponse -> createTopicObservable(new CreateTopicRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getChip_id(), AppConstants.MQTT_HOST)))
+                .flatMap(deviceResponse -> {
+                    if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR) && deviceResponse.getData().getMessage().equals(AppConstants.FORBIDDEN)){
+                        Toast.makeText(activity, "شما قادر به نصب این دستگاه نیستید", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Action is forbidden... Operation will fail");
+                        return null;
+                    }
+                    Log.e(TAG, "Device Specification successfully Changed...");
+                    return createTopicObservable(new CreateTopicRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getChip_id(), AppConstants.MQTT_HOST));
+                })
                 .flatMap(deviceBaseResponse ->{
                     Log.e(TAG, "Topic Creation Passed\nConnecting to device...");
                     activity.getNewDevice().setTopic(deviceBaseResponse.getData().getDevice().getTopic());

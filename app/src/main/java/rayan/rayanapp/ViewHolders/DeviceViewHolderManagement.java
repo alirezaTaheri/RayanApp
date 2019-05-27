@@ -24,7 +24,7 @@ public class DeviceViewHolderManagement extends BaseViewHolder<Device, OnDeviceC
     @BindView(R.id.name)
     TextView name;
     @BindView(R.id.favoriteIcon)
-    SparkButton favoriteIcon;
+    ImageView optionsIcon;
     private List<String> waiting;
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
@@ -40,17 +40,17 @@ public class DeviceViewHolderManagement extends BaseViewHolder<Device, OnDeviceC
 
     @Override
     public void onBind(Device item, @Nullable OnDeviceClickListenerManagement<Device> listener) {
-        Log.e("////////:" ,"This Device: " + item + "\n"+item.isFavorite());
+        Log.e(TAG ,"This Device: " + item + "\n"+item.isFavorite());
         name.setText(item.getName1());
-        favoriteIcon.setChecked(item.isFavorite());
+//        optionsIcon.setChecked(item.isFavorite());
         if (waiting.contains(item.getChipId()))
             progressBar.setVisibility(View.VISIBLE);
         else progressBar.setVisibility(View.INVISIBLE);
         itemView.setOnClickListener(v -> {
             listener.onItemClick(item);
         });
-        favoriteIcon.setOnClickListener(v -> {
-            listener.onFavoriteIconClicked(item);});
+        optionsIcon.setOnClickListener(v -> {
+            listener.onFavoriteIconClicked(item, optionsIcon);});
         if (item.getType().equals("switch_1")){ deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
         }else if (item.getType().equals("switch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
         }else if (item.getType().equals("touch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));

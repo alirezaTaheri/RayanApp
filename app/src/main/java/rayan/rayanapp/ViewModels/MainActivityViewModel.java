@@ -41,8 +41,10 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
@@ -80,6 +82,14 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public List<Group> getAllGroups(){
         return groupDatabase.getAllGroups();
+    }
+
+    public Flowable<List<Device>> getAllDevicesFlowable(){
+        return deviceDatabase.getAllDevicesFlowable().observeOn(Schedulers.io());
+    }
+
+    public Flowable<List<Group>> getAllGroupsFlowable(){
+        return groupDatabase.getAllGroupsFlowable();
     }
 
     public List<Device> getAllDevices(){
@@ -254,5 +264,4 @@ public class MainActivityViewModel extends AndroidViewModel {
             return null;
         }
     }
-
 }

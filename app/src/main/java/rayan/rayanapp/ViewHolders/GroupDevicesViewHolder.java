@@ -19,9 +19,6 @@ public class GroupDevicesViewHolder extends BaseViewHolder<Device, OnDeviceClick
     private final String TAG = GroupDevicesViewHolder.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.favoriteIcon)
-    SparkButton favoriteIcon;
-
     @BindView(R.id.deviceImage)
     ImageView deviceImage;
     Context context;
@@ -34,12 +31,10 @@ public class GroupDevicesViewHolder extends BaseViewHolder<Device, OnDeviceClick
     @Override
     public void onBind(Device item, @Nullable OnDeviceClickListenerManagement<Device> listener) {
         name.setText(item.getName1());
-        favoriteIcon.setVisibility(View.GONE);
         if (item.getType().equals("switch_1")){ deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
         }else if (item.getType().equals("switch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
         }else if (item.getType().equals("touch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
         }else if (item.getType().equals("plug")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_plug_off_1));
-        }else { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_device));
-        }
+        }else { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_device)); }
         }
 }

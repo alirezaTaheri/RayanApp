@@ -42,6 +42,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
@@ -83,6 +84,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
             @Override
             public void onChanged(@Nullable List<Device> devices) {
                 List<Device> finalDevices = new ArrayList<>();
+                DevicesFragment.this.devices = devices;
                 String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
                 Log.e(TAG ,"All Devices: " + devices.subList(0, devices.size()/3));
                 Log.e(TAG ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
@@ -90,11 +92,16 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                 Log.e(TAG ,"currentGroup: " + currentGroup);
                 if (currentGroup != null)
                     for (int a = 0; a<devices.size();a++){
-                        if (devices.get(a).getGroupId().equals(currentGroup)){
+                        if (devices.get(a).getGroupId().equals(currentGroup) && !devices.get(a).isHidden()){
                             finalDevices.add(devices.get(a));
                         }
                 }
-                        else finalDevices = devices;
+                        else
+                    for (int a = 0; a<devices.size();a++){
+                        if (!devices.get(a).isHidden()){
+                            finalDevices.add(devices.get(a));
+                        }
+                    }
             Collections.sort(finalDevices, new Comparator<Device>(){
                 public int compare(Device obj1, Device obj2) {
                     // ## Ascending order
@@ -138,6 +145,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         };
         devicesObservable.observe(this, devicesObserver);
         activity = getActivity();
+
     }
 
     @Override
@@ -160,6 +168,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
         return view;
     }
 
@@ -171,8 +180,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void onPin1Clicked(Device device, int position) {
+        Log.e("Pin1 Is Touching: " , "Device: " +device + position);
         Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
-            Log.e("Pin1 Is Touching: " , "Device: " +device + position);
 //        if (!((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().isWaitingPin1(device.getChipId()))
 //        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
 //            if (device.getIp() != null)
@@ -221,7 +230,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void onAccessPointChanged(Device item) {
-        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
+//        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
     }
 
 
@@ -383,6 +392,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
             return false;
         }
 
+        
         @Override
         public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             Log.e("///////////" , "////////clearView: ");

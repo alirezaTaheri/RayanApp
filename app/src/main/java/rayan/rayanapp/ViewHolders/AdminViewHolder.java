@@ -33,13 +33,13 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
     View itemLine;
     String parentFragment;
     ArrayList<String> adminsPhoneNumber;
-    String lastItemUserName;
-    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber, String lastItemUserName, String parentFragment ) {
+//    String lastItemUserName;
+    public AdminViewHolder(View itemView, ArrayList<String> adminsPhoneNumber, String parentFragment ) {
         super(itemView);
         ButterKnife.bind(this,itemView);
         this.adminsPhoneNumber=adminsPhoneNumber;
         this.parentFragment=parentFragment;
-        this.lastItemUserName=lastItemUserName;
+//        this.lastItemUserName=lastItemUserName;
     }
 
     @Override
@@ -63,8 +63,8 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
             adminTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableTop, null);
             adminTxt.setOnClickListener(v -> listener.onRemoveAdminClicked(item));
         }
-        if (item.getUsername().equals(lastItemUserName)){
-            itemLine.setVisibility(View.GONE);
-        }
+//        if (item.getUsername().equals(lastItemUserName)){
+//            itemLine.setVisibility(View.GONE);
+//        }
     }
 }

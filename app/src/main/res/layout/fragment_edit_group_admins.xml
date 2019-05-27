@@ -36,6 +36,7 @@
                         android:layout_marginLeft="5dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginRight="47dp"
                         android:tint="@color/baseColor"
                         app:srcCompat="@drawable/ic_add_member"/>
                     <TextView
@@ -44,7 +45,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:id="@+id/addToGrouptxt"
-                        android:layout_marginRight="10dp"
+                        android:layout_marginRight="24dp"
                         android:textSize="15sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />

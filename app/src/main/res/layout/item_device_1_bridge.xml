@@ -41,19 +41,6 @@
                     app:srcCompat="@drawable/ic_lamp_off"
                     />
 
-                <TextView
-                    android:text="Name"
-                    android:clickable="false"
-                    android:focusable="false"
-                    android:background="#00ffffff"
-                    android:id="@+id/name"
-                    android:layout_below="@+id/pin1"
-                    android:gravity="center"
-                    android:textColor="@color/ms_black"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="1.5dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
             </RelativeLayout>
         </LinearLayout>
         <View
@@ -69,5 +56,19 @@
             android:layout_width="match_parent"
             android:layout_height="5dp"
             />
+
+        <TextView
+            android:layout_gravity="center_horizontal|bottom"
+            android:text="Name"
+            android:clickable="false"
+            android:focusable="false"
+            android:background="#00ffffff"
+            android:id="@+id/name"
+            android:gravity="center"
+            android:textColor="@color/ms_black"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="1.5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </FrameLayout>
 </android.support.v7.widget.CardView>

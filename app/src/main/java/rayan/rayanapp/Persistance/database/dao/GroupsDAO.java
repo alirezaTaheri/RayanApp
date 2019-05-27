@@ -8,6 +8,7 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 @Dao
@@ -15,6 +16,9 @@ public interface GroupsDAO extends BaseDAO<Group> {
 
     @Query("SELECT * FROM `Group`")
     List<Group> getAll();
+
+    @Query("SELECT * FROM `Group`")
+    Flowable<List<Group>> getAllFlowable();
 
     @Query("SELECT * FROM `Group`")
     LiveData<List<Group>> getAllLive();

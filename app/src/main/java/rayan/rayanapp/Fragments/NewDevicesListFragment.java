@@ -24,6 +24,8 @@ import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.Step;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
+import com.thanosfisherman.wifiutils.WifiUtils;
+import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,9 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Adapters.recyclerView.NewDevicesRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.AccessPoint;
+import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Listeners.ConnectingToTarget;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
@@ -91,6 +95,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
                     this.failure();
                 }
             }
+            currentSSID = getCurrentSSID();
         });
     }
 
@@ -136,15 +141,38 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
         currentSSID = getCurrentSSID();
         Log.e(TAG, "Item: " + item + "\nCurrent SSID: " + currentSSID);
         if (!currentSSID.equals(item.getSSID())){
-            this.connecting(item.getSSID());
+            this.connecting(item);
         }
         else this.connectToSame(currentSSID);
     }
 
     @Override
-    public void connecting(String targetSSID) {
-        this.targetSSID = targetSSID;
-        WifiHandler.connectToSSID(getActivity(),targetSSID, AppConstants.DEVICE_PRIMARY_PASSWORD);
+    public void connecting(AccessPoint target) {
+        this.targetSSID = target.getSSID();
+        ProgressDialog progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
+        progressDialog.show();
+        String password,chipId;
+        if (target.getSSID().split("_")[target.getSSID().split("_").length-1].toLowerCase().equals("f"))
+            chipId = target.getSSID().split("_")[target.getSSID().split("_").length-2];
+        else chipId = target.getSSID().split("_")[target.getSSID().split("_").length-1];
+        Device existingDevice = viewModel.getDevice(chipId);
+        if (existingDevice != null)
+            password = existingDevice.getSecret();
+        else password = AppConstants.DEVICE_PRIMARY_PASSWORD;
+        Log.e(TAG , "Connecting To: "+ target.getSSID() +" with password: " + password);
+        WifiUtils.enableLog(true);
+        WifiUtils.withContext(getActivity())
+                .connectWith(targetSSID, password)
+                .onConnectionResult(new ConnectionSuccessListener() {
+                    @Override
+                    public void isSuccessful(boolean isSuccess) {
+                        progressDialog.dismiss();
+                        Log.e("SuccessfullyConnected?" , "isisisisi: " + isSuccess);
+                        Toast.makeText(getActivity(), ""+isSuccess, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .start();
+//        WifiHandler.connectToSSID(getActivity(),targetSSID, AppConstants.DEVICE_PRIMARY_PASSWORD);
         connectionStatus = ConnectionStatus.CONNECTING;
     }
 

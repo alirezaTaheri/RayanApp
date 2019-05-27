@@ -3,9 +3,41 @@
   <component name="WizardSettings">
     <option name="children">
       <map>
-        <entry key="imageWizard">
+        <entry key="vectorWizard">
           <value>
-            <PersistentState />
+            <PersistentState>
+              <option name="children">
+                <map>
+                  <entry key="vectorAssetStep">
+                    <value>
+                      <PersistentState>
+                        <option name="children">
+                          <map>
+                            <entry key="clipartAsset">
+                              <value>
+                                <PersistentState>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_visibility_black_24dp.xml" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="outputName" value="ic_visibility_on" />
+                            <entry key="sourceFile" value="C:\Users\Milad\Downloads\Telegram Desktop\Devices icons (svg)_6\7-Switch-on-1.svg" />
+                          </map>
+                        </option>
+                      </PersistentState>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </PersistentState>
           </value>
         </entry>
       </map>

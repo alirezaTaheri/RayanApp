@@ -193,24 +193,15 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-
-            Log.e("///////////" , "onMove : " + viewHolder);
-            Log.e("///////////" , "onMove : " + target);
             int fromPosition = viewHolder.getAdapterPosition();
             int toPosition = target.getAdapterPosition();
             Log.e("///////////" , "onMove:new List:: " + devices);
-
-            Log.e("///////////" , "onMove From: " + fromPosition);
-            Log.e("///////////" , "onMove to: " + toPosition);
-
-
+            Log.e("///////////" , "onMove From: " + fromPosition+" To: " + toPosition);
             if(dragFrom == -1) {
                 dragFrom =  fromPosition;
             }
             dragTo = toPosition;
-
             devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
-
             return true;
         }
 
@@ -273,6 +264,6 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
 
     @Override
     public void onAccessPointChanged(Device item) {
-        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
+//        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
     }
 }

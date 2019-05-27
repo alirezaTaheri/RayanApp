@@ -4,11 +4,14 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.RoomWarnings;
 import android.arch.persistence.room.Update;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 
 @Dao
 public interface DevicesDAO extends BaseDAO<Device>{
@@ -24,6 +27,9 @@ public interface DevicesDAO extends BaseDAO<Device>{
 
     @Query("SELECT * FROM Device ")
     List<Device> getAll();
+
+    @Query("SELECT * FROM Device ")
+    Flowable<List<Device>> getAllFlowable();
 
     @Query("SELECT * FROM Device WHERE groupId = :groupId")
     List<Device> getAllInGroup(String groupId);

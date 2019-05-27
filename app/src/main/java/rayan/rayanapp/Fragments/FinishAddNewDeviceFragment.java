@@ -109,7 +109,9 @@ public class FinishAddNewDeviceFragment extends Fragment implements BlockingStep
     @Override
     public void onCompleteClicked(StepperLayout.OnCompleteClickedCallback callback) {
 //        Objects.requireNonNull(getActivity()).onBackPressed();
-        startActivity(new Intent(getActivity(), MainActivity.class));
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
         Objects.requireNonNull(getActivity()).finish();
     }
 

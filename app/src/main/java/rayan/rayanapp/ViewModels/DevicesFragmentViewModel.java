@@ -1,5 +1,6 @@
 package rayan.rayanapp.ViewModels;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
@@ -27,16 +28,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Helper.SendMessageToDevice;
@@ -58,18 +63,12 @@ import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
 public class DevicesFragmentViewModel extends AndroidViewModel {
     protected DeviceDatabase deviceDatabase;
     private GroupDatabase groupDatabase;
-    private ExecutorService executorService;
     private SendUDPMessage sendUDPMessage;
     public DevicesFragmentViewModel(@NonNull Application application) {
         super(application);
         deviceDatabase = new DeviceDatabase(application);
         groupDatabase = new GroupDatabase(application);
         sendUDPMessage = new SendUDPMessage();
-        executorService= Executors.newSingleThreadExecutor();
-    }
-
-    public void addDevices(List<Device> devices){
-        executorService.execute( () -> deviceDatabase.addDevices(devices));
     }
 
     public Device getDevice(String id){
@@ -107,6 +106,15 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             return deviceDatabase.getAllDevicesLive();
         }
     }
+
+    public Flowable<List<Group>> getAllGroupsFlowable(){
+        return groupDatabase.getAllGroupsFlowable().observeOn(Schedulers.io());
+    }
+
+    public Flowable<List<Device>> getAllDevicesFlowable(){
+        return deviceDatabase.getAllDevicesFlowable().observeOn(Schedulers.io());
+    }
+
 
     private final String TAG = DevicesFragmentViewModel.class.getSimpleName();
 
@@ -190,6 +198,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         SyncGroups(List<Group> groups){
             this.serverGroups.addAll(groups);
         }
+        @SuppressLint("CheckResult")
         @Override
         protected Void doInBackground(Void... voids) {
             List<Device> newDevices = new ArrayList<>();
@@ -208,6 +217,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     if (existing == null){
                         Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
+                        deviceUser.setIp(AppConstants.UNKNOWN_IP);
                         deviceUser.setPosition(nOd);
                         if (deviceUser.getType()!= null && deviceUser.getName1() != null){
                             devices.add(deviceUser);
@@ -230,111 +240,55 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 g.setHumanUsers(users);
                 newDevices.addAll(devices);
                 newUsers.addAll(users);
-            }
-            List<Device> oldDevices = deviceDatabase.getAllDevices();
-            List<Group> oldGroups = groupDatabase.getAllGroups();
-            deviceDatabase.addDevices(newDevices);
-            ((RayanApplication)getApplication()).getMtd().setDevices(newDevices);
-            if (oldDevices != null){
-                for (int a = 0;a<oldDevices.size();a++){
-                    String cId = oldDevices.get(a).getChipId();
-                    boolean exist = false;
-                    for (int b = 0;b<newDevices.size();b++){
-                        if (cId.equals(newDevices.get(b).getChipId())) exist = true;
+            }Log.e("<?><?><?><?><","1111111111111 " + Thread.currentThread().getName());
+            getAllDevicesFlowable().zipWith(getAllGroupsFlowable(), new BiFunction<List<Device>, List<Group>, Object>() {
+                @Override
+                public Object apply(List<Device> oldDevices, List<Group> oldGroups) throws Exception {
+                    Log.e("<?><?><?><?><","?>?>?>: " + Thread.currentThread().getName());
+                    if (oldDevices != null){
+                        for (int a = 0;a<oldDevices.size();a++){
+                            String cId = oldDevices.get(a).getChipId();
+                            boolean exist = false;
+                            for (int b = 0;b<newDevices.size();b++){
+                                if (cId.equals(newDevices.get(b).getChipId())) exist = true;
+                            }
+                            if (!exist) deviceDatabase.deleteDevice(oldDevices.get(a));
+                        }
                     }
-                    if (!exist) deviceDatabase.deleteDevice(oldDevices.get(a));
-                }
-            }
-            if (serverGroups != null && oldGroups != null){
-                for (int a = 0;a<oldGroups.size();a++){
-                    String cId = oldGroups.get(a).getId();
-                    boolean exist = false;
-                    for (int b = 0;b<serverGroups.size();b++){
-                        if (cId.equals(serverGroups.get(b).getId())) exist = true;
+                    if (serverGroups != null && oldGroups != null){
+                        for (int a = 0;a<oldGroups.size();a++){
+                            String cId = oldGroups.get(a).getId();
+                            boolean exist = false;
+                            for (int b = 0;b<serverGroups.size();b++){
+                                if (cId.equals(serverGroups.get(b).getId())) exist = true;
+                            }
+                            if (!exist) groupDatabase.deleteGroup(oldGroups.get(a));
+                        }
                     }
-                    if (!exist) groupDatabase.deleteGroup(oldGroups.get(a));
+                    return new Object();
                 }
-            }
-            groupDatabase.addGroups(serverGroups);
-            nOd = 0;
-//            DevicesDiffCallBack devicesDiffCallBack = new DevicesDiffCallBack(newDevices, oldDevices);
-//            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack);
-//            diffResult.dispatchUpdatesTo(new ListUpdateCallback() {
-//                @Override
-//                public void onInserted(int i, int i1) {
-////                    Log.e("FGHIJ", newDevices.size()+" old: " + oldDevices.size()+"OnInserted: from: "+i+" To: " + (i+i1) + " Count: " + i1);
-//                    addDevices(newDevices.subList(i, i+i1));
-////                    ((RayanApplication)getApplication()).getMtd().addDevices(newDevices.subList(i, i+i1));
-//                }
-//
-//                @Override
-//                public void onRemoved(int i, int i1) {
-////                    Log.e("ABC", "OnRemoved: from: "+i+" To: " + (i1 +i) + " Count: " + i1);
-//                    deviceDatabase.deleteDevices(oldDevices.subList(i, i + i1));
-//                }
-//
-//                @Override
-//                public void onMoved(int i, int i1) {
-////                    Log.e("ABC", "onMoved: from: "+i+" To: " + i1);
-//                }
-//
-//                @Override
-//                public void onChanged(int i, int i1, @Nullable Object o) {
-//                    Log.e("ABCDE", "onChanged: position: "+i+" Count: " + i1 + oldDevices.size() + newDevices.size());
-//                    Log.e("ABCDE", "old:" + oldDevices + o);
-//                    Log.e("ABCDE", "new:" + newDevices);
-//                    Log.e("ABCDE", "old at position: "+i+ oldDevices.get(i));
-//                    Log.e("ABCDE", "new at position: "+i+ newDevices.get(i));
-//                    if (oldDevices.get(i) != null && oldDevices.get(i).getChipId().equals(((Bundle)o).getString("chipId"))){
-//                        Log.e("ABCDE", "oldIsRight is: " + oldDevices.get(i));
-//                    }
-//                    if (newDevices.get(i) != null && newDevices.get(i).getChipId().equals(((Bundle)o).getString("chipId"))){
-//                        Log.e("ABCDE", "newIsRight is: " + newDevices.get(i));
-//                        deviceDatabase.updateDevice(newDevices.get(i));
-//                    }
-//                    else Log.e("ABCDE", "NeighterIsRight is: ");
-//
-//                }
-//            });
-//            GroupsDiffCallBack groupsDiffCallBack = new GroupsDiffCallBack(serverGroups, oldGroups);
-//            DiffUtil.DiffResult diffResult1 = DiffUtil.calculateDiff(groupsDiffCallBack);
-//            diffResult1.dispatchUpdatesTo(new ListUpdateCallback() {
-//                @Override
-//                public void onInserted(int i, int i1) {
-//                    groupDatabase.addGroups(serverGroups.subList(i, i+i1));
-////                    Log.e("DEF", "OnInserted: from: "+i+" To: " + i+i1 + " Count: " + i1);
-//                }
-//
-//                @Override
-//                public void onRemoved(int i, int i1) {
-////                    Log.e("DEF", "OnRemoved: from: "+i+" To: " + (i1 +i) + " Count: " + i1);
-//                    groupDatabase.deleteGroups(oldGroups.subList(i, i+1));
-//                }
-//
-//                @Override
-//                public void onMoved(int i, int i1) {
-////                    Log.e("DEF", "onMoved: from: "+i+" To: " + i1);
-//
-//                }
-//
-//                @Override
-//                public void onChanged(int i, int i1, @Nullable Object o) {
-////                    Log.e("DEF", "onChanged: from: "+i+" To: " + (i1+i) +"Count: " + i1);
-//                    groupDatabase.updateGroups(serverGroups.subList(i, i+i1));
-//                }
-//            });
-            try {
+            }).observeOn(Schedulers.io()).subscribe(new Consumer<Object>() {
+                @Override
+                public void accept(Object o) throws Exception {
+                    Log.e("alldoneman", "alldoneman");
+                }
+            });
 
-            if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {
-                Log.e(TAG, "After getting Groups mqtt connection is: " + MainActivityViewModel.connection.getValue().getClient().isConnected());
-                subscribeToAll(newDevices);
-            }
-            }catch (Exception e){
-                Log.e(TAG, AppConstants.ERROR_OCCURRED + e);
-            }
-//            MainActivityViewModel.connection.getValue().getClient().subs
-//            groupDatabase.addGroups(newGroups);
-//            myViewModel.addUsers(newUsers);
+            deviceDatabase.addDevices(newDevices);
+            groupDatabase.addGroups(serverGroups);
+//            List<Device> oldDevices = deviceDatabase.getAllDevices();
+//            List<Group> oldGroups = groupDatabase.getAllGroups();
+//            ((RayanApplication)getApplication()).getMtd().setDevices(newDevices);
+
+            nOd = 0;
+//            try {
+//            if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {
+//                Log.e(TAG, "After getting Groups mqtt connection is: " + MainActivityViewModel.connection.getValue().getClient().isConnected());
+//                subscribeToAll(newDevices);
+//            }
+//            }catch (Exception e){
+//                Log.e(TAG, AppConstants.ERROR_OCCURRED + e);
+//            }
             return null;
         }
     }
