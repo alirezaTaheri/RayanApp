@@ -27,6 +27,9 @@ public interface GroupsDAO extends BaseDAO<Group> {
     Group getGroup(String id);
 
     @Query("SELECT * FROM `Group` WHERE id = :id")
+    Flowable<Group> getGroupFlowable(String id);
+
+    @Query("SELECT * FROM `Group` WHERE id = :id")
     LiveData<Group> getGroupLive(String id);
 
     @Update

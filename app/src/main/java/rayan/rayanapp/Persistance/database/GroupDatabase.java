@@ -27,6 +27,9 @@ public class GroupDatabase {
     public Group getGroup(String id){
         return groupsDAO.getGroup(id);
     }
+    public Flowable<Group> getGroupFlowable(String id){
+        return groupsDAO.getGroupFlowable(id);
+    }
     public LiveData<Group> getGroupLive(String id){
         return groupsDAO.getGroupLive(id);
     }

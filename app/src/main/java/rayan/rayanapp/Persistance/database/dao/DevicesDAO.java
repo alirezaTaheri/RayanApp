@@ -10,6 +10,8 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 
@@ -39,6 +41,9 @@ public interface DevicesDAO extends BaseDAO<Device>{
 
     @Query("SELECT * FROM Device WHERE chipId = :chipId")
     Device getDevice(String chipId);
+
+    @Query("SELECT * FROM Device WHERE chipId = :chipId")
+    Maybe<Device> getDeviceFlowable(String chipId);
 
     @Update
     void updateDevice(Device device);

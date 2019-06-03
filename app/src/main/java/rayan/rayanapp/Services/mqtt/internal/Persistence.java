@@ -10,6 +10,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.ArrayList;
@@ -278,8 +279,7 @@ public class Persistence extends SQLiteOpenHelper implements BaseColumns {
      * @return list of connections that have been restored
      * @throws PersistenceException if restoring connections fails, this is thrown
      */
-    public List<Connection> restoreConnections(Context context) throws PersistenceException
-    {
+    public List<Connection> restoreConnections(Context context) throws PersistenceException, MqttException {
 
 
         //columns to return

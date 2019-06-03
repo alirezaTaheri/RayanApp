@@ -11,7 +11,18 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.security.cert.CertPathValidatorException;
 import java.util.ArrayList;
+
+import javax.net.ssl.SSLHandshakeException;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Activities.MainActivity;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.mqtt.internal.Connections;
@@ -30,7 +41,7 @@ public class ActionListener implements IMqttActionListener {
         PUBLISH
     }
     private final Action action;
-    private final String[] additionalArgs;
+    private String[] additionalArgs;
     private final Connection connection;
     private final String clientHandle;
     private final Context context;
@@ -42,6 +53,14 @@ public class ActionListener implements IMqttActionListener {
         this.connection = connection;
         this.clientHandle = connection.handle();
         this.additionalArgs = additionalArgs;
+        this.updateConnection = updateConnection;
+    }
+    public ActionListener(Context context, Action action,
+                          Connection connection, MutableLiveData<Connection> updateConnection) {
+        this.context = context;
+        this.action = action;
+        this.connection = connection;
+        this.clientHandle = connection.handle();
         this.updateConnection = updateConnection;
     }
     public ActionListener(Context context, Action action,
@@ -64,41 +83,41 @@ public class ActionListener implements IMqttActionListener {
                 disconnect();
                 break;
             case SUBSCRIBE:
-                subscribe();
+                Log.e(TAG, "In onSuccess Method SUBSCRIBE");
                 break;
             case PUBLISH:
-                publish();
+                Log.e(TAG, "In onSuccess Method PUBLISH");
                 break;
         }
 
     }
 
-    private void publish() {
+//    private void publish() {
+//
+//        Log.e(TAG, "In publish Method");
+//
+//
+//        Connection c = Connections.getInstance(context).getConnection(clientHandle);
+//        @SuppressLint("StringFormatMatches") String actionTaken = context.getString(R.string.toast_pub_success,
+//              (Object[]) additionalArgs);
+//        c.addAction(actionTaken);
+////        Notify.toast(context, actionTaken, Toast.LENGTH_SHORT);
+//        System.out.print("Published");
+//
+//    }
 
-        Log.e(TAG, "In publish Method");
-
-
-        Connection c = Connections.getInstance(context).getConnection(clientHandle);
-        @SuppressLint("StringFormatMatches") String actionTaken = context.getString(R.string.toast_pub_success,
-              (Object[]) additionalArgs);
-        c.addAction(actionTaken);
-//        Notify.toast(context, actionTaken, Toast.LENGTH_SHORT);
-        System.out.print("Published");
-
-    }
-
-    private void subscribe() {
-
-        Log.e(TAG, "In Subscribe Method");
-
-        Connection c = Connections.getInstance(context).getConnection(clientHandle);
-        String actionTaken = context.getString(R.string.toast_sub_success,
-                (Object[]) additionalArgs);
-        c.addAction(actionTaken);
-//        Notify.toast(context, actionTaken, Toast.LENGTH_SHORT);
-        System.out.print(actionTaken);
-
-    }
+//    private void subscribe() {
+//
+//        Log.e(TAG, "In Subscribe Method");
+//
+//        Connection c = Connections.getInstance(context).getConnection(clientHandle);
+//        String actionTaken = context.getString(R.string.toast_sub_success,
+//                (Object[]) additionalArgs);
+//        c.addAction(actionTaken);
+////        Notify.toast(context, actionTaken, Toast.LENGTH_SHORT);
+//        System.out.print(actionTaken);
+//
+//    }
 
     private void disconnect() {
 
@@ -116,6 +135,7 @@ public class ActionListener implements IMqttActionListener {
         intent.putExtra("handle", clientHandle);
     }
 
+    @SuppressLint("CheckResult")
     private void connect() {
         Log.e(TAG, "In Connect Method");
 //        ArrayList<Subscription> subscriptionss = new ArrayList<>();
@@ -125,15 +145,20 @@ public class ActionListener implements IMqttActionListener {
         connection.addAction("Client Connected");
 //        Toast.makeText(context, "Successfully Connected", Toast.LENGTH_SHORT).show();
         Log.i(TAG, connection.handle() + " connected.");
-        try {
-            ArrayList<Subscription> subscriptions = connection.getSubscriptions();
-            for (Subscription sub : subscriptions) {
-                Log.i(TAG, "Auto-subscribing to: " + sub.getTopic() + " @ QoS: " + sub.getQos() + connection.getClient());
-                connection.getClient().subscribe(sub.getTopic(), sub.getQos());
+        MainActivity.connection = connection;
+        Observable.create(emitter -> {
+            try {
+                ArrayList<Subscription> subscriptions = connection.getSubscriptions();
+                for (Subscription sub : subscriptions) {
+                    Log.i(TAG, "Auto-subscribing to: " + sub.getTopic() + " @ QoS: " + sub.getQos() + connection.getClient());
+                    connection.getClient().subscribe(sub.getTopic(), sub.getQos());
+                }
+            } catch (MqttException | IllegalArgumentException ex){
+                Log.e(TAG, "Failed to Auto-Subscribe: " + ex.getMessage());
             }
-        } catch (MqttException | IllegalArgumentException ex){
-            Log.e(TAG, "Failed to Auto-Subscribe: " + ex.getMessage());
-        }
+        }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(o -> {
+
+        });
         updateConnection.postValue(connection);
 //        MainActivityViewModel.connection.setValue(connection);
 
@@ -150,37 +175,37 @@ public class ActionListener implements IMqttActionListener {
                 disconnect(exception);
                 break;
             case SUBSCRIBE:
-                subscribe(exception);
+                Log.e(TAG, "In onFailure  Method SUBSCRIBE");
                 break;
             case PUBLISH:
-                publish(exception);
+                Log.e(TAG, "In onFailure  Method PUBLISH");
                 break;
         }
 
     }
 
-    private void publish(Throwable exception) {
-        Log.e(TAG, "In publish Method 2 ");
-        Connection c = Connections.getInstance(context).getConnection(clientHandle);
-        @SuppressLint("StringFormatMatches") String action = context.getString(R.string.toast_pub_failed,
-                (Object[]) additionalArgs);
-        c.addAction(action);
-//        Notify.toast(context, action, Toast.LENGTH_SHORT);
-        System.out.print("Publish failed");
+//    private void publish(Throwable exception) {
+//        Log.e(TAG, "In publish Method 2 ");
+//        Connection c = Connections.getInstance(context).getConnection(clientHandle);
+//        @SuppressLint("StringFormatMatches") String action = context.getString(R.string.toast_pub_failed,
+//                (Object[]) additionalArgs);
+//        c.addAction(action);
+////        Notify.toast(context, action, Toast.LENGTH_SHORT);
+//        System.out.print("Publish failed");
+//
+//    }
 
-    }
-
-    private void subscribe(Throwable exception) {
-        Log.e(TAG, "In subscribe Method 2 ");
-
-        Connection c = Connections.getInstance(context).getConnection(clientHandle);
-        String action = context.getString(R.string.toast_sub_failed,
-                (Object[]) additionalArgs);
-        c.addAction(action);
-//        Notify.toast(context, action, Toast.LENGTH_SHORT);
-        System.out.print(action);
-
-    }
+//    private void subscribe(Throwable exception) {
+//        Log.e(TAG, "In subscribe Method 2 ");
+//
+//        Connection c = Connections.getInstance(context).getConnection(clientHandle);
+//        String action = context.getString(R.string.toast_sub_failed,
+//                (Object[]) additionalArgs);
+//        c.addAction(action);
+////        Notify.toast(context, action, Toast.LENGTH_SHORT);
+//        System.out.print(action);
+//
+//    }
 
     private void disconnect(Throwable exception) {
         Log.e(TAG, "In Disconnect Method 2");
@@ -193,6 +218,8 @@ public class ActionListener implements IMqttActionListener {
     private void connect(Throwable exception) {
 //        Toast.makeText(context, "Can't Connect", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "In Connect Method 2" + exception);
+        if (exception instanceof SSLHandshakeException || exception instanceof CertPathValidatorException)
+            RayanApplication.getPref().setMqttSsl(false);
         exception.printStackTrace();
 //        Connection c = MainActivityViewModel.connection.getValue();
 //        if (c == null)

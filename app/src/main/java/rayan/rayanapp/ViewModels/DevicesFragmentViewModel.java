@@ -1,6 +1,5 @@
 package rayan.rayanapp.ViewModels;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
@@ -28,14 +27,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.MainActivity;
@@ -63,12 +59,18 @@ import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
 public class DevicesFragmentViewModel extends AndroidViewModel {
     protected DeviceDatabase deviceDatabase;
     private GroupDatabase groupDatabase;
+    private ExecutorService executorService;
     private SendUDPMessage sendUDPMessage;
     public DevicesFragmentViewModel(@NonNull Application application) {
         super(application);
         deviceDatabase = new DeviceDatabase(application);
         groupDatabase = new GroupDatabase(application);
         sendUDPMessage = new SendUDPMessage();
+        executorService= Executors.newSingleThreadExecutor();
+    }
+
+    public void addDevices(List<Device> devices){
+        executorService.execute( () -> deviceDatabase.addDevices(devices));
     }
 
     public Device getDevice(String id){
@@ -106,15 +108,6 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             return deviceDatabase.getAllDevicesLive();
         }
     }
-
-    public Flowable<List<Group>> getAllGroupsFlowable(){
-        return groupDatabase.getAllGroupsFlowable().observeOn(Schedulers.io());
-    }
-
-    public Flowable<List<Device>> getAllDevicesFlowable(){
-        return deviceDatabase.getAllDevicesFlowable().observeOn(Schedulers.io());
-    }
-
 
     private final String TAG = DevicesFragmentViewModel.class.getSimpleName();
 
@@ -198,7 +191,6 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         SyncGroups(List<Group> groups){
             this.serverGroups.addAll(groups);
         }
-        @SuppressLint("CheckResult")
         @Override
         protected Void doInBackground(Void... voids) {
             List<Device> newDevices = new ArrayList<>();
@@ -240,46 +232,32 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 g.setHumanUsers(users);
                 newDevices.addAll(devices);
                 newUsers.addAll(users);
-            }Log.e("<?><?><?><?><","1111111111111 " + Thread.currentThread().getName());
-            getAllDevicesFlowable().zipWith(getAllGroupsFlowable(), new BiFunction<List<Device>, List<Group>, Object>() {
-                @Override
-                public Object apply(List<Device> oldDevices, List<Group> oldGroups) throws Exception {
-                    Log.e("<?><?><?><?><","?>?>?>: " + Thread.currentThread().getName());
-                    if (oldDevices != null){
-                        for (int a = 0;a<oldDevices.size();a++){
-                            String cId = oldDevices.get(a).getChipId();
-                            boolean exist = false;
-                            for (int b = 0;b<newDevices.size();b++){
-                                if (cId.equals(newDevices.get(b).getChipId())) exist = true;
-                            }
-                            if (!exist) deviceDatabase.deleteDevice(oldDevices.get(a));
-                        }
-                    }
-                    if (serverGroups != null && oldGroups != null){
-                        for (int a = 0;a<oldGroups.size();a++){
-                            String cId = oldGroups.get(a).getId();
-                            boolean exist = false;
-                            for (int b = 0;b<serverGroups.size();b++){
-                                if (cId.equals(serverGroups.get(b).getId())) exist = true;
-                            }
-                            if (!exist) groupDatabase.deleteGroup(oldGroups.get(a));
-                        }
-                    }
-                    return new Object();
-                }
-            }).observeOn(Schedulers.io()).subscribe(new Consumer<Object>() {
-                @Override
-                public void accept(Object o) throws Exception {
-                    Log.e("alldoneman", "alldoneman");
-                }
-            });
-
+            }
+            List<Device> oldDevices = deviceDatabase.getAllDevices();
+            List<Group> oldGroups = groupDatabase.getAllGroups();
             deviceDatabase.addDevices(newDevices);
-            groupDatabase.addGroups(serverGroups);
-//            List<Device> oldDevices = deviceDatabase.getAllDevices();
-//            List<Group> oldGroups = groupDatabase.getAllGroups();
 //            ((RayanApplication)getApplication()).getMtd().setDevices(newDevices);
-
+            if (oldDevices != null){
+                for (int a = 0;a<oldDevices.size();a++){
+                    String cId = oldDevices.get(a).getChipId();
+                    boolean exist = false;
+                    for (int b = 0;b<newDevices.size();b++){
+                        if (cId.equals(newDevices.get(b).getChipId())) exist = true;
+                    }
+                    if (!exist) deviceDatabase.deleteDevice(oldDevices.get(a));
+                }
+            }
+            if (serverGroups != null && oldGroups != null){
+                for (int a = 0;a<oldGroups.size();a++){
+                    String cId = oldGroups.get(a).getId();
+                    boolean exist = false;
+                    for (int b = 0;b<serverGroups.size();b++){
+                        if (cId.equals(serverGroups.get(b).getId())) exist = true;
+                    }
+                    if (!exist) groupDatabase.deleteGroup(oldGroups.get(a));
+                }
+            }
+            groupDatabase.addGroups(serverGroups);
             nOd = 0;
 //            try {
 //            if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {

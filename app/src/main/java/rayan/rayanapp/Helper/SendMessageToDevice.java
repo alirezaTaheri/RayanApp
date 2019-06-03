@@ -74,6 +74,7 @@ public class SendMessageToDevice {
                 }
             };
             connection.getClient().publish(topic, message.getBytes(), qos, retain, null, iMqttActionListener);
+
         } catch( MqttException ex){
             Log.e(TAG, "Exception occurred during publish: " + ex.getMessage());
         }

@@ -141,4 +141,5 @@ dependencies {
     implementation 'commons-net:commons-net:3.6'
     implementation 'com.thanosfisherman.wifiutils:wifiutils:1.4.0'
     implementation "android.arch.persistence.room:rxjava2:1.1.1"
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.3'
 }

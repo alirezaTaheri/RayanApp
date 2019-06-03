@@ -16,9 +16,11 @@ import rayan.rayanapp.ViewModels.MainActivityViewModel;
 
 public class RetryConnectMqtt {
 
+    private final String TAG = "RetryConnectMqtt";
     private boolean running;
     Disposable d;
     MainActivity mainActivity;
+    public int retry = 0;
     public RetryConnectMqtt(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
@@ -29,31 +31,35 @@ public class RetryConnectMqtt {
                     @Override
                     public void onSubscribe(Disposable d) {
                         RetryConnectMqtt.this.d = d;
-                        Log.e("???????????", "subscribed");
+                        Log.e(TAG, "subscribed");
                     }
 
                     @Override
                     public void onNext(Long aLong) {
-                        Log.e("???????????", "onNext " + aLong);
+                        Log.e(TAG, "onNext " + aLong);
                         if (aLong > 10 || RayanApplication.getPref().getProtocol().equals(AppConstants.MQTT))
                             stop();
-                        else if (!RayanApplication.getPref().getProtocol().equals(AppConstants.MQTT))mainActivity.onRetryMqtt();
+                        else if (!RayanApplication.getPref().getProtocol().equals(AppConstants.MQTT)){
+                            mainActivity.onRetryMqtt();
+                            retry++;
+                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("???????????", "onError " + e);
+                        Log.e(TAG, "onError " + e);
                         e.printStackTrace();
                     }
 
                     @Override
                     public void onComplete() {
-                        Log.e("???????????", "onComplete");
+                        Log.e(TAG, "onComplete");
                     }
                 });
     }
     public void stop(){
         d.dispose();
+        retry = 0;
         running = false;
     }
 

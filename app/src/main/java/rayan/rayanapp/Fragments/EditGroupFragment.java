@@ -2,7 +2,6 @@ package rayan.rayanapp.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,7 +26,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -82,7 +79,49 @@ public class EditGroupFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        editGroupFragmentViewModel = ViewModelProviders.of(this).get(EditGroupFragmentViewModel.class);
+        instance = this;
+        if (getArguments() != null) {
+            this.group = editGroupFragmentViewModel.getGroup(getArguments().getString("id"));
+            int c = 0;
+            for (int i = 0; i <= group.getAdmins().size() - 1; i++) {
+                if (group.getAdmins().get(i).getId().equals(RayanApplication.getPref().getId())) {
+                    c++;
+                }
+            }
+            if (c > 0)
+                RayanApplication.getPref().setIsGroupAdminKey(true);
+            else RayanApplication.getPref().setIsGroupAdminKey(false);
+            editGroupFragmentViewModel.getGroupLive(getArguments().getString("id")).observe(this, group1 -> {
+                this.group = group1;
+                admins = group1.getAdmins();
+                humanUsers = group1.getHumanUsers();
+                for (int i = 0; i <= admins.size() - 1; i++) {
+                    adminsUserNames.add(admins.get(i).getUsername());
+                }
+              //  Toast.makeText(getContext(), adminsUserNames.get(0), Toast.LENGTH_SHORT).show();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+                    for (int i = 0; i <= admins.size() - 1; i++) {
+                        admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(), getActivity()));
+                        admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(), getActivity()));
+                    }
+                    for (int i = 0; i <= humanUsers.size() - 1; i++) {
+                        humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(), getActivity()));
+                        humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(), getActivity()));
+                    }
+                } else getContactPermission();
+                managersRecyclerViewAdapter.setItems(humanUsers);
+                devicesRecyclerViewAdapter.setItems(group1.getDevices());
+            });
+        }
+        groupUsers=editGroupFragmentViewModel.getUsers(getArguments().getString("id"));
+      //  Toast.makeText(getContext(), groupUsers.get(groupUsers.size()-1).getUsername(), Toast.LENGTH_SHORT).show();
+        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"");
+        devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(getActivity(), new ArrayList<>());
+        setHasOptionsMenu(true);
+//        onToolbarNameChange=(OnToolbarNameChange)getActivity();
+//        onToolbarNameChange.toolbarNameChanged(group.getName());
+        ((GroupsActivity) getActivity()).toolbarNameChanged(group.getName());
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -158,61 +197,12 @@ public class EditGroupFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_group, container, false);
         ButterKnife.bind(this, view);
-        managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"");
-        devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(getActivity(), new ArrayList<>());
         getContactPermission();
-        editGroupFragmentViewModel = ViewModelProviders.of(this).get(EditGroupFragmentViewModel.class);
-        instance = this;
-        if (getArguments() != null) {
-            editGroupFragmentViewModel.getGroupLive(getArguments().getString("id")).observe(this, new Observer<Group>() {
-                @Override
-                public void onChanged(@Nullable Group group) {
-                    EditGroupFragment.group = group;
-                    int c = 0;
-                    for (int i = 0; i <= group.getAdmins().size() - 1; i++) {
-                        if (group.getAdmins().get(i).getId().equals(RayanApplication.getPref().getId())) {
-                            c++;
-                        }
-                    }
-                    if (c > 0)
-                        RayanApplication.getPref().setIsGroupAdminKey(true);
-                    else RayanApplication.getPref().setIsGroupAdminKey(false);
-//                    editGroupFragmentViewModel.getGroupLive(getArguments().getString("id")).observe(EditGroupFragment.this, group1 -> {
-                    admins = EditGroupFragment.group.getAdmins();
-                    humanUsers = EditGroupFragment.group.getHumanUsers();
-                    for (int i = 0; i <= admins.size() - 1; i++) {
-                        adminsUserNames.add(admins.get(i).getUsername());
-                    }
-                    //  Toast.makeText(getContext(), adminsUserNames.get(0), Toast.LENGTH_SHORT).show();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-                        for (int i = 0; i <= admins.size() - 1; i++) {
-                            admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(), getActivity()));
-                            admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(), getActivity()));
-                        }
-                        for (int i = 0; i <= humanUsers.size() - 1; i++) {
-                            humanUsers.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(humanUsers.get(i).getUsername(), getActivity()));
-                            humanUsers.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(humanUsers.get(i).getUsername(), getActivity()));
-                        }
-                    } else getContactPermission();
-                    managersRecyclerViewAdapter.setItems(humanUsers);
-                    devicesRecyclerViewAdapter.setItems(EditGroupFragment.group.getDevices());
-//                    });
-                    groupUsers = group.getHumanUsers();
-                    //  Toast.makeText(getContext(), groupUsers.get(groupUsers.size()-1).getUsername(), Toast.LENGTH_SHORT).show();
-                    setHasOptionsMenu(true);
-//        onToolbarNameChange=(OnToolbarNameChange)getActivity();
-//        onToolbarNameChange.toolbarNameChanged(group.getName());
-                    ((GroupsActivity) getActivity()).toolbarNameChanged(group.getName());
-
-                    managersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    managersRecyclerView.setAdapter(managersRecyclerViewAdapter);
-                    devicesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                    devicesRecyclerView.setAdapter(devicesRecyclerViewAdapter);
-                    init(group);
-                }
-            });
-
-        }
+        managersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        managersRecyclerView.setAdapter(managersRecyclerViewAdapter);
+        devicesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        devicesRecyclerView.setAdapter(devicesRecyclerViewAdapter);
+        init(group);
         return view;
     }
 
@@ -263,6 +253,29 @@ public class EditGroupFragment extends Fragment {
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
+    public void clickOnRemoveUserSubmit() {
+        editGroupFragmentViewModel.deleteUser(userId, group.getId()).observe(this, baseResponse -> {
+            Log.e("remove user code", baseResponse.getStatus().getCode());
+//            Toast.makeText(getActivity(), "remove user code"+baseResponse.getStatus().getCode()+" "+ baseResponse.getData().getMessage(), Toast.LENGTH_SHORT).show();
+            if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("nouser")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "این کاربر وجود ندارد");
+            } else if (baseResponse.getStatus().getCode().equals("404")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "حذف این کاربر امکان پذیر نیست");
+            } else if (baseResponse.getStatus().getCode().equals("403")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شما قادر به حذف این کاربر نیستید");
+            } else if (baseResponse.getStatus().getCode().equals("204")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "کاربر با موفقیت از گروه حذف شد");
+//                ((DoneWithFragment)getActivity()).operationDone();
+                editGroupFragmentViewModel.getGroups();
+            } else if (baseResponse.getStatus().getCode().equals("200")) {
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "کاربر با موفقیت از گروه حذف شد");
+//                ((DoneWithFragment)getActivity()).operationDone();
+                editGroupFragmentViewModel.getGroups();
+            } else
+                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "مشکلی وجود دارد");
+        });
+    }
+
     public void clickOnLeaveGroupSubmit() {
         if (adminsUserNames.contains(RayanApplication.getPref().getUsername())) {
             if (admins.size() == 1) {
@@ -306,6 +319,8 @@ public class EditGroupFragment extends Fragment {
     public void onResume() {
         super.onResume();
        // onToolbarNameChange.toolbarNameChanged(group.getName());
+
+        ((GroupsActivity) getActivity()).toolbarNameChanged(group.getName());
     }
 //    public void doAddUserFromPhone(ArrayList<PhoneContact> selectedContacts){
 //        ArrayList<String> contacts=new ArrayList<>();

@@ -18,6 +18,8 @@ package rayan.rayanapp.Services.mqtt.internal;
 
 import android.content.Context;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +58,8 @@ public class Connections {
                 connections.put(connection.handle(), connection);
             }
         } catch (PersistenceException e){
+            e.printStackTrace();
+        } catch (MqttException e) {
             e.printStackTrace();
         }
     }

@@ -1,6 +1,5 @@
 package rayan.rayanapp.Fragments;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -30,12 +29,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Adapters.recyclerView.DevicesManagementRecyclerViewAdapter;
 import rayan.rayanapp.Data.Device;
@@ -95,41 +89,34 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return view;
     }
-    @SuppressLint("CheckResult")
     @Override
     public void onItemClick(Device item) {
 
 //        if (item.getIp() != null) {
-        getAllDeviceObservable().subscribe(new Consumer<List<Device>>() {
-            @Override
-            public void accept(List<Device> devices) throws Exception {
-//                waiting.add(item.getChipId());
-//                devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
-                devicesManagementListFragmentViewModel.setReadyForSettingsHttp(item).observe(DevicesManagementListFragment.this, new Observer<String>() {
-                    @Override
-                    public void onChanged(@Nullable String s) {
-                        Log.e("...........", "............" + s);
-                        if (s.equals(AppConstants.SETTINGS)) {
-                            transaction = fragmentManager.beginTransaction();
-                            transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-                            EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
-                            ((DeviceManagementActivity)Objects.requireNonNull(getActivity())).editDeviceFragment = editGroupFragment;
-                            ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
-                            transaction.replace(R.id.frameLayout, editGroupFragment);
-                            transaction.addToBackStack(null);
-                            transaction.commit();
-                        }else if (s.equals(AppConstants.SOCKET_TIME_OUT)){
-                            Log.e("ttttttttttt", "tttttttttttttt" +s);
-                            Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
-                        }else
-                            Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
-//                        waiting.remove(item.getChipId());
-//                        devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
-                    }
-                });
-            }
-        });
-
+            waiting.add(item.getChipId());
+            devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+            devicesManagementListFragmentViewModel.setReadyForSettingsHttp(item).observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable String s) {
+                    Log.e("...........", "............" + s);
+                    if (s.equals(AppConstants.SETTINGS)) {
+                        transaction = fragmentManager.beginTransaction();
+                        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+                        EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
+                        ((DeviceManagementActivity)getActivity()).editDeviceFragment = editGroupFragment;
+                        ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
+                        transaction.replace(R.id.frameLayout, editGroupFragment);
+                        transaction.addToBackStack(null);
+                        transaction.commit();
+                    }else if (s.equals(AppConstants.SOCKET_TIME_OUT)){
+                        Log.e("ttttttttttt", "tttttttttttttt" +s);
+                        Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
+                    }else
+                        Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                    waiting.remove(item.getChipId());
+                    devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+                }
+            });
 //        }else SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
 
 
@@ -171,47 +158,25 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         popupDialog.show();
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onFavoriteClicked(Device item) {
-        getDeviceObservable(item.getChipId()).subscribe(new Consumer<Device>() {
-            @Override
-            public void accept(Device device) throws Exception {
-                Log.e("OOOOOOOOmad" , "OOOMAD:>>>" + device);
-                Log.e("OOOOOOOOmad" , "OOOMAD:>>>" + item);
-                Log.e("OOOOOOOOmad" , "OOOMAD:>>>" + Thread.currentThread().getName());
-                if (item.isFavorite()){
-                    device.setFavorite(true);
-//                    Toast.makeText(getActivity(),item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    device.setFavorite(false);
-//                    Toast.makeText(getActivity(),item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
-                }
-                devicesManagementListFragmentViewModel.updateDevice(device);
-            }
-        });
+        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
+        devicesManagementListFragmentViewModel.updateDevice(d);
+        if (item.isFavorite()){
+            d.setFavorite(true);
+            Toast.makeText(getActivity(),item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
+        }
+        else Toast.makeText(getActivity(),item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onVisibilityClicked(Device item) {
-        getDeviceObservable(item.getChipId()).subscribe(new Consumer<Device>() {
-            @Override
-            public void accept(Device d) throws Exception {
-                d.setHidden(!d.isHidden());
-                if (item.isHidden()){
-                    item.setHidden(true);
-//                    Toast.makeText(getActivity(),item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    item.setHidden(false);
-//                    Toast.makeText(getActivity(),item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
-                }
-                devicesManagementListFragmentViewModel.updateDevice(d);
-            }
-        });
-
+        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
+        d.setHidden(!d.isHidden());
+        devicesManagementListFragmentViewModel.updateDevice(d);
+        if (item.isHidden())
+        Toast.makeText(getActivity(),item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
+        else Toast.makeText(getActivity(),item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
     }
 
     public interface ClickOnDevice {
@@ -222,22 +187,6 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     public void onAttach(Context context) {
         super.onAttach(context);
         sendDevice = (ClickOnDevice) getActivity();
-    }
-    public Observable<Device> getDeviceObservable(String chipId){
-        return Observable.create(new ObservableOnSubscribe<Device>() {
-            @Override
-            public void subscribe(ObservableEmitter<Device> e) throws Exception {
-                e.onNext(devicesManagementListFragmentViewModel.getDevice(chipId));
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
-    }
-    public Observable<List<Device>> getAllDeviceObservable(){
-        return Observable.create(new ObservableOnSubscribe<List<Device>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<Device>> e) throws Exception {
-                e.onNext(devicesManagementListFragmentViewModel.getDevices());
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     }
 
 }

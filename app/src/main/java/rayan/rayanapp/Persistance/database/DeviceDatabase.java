@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 import rayan.rayanapp.Persistance.AppDatabase;
@@ -24,6 +26,10 @@ public class DeviceDatabase {
     }
     public Device getDevice(String chipId){
         return deviceDAO.getDevice(chipId);
+    }
+
+    public Maybe<Device> getDeviceFlowable(String chipId){
+        return deviceDAO.getDeviceFlowable(chipId);
     }
 
     public LiveData<List<Device>> getAllDevicesLive(){

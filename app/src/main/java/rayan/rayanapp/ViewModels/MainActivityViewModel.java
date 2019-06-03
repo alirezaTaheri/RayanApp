@@ -1,21 +1,22 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.ComponentName;
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.provider.SyncStateContract;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.JsonObject;
 
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -23,12 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -37,25 +33,24 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.ActionListener;
 import rayan.rayanapp.Services.mqtt.Connection;
+import rayan.rayanapp.Services.mqtt.MqttJobService;
 import rayan.rayanapp.Services.mqtt.MyMqttCallbackHandler;
 import rayan.rayanapp.Services.mqtt.model.Subscription;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
@@ -69,6 +64,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private DeviceDatabase deviceDatabase;
     private SendUDPMessage sendUDPMessage;
     private GroupDatabase groupDatabase;
+    MyMqttCallbackHandler myMqttCallbackHandler;
     public static MutableLiveData<Connection> connection = new MutableLiveData<>();
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -76,6 +72,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         deviceDatabase = new DeviceDatabase(application);
         sendUDPMessage = new SendUDPMessage();
         groupDatabase = new GroupDatabase(application);
+        myMqttCallbackHandler = new MyMqttCallbackHandler(application);
 //        connection = new MutableLiveData<>();
 //        connection.setValue(Connection.createConnection("ClientHandle","ClientId","api.rayansmarthome.ir",1883,application,false));
     }
@@ -96,9 +93,19 @@ public class MainActivityViewModel extends AndroidViewModel {
         return deviceDatabase.getAllDevices();
     }
 
-    public MutableLiveData<Connection> connectToMqtt(Context context){
+    public void connectToMqtt(Context context){
+        Log.e("____________" ,"Connecting To mqtt.............................");
         disconnectMQTT(MainActivityViewModel.connection);
-        MutableLiveData<Connection> updateConnection = new MutableLiveData<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.e("____________" ,"Android Version is greater than O = 26");
+            JobScheduler jobScheduler =
+                    (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            jobScheduler.schedule(new JobInfo.Builder(11,
+                    new ComponentName(context, MqttJobService.class))
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .build());
+        }else {
+            Log.e("____________" ,"Android Version is less than O = 26");
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -108,48 +115,24 @@ public class MainActivityViewModel extends AndroidViewModel {
                 mqttConnectOptions.setCleanSession(false);
                 mqttConnectOptions.setConnectionTimeout(5);
                 mqttConnectOptions.setKeepAliveInterval(500);
-                    InputStream input =
-                            context.getApplicationContext().getAssets().open("ca_certificate.pem");
-                    Log.e("/////////////" ,"/////////////Input: " + input);
                 Connection connection = Connection.createConnection("ClientHandle" + System.currentTimeMillis(),"ClientId"+ System.currentTimeMillis(),AppConstants.MQTT_HOST,AppConstants.MQTT_PORT,context,true);
                 connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTING);
                 connection.setSubscriptions(getSubscriptions(connection));
-                    Log.e("/////////////" ,"/////////////000000");
-//                    SSLSocketFactory result;  	// check to see if already created
-//
-//                        KeyStore keystoreTrust = KeyStore.getInstance("BKS");        // Bouncy Castle
-//
-//                        keystoreTrust.load(context.getResources().openRawResource(R.raw.ca_certificate),
-//                                "12345678".toCharArray());
-//
-//                        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-//
-//                        trustManagerFactory.init(keystoreTrust);
-//
-//                        SSLContext sslContext = SSLContext.getInstance("TLS");
-//
-//                        sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
-//
-//                        result = sslContext.getSocketFactory();
-//
-//                mqttConnectOptions.setSocketFactory(result);
-                    mqttConnectOptions.setUserName(RayanApplication.getPref().getUsername());
-                    mqttConnectOptions.setPassword(RayanApplication.getPref().getPassword().toCharArray());
+                mqttConnectOptions.setUserName(RayanApplication.getPref().getUsername());
+                mqttConnectOptions.setPassword(RayanApplication.getPref().getPassword().toCharArray());
+                boolean b = RayanApplication.getPref().isMqttSsl();
+                Log.e(TAG, "Mqtt Connection is ssl? " + b);
+                if (b) {
                     mqttConnectOptions.setSocketFactory(getSocketFactory(context));
-//                mqttConnectOptions.setSocketFactory(connection.getClient().getSSLSocketFactory(input, "12345678"));
-//                    mqttConnectOptions.setSocketFactory(connection.getClient().getSSLSocketFactory());
-                    Log.e("/////////////" ,"/////////////1111111");
-                connection.addConnectionOptions(mqttConnectOptions);
-                updateConnection.postValue(connection);
-                String[] actionArgs = new String[1];
-                actionArgs[0] = connection.getId();
-                final ActionListener callback = new ActionListener(context,
-                        ActionListener.Action.CONNECT,connection, updateConnection, actionArgs);
-//        connection.getClient().setCallback(new MqttCallbackHandler(this, connection.handle()));
-                connection.getClient().setCallback(new MyMqttCallbackHandler(context));
-                    connection.getClient().connect(connection.getConnectionOptions(), null, callback);
                 }
-                catch (MqttException | IOException e) {
+                connection.addConnectionOptions(mqttConnectOptions);
+                MainActivityViewModel.connection.postValue(connection);
+                ActionListener callback = new ActionListener(context,
+                        ActionListener.Action.CONNECT,connection, MainActivityViewModel.connection);
+                connection.getClient().setCallback(myMqttCallbackHandler);
+                connection.getClient().connect(connection.getConnectionOptions(), null, callback);
+                }
+                catch (MqttException e) {
                     Log.e(this.getClass().getCanonicalName(),
                             "MqttException occurred", e);
                     Log.e("//////////error","error: " + e);
@@ -157,10 +140,11 @@ public class MainActivityViewModel extends AndroidViewModel {
                 }
             }
         });
-        return updateConnection;
+        }
     }
 
     public LiveData<Connection> disconnectMQTT(LiveData<Connection> connection){
+        Log.e("____________" ,"**************************");
         MutableLiveData<Connection> updateConnection = new MutableLiveData<>();
         if (connection.getValue()!= null && connection.getValue().getClient() != null)
         try {

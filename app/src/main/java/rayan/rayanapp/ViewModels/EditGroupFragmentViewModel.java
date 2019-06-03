@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
@@ -49,6 +50,9 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
     }
     public LiveData<Group> getGroupLive(String id){
         return groupDatabase.getGroupLive(id);
+    }
+    public Flowable<Group> getGroupFlowable(String id){
+        return groupDatabase.getGroupFlowable(id);
     }
 
     public Group getGroup(String id){

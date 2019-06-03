@@ -27,13 +27,13 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
         this.context = context;
         wifiManager = (WifiManager) Objects.requireNonNull(context).getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         Log.e("seekbarthis","In networkconnectionlivedata created now");
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        context.registerReceiver(networkReceiver, filter);
     }
 
     @Override
     protected void onActive() {
         super.onActive();
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        context.registerReceiver(networkReceiver, filter);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
                     switch (activeNetwork.getType()){
                         case ConnectivityManager.TYPE_WIFI:
                             String status = NetworkUtil.getConnectivityStatusString(context);
-                            Log.e("seekbarthis","in thw switch type is wifi: " + status);
+                            Log.e("postingthis","in the switch type is wifi: ");
                             if (status.equals(AppConstants.WIFI)){
                                 ((RayanApplication)(context)).getNetworkBus().send(getCurrentSSID());
                             }
@@ -66,26 +66,30 @@ public class NetworkConnectionLiveData extends LiveData<NetworkConnection> {
                             ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.ConnectionStatus.WIFI);
                             break;
                         case ConnectivityManager.TYPE_MOBILE:
-                            Log.e("seekbarthis","in thw switch type is mobile: ");
+                            Log.e("postingthis","in thw switch type is mobile: ");
                             ((RayanApplication)context).getMtd().setCurrentSSID(getCurrentSSID());
                             ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.ConnectionStatus.MOBILE);
                             postValue(new NetworkConnection(AppConstants.MOBILE_DATA,true));
                             break;
                         case ConnectivityManager.TYPE_VPN:
+                            Log.e("postingthis","in thw switch type is vpn: ");
                             postValue(new NetworkConnection(AppConstants.VPN_NETWORK,true, getCurrentSSID()));
                             ((RayanApplication)context).getMtd().setCurrentSSID(getCurrentSSID());
                             ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.ConnectionStatus.VPN);
                             break;
                     }
                 } else {
-                    Log.e("seekbarthis","in thw switch type is nothing:tytyty " + activeNetwork.getType());
+                    Log.e("seekbarthis","active network.getType: ()" + activeNetwork.getType());
+                    Log.e("postingthis","in thw switch type is not connected: ");
                     if (activeNetwork.getType() == ConnectivityManager.TYPE_VPN){
+                        Log.e("postingthis","in thw switch type vpn not connected: ");
                         Log.e(this.getClass().getSimpleName(),"Connection is disconnected and sending vpn" + activeNetwork.getType());
                         postValue(new NetworkConnection(AppConstants.VPN_NETWORK,false, getCurrentSSID()));
                         ((RayanApplication)context).getMtd().setCurrentSSID(getCurrentSSID());
                         ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.ConnectionStatus.VPN);
                     }else{
                         ((RayanApplication)context).getMtd().updateStatus(MessageTransmissionDecider.ConnectionStatus.NOT_CONNECTED);
+                        Log.e("postingthis","in thw switch type not connected: ");
                         postValue(new NetworkConnection(0,false));
                     }
                 }

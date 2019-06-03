@@ -290,9 +290,9 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     public void onResume() {
         super.onResume();
         devicesFragmentViewModel.getGroups();
-        ((RayanApplication)getActivity().getApplication()).getNetworkStatus().observe(getActivity(), networkConnection -> {
-            devicesRecyclerViewAdapter.updateItems(devices);
-        });
+//        ((RayanApplication)getActivity().getApplication()).getNetworkStatus().observe(getActivity(), networkConnection -> {
+//            devicesRecyclerViewAdapter.updateItems(devices);
+//        });
     }
 
     public static int calculateNoOfColumns(Context context, float columnWidthDp) {
