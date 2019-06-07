@@ -1,11 +1,17 @@
 package rayan.rayanapp.Fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,6 +32,7 @@ import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.Contact;
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.Listeners.OnUserClicked;
@@ -39,6 +46,8 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
     private List<User> users;
     //OnToolbarNameChange onToolbarNameChange;
     private String userId;
+    static final int PICK_CONTACT = 1;
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     Group group;
     ArrayList<String> userNames = new ArrayList<>();
     private EditGroupFragmentViewModel editGroupFragmentViewModel;
@@ -91,10 +100,9 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
         View view = inflater.inflate(R.layout.fragment_edit_group_admins, container, false);
         ButterKnife.bind(this, view);
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        usersRecyclerView.setItemViewCacheSize(100);
         usersRecyclerView.setAdapter(usersRecyclerViewAdapter);
-        addToGrouptxt.setVisibility(View.GONE);
-        addToGroupLayout.setVisibility(View.GONE);
-        addToGroupLine.setVisibility(View.GONE);
+        addToGrouptxt.setText("اضافه کردن کاربر گروه");
         init(group);
         return view;
     }
@@ -105,8 +113,27 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
     @Override
     public void onRemoveAdminClicked(User item) {
         userId = item.getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupUsersFragmentRemoveUser", "حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر گروه هستید؟");
-        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        ViewGroup viewGroup = getActivity().findViewById(android.R.id.content);
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.custom_alert_dialog, viewGroup, false);
+        builder.setView(dialogView);
+        AlertDialog alertDialog = builder.create();
+        TextView dialog_title= dialogView.findViewById(R.id.dialog_title);
+        TextView dialog_message= dialogView.findViewById(R.id.dialog_message);
+        TextView dialog_submitBtn= dialogView.findViewById(R.id.dialog_submitBtn);
+        TextView dialog_cancelBtn= dialogView.findViewById(R.id.dialog_cancelBtn);
+        dialog_title.setText("حذف کاربر");
+        dialog_message.setText("آیا مایل به حذف کاربر گروه هستید؟");
+        dialog_submitBtn.setOnClickListener(v -> {
+            clickOnRemoveUserSubmit();
+            alertDialog.dismiss();
+        });
+        dialog_cancelBtn.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+        alertDialog.show();
+//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupUsersFragmentRemoveUser", "حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر گروه هستید؟");
+//        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     public void clickOnRemoveUserSubmit() {
@@ -140,6 +167,67 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
 
         ((GroupsActivity) getActivity()).toolbarNameChanged("کاربران گروه");
        // onToolbarNameChange.toolbarNameChanged("کاربران گروه");
+    }
+    @OnClick(R.id.addToGroupLayout)
+    void addUserToGroup() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
+            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+            startActivityForResult(intent, PICK_CONTACT);
+        }
+        else getContactPermission();
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String cNumber;
+        switch (requestCode) {
+            case (PICK_CONTACT):
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri contactData = data.getData();
+                    Cursor c =  getActivity().managedQuery(contactData, null, null, null, null);
+                    if (c.moveToFirst()) {
+                        String id =c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                        String hasPhone =c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                        if (hasPhone.equalsIgnoreCase("1")) {
+                            Cursor phones = getActivity().getContentResolver().query(
+                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
+                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,
+                                    null, null);
+                            phones.moveToFirst();
+                            cNumber = phones.getString(phones.getColumnIndex("data1"));
+                            cNumber = cNumber.trim();
+                            while (cNumber.contains(" "))
+                                cNumber = cNumber.replace(" ", "");
+                            cNumber = cNumber.replace("+98","0");
+                            String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                            Contact contact = new Contact();
+                            contact.setName(name);
+                            contact.setNumbers(cNumber);
+                            editGroupFragmentViewModel.addUserByMobile(cNumber, group.getId()).observe(getActivity(), baseResponse -> {
+                                if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
+                                    Toast.makeText(getActivity(), "کاربری با این شماره وجود ندارد", Toast.LENGTH_SHORT).show();
+                                }
+                                else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")){
+                                    Toast.makeText(getActivity(), "این کاربر هم‌اکنون عضو گروه است", Toast.LENGTH_SHORT).show();
+                                }
+                                else if (baseResponse.getStatus().getCode().equals("200")){
+                                    Toast.makeText(getActivity(), "کاربر با موفقیت اضافه شد", Toast.LENGTH_SHORT).show();
+                                    editGroupFragmentViewModel.getGroups();
+                                }
+                                else
+                                    Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    }
+                }
+                break;
+
+        }
+    }
+    public void getContactPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+        }
     }
 }
 

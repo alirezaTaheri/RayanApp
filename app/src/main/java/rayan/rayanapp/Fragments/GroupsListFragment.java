@@ -87,6 +87,7 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         } else {
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
         }
+        recyclerView.setItemViewCacheSize(100);
         recyclerView.setAdapter(groupsRecyclerViewAdapter);
         return view;
     }

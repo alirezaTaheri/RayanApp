@@ -199,6 +199,7 @@ public class EditGroupFragment extends Fragment {
         ButterKnife.bind(this, view);
         getContactPermission();
         managersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        managersRecyclerView.setItemViewCacheSize(100);
         managersRecyclerView.setAdapter(managersRecyclerViewAdapter);
         devicesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         devicesRecyclerView.setAdapter(devicesRecyclerViewAdapter);
@@ -243,7 +244,7 @@ public class EditGroupFragment extends Fragment {
     }
     public void init(Group group) {
         devicesRecyclerViewAdapter.setItems(group.getDevices());
-        managersRecyclerViewAdapter.setItems(group.getAdmins());
+        managersRecyclerViewAdapter.setItems(group.getHumanUsers());
     }
 
     //    @OnClick(R.id.leaveGroup_btn)
@@ -319,7 +320,6 @@ public class EditGroupFragment extends Fragment {
     public void onResume() {
         super.onResume();
        // onToolbarNameChange.toolbarNameChanged(group.getName());
-
         ((GroupsActivity) getActivity()).toolbarNameChanged(group.getName());
     }
 //    public void doAddUserFromPhone(ArrayList<PhoneContact> selectedContacts){

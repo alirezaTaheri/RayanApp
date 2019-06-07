@@ -2,14 +2,10 @@ package rayan.rayanapp.ViewHolders;
 
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.mikhaellopez.circularimageview.CircularImageView;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rayan.rayanapp.App.RayanApplication;
+import de.hdodenhof.circleimageview.CircleImageView;
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -18,10 +14,8 @@ public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
     private final String TAG = UserViewHolder.class.getSimpleName();
     @BindView(R.id.contactName)
     TextView contactName;
-//    @BindView(R.id.deleteUser)
-//    ImageView delete;
     @BindView(R.id.contactImage)
-CircularImageView contactImage;
+    CircleImageView contactImage;
     public UserViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);

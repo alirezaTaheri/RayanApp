@@ -11,41 +11,31 @@
         android:layout_height="wrap_content"
         android:id="@+id/group_item_layout"
         >
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:layout_width="47dp"
-            android:layout_height="47dp"
-            android:src="@drawable/ic_rayan"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="20dp"
-            android:id="@+id/icon"
-            />
-
     <ImageView
         android:id="@+id/gr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="12dp"
+        android:layout_marginRight="15dp"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/icon"
+        android:layout_alignParentRight="true"
         app:srcCompat="@drawable/ic_group_filled"
         />
 
-                <TextView
-                    android:text="Name"
-                    android:id="@+id/name"
-                    android:layout_toLeftOf="@id/gr"
-                    android:layout_marginRight="12dp"
-                    android:layout_centerVertical="true"
-                    android:textSize="13sp"
-                    android:textColor="@color/ms_black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+    <TextView
+        android:text="Name"
+        android:id="@+id/name"
+        android:layout_toLeftOf="@id/gr"
+        android:layout_marginRight="15dp"
+        android:layout_centerVertical="true"
+        android:textSize="14sp"
+        android:textColor="@color/ms_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <View
         android:layout_width="match_parent"
         android:background="@color/grey"
         android:layout_height="0.3dp"
-        android:layout_marginRight="53dp"
+        android:layout_marginRight="54dp"
         android:padding="1dp"
         android:id="@+id/grouplistLinee"
         android:layout_alignParentBottom="true"/>

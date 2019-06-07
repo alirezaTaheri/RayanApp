@@ -118,18 +118,18 @@ public class GroupsActivity extends AppCompatActivity implements EditGroupFragme
             case "CreateGroupFragment":
                 createGroupFragment.clickOnSubmit();
                 break;
-            case "EditGroupUsersFragmentRemoveUser":
-                editGroupUsersFragment.clickOnRemoveUserSubmit();
-                break;
-            case "EditGroupAdminsFragmentRemoveAdmin":
-                editGroupAdminsFragment.clickOnRemoveAdminSubmit();
-                break;
+//            case "EditGroupUsersFragmentRemoveUser":
+//                editGroupUsersFragment.clickOnRemoveUserSubmit();
+//                break;
+//            case "EditGroupAdminsFragmentRemoveAdmin":
+//                editGroupAdminsFragment.clickOnRemoveAdminSubmit();
+//                break;
             case "EditGroupFragment3":
                 editGroupFragment.clickOnLeaveGroupSubmit();
                 break;
-            case "EditGroupFragment2_DeleteGroup":
-                editGroupFragment2.clickOnDeleteGroupSubmit();
-                break;
+//            case "EditGroupFragment2_DeleteGroup":
+//                editGroupFragment2.clickOnDeleteGroupSubmit();
+//                break;
             default:
                 break;
         }

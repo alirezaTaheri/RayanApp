@@ -100,7 +100,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                     Log.e("...........", "............" + s);
                     if (s.equals(AppConstants.SETTINGS)) {
                         transaction = fragmentManager.beginTransaction();
-                        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+                        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
                         EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
                         ((DeviceManagementActivity)getActivity()).editDeviceFragment = editGroupFragment;
                         ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());

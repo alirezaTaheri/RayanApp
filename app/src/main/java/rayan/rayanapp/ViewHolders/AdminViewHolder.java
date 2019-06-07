@@ -4,15 +4,11 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v7.content.res.AppCompatResources;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.mikhaellopez.circularimageview.CircularImageView;
-
 import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.R;
@@ -24,7 +20,7 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
     private final String TAG = AdminViewHolder.class.getSimpleName();
 
     @BindView(R.id.contactImage)
-    CircularImageView contactImage;
+    CircleImageView contactImage;
     @BindView(R.id.contactName)
     TextView contactName;
     @BindView(R.id.adminTxt)
@@ -62,6 +58,14 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
             Drawable drawableTop = AppCompatResources.getDrawable(getContext(), R.drawable.ic_more);
             adminTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableTop, null);
             adminTxt.setOnClickListener(v -> listener.onRemoveAdminClicked(item));
+            if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
+                adminTxt.setVisibility(View.INVISIBLE);
+            }
+        }
+        if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
+            if (RayanApplication.getPref().getNameKey()!=null){
+                contactName.setText(RayanApplication.getPref().getNameKey());
+            }
         }
         if (item.getUsername().equals(lastItemUserName)){
             itemLine.setVisibility(View.GONE);
