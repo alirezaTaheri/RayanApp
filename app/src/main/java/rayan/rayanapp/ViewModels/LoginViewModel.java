@@ -1,5 +1,6 @@
 package rayan.rayanapp.ViewModels;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
@@ -14,13 +15,23 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
@@ -29,6 +40,7 @@ import rayan.rayanapp.Util.AppConstants;
 
 public class LoginViewModel extends ViewModel {
     private final String TAG = LoginViewModel.class.getSimpleName();
+
 //<<<<<<< HEAD
     public final MutableLiveData<BaseResponse> loginResponse = new MutableLiveData<>();
 //=======
@@ -40,8 +52,20 @@ public class LoginViewModel extends ViewModel {
         return NInfo != null && NInfo.isConnectedOrConnecting();
     }
 
-    public LiveData<BaseResponse> login(String username, String password){
-        loginObservable(username, password).subscribe(loginObserver(loginResponse));
+    @SuppressLint("CheckResult")
+    public LiveData<BaseResponse> login(String username, String password, DialogPresenter dp){
+        internetProvided().subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean aBoolean) throws Exception {
+                if (aBoolean)
+                    loginObservable(username, password).subscribe(loginObserver(loginResponse));
+                else {
+                    dp.showDialog(AppConstants.DIALOG_PROVIDE_INTERNET, new ArrayList<>());
+                    Log.e(TAG, "Internet is not connected");
+                }
+            }
+        });
+
         return loginResponse;
     }
 
@@ -86,5 +110,19 @@ public class LoginViewModel extends ViewModel {
     }
     public LiveData<BaseResponse> getLoginResponse(){
         return loginResponse;
+    }
+
+    public Single<Boolean> internetProvided(){
+        return Single.fromCallable(() -> {
+            try {
+                Socket sock = new Socket();
+                SocketAddress address = new InetSocketAddress("8.8.8.8", 53);
+                sock.connect(address, 1000);
+                sock.close();
+                return true;
+            }catch (IOException e){
+                return false;
+            }
+        }).timeout(3500, TimeUnit.MILLISECONDS);
     }
 }

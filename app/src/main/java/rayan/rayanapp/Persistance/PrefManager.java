@@ -28,6 +28,7 @@ public class PrefManager {
     private final String KEY_PASSWORD = "KEY_PASSWORD";
     private final String KEY_LOCAL_BROADCAST_ADDRESS = "KEY_LOCAL_BROADCAST_ADDRESS";
     private final String KEY_MQTT_SSL = "KEY_MQTT_SSL";
+    private final String KEY_TOKEN_VALID = "KEY_TOKEN";
     private final String KEY_CURRENT_SHOWING_GROUP = "KEY_CURRENT_SHOWING_GROUP";
     public PrefManager(){
         pref = RayanApplication.getContext().getSharedPreferences(PREF_NAME, PRIVATE_MODE);
@@ -151,6 +152,14 @@ public class PrefManager {
     }
     public Boolean isMqttSsl(){
         return pref.getBoolean(KEY_MQTT_SSL,true);
+    }
+
+    public void setTokenValidity(boolean validity){
+        editor.putBoolean(KEY_TOKEN_VALID,validity);
+        editor.commit();
+    }
+    public Boolean isTokenValid(){
+        return pref.getBoolean(KEY_TOKEN_VALID,false);
     }
 
     public void setBottomNavigationIndexKey(Integer bottomNavigationIndexKey){

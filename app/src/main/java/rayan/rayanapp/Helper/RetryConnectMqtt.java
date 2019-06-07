@@ -24,39 +24,39 @@ public class RetryConnectMqtt {
     public RetryConnectMqtt(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
-    public void start(){
-        running = true;
-        Observable.interval(0,2, TimeUnit.SECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
-                .subscribe(new Observer<Long>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        RetryConnectMqtt.this.d = d;
-                        Log.e(TAG, "subscribed");
-                    }
-
-                    @Override
-                    public void onNext(Long aLong) {
-                        Log.e(TAG, "onNext " + aLong);
-                        if (aLong > 10 || RayanApplication.getPref().getProtocol().equals(AppConstants.MQTT))
-                            stop();
-                        else if (!RayanApplication.getPref().getProtocol().equals(AppConstants.MQTT)){
-                            mainActivity.onRetryMqtt();
-                            retry++;
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "onError " + e);
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.e(TAG, "onComplete");
-                    }
-                });
-    }
+//    public void start(){
+//        running = true;
+//        Observable.interval(0,2, TimeUnit.SECONDS).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+//                .subscribe(new Observer<Long>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        RetryConnectMqtt.this.d = d;
+//                        Log.e(TAG, "subscribed");
+//                    }
+//
+//                    @Override
+//                    public void onNext(Long aLong) {
+//                        Log.e(TAG, "onNext " + aLong);
+//                        if (aLong > 10 || RayanApplication.getPref().getProtocol().equals(AppConstants.MQTT))
+//                            stop();
+//                        else if (!RayanApplication.getPref().getProtocol().equals(AppConstants.MQTT)){
+//                            mainActivity.onRetryMqtt();
+//                            retry++;
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e(TAG, "onError " + e);
+//                        e.printStackTrace();
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.e(TAG, "onComplete");
+//                    }
+//                });
+//    }
     public void stop(){
         d.dispose();
         retry = 0;

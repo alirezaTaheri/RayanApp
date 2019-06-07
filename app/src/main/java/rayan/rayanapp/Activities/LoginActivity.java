@@ -25,6 +25,7 @@ import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnTouch;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.KeyboardUtil;
@@ -136,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 @OnFocusChange(R.id.phoneNumberEditText)
 void onPhoneEditTextFocusChange(){
-    phoneEditText.setHint("09xxxxxxxxx");
+    phoneEditText.setHint("09123456789");
 }
     @OnFocusChange(R.id.passwordEditText)
     void onPasswordEditTextFocusChange(){
@@ -156,7 +157,7 @@ void onPhoneEditTextFocusChange(){
             if (phoneNumber.length() == 0 | password.length() == 0) {
                 SnackBarSetup.snackBarSetup(findViewById(android.R.id.content),"لطفا اطلاعات خود را کامل وارد کنید");
             } else {
-                loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString()).observe(this,baseResponse -> {
+                loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString(), new DialogPresenter(getSupportFragmentManager())).observe(this, baseResponse -> {
                     Log.e("message", baseResponse.getData().getMessage()+" "+ baseResponse.getStatus().getCode());
                     if (baseResponse.getStatus().getCode().equals("200")) {
                         Toast.makeText(this, "با موفقیت وارد شدید", Toast.LENGTH_SHORT).show();

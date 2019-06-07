@@ -43,7 +43,9 @@ import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Dialogs.ProgressDialog;
+import rayan.rayanapp.Helper.NetworkDetector;
 import rayan.rayanapp.Listeners.ConnectingToTarget;
+import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -52,7 +54,7 @@ import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 
-public class NewDevicesListFragment extends BackHandledFragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, BlockingStep {
+public class NewDevicesListFragment extends BackHandledFragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, BlockingStep, NetworkConnectivityListener {
 
     private final String TAG = NewDevicesListFragment.class.getSimpleName();
     public AccessPoint selectedAccessPoint;
@@ -85,18 +87,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
         newDevicesRecyclerViewAdapter.setListener(this);
         connection = this;
         this.searching();
-        ((RayanApplication)this.getActivity().getApplication()).getNetworkStatus().observe(this, networkConnection -> {
-            String status = NetworkUtil.getConnectivityStatusString(getActivity());
-            if (status.equals(AppConstants.WIFI) && connectionStatus.equals(ConnectionStatus.CONNECTING)){
-                currentSSID = getCurrentSSID();
-                if (currentSSID.equals(targetSSID)){
-                    this.successful(targetSSID);
-                }else{
-                    this.failure();
-                }
-            }
-            currentSSID = getCurrentSSID();
-        });
+        NetworkDetector networkDetector = new NetworkDetector(getActivity(), this);
     }
 
     @SuppressLint("CheckResult")
@@ -279,6 +270,34 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     @Override
     public void onBackClicked(StepperLayout.OnBackClickedCallback callback) {
+
+    }
+
+    @Override
+    public void wifiNetwork(boolean connected, String ssid) {
+        if (targetSSID != null) {
+            currentSSID = ssid;
+            if (currentSSID.equals(targetSSID)) {
+                this.successful(targetSSID);
+            } else {
+                this.failure();
+            }
+            currentSSID = ssid;
+        }
+    }
+
+    @Override
+    public void mobileNetwork(boolean connected) {
+
+    }
+
+    @Override
+    public void vpnNetwork() {
+
+    }
+
+    @Override
+    public void notConnected() {
 
     }
 

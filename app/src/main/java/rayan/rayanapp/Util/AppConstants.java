@@ -51,6 +51,7 @@ public class AppConstants {
     public final static String MOBILE = "MOBILE";
     public final static String WIFI = "WIFI";
     public final static String NOT_CONNECTED = "NOT_CONNECTED";
+    public final static int NOT_CONNECTED_NETWORK = -1;
     public final static String NO_HTTP = "no_http";
 
     //Operations

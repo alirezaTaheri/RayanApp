@@ -19,6 +19,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.KeyboardUtil;
 import rayan.rayanapp.Util.SnackBarSetup;
@@ -63,13 +64,12 @@ public class ChangePasswordFragment extends Fragment {
     }
       @OnClick(R.id.change_passwordbtn)
       void changePassword(){
-
         if (newPassword_EditText.getText().toString().equals(newPasswordRepeat_EditText.getText().toString())) {
             if(bundle != null){
                 changePasswordViewModel.changePassword(currentPassword_EditText.getText().toString(),
                         newPassword_EditText.getText().toString(), username).observe(this, baseResponse -> {
                     if (baseResponse.getStatus().getCode().equals("200")) {
-                        loginViewModel.login(username, newPassword_EditText.getText().toString() );
+                        loginViewModel.login(username, newPassword_EditText.getText().toString() , new DialogPresenter(getActivity().getSupportFragmentManager()));
                         Toast.makeText(getActivity(), "تغییر رمز با موفقیت انجام شد", Toast.LENGTH_SHORT).show();
                         if (baseResponse.getData().getUser().getRegistered().equals("true")) {
                             RayanApplication.getPref().saveToken(baseResponse.getData().getToken());

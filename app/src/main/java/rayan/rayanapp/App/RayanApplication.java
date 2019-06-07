@@ -9,31 +9,29 @@ import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.support.multidex.MultiDex;
 import android.util.Log;
-import android.support.multidex.MultiDexApplication;
-//import io.fabric.sdk.android.Fabric;
-//import com.crashlytics.android.Crashlytics;
 
 import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Locale;
 
-import rayan.rayanapp.Data.NetworkConnectionLiveData;
-//<<<<<<< HEAD
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
 import rayan.rayanapp.Helper.RequestManager;
 import rayan.rayanapp.Helper.SendMessageToDevice;
-import rayan.rayanapp.Persistance.database.DeviceDatabase;
-import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
-//=======
+import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.R;
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
+import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
 import rayan.rayanapp.RxBus.NetworkConnectionBus;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
-import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.JsonMaker;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+
+//import io.fabric.sdk.android.Fabric;
+//import com.crashlytics.android.Crashlytics;
+//<<<<<<< HEAD
+//=======
+//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 
 public class RayanApplication extends Application {
     private static Context context;
@@ -41,7 +39,6 @@ public class RayanApplication extends Application {
     private WifiScanResultsBus wifiBus;
     private JsonMaker jsonMaker;
     private static PrefManager pref;
-    private NetworkConnectionLiveData networkConnectionLiveData;
     private NetworkConnectionBus networkBus;
     private DevicesAccessibilityBus devicesAccessibilityBus;
     private String currentSSID;
@@ -79,7 +76,6 @@ public class RayanApplication extends Application {
 //        intentFilter.addAction("android.net.wifi.WIFI_STATE_CHANGED");
 //        registerReceiver(networkReceiver,intentFilter);
         Log.e("seekbarthis","in the rayan application creating networkconnectionlivedata");
-        networkConnectionLiveData = new NetworkConnectionLiveData(this);
         networkBus = new NetworkConnectionBus();
         context = this;
         bus = new UDPMessageRxBus();
@@ -131,10 +127,6 @@ public class RayanApplication extends Application {
 
     public UDPMessageRxBus getBus(){
         return bus;
-    }
-
-    public NetworkConnectionLiveData getNetworkStatus(){
-        return networkConnectionLiveData;
     }
 
     public int getVersionCode() {
