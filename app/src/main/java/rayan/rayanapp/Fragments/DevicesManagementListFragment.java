@@ -9,15 +9,11 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -74,7 +70,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         devicesRecyclerViewAdapterManagement = new DevicesManagementRecyclerViewAdapter(getActivity(), devices, waiting);
         devicesRecyclerViewAdapterManagement.setListener(this);
         devicesManagementListFragmentViewModel = ViewModelProviders.of(this).get(DevicesManagementListFragmentViewModel.class);
-        devicesManagementListFragmentViewModel.getAllDevices().observe(this, devices -> devicesRecyclerViewAdapterManagement.updateItems(devices));
+        devicesManagementListFragmentViewModel.getAllDevicesLive().observe(this, devices -> devicesRecyclerViewAdapterManagement.updateItems(devices));
         fragmentManager = getActivity().getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
     }
@@ -101,7 +97,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                     Log.e("...........", "............" + s);
                     if (s.equals(AppConstants.SETTINGS)) {
                         transaction = fragmentManager.beginTransaction();
-                        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+                        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
                         EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
                         ((DeviceManagementActivity)getActivity()).editDeviceFragment = editGroupFragment;
                         ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());

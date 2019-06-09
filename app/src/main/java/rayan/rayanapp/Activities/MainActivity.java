@@ -16,6 +16,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -139,7 +140,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     SortByGroupRecyclerViewAdapter drawer_groupsRecyclerViewAdapter;
     int connectionRetries;
     Connection.ConnectionStatus mqttConnectionStatus;
-//    RetryConnectMqtt retryConnectMqtt;
+    NetworkDetector networkDetector;
+    //    RetryConnectMqtt retryConnectMqtt;
     boolean networkConnected = false;
 
     @Override
@@ -157,9 +159,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
             finish();
         }else {
+            if (networkDetector == null) {
+                networkDetector = new NetworkDetector(this, this);
+            }
             mqttConnectionStatus = Connection.ConnectionStatus.NONE;
-            NetworkDetector networkDetector = new NetworkDetector(this, this);
-
             setContentView(R.layout.activity_main);
 //            retryConnectMqtt = new RetryConnectMqtt(this);
 //        requestRecordAudioPermission();
@@ -323,8 +326,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startService(new Intent(this, UDPServerService.class));
             RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
             mainActivityViewModel.sendNodeToAll();
+            mainActivityViewModel.getGroups();
         }
+        ((RayanApplication)getApplication()).getMsc().init();
     }
+
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -361,10 +367,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.e(TAG, "Mqtt ConnectionStatus: CONNECTING Connection Retries:" + connectionRetries);
     }
 
+    public static boolean mqttConnected;
     @Override
     public void mqttConnected() {
+        ((RayanApplication)getApplication()).getMsc().setMqttConnected(true);
         Log.e(TAG, "Mqtt ConnectionStatus: Connected Connection Retries: " + connectionRetries);
         mqttConnectionStatus = Connection.ConnectionStatus.CONNECTED;
+        mqttConnected = true;
         connectionRetries = 0;
         actionBarStatus.setText("رایان");
         retryIcon.setVisibility(View.INVISIBLE);
@@ -375,6 +384,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttDisconnected() {
+        mqttConnected = false;
         Log.e(TAG, "Mqtt ConnectionStatus: DISCONNECTED Connection Retries: " + connectionRetries);
         mqttConnectionStatus = Connection.ConnectionStatus.DISCONNECTED;
         if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
@@ -398,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttError() {
+        mqttConnected = false;
         mqttConnectionStatus = Connection.ConnectionStatus.ERROR;
         Log.e(TAG, "Mqtt ConnectionStatus: ERROR Connection Retries: " + connectionRetries);
         if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
@@ -465,6 +476,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onDestroy() {
+        Log.e(TAG, "OnDestroy...");
         if (RayanApplication.getPref().isLoggedIn()) {
             stopService(new Intent(this, UDPServerService.class));
             mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection);
@@ -856,23 +868,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void wifiNetwork(boolean connected, String ssid) {
-        RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
-        mainActivityViewModel.sendNodeToAll();
-        Toast.makeText(this, "Wifi "+ssid+" " +connected, Toast.LENGTH_SHORT).show();
         Log.e("MainActivity","wifiNetwork "+ssid+connected);
-        ((RayanApplication)getApplication()).getMtd().setCurrentSSID(ssid);
         ((RayanApplication)getApplication()).getMtd().updateStatus(MessageTransmissionDecider.ConnectionStatus.WIFI);
         if (connected && !mqttConnectionStatus.equals(Connection.ConnectionStatus.CONNECTED)) {
             Log.e("///////////////", "////connecting to mqtt");
             connectToMqtt();
         }
-        if (connected)
-            ((RayanApplication)(getApplication())).getNetworkBus().send(ssid);
+        if (connected){
+            ((RayanApplication)getApplication()).getMtd().setCurrentSSID(ssid);
+            mainActivityViewModel.getGroups();
+            RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
+            mainActivityViewModel.sendNodeToAll();
+        }
     }
 
     @Override
     public void mobileNetwork(boolean connected) {
-        Toast.makeText(this, "Mobile "+connected, Toast.LENGTH_SHORT).show();
         Log.e("MainActivity","mobileNetwork "+connected);
         ((RayanApplication)getApplication()).getMtd().setCurrentSSID(AppConstants.UNKNOWN_SSID);
         ((RayanApplication)getApplication()).getMtd().updateStatus(MessageTransmissionDecider.ConnectionStatus.MOBILE);
@@ -880,6 +891,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.e("///////////////", "////connecting to mqtt");
             connectToMqtt();
         }
+        if (connected)
+            mainActivityViewModel.getGroups();
     }
 
     @Override

@@ -9,19 +9,15 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.stepstone.stepper.BlockingStep;
-import com.stepstone.stepper.Step;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 import com.thanosfisherman.wifiutils.WifiUtils;
@@ -34,7 +30,6 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Adapters.recyclerView.NewDevicesRecyclerViewAdapter;
@@ -43,16 +38,13 @@ import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Dialogs.ProgressDialog;
-import rayan.rayanapp.Helper.NetworkDetector;
 import rayan.rayanapp.Listeners.ConnectingToTarget;
 import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
-import rayan.rayanapp.Wifi.WifiHandler;
 
 public class NewDevicesListFragment extends BackHandledFragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, BlockingStep, NetworkConnectivityListener {
 
@@ -78,7 +70,6 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     public boolean onBackPressed() {
         return false;
     }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +78,6 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
         newDevicesRecyclerViewAdapter.setListener(this);
         connection = this;
         this.searching();
-        NetworkDetector networkDetector = new NetworkDetector(getActivity(), this);
     }
 
     @SuppressLint("CheckResult")
@@ -275,6 +265,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     @Override
     public void wifiNetwork(boolean connected, String ssid) {
+        if (connected)
+            ((RayanApplication)(getActivity().getApplication())).getNetworkBus().send(ssid);
         if (targetSSID != null) {
             currentSSID = ssid;
             if (currentSSID.equals(targetSSID)) {

@@ -39,6 +39,7 @@
         <item name="colorAccent">@android:color/white</item>
         <item name="colorControlNormal">#aaa</item>
         <item name="android:textColorHint">#aaa</item>
+        <item name="android:itemBackground">#ffffff</item>
         <item name="colorControlActivated">@color/baseColor</item>
         <item name="colorControlHighlight">@color/baseColor</item>
     </style>
@@ -110,4 +111,5 @@
         <item name="colorControlActivated">@color/grey</item>
         <item name="colorControlHighlight">@color/grey</item>
     </style>
+
 </resources>

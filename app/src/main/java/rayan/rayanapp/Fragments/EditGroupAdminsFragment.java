@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -82,6 +83,7 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
       View view = inflater.inflate(R.layout.fragment_edit_group_admins, container, false);
         ButterKnife.bind(this, view);
         adminsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        adminsRecyclerView.setItemViewCacheSize(100);
        adminsRecyclerView.setAdapter(managersRecyclerViewAdapter);
        addToGrouptxt.setText("اضافه کردن مدیر گروه");
        init(group);
@@ -91,13 +93,32 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
     @Override
     public void onRemoveAdminClicked(User user) {
         userId = user.getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupAdminsFragmentRemoveAdmin", "حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
-        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        ViewGroup viewGroup = getActivity().findViewById(android.R.id.content);
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.custom_alert_dialog, viewGroup, false);
+        builder.setView(dialogView);
+        AlertDialog alertDialog = builder.create();
+        TextView dialog_title= dialogView.findViewById(R.id.dialog_title);
+        TextView dialog_message= dialogView.findViewById(R.id.dialog_message);
+        TextView dialog_submitBtn= dialogView.findViewById(R.id.dialog_submitBtn);
+        TextView dialog_cancelBtn= dialogView.findViewById(R.id.dialog_cancelBtn);
+        dialog_title.setText("حذف مدیر");
+        dialog_message.setText("آیا مایل به حذف مدیر گروه هستید؟");
+        dialog_submitBtn.setOnClickListener(v -> {
+            clickOnRemoveAdminSubmit();
+            alertDialog.dismiss();
+        });
+        dialog_cancelBtn.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+        alertDialog.show();
+//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupAdminsFragmentRemoveAdmin", "حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
+//        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
     public void init(Group group) {
         managersRecyclerViewAdapter.setItems(group.getAdmins());
     }
-    @OnClick(R.id.addToGrouptxt)
+    @OnClick(R.id.addToGroupLayout)
     void addManager() {
         UsersListDialogFragment usersListDialogFragment = UsersListDialogFragment.newInstance(group);
         usersListDialogFragment.show(getActivity().getSupportFragmentManager(), "usersList");

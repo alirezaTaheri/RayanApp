@@ -15,7 +15,7 @@ public class FavoritesFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     @Override
-    public LiveData<List<Device>> getAllDevices() {
+    public LiveData<List<Device>> getAllDevicesLive() {
         return deviceDatabase.getFavoriteDevices();
     }
 }

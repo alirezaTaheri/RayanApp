@@ -1,6 +1,5 @@
 package rayan.rayanapp.Fragments;
 
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
@@ -12,8 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.util.ListUpdateCallback;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -26,7 +23,6 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,20 +32,12 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.PublishSubject;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Services.mqtt.model.Subscription;
-import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -66,6 +54,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     LiveData<List<Device>> devicesObservable;
     Observer<List<Device>> devicesObserver;
     private final String TAG = this.getClass().getSimpleName();
+    public static List<String> subscribedDevices = new ArrayList<>();
     public static DevicesFragment newInstance() {
         return new DevicesFragment();
     }
@@ -79,7 +68,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         dp = new DialogPresenter(getActivity().getSupportFragmentManager());
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
 //        sortDevicesByGroup(RayanApplication.getPref().getCurrentShowingGroup());
-        devicesObservable = devicesFragmentViewModel.getAllDevices();
+        devicesObservable = devicesFragmentViewModel.getAllDevicesLive();
         devicesObserver = new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {
@@ -289,7 +278,6 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     @Override
     public void onResume() {
         super.onResume();
-        devicesFragmentViewModel.getGroups();
 //        ((RayanApplication)getActivity().getApplication()).getNetworkStatus().observe(getActivity(), networkConnection -> {
 //            devicesRecyclerViewAdapter.updateItems(devices);
 //        });

@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_marginLeft="5dp"
     android:layout_marginRight="5dp"
     android:background="@color/white"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:clickable="true"
-    android:layout_height="49dp">
+    android:layout_height="55dp">
     <RelativeLayout
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:clickable="true"
-        android:layout_height="45dp">
+        android:layout_height="55dp">
         <TextView
             android:id="@+id/adminTxt"
             android:layout_width="wrap_content"
@@ -32,26 +31,24 @@
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
             android:text="hello"
             android:layout_toLeftOf="@id/contactImage"
             android:textAlignment="center" />
 
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:src="@drawable/ic_rayan"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="20dp"
             android:id="@+id/contactImage"
             />
         <View
             android:layout_width="wrap_content"
             android:id="@+id/itemLine"
             android:layout_height="0.5dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginRight="6dp"
             android:layout_alignParentBottom="true"
             android:background="@color/grey_light_1"
             android:layout_toLeftOf="@id/contactImage"/>

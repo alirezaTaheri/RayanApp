@@ -2,17 +2,23 @@ package rayan.rayanapp.Fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,10 +47,8 @@ public class EditGroupFragment2 extends Fragment{
     EditText name;
     @BindView(R.id.saveGroupName)
     TextView saveGroupName;
-
     @BindView(R.id.adminCount)
     TextView adminCount;
-
     @BindView(R.id.userCount)
     TextView userCount;
    private EditGroupFragmentViewModel editGroupFragmentViewModel;
@@ -62,13 +66,15 @@ public class EditGroupFragment2 extends Fragment{
         humanUsers=EditGroupFragment.humanUsers;
         group=EditGroupFragment.group;
         groupId=group.getId();
-        editGroupFragmentViewModel.getGroupLive(group.getId()).observe(this, group1 -> {
-            this.group = group1;
-            admins = group1.getAdmins();
-            humanUsers = group1.getHumanUsers();
-            adminCount.setText(String.valueOf(admins.size()));
-            userCount.setText(String.valueOf(humanUsers.size()));
-        });
+       // Toast.makeText(getContext(), String.valueOf(admins.size()), Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getContext(), String.valueOf(humanUsers.size()), Toast.LENGTH_SHORT).show();
+
+//        editGroupFragmentViewModel.getGroupLive(group.getId()).observe(this, group1 -> {
+//            this.group = group1;
+//            admins = group1.getAdmins();
+//            humanUsers = group1.getHumanUsers();
+//
+//        });
 //        onToolbarNameChange=(OnToolbarNameChange)getActivity();
 //        onToolbarNameChange.toolbarNameChanged(group.getName());
         ((GroupsActivity) getActivity()).toolbarNameChanged("مدیریت گروه");
@@ -105,8 +111,27 @@ public class EditGroupFragment2 extends Fragment{
 
     @OnClick(R.id.deleteGroup)
     void clickOndeleteGroup() {
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment2_DeleteGroup", "حذف گروه", "بازگشت", "آیا مایل به حذف گروه هستید؟");
-        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        ViewGroup viewGroup = getActivity().findViewById(android.R.id.content);
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.custom_alert_dialog, viewGroup, false);
+        builder.setView(dialogView);
+        AlertDialog alertDialog = builder.create();
+        TextView dialog_title= dialogView.findViewById(R.id.dialog_title);
+        TextView dialog_message= dialogView.findViewById(R.id.dialog_message);
+        TextView dialog_submitBtn= dialogView.findViewById(R.id.dialog_submitBtn);
+        TextView dialog_cancelBtn= dialogView.findViewById(R.id.dialog_cancelBtn);
+        dialog_title.setText("حذف گروه");
+        dialog_message.setText("آیا مایل به حذف گروه هستید؟");
+        dialog_submitBtn.setOnClickListener(v -> {
+            clickOnDeleteGroupSubmit();
+            alertDialog.dismiss();
+        });
+        dialog_cancelBtn.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+        alertDialog.show();
+//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment2_DeleteGroup", "حذف گروه", "بازگشت", "آیا مایل به حذف گروه هستید؟");
+//        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     @OnClick(R.id.saveGroupName)
@@ -180,4 +205,5 @@ public class EditGroupFragment2 extends Fragment{
 //        onToolbarNameChange.toolbarNameChanged(group.getName());
         ((GroupsActivity) getActivity()).toolbarNameChanged("مدیریت گروه");
     }
+
 }

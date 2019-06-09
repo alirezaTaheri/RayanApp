@@ -12,6 +12,9 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.ArrayList;
+
+import rayan.rayanapp.Fragments.DevicesFragment;
+import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.mqtt.internal.Connections;
@@ -125,12 +128,42 @@ public class ActionListener implements IMqttActionListener {
         connection.addAction("Client Connected");
 //        Toast.makeText(context, "Successfully Connected", Toast.LENGTH_SHORT).show();
         Log.i(TAG, connection.handle() + " connected.");
+        Log.e(TAG, "subscriptions: " + connection.getSubscriptions());
         try {
             ArrayList<Subscription> subscriptions = connection.getSubscriptions();
-            for (Subscription sub : subscriptions) {
-                Log.i(TAG, "Auto-subscribing to: " + sub.getTopic() + " @ QoS: " + sub.getQos() + connection.getClient());
-                connection.getClient().subscribe(sub.getTopic(), sub.getQos());
-            }
+            if (subscriptions.size() > 0)
+                for (Subscription sub : subscriptions) {
+                    Log.i(TAG, "Auto-subscribing to: " + sub.getTopic() + " @ QoS: " + sub.getQos() + connection.getClient());
+                    connection.getClient().subscribe(sub.getTopic(), sub.getQos()).setActionCallback(new IMqttActionListener() {
+                        @Override
+                        public void onSuccess(IMqttToken asyncActionToken) {
+                            Log.e(TAG, "Subscribed Successfully "+asyncActionToken.getTopics());
+                            DevicesFragment.subscribedDevices.add(sub.getTopic());
+                        }
+
+                        @Override
+                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                            Log.e(TAG, "Failed To Subscribe  "+asyncActionToken.getTopics());
+                        }
+                    });
+                }
+//                else
+//                for (String sub : DevicesFragmentViewModel.tempTopics) {
+//                    Log.i(TAG, "Auto-subscribing to: " + sub + " @ QoS: " + "0" + connection.getClient());
+//                    connection.getClient().subscribe(sub, 0).setActionCallback(new IMqttActionListener() {
+//                        @Override
+//                        public void onSuccess(IMqttToken asyncActionToken) {
+//                            Log.e(TAG, "Subscribed Successfully "+asyncActionToken.getTopics());
+//                            DevicesFragment.subscribedDevices.add(sub);
+//                        }
+//
+//                        @Override
+//                        public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+//                            Log.e(TAG, "Failed To Subscribe  "+asyncActionToken.getTopics());
+//                        }
+//                    });
+//
+//                }
         } catch (MqttException | IllegalArgumentException ex){
             Log.e(TAG, "Failed to Auto-Subscribe: " + ex.getMessage());
         }

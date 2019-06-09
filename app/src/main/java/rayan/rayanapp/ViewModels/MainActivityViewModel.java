@@ -62,7 +62,7 @@ import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
 
 
-public class MainActivityViewModel extends AndroidViewModel {
+public class MainActivityViewModel extends DevicesFragmentViewModel {
 
     private final String TAG = MainActivityViewModel.class.getSimpleName();
     private ExecutorService executorService;
@@ -114,7 +114,7 @@ public class MainActivityViewModel extends AndroidViewModel {
                     Log.e("/////////////" ,"/////////////Input: " + input);
                 Connection connection = Connection.createConnection("ClientHandle" + System.currentTimeMillis(),"ClientId"+ System.currentTimeMillis(),AppConstants.MQTT_HOST,AppConstants.MQTT_PORT,context,true);
                 connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTING);
-                connection.setSubscriptions(getSubscriptions(connection));
+//                connection.setSubscriptions(getSubscriptions(connection));
                     Log.e("/////////////" ,"/////////////000000");
 //                    SSLSocketFactory result;  	// check to see if already created
 //
@@ -148,11 +148,14 @@ public class MainActivityViewModel extends AndroidViewModel {
                         ActionListener.Action.CONNECT,connection, MainActivityViewModel.connection, actionArgs);
 //        connection.getClient().setCallback(new MqttCallbackHandler(this, connection.handle()));
                 connection.getClient().setCallback(new MyMqttCallbackHandler(context));
+                Log.e(TAG, "I am Going To Connect To mqtt using thread: " + Thread.currentThread().getName());
                     connection.getClient().connect(connection.getConnectionOptions(), null, callback);
                 }
-                catch (MqttException | IOException e) {
+                catch (IllegalStateException | MqttException | IOException e) {
                     Log.e(this.getClass().getCanonicalName(),
                             "MqttException occurred", e);
+                    if (e instanceof IllegalStateException)
+                        Log.e(TAG, "There is an os Permission issue with connect to mqtt...");
                     Log.e("//////////error","error: " + e);
                     e.printStackTrace();
                 }

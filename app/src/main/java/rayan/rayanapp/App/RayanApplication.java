@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
+import rayan.rayanapp.Helper.MqttSubscriptionController;
 import rayan.rayanapp.Helper.RequestManager;
 import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Persistance.PrefManager;
@@ -46,6 +47,7 @@ public class RayanApplication extends Application {
     private SendMessageToDevice sendMessageToDevice;
     private RequestManager requestManager;
     private Locale locale = null;
+    private MqttSubscriptionController msc;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -84,9 +86,14 @@ public class RayanApplication extends Application {
         mtd = new MessageTransmissionDecider(this);
         sendMessageToDevice = new SendMessageToDevice(this);
         requestManager = new RequestManager();
+        msc = new MqttSubscriptionController(this);
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
+    }
+
+    public MqttSubscriptionController getMsc() {
+        return msc;
     }
 
     public MessageTransmissionDecider getMtd() {

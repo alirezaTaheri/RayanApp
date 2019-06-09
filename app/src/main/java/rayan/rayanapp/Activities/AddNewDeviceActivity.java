@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +12,9 @@ import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -23,19 +26,24 @@ import android.view.MenuItem;
 import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.StepperLayout;
 
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Adapters.viewPager.AddNewDeviceStepperAdapter;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.ChangeGroupFragment;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
+import rayan.rayanapp.Fragments.NewDevicesListFragment;
+import rayan.rayanapp.Helper.NetworkDetector;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
+import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
@@ -46,7 +54,7 @@ import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked, YesNoDialogListener {
+public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked, YesNoDialogListener, NetworkConnectivityListener {
     private final String TAG = AddNewDeviceActivity.class.getSimpleName();
     private WifiHandler wifiHandler;
     WifiScanReceiver wifiReceiver;
@@ -61,6 +69,8 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     private SetPrimaryConfigRequest setPrimaryConfigRequest;
     private NewDevice newDevice;
     GroupsListFragmentViewModel viewModel;
+    NetworkDetector networkDetector;
+    String testCaseSSID;
 //    @BindView(R.id.toolbar)
 //    Toolbar toolbar;
     protected void attachBaseContext(Context newBase) {
@@ -122,24 +132,26 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     }
 
     protected void onResume() {
+        super.onResume();
         wifiHandler.setWifiEnabled();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
-        intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        registerReceiver(wifiReceiver, intentFilter);
-//        registerReceiver(
-//                wifiReceiver,
-//                new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-//        );
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+//        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+//        intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+//        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+//        intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+//        registerReceiver(wifiReceiver, intentFilter);
+        registerReceiver(
+                wifiReceiver,
+                new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
+        );
         Log.e("=========---", "status Check: " + (ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED));
         if (ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
             statusCheck();
             wifiHandler.scan();
         }
-        super.onResume();
+        if (networkDetector == null)
+            networkDetector = new NetworkDetector(this, this);
     }
 
     public void statusCheck() {
@@ -256,5 +268,30 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     private void buildAlertMessageNoGps() {
         YesNoDialog yesNoDialog = new YesNoDialog(this, R.style.ProgressDialogTheme, this,"برای ادامه نیاز به سرویس Location داریم");
         yesNoDialog.show();
+    }
+
+    @Override
+    public void wifiNetwork(boolean connected, String ssid) {
+        List<Fragment> fs = getSupportFragmentManager().getFragments();
+        NewDevicesListFragment newDevicesListFragment = null;
+        for (int a = 0;a<fs.size();a++)
+            if (fs.get(a) instanceof NewDevicesListFragment)
+                newDevicesListFragment = (NewDevicesListFragment) fs.get(a);
+        newDevicesListFragment.wifiNetwork(connected, ssid);
+    }
+
+    @Override
+    public void mobileNetwork(boolean connected) {
+
+    }
+
+    @Override
+    public void vpnNetwork() {
+
+    }
+
+    @Override
+    public void notConnected() {
+
     }
 }

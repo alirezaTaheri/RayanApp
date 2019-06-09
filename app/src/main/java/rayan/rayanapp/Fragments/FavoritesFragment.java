@@ -1,6 +1,5 @@
 package rayan.rayanapp.Fragments;
 
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
@@ -24,7 +23,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.DialogPresenter;
@@ -61,7 +59,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
         activity = getActivity();
         dp = new DialogPresenter(getActivity().getSupportFragmentManager());
         favoritesFragmentViewModel = ViewModelProviders.of(getActivity()).get(FavoritesFragmentViewModel.class);
-        favoritesObservable = favoritesFragmentViewModel.getAllDevices();
+        favoritesObservable = favoritesFragmentViewModel.getAllDevicesLive();
         favoritesObserver = new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {

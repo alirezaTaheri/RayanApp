@@ -25,18 +25,13 @@
             android:layout_width="wrap_content"
             android:enabled="false"
             android:layout_height="wrap_content" />
-        <com.varunest.sparkbutton.SparkButton
+        <ImageView
             android:clickable="false"
             android:enabled="false"
             android:focusable="false"
             android:layout_alignParentLeft="true"
             android:id="@+id/favoriteIcon"
             android:layout_centerVertical="true"
-            app:sparkbutton_activeImage="@drawable/ic_star_full"
-            app:sparkbutton_inActiveImage="@drawable/ic_star_empty"
-            app:sparkbutton_iconSize="30dp"
-            app:sparkbutton_primaryColor="@color/baseColor"
-            app:sparkbutton_secondaryColor="@color/primary_dark2"
             android:layout_width="35dp"
             android:layout_height="35dp"/>
     </RelativeLayout>
@@ -62,18 +57,13 @@
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <com.varunest.sparkbutton.SparkButton
+        <ImageView
             android:clickable="false"
             android:enabled="false"
             android:focusable="false"
             android:layout_alignParentLeft="true"
             android:id="@+id/visibilityIcon"
             android:layout_centerVertical="true"
-            app:sparkbutton_activeImage="@drawable/ic_visibility_off"
-            app:sparkbutton_inActiveImage="@drawable/ic_visibility_on"
-            app:sparkbutton_iconSize="30dp"
-            app:sparkbutton_primaryColor="@color/baseColor"
-            app:sparkbutton_secondaryColor="@color/primary_dark2"
             android:layout_width="35dp"
             android:layout_height="35dp"/>
     </RelativeLayout>

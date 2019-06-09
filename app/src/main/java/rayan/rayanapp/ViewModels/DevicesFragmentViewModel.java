@@ -38,6 +38,7 @@ import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
+import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Helper.SendMessageToDevice;
@@ -77,7 +78,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         return deviceDatabase.getDevice(id);
     }
 
-    public LiveData<List<Device>> getAllDevices(){
+    public LiveData<List<Device>> getAllDevicesLive(){
         try {
             return new GetAllDevices().execute().get();
         } catch (ExecutionException e) {
@@ -188,6 +189,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     private int nOd = 0;
     private class SyncGroups extends AsyncTask<Void, Void, Void>{
         private List<Group> serverGroups = new ArrayList<>();
+        private List<String> tempTopics = new ArrayList<>();
         SyncGroups(List<Group> groups){
             this.serverGroups.addAll(groups);
         }
@@ -211,6 +213,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
                         deviceUser.setIp(AppConstants.UNKNOWN_IP);
                         deviceUser.setPosition(nOd);
+                        tempTopics.add(deviceUser.getTopic().getTopic());
                         if (deviceUser.getType()!= null && deviceUser.getName1() != null){
                             devices.add(deviceUser);
                             nOd++;
@@ -223,6 +226,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         existing.setName1(u.getName1());
                         existing.setType(u.getType());
                         existing.setTopic(u.getTopic());
+                        tempTopics.add(u.getTopic().getTopic());
                         existing.setGroupId(g.getId());
                         devices.add(existing);
                         nOd++;
@@ -233,6 +237,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 newDevices.addAll(devices);
                 newUsers.addAll(users);
             }
+            ((RayanApplication)getApplication()).getMsc().setNewArrivedTopics(tempTopics);
             List<Device> oldDevices = deviceDatabase.getAllDevices();
             List<Group> oldGroups = groupDatabase.getAllGroups();
             deviceDatabase.addDevices(newDevices);
@@ -268,6 +273,17 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 //                Log.e(TAG, AppConstants.ERROR_OCCURRED + e);
 //            }
             return null;
+        }
+    }
+
+    public void subscribeToTopic(String topic){
+        try {
+            if (!DevicesFragment.subscribedDevices.contains(topic)){
+                Log.e(TAG, "Not Subscribed Yet to: " + topic);
+                MainActivityViewModel.connection.getValue().getClient().subscribe(topic, 0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

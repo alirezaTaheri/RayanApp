@@ -5,10 +5,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -31,9 +33,9 @@ public class DeviceManagementPopupDialog extends AlertDialog {
     @BindView(R.id.hideContainer)
     RelativeLayout visibilityContainer;
     @BindView(R.id.favoriteIcon)
-    SparkButton favoriteIcon;
+    ImageView favoriteIcon;
     @BindView(R.id.visibilityIcon)
-    SparkButton visibilityIcon;
+    ImageView visibilityIcon;
 
     Device item;
     public DeviceManagementPopupDialog(@NonNull Context context, DeviceManagementOptionsClickListener listener, Device item) {
@@ -48,17 +50,15 @@ public class DeviceManagementPopupDialog extends AlertDialog {
         View content = LayoutInflater.from(getContext()).inflate(R.layout.dialog_device_management_popup, null);
         setView(content);
         ButterKnife.bind(this, content);
-        favoriteIcon.setEnabled(false);
-        visibilityIcon.setEnabled(false);
-        favoriteIcon.setChecked(item.isFavorite());
-        visibilityIcon.setChecked(item.isHidden());
+        favoriteIcon.setImageDrawable(ContextCompat.getDrawable(getContext(), item.isFavorite()?R.drawable.ic_star_full:R.drawable.ic_star_empty));
+        visibilityIcon.setImageDrawable(ContextCompat.getDrawable(getContext(), item.isHidden()?R.drawable.ic_visibility_off:R.drawable.ic_visibility_on));
         favoriteContainer.setOnClickListener(v -> {
-            favoriteIcon.setChecked(!item.isFavorite());
+            favoriteIcon.setImageDrawable(ContextCompat.getDrawable(getContext(), !item.isFavorite()?R.drawable.ic_star_full:R.drawable.ic_star_empty));
             item.setFavorite(!item.isFavorite());
             listener.onFavoriteClicked(item);
         });
         visibilityContainer.setOnClickListener(v -> {
-            visibilityIcon.setChecked(!item.isHidden());
+            visibilityIcon.setImageDrawable(ContextCompat.getDrawable(getContext(), !item.isHidden()?R.drawable.ic_visibility_off:R.drawable.ic_visibility_on));
             item.setHidden(!item.isHidden());
             listener.onVisibilityClicked(item);
         });
