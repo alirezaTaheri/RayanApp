@@ -29,9 +29,10 @@ public class MyMqttCallbackHandler implements MqttCallback {
   private final String TAG = MyMqttCallbackHandler.class.getSimpleName();
   private Context context;
   private DeviceDatabase deviceDatabase;
-
-  public MyMqttCallbackHandler(Context context){
+  private RayanApplication rayanApplication;
+  public MyMqttCallbackHandler(Context context, RayanApplication rayanApplication){
       this.context = context;
+      this.rayanApplication = rayanApplication;
       deviceDatabase = new DeviceDatabase(context);
       Log.e(TAG, "I am Coming" + this);
   }
@@ -65,19 +66,17 @@ public class MyMqttCallbackHandler implements MqttCallback {
       Log.e(TAG, "Delivery Completed//: ");
   }
 
-    public static boolean isJSONValid(String test) {
+    public static JSONObject isJSONValid(String test) {
         try {
-            new JSONObject(test);
+            return new JSONObject(test);
         } catch (JSONException ex) {
-            // edited, to include @Arthur's comment
-            // e.g. in case JSONArray is valid as well...
             try {
                 new JSONArray(test);
             } catch (JSONException ex1) {
-                return false;
+                return null;
             }
         }
-        return true;
+        return null;
     }
     public Maybe<Device> getDeviceAsync(String chipId){
       return deviceDatabase.getDeviceFlowable(chipId).observeOn(Schedulers.io());
@@ -89,31 +88,34 @@ public class MyMqttCallbackHandler implements MqttCallback {
           @Override
           public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
               Log.e(TAG, "MQTT Message Received//: " + message.toString()+"\tTopic: " + topic +" htisis: " +MyMqttCallbackHandler.this);
-              try {
-                  JSONObject jsonMessage = new JSONObject(message.toString());
-                  String cmd = jsonMessage.getString("cmd");
-                  switch (cmd) {
-                      case "tgl":
-                          String src = jsonMessage.getString("src");
-                          String sid = jsonMessage.getString("sid");
-                          String pin1 = jsonMessage.getString("pin1");
-                          String pin2 = jsonMessage.getString("pin2");
-                          getDeviceAsync(src).subscribe(device -> {
-                              if (device != null) {
+              JSONObject jsonMessage = isJSONValid(message.toString());
+                  if (jsonMessage != null) {
+                      try {
+                          String cmd = jsonMessage.getString("cmd");
+                          switch (cmd) {
+                              case "tgl":
+                                  String src = jsonMessage.getString("src");
+                                  String sid = jsonMessage.getString("sid");
+                                  String pin1 = jsonMessage.getString("pin1");
+                                  String pin2 = jsonMessage.getString("pin2");
+                                  rayanApplication.getMqttMessagesController().responseReceived(src, jsonMessage);
+                                  getDeviceAsync(src).subscribe(device -> {
+                                      if (device != null) {
 //                          ((RayanApplication)context.getApplicationContext()).getDevicesAccessibilityBus().send(src);
-                                  device.setPin1(pin1);
-                                  device.setPin2(pin2);
-                                  deviceDatabase.updateDevice(device);
-                              } else {
-                                  Log.e(TAG, "Can't find device with chipId: " + src);
-                              }
-                          });
-                          break;
+                                          device.setPin1(pin1);
+                                          device.setPin2(pin2);
+                                          deviceDatabase.updateDevice(device);
+                                      } else {
+                                          Log.e(TAG, "Can't find device with chipId: " + src);
+                                      }
+                                  });
+                                  break;
+                          }
+                      } catch (Exception e) {
+                          Log.e(TAG, "There is an error after receiving message... " + e);
+                          e.printStackTrace();
+                      }
                   }
-              }catch (Exception e){
-                  Log.e(TAG, "There is an error after receiving message... " + e);
-                  e.printStackTrace();
-              }
           }
       }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(o -> {
 

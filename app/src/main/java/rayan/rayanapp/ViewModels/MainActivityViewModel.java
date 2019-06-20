@@ -92,6 +92,9 @@ public class MainActivityViewModel extends DevicesFragmentViewModel {
         return groupDatabase.getAllGroupsFlowable();
     }
 
+    public Group getGroup(String id){
+        return groupDatabase.getGroup(id);
+    }
     public List<Device> getAllDevices(){
         return deviceDatabase.getAllDevices();
     }
@@ -147,7 +150,7 @@ public class MainActivityViewModel extends DevicesFragmentViewModel {
                 final ActionListener callback = new ActionListener(context,
                         ActionListener.Action.CONNECT,connection, MainActivityViewModel.connection, actionArgs);
 //        connection.getClient().setCallback(new MqttCallbackHandler(this, connection.handle()));
-                connection.getClient().setCallback(new MyMqttCallbackHandler(context));
+                connection.getClient().setCallback(new MyMqttCallbackHandler(context, (RayanApplication)getApplication()));
                 Log.e(TAG, "I am Going To Connect To mqtt using thread: " + Thread.currentThread().getName());
                     connection.getClient().connect(connection.getConnectionOptions(), null, callback);
                 }
@@ -174,6 +177,7 @@ public class MainActivityViewModel extends DevicesFragmentViewModel {
             updateConnection.postValue(connection.getValue());
         } catch(Exception ex){
             Log.e(TAG, "Exception occurred during disconnect: " + ex.getMessage());
+            ex.printStackTrace();
         }
         return updateConnection;
     }

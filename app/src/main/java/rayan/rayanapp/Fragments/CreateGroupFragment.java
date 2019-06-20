@@ -9,11 +9,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,6 +33,8 @@ import butterknife.OnClick;
 import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.Data.Contact;
+import rayan.rayanapp.Helper.CicularRevealAnimation;
+import rayan.rayanapp.Helper.RevealAnimationSetting;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -64,7 +68,38 @@ public class CreateGroupFragment extends Fragment {
         usersRecyclerViewAdapter.setItems(users);
         recyclerView.setAdapter(usersRecyclerViewAdapter);
         if (getActivity() instanceof  GroupsActivity)
-        ((GroupsActivity) getActivity()).toolbarNameChanged("گروه جدید");
+            ((GroupsActivity) getActivity()).toolbarNameChanged("گروه جدید");
+        CicularRevealAnimation.registerCircularRevealAnimation(getContext(), view, new RevealAnimationSetting() {
+            @Override
+            public int getCenterX() {
+                return 0;
+            }
+
+            @Override
+            public int getCenterY() {
+                return 0;
+            }
+
+            @Override
+            public int getWidth() {
+                return 700;
+            }
+
+            @Override
+            public int getHeight() {
+                return 700;
+            }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {
+
+            }
+        }, ContextCompat.getColor(getContext(), R.color.baseColor2), ContextCompat.getColor(getContext(), R.color.white));
         return view;
     }
 

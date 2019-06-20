@@ -57,6 +57,30 @@ public class Device implements Parcelable {
     private boolean hidden;
     private int position;
 
+    public Device(Device device) {
+        this.pin1 = device.getPin1();
+        this.chipId = device.getChipId();
+        this.name1 = device.getName1();
+        this.id = device.getId();
+        this.type = device.getType();
+        this.style = device.getStyle();
+        this.ssid = device.getSsid();
+        this.username = device.getUsername();
+        this.topic = device.getTopic();
+        this.groupId = device.getGroupId();
+        this.favorite = device.isFavorite();
+        this.pin1 = device.getPin1();
+        this.pin2 = device.getPin2();
+        this.secret = device.getSecret();
+        this.ip = device.getIp();
+        this.devicePassword = device.getDevicePassword();
+        this.statusWord = device.getStatusWord();
+        this.hidden = device.isHidden();
+        this.position = device.getPosition();
+        this.locallyAccessibility = device.isLocallyAccessibility();
+        this.onlineAccessibility = device.isOnlineAccessibility();
+    }
+
     public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId, String secret) {
         this.chipId = chipId;
         this.name1 = name1;
@@ -317,26 +341,54 @@ public class Device implements Parcelable {
         return "Device{" +
                 "chipId='" + chipId + '\'' +
                 ", name1='" + name1 + '\'' +
-                ", position=" + position +
-//                ", name2='" + name2 + '\'' +
-//                ", pin1='" + pin1 + '\'' +
-//                ", pin2='" + pin2 + '\'' +
-//                ", id='" + id + '\'' +
-//                ", type='" + type + '\'' +
-//                ", username='" + username + '\'' +
+                ", name2='" + name2 + '\'' +
+                ", pin1='" + pin1 + '\'' +
+                ", pin2='" + pin2 + '\'' +
+                ", id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", username='" + username + '\'' +
                 ", topic=" + topic +
                 ", groupId='" + groupId + '\'' +
-//                ", style='" + style + '\'' +
+                ", style='" + style + '\'' +
                 ", ssid='" + ssid + '\'' +
+                ", devicePassword='" + devicePassword + '\'' +
                 ", ip='" + ip + '\'' +
-//                ", password='" + password + '\'' +
-//                ", favorite=" + favorite +
-//                ", locallyAccessibility=" + locallyAccessibility +
-//                ", onlineAccessibility=" + onlineAccessibility +
+                ", password='" + password + '\'' +
+                ", favorite=" + favorite +
+                ", locallyAccessibility=" + locallyAccessibility +
+                ", onlineAccessibility=" + onlineAccessibility +
                 ", statusWord='" + statusWord + '\'' +
                 ", secret='" + secret + '\'' +
+                ", hidden=" + hidden +
+                ", position=" + position +
                 '}';
     }
+
+    //    @Override
+//    public String toString() {
+//        return "Device{" +
+//                "chipId='" + chipId + '\'' +
+//                ", name1='" + name1 + '\'' +
+//                ", position=" + position +
+////                ", name2='" + name2 + '\'' +
+//                ", pin1='" + pin1 + '\'' +
+//                ", pin2='" + pin2 + '\'' +
+////                ", id='" + id + '\'' +
+////                ", type='" + type + '\'' +
+////                ", username='" + username + '\'' +
+//                ", topic=" + topic +
+//                ", groupId='" + groupId + '\'' +
+////                ", style='" + style + '\'' +
+//                ", ssid='" + ssid + '\'' +
+//                ", ip='" + ip + '\'' +
+////                ", password='" + password + '\'' +
+////                ", favorite=" + favorite +
+////                ", locallyAccessibility=" + locallyAccessibility +
+////                ", onlineAccessibility=" + onlineAccessibility +
+//                ", statusWord='" + statusWord + '\'' +
+//                ", secret='" + secret + '\'' +
+//                '}';
+//    }
 
     public int getPosition() {
         return position;

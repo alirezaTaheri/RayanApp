@@ -1,29 +1,26 @@
 package rayan.rayanapp.Activities;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.stepstone.stepper.BlockingStep;
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import com.stepstone.stepper.StepperLayout;
 
 import java.util.List;
@@ -31,8 +28,9 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.viewPager.AddNewDeviceStepperAdapter;
-import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Dialogs.YesNoDialog;
@@ -40,16 +38,17 @@ import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.ChangeGroupFragment;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Fragments.NewDevicesListFragment;
-import rayan.rayanapp.Helper.NetworkDetector;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Receivers.WifiScanReceiver;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -69,7 +68,6 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     private SetPrimaryConfigRequest setPrimaryConfigRequest;
     private NewDevice newDevice;
     GroupsListFragmentViewModel viewModel;
-    NetworkDetector networkDetector;
     String testCaseSSID;
 //    @BindView(R.id.toolbar)
 //    Toolbar toolbar;
@@ -86,6 +84,21 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         initNewDevice();
         setPrimaryConfigRequest = new SetPrimaryConfigRequest();
         ButterKnife.bind(this);
+        ConnectionLiveData connectionLiveData = new ConnectionLiveData(getApplicationContext());
+        connectionLiveData.observe(this, connectionStatusModel -> {
+            if (connectionStatusModel == null){
+                this.notConnected();
+            }else {
+                if (connectionStatusModel.getType() == AppConstants.WIFI_NETWORK) {
+                    String extraInfo = connectionStatusModel.getSsid();
+                    if (extraInfo != null && connectionStatusModel.getSsid().charAt(connectionStatusModel.getSsid().length()-1) == connectionStatusModel.getSsid().charAt(0) && String.valueOf(connectionStatusModel.getSsid().charAt(0)).equals("\""))
+                        extraInfo = connectionStatusModel.getSsid().substring(1,extraInfo.length()-1);
+                    this.wifiNetwork(connectionStatusModel.getState().equals(NetworkInfo.State.CONNECTED), extraInfo);
+                } else if (connectionStatusModel.getType() == AppConstants.MOBILE_DATA) {
+                    this.mobileNetwork(connectionStatusModel.getState().equals(NetworkInfo.State.CONNECTED));
+                }
+            }
+        });
 //        setSupportActionBar(toolbar);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -131,9 +144,31 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         super.onStop();
     }
 
+    @SuppressLint("CheckResult")
     protected void onResume() {
         super.onResume();
         wifiHandler.setWifiEnabled();
+//        ReactiveNetwork
+//                .observeNetworkConnectivity(this)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(connectivity -> {
+//                    Log.e("NetworkDetector", "From context: " + this + " connectivityIs: " + connectivity);
+//                    switch (connectivity.type()){
+//                        case AppConstants.WIFI_NETWORK:
+//                            String extraInfo = connectivity.extraInfo();
+//                            if (extraInfo != null && connectivity.extraInfo().charAt(connectivity.extraInfo().length()-1) == connectivity.extraInfo().charAt(0) && String.valueOf(connectivity.extraInfo().charAt(0)).equals("\""))
+//                                extraInfo = connectivity.extraInfo().substring(1,extraInfo.length()-1);
+//                            this.wifiNetwork(connectivity.state().equals(NetworkInfo.State.CONNECTED), extraInfo);
+//                            break;
+//                        case AppConstants.MOBILE_DATA:
+//                            this.mobileNetwork(connectivity.state().equals(NetworkInfo.State.CONNECTED));
+//                            break;
+//                        case AppConstants.NOT_CONNECTED_NETWORK:
+//                            this.notConnected();
+//                            break;
+//                    }
+//                });
 //        IntentFilter intentFilter = new IntentFilter();
 //        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 //        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
@@ -150,8 +185,6 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
             statusCheck();
             wifiHandler.scan();
         }
-        if (networkDetector == null)
-            networkDetector = new NetworkDetector(this, this);
     }
 
     public void statusCheck() {
@@ -272,12 +305,14 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 
     @Override
     public void wifiNetwork(boolean connected, String ssid) {
+//        Toast.makeText(this, "Wifi "+this.getClass().getSimpleName(), Toast.LENGTH_SHORT).show();
         List<Fragment> fs = getSupportFragmentManager().getFragments();
         NewDevicesListFragment newDevicesListFragment = null;
         for (int a = 0;a<fs.size();a++)
             if (fs.get(a) instanceof NewDevicesListFragment)
                 newDevicesListFragment = (NewDevicesListFragment) fs.get(a);
-        newDevicesListFragment.wifiNetwork(connected, ssid);
+        if (newDevicesListFragment != null)
+            newDevicesListFragment.wifiNetwork(connected, ssid);
     }
 
     @Override
@@ -292,6 +327,6 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 
     @Override
     public void notConnected() {
-
+//        Toast.makeText(this, "NotConnected "+this.getClass().getSimpleName(), Toast.LENGTH_SHORT).show();
     }
 }

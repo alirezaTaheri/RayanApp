@@ -15,6 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+
+import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +39,11 @@ import rayan.rayanapp.Util.AppConstants;
 public class FavoritesFragment extends Fragment implements OnToggleDeviceListener<Device>, ToggleDeviceAnimationProgress {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+
+    @BindView(R.id.empty_view)
+    RelativeLayout emptyView;
+    @BindView(R.id.animation_view)
+    LottieAnimationView lottieAnimationView;
     List<Device> devices = new ArrayList<>();
     FavoritesFragmentViewModel favoritesFragmentViewModel;
     DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
@@ -76,6 +84,15 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                         }
                     }
                 else finalDevices = devices;
+                if (finalDevices.size() == 0){
+                    lottieAnimationView.setMaxProgress(0.5f);
+                    emptyView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    emptyView.setVisibility(View.INVISIBLE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
 //                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
                 Collections.sort(finalDevices, new Comparator<Device>(){
                     public int compare(Device obj1, Device obj2) {

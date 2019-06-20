@@ -1,6 +1,7 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +16,11 @@ import com.varunest.sparkbutton.SparkButton;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.R;
@@ -154,5 +160,35 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
             clickableLayout2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));
         }
+    }
+    @SuppressLint("CheckResult")
+    public void pin2Toggled(boolean on){
+        if (on){
+            Observable.create(new ObservableOnSubscribe<Object>() {
+                @Override
+                public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
+                    playSoundSwitchOn();
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Object>() {
+                @Override
+                public void accept(Object o) throws Exception {
+
+                }
+            });
+        }
+        else {
+            Observable.create(new ObservableOnSubscribe<Object>() {
+                @Override
+                public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
+                    playSoundSwitchOff();
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Object>() {
+                @Override
+                public void accept(Object o) throws Exception {
+
+                }
+            });
+        }
+
     }
 }

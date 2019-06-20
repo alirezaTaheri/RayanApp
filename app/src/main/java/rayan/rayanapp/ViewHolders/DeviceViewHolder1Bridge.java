@@ -1,7 +1,11 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -14,11 +18,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.varunest.sparkbutton.SparkButton;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.R;
@@ -35,9 +45,56 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     View bottomStrip;
     @BindView(R.id.clickableLayout)
     LinearLayout clickableLayout;
+    MediaPlayer switchOnSound, switchOffSound;
+    Uri switchOnPath, switchOffPath;
     public DeviceViewHolder1Bridge(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
+//        switchOffSound = new MediaPlayer();
+//        switchOffPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_off");
+//        try {
+//            switchOffSound.setDataSource(itemView.getContext(), switchOffPath);
+//            switchOffSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+//            switchOffSound.prepare();
+//            switchOffSound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                @Override
+//                public void onCompletion(MediaPlayer mp) {
+//                    mp.reset();
+////                    mp.release();
+//                }
+//            });
+////            switchOffSound.start();
+//        } catch (IllegalArgumentException e) {
+//            e.printStackTrace();
+//        } catch (SecurityException e) {
+//            e.printStackTrace();
+//        } catch (IllegalStateException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        switchOnSound = new MediaPlayer();
+//        switchOnPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_on");
+//        try {
+//            switchOnSound.setDataSource(itemView.getContext(), switchOnPath);
+//            switchOnSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+//            switchOnSound.prepare();
+//            switchOnSound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                @Override
+//                public void onCompletion(MediaPlayer mp) {
+//                    mp.reset();
+//                }
+//            });
+////            switchOnSound.start();
+//        } catch (IllegalArgumentException e) {
+//            e.printStackTrace();
+//        } catch (SecurityException e) {
+//            e.printStackTrace();
+//        } catch (IllegalStateException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -48,12 +105,9 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on));
 //            pin1.setChecked(true);
-            itemView.post(new Runnable() {
-                @Override
-                public void run(){
-                    bottomStrip.getLayoutParams().width = itemView.getWidth();
-                    bottomStrip.requestLayout();
-                }
+            itemView.post(() -> {
+                bottomStrip.getLayoutParams().width = itemView.getWidth();
+                bottomStrip.requestLayout();
             });
         }
         else {
@@ -83,41 +137,49 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     }
 
     public void stopToggleAnimationPin1(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
-        Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge1" + item);
-        AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
-        if (v != null) {
-            v.cancel();
-            if (item.getPin1().equals(AppConstants.ON_STATUS)) {
-                v.setIntValues((int) v.getAnimatedValue(),
-                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
-                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
-                        itemView.getWidth());
-            } else {
-                v.setIntValues((int) v.getAnimatedValue(),
-                        ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3),
-                        ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3 * 2),
-                        0);
-            }
-        }
-        else {
-            if (item.getPin1().equals(AppConstants.ON_STATUS))
-                v = ValueAnimator.ofInt(0,getDeviceItemWidth());
-            else
-                v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
-            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    bottomStrip.getLayoutParams().width = (int) animation.getAnimatedValue();
-                    bottomStrip.requestLayout();
+        try {
+            Log.e("<<<<<<<<<<<<<<<<", "<Stopping bridge1" + item);
+            AppConstants.disableEnableControls(true, clickableLayout);
+            if (v != null) {
+                v.cancel();
+                if (item.getPin1().equals(AppConstants.ON_STATUS)) {
+//                    playSoundSwitchOn();
+                    v.setIntValues((int) v.getAnimatedValue(),
+                            ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
+                            ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
+                            itemView.getWidth());
+                } else {
+//                    playSoundSwitchOff();
+                    v.setIntValues((int) v.getAnimatedValue(),
+                            ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3),
+                            ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3 * 2),
+                            0);
                 }
-            });
-        }
+            } else {
+                if (item.getPin1().equals(AppConstants.ON_STATUS)) {
+//                    playSoundSwitchOn();
+                    v = ValueAnimator.ofInt(0, getDeviceItemWidth());
+                } else {
+//                    playSoundSwitchOff();
+                    v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
+                }
+                v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        bottomStrip.getLayoutParams().width = (int) animation.getAnimatedValue();
+                        bottomStrip.requestLayout();
+                    }
+                });
+            }
             v.setDuration(300);
             v.start();
-        pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
+            pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS) ? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on) : ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
 //            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
-        if (listener != null){
-            clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+            if (listener != null) {
+                clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -136,5 +198,95 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     }
     public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
         l.onAccessPointChanged(device);
+    }
+
+    public void playSoundSwitchOn(){
+        switchOnSound = new MediaPlayer();
+        switchOnPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_off");
+        try {
+            switchOnSound.setDataSource(itemView.getContext(), switchOnPath);
+            switchOnSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+            switchOnSound.prepareAsync();
+            switchOnSound.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    switchOnSound.start();
+                }
+            });
+            switchOnSound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.reset();
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void playSoundSwitchOff(){
+        switchOffSound = new MediaPlayer();
+        switchOffPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_off");
+        try {
+            switchOffSound.setDataSource(itemView.getContext(), switchOffPath);
+            switchOffSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+            switchOffSound.prepareAsync();
+            switchOffSound.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    switchOffSound.start();
+                }
+            });
+            switchOffSound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.reset();
+//                    mp.release();
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    public void pin1Toggled(boolean on){
+        if (on){
+            Observable.create(new ObservableOnSubscribe<Object>() {
+                @Override
+                public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
+                    playSoundSwitchOn();
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Object>() {
+                @Override
+                public void accept(Object o) throws Exception {
+
+                }
+            });
+        }
+        else {
+            Observable.create(new ObservableOnSubscribe<Object>() {
+                @Override
+                public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
+                    playSoundSwitchOff();
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Object>() {
+                @Override
+                public void accept(Object o) throws Exception {
+
+                }
+            });
+        }
     }
 }

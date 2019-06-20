@@ -1,12 +1,14 @@
 package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,12 +43,14 @@ import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Listeners.ConnectingToTarget;
 import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
+import rayan.rayanapp.Listeners.TestNewDeviceDialogControllerListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDevicesListViewModel;
 
-public class NewDevicesListFragment extends BackHandledFragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, BlockingStep, NetworkConnectivityListener {
+@SuppressLint("ParcelCreator")
+public class NewDevicesListFragment extends BackHandledFragment implements OnNewDeviceClicked<AccessPoint>, ConnectingToTarget , View.OnClickListener, BlockingStep, NetworkConnectivityListener,TestNewDeviceDialogControllerListener {
 
     private final String TAG = NewDevicesListFragment.class.getSimpleName();
     public AccessPoint selectedAccessPoint;
@@ -73,7 +77,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        wifiManager = (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager) Objects.requireNonNull(activity).getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         newDevicesRecyclerViewAdapter = new NewDevicesRecyclerViewAdapter(getActivity(), this);
         newDevicesRecyclerViewAdapter.setListener(this);
         connection = this;
@@ -89,7 +93,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         viewModel = ViewModelProviders.of(this).get(NewDevicesListViewModel.class);
-        ((RayanApplication)getActivity().getApplication()).getWifiBus().toObservable().subscribeOn(Schedulers.io())
+        ((RayanApplication)activity.getApplication()).getWifiBus().toObservable().subscribeOn(Schedulers.io())
                 .subscribe(scanResults -> {
                     this.idle();
                     List<AccessPoint> newDevices = new ArrayList<>();
@@ -162,7 +166,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
         Log.e(TAG, "Successfully connected to: " + targetSSID);
         connectionStatus = ConnectionStatus.SUCCESSFUL;
         Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
-        TestDeviceFragment.newInstance(targetSSID).show(getActivity().getSupportFragmentManager(), "testDevice");
+        TestDeviceFragment.newInstance(targetSSID, this).show(getActivity().getSupportFragmentManager(), "testDevice");
     }
 
     @Override
@@ -187,7 +191,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     public void connectToSame(String targetSSID) {
         Log.e(TAG, "Already connected to: " + targetSSID);
         Toast.makeText(getActivity(), "در حال حاضر به این دستگاه متصل هستید", Toast.LENGTH_SHORT).show();
-        TestDeviceFragment.newInstance(targetSSID).show(getActivity().getSupportFragmentManager(), "testDevice");
+        TestDeviceFragment.newInstance(targetSSID, this).show(getActivity().getSupportFragmentManager(), "testDevice");
     }
 
     @Override
@@ -266,7 +270,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     @Override
     public void wifiNetwork(boolean connected, String ssid) {
         if (connected)
-            ((RayanApplication)(getActivity().getApplication())).getNetworkBus().send(ssid);
+            ((RayanApplication)(activity.getApplication())).getNetworkBus().send(ssid);
         if (targetSSID != null) {
             currentSSID = ssid;
             if (currentSSID.equals(targetSSID)) {
@@ -293,6 +297,22 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     }
 
+    @Override
+    public void testTerminated() {
+        Log.e(TAG, "Testing Terminated for: " + targetSSID);
+        this.targetSSID = null;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+    }
+
     private enum ConnectionStatus{
         IDLE,
         SEARCHING,
@@ -315,4 +335,12 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
                 return true;
         return false;
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Activity)
+            this.activity = (Activity) context;
+    }
+    Activity activity;
 }

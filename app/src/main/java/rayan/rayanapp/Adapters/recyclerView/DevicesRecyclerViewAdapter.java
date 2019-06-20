@@ -68,11 +68,14 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                 if (key.equals("pin1")){
                     Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge1" + items.get(position));
                     holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
+//                    holder.pin1Toggled(items.get(position).getPin1().endsWith(AppConstants.ON_STATUS));
                 }
                 if (key.equals("pin2")){
                     Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge2" + items.get(position));
-                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2))
+                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)){
                         ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
+//                        ((DeviceViewHolder2Bridges)holder).pin2Toggled(items.get(position).getPin2().endsWith(AppConstants.ON_STATUS));
+                    }
                 }
                 if (key.equals("name")){
                     holder.changeName(b.getString("name"));

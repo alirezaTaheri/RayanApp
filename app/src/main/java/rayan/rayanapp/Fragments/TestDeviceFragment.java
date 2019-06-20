@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,6 +40,7 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
 import rayan.rayanapp.Data.Contact;
 import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Listeners.TestNewDeviceDialogControllerListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Util.AppConstants;
@@ -54,9 +56,11 @@ public class TestDeviceFragment extends BottomSheetDialogFragment implements Vie
     NewDevice newDevice;
     TestDeviceFragmentViewModel viewModel;
     private String targetSSID;
-    public static TestDeviceFragment newInstance(String targetSSID) {
+    private TestNewDeviceDialogControllerListener listener;
+    public static TestDeviceFragment newInstance(String targetSSID, TestNewDeviceDialogControllerListener listener) {
         Bundle b = new Bundle();
         b.putString("targetSSID", targetSSID);
+        b.putParcelable("listener", listener);
         TestDeviceFragment t = new TestDeviceFragment();
         t.setArguments(b);
         return t;
@@ -69,6 +73,8 @@ public class TestDeviceFragment extends BottomSheetDialogFragment implements Vie
         newDevice = ((AddNewDeviceActivity)getActivity()).getNewDevice();
         ButterKnife.bind(this, view);
         pin1.setOnClickListener(this);
+        assert getArguments() != null;
+        listener = getArguments().getParcelable("listener");
         name.setText(getArguments().getString("targetSSID"));
         return view;
     }
@@ -118,6 +124,7 @@ public class TestDeviceFragment extends BottomSheetDialogFragment implements Vie
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
+        listener.testTerminated();
         Toast.makeText(getContext(), "پایان تست", Toast.LENGTH_SHORT).show();
     }
 }

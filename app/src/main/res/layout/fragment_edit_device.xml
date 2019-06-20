@@ -115,6 +115,7 @@
             android:layout_centerInParent="true"
             android:layout_marginRight="20dp"
             app:srcCompat="@drawable/ic_cloud"
+            android:tint="@color/white"
             android:id="@+id/setTopicIcon"
             />
         <ProgressBar
@@ -137,7 +138,7 @@
         android:paddingLeft="23dp"
         android:paddingRight="23dp"
         android:paddingTop="10dp"
-        android:textColor="@color/grey_dark_2"
+        android:textColor="@color/white"
         android:textSize="14sp" />
     </RelativeLayout>
     <RelativeLayout
@@ -151,6 +152,7 @@
             android:layout_alignParentRight="true"
             android:layout_height="27dp"
             android:layout_width="27dp"
+            android:tint="@color/white"
             android:layout_centerInParent="true"
             android:layout_marginRight="20dp"
             app:srcCompat="@drawable/ic_cloud"
@@ -176,7 +178,7 @@
         android:paddingLeft="23dp"
         android:paddingRight="23dp"
         android:paddingTop="10dp"
-        android:textColor="@color/grey_dark_2"
+        android:textColor="@color/white"
         android:textSize="14sp" />
     </RelativeLayout>
     <TextView
@@ -196,7 +198,7 @@
         android:paddingLeft="23dp"
         android:paddingRight="23dp"
         android:paddingTop="10dp"
-        android:textColor="@color/grey_dark_2"
+        android:textColor="@color/white"
         android:textSize="14sp" />
 
     <TextView
@@ -216,7 +218,7 @@
         android:paddingRight="23dp"
         android:paddingBottom="10dp"
         android:text="آپدیت دستگاه"
-        android:textColor="@color/grey_dark_2"
+        android:textColor="@color/white"
         android:textSize="14sp" />
 
     <TextView

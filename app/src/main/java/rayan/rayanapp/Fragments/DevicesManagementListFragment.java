@@ -70,7 +70,10 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         devicesRecyclerViewAdapterManagement = new DevicesManagementRecyclerViewAdapter(getActivity(), devices, waiting);
         devicesRecyclerViewAdapterManagement.setListener(this);
         devicesManagementListFragmentViewModel = ViewModelProviders.of(this).get(DevicesManagementListFragmentViewModel.class);
-        devicesManagementListFragmentViewModel.getAllDevicesLive().observe(this, devices -> devicesRecyclerViewAdapterManagement.updateItems(devices));
+        devicesManagementListFragmentViewModel.getAllDevicesLive().observe(this, devices -> {
+            devicesRecyclerViewAdapterManagement.updateItems(devices);
+            Log.e("devdevdevdev: ", ": " + devices);
+        });
         fragmentManager = getActivity().getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
     }
@@ -156,10 +159,9 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
 
     @Override
     public void onFavoriteClicked(Device item) {
-        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
-        devicesManagementListFragmentViewModel.updateDevice(d);
+//        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
+        devicesManagementListFragmentViewModel.updateDevice(item);
         if (item.isFavorite()){
-            d.setFavorite(true);
             Toast.makeText(getActivity(),item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
         }
         else Toast.makeText(getActivity(),item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
@@ -167,11 +169,11 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
 
     @Override
     public void onVisibilityClicked(Device item) {
-        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
-        d.setHidden(!d.isHidden());
-        devicesManagementListFragmentViewModel.updateDevice(d);
+//        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
+//        d.setHidden(!d.isHidden());
+        devicesManagementListFragmentViewModel.updateDevice(item);
         if (item.isHidden())
-        Toast.makeText(getActivity(),item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
         else Toast.makeText(getActivity(),item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
     }
 

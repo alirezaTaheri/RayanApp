@@ -209,6 +209,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
         YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
+    @SuppressLint("CheckResult")
     public void resetDevice(){
         editDeviceFragmentViewModel.internetProvided().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe((aBoolean, throwable) -> {
@@ -219,6 +220,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
                                 case AppConstants.FACTORY_RESET_DONE:
                                     Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
                                     setDeviceTopicStatus(EditDeviceFragment.TopicStatus.CHANGED);
+                                    editDeviceFragmentViewModel.getGroups();
                                     break;
                                 case AppConstants.SOCKET_TIME_OUT:
                                     setDeviceTopicStatus(EditDeviceFragment.TopicStatus.CHANGED);

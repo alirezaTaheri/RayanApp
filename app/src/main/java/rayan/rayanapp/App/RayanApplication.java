@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
+import rayan.rayanapp.Helper.MqttMessagesController;
 import rayan.rayanapp.Helper.MqttSubscriptionController;
 import rayan.rayanapp.Helper.RequestManager;
 import rayan.rayanapp.Helper.SendMessageToDevice;
@@ -47,6 +48,7 @@ public class RayanApplication extends Application {
     private SendMessageToDevice sendMessageToDevice;
     private RequestManager requestManager;
     private Locale locale = null;
+    private MqttMessagesController mqttMessagesController;
     private MqttSubscriptionController msc;
     @Override
     public void onCreate() {
@@ -87,6 +89,7 @@ public class RayanApplication extends Application {
         sendMessageToDevice = new SendMessageToDevice(this);
         requestManager = new RequestManager();
         msc = new MqttSubscriptionController(this);
+        mqttMessagesController = new MqttMessagesController();
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
@@ -178,26 +181,28 @@ public class RayanApplication extends Application {
     public static Context getContext(){
         return context;
     }
+
     public static PrefManager getPref(){
         return pref;
     }
+
     @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (locale != null)
-        {
+        if (locale != null) {
             newConfig.locale = locale;
             Locale.setDefault(locale);
             getBaseContext().getResources().updateConfiguration(newConfig, getBaseContext().getResources().getDisplayMetrics());
         }
     }
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
 
-
-
+    public MqttMessagesController getMqttMessagesController() {
+        return mqttMessagesController;
+    }
 }

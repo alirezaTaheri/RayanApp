@@ -23,6 +23,9 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+
+import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +35,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.DialogPresenter;
@@ -49,9 +53,14 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     public DevicesFragment() {}
     @BindView(R.id.recyclerView)
     public RecyclerView recyclerView;
+    @BindView(R.id.empty_view)
+    RelativeLayout emptyView;
+    @BindView(R.id.animation_view)
+    LottieAnimationView lottieAnimationView;
     public DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     public List<Device> devices = new ArrayList<>();
     LiveData<List<Device>> devicesObservable;
+    MainActivity mainActivity;
     Observer<List<Device>> devicesObserver;
     private final String TAG = this.getClass().getSimpleName();
     public static List<String> subscribedDevices = new ArrayList<>();
@@ -91,42 +100,16 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                             finalDevices.add(devices.get(a));
                         }
                     }
-            Collections.sort(finalDevices, new Comparator<Device>(){
-                public int compare(Device obj1, Device obj2) {
-                    // ## Ascending order
-//                    return obj1.firstName.compareToIgnoreCase(obj2.firstName); // To compare string values
-                     return Integer.compare(obj1.getPosition(), obj2.getPosition()); // To compare integer values
-                    // ## Descending order
-                    // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
-                    // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
-                }
-            });
-//                DevicesDiffCallBack c = new DevicesDiffCallBack(finalDevices, DevicesFragment.this.devices);
-//                DiffUtil.DiffResult d = DiffUtil.calculateDiff(c);
-//                List<Device> finalDevices1 = finalDevices;
-//                d.dispatchUpdatesTo(new ListUpdateCallback() {
-//                    @Override
-//                    public void onInserted(int i, int i1) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onRemoved(int i, int i1) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onMoved(int i, int i1) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onChanged(int i, int i1, @Nullable Object o) {
-//                        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices1.subList(i, i + i1));
-//                    }
-//                });
-
-//                ((RayanApplication)getActivity().getApplication()).getMtd().setDevices(finalDevices);
+                    if (finalDevices.size() == 0){
+                        lottieAnimationView.setMaxProgress(0.5f);
+                        emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.INVISIBLE);
+                    }
+                    else{
+                        emptyView.setVisibility(View.INVISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+            Collections.sort(finalDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
                 Log.e(TAG ,"ShowingDevices: " + finalDevices);
                 devicesRecyclerViewAdapter.updateItems(finalDevices);
                 DevicesFragment.this.devices = finalDevices;
@@ -134,7 +117,6 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         };
         devicesObservable.observe(this, devicesObserver);
         activity = getActivity();
-
     }
 
     @Override
@@ -171,57 +153,20 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     public void onPin1Clicked(Device device, int position) {
         Log.e("Pin1 Is Touching: " , "Device: " +device + position);
         Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
-//        if (!((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().isWaitingPin1(device.getChipId()))
-//        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
-//            if (device.getIp() != null)
-                devicesFragmentViewModel.togglePin1(dp,this, position, ((RayanApplication) getActivity().getApplication()), device);
-//            else{
-////                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, true);
-//                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//        else {
-//            if (device.getTopic() != null){
-//                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
-//            }
-//            else{
-////                devicesFragmentViewModel.togglePin1(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
-//                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-
+        devicesFragmentViewModel.togglePin1(dp,this, position, ((RayanApplication) getActivity().getApplication()), device);
     }
 
     @Override
     public void onPin2Clicked(Device device, int position) {
         Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
         Log.e("Pin2 Is Touching: " , "Device: " +device);
-////        ((RayanApplication)getActivity().getApplication()).getDevicesAccessibilityBus().registerForAnimation(this, device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)? recyclerView.getLayoutManager().findViewByPosition(position).getWidth()/2:recyclerView.getLayoutManager().findViewByPosition(position).getWidth());
-//        if (RayanApplication.getPref().getProtocol().equals(AppConstants.UDP)) {
-//            if (device.getIp()!= null)
-                devicesFragmentViewModel.togglePin2(dp,this,position, (RayanApplication) getActivity().getApplication(),device);
-//            else{
-//                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-////                devicesFragmentViewModel.togglePin2(this, position, (RayanApplication) getActivity().getApplication(),device, RayanApplication.getPref().getProtocol().equals(AppConstants.UDP));
-//            }
-//        }
-//        else {
-//            if (device.getTopic() != null){
-//                devicesFragmentViewModel.togglePin2(this,position, ((RayanApplication) getActivity().getApplication()), device, false);
-//            }
-//            else{
-////                devicesFragmentViewModel.togglePin2(this, position, ((RayanApplication) getActivity().getApplication()), device, false);
-//                Toast.makeText(getActivity(), "دستگاه در دسترس نمی‌باشد", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-
+        devicesFragmentViewModel.togglePin2(dp,this,position, (RayanApplication) getActivity().getApplication(),device);
         }
 
     @Override
     public void onAccessPointChanged(Device item) {
 //        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
     }
-
 
     @Override
     public void startToggleAnimationPin1(String chipId, int position) {
@@ -255,7 +200,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                         Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
                     }
                 });
-            }
+            }else
+                Log.e(TAG+" Pinn1", "Can not find Device with: " +chipId+" among list Items...");
     }
 
     @Override
@@ -272,7 +218,14 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                     Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
                 }
             });
-        }
+        }else
+            Log.e(TAG+" Pinn2", "Can not find Device with: " +chipId+" among list Items...");
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mainActivity = (MainActivity) context;
     }
 
     @Override

@@ -60,6 +60,7 @@ public class MqttSubscriptionController {
                             MainActivityViewModel.connection.getValue().getClient().subscribe(dbTopics.get(a), 0).setActionCallback(new IMqttActionListener() {
                                 @Override
                                 public void onSuccess(IMqttToken asyncActionToken) {
+                                    Log.e(TAG, "Subscribed Successfully to: " + dbTopics.get(finalA));
                                     subscribedTopics.add(dbTopics.get(finalA));
                                     if (finalA == dbTopics.size() - 1)
                                         check2();
@@ -67,6 +68,7 @@ public class MqttSubscriptionController {
 
                                 @Override
                                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                    Log.e(TAG, "Subscribed Failed to: " + dbTopics.get(finalA));
                                     if (finalA == dbTopics.size() - 1)
                                         check2();
                                 }
@@ -75,7 +77,7 @@ public class MqttSubscriptionController {
                     }
                 }else check2();
 
-            }
+            }else subscribedTopics = new ArrayList<>();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -92,11 +94,13 @@ public class MqttSubscriptionController {
                         MainActivityViewModel.connection.getValue().getClient().subscribe(newArrivedTopics.get(a), 0).setActionCallback(new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
+                                Log.e(TAG, "Fast Subscribed Successfully to: " + newArrivedTopics.get(finalA));
                                 subscribedTopics.add(newArrivedTopics.get(finalA));
                             }
 
                             @Override
                             public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                                Log.e(TAG, "Fast Subscribed Successfully to: " + newArrivedTopics.get(finalA));
                             }
                         });
                     }

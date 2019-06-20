@@ -15,11 +15,11 @@ import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Util.AppConstants;
 
 public class NetworkDetector {
-//    NetworkConnectivityListener listener;
+    NetworkConnectivityListener listener;
 //    Context context;
     Disposable d;
     @SuppressLint("CheckResult")
-    public NetworkDetector(Context context, NetworkConnectivityListener listener) {
+    public NetworkDetector(Context context) {
 //        this.listener = listener;
 //        this.context = context;
         ReactiveNetwork
@@ -33,16 +33,19 @@ public class NetworkDetector {
                             String extraInfo = connectivity.extraInfo();
                             if (extraInfo != null && connectivity.extraInfo().charAt(connectivity.extraInfo().length()-1) == connectivity.extraInfo().charAt(0) && String.valueOf(connectivity.extraInfo().charAt(0)).equals("\""))
                                 extraInfo = connectivity.extraInfo().substring(1,extraInfo.length()-1);
-                            listener.wifiNetwork(connectivity.state().equals(NetworkInfo.State.CONNECTED), extraInfo);
+//                            listener.wifiNetwork(connectivity.state().equals(NetworkInfo.State.CONNECTED), extraInfo);
                             break;
                         case AppConstants.MOBILE_DATA:
-                            listener.mobileNetwork(connectivity.state().equals(NetworkInfo.State.CONNECTED));
+//                            listener.mobileNetwork(connectivity.state().equals(NetworkInfo.State.CONNECTED));
                             break;
                         case AppConstants.NOT_CONNECTED_NETWORK:
-                            listener.notConnected();
+//                            listener.notConnected();
                             break;
                     }
                 });
+    }
+    public void setListener(NetworkConnectivityListener listener){
+        this.listener = listener;
     }
     public Disposable getNetworkDetectorDisposable(){
         return d;

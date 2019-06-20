@@ -69,7 +69,7 @@ public class MqttJobService extends JobService {
                     actionArgs[0] = connection.getId();
                     ActionListener callback = new ActionListener(getApplicationContext(),
                             ActionListener.Action.CONNECT,connection, MainActivityViewModel.connection, actionArgs);
-                    connection.getClient().setCallback(new MyMqttCallbackHandler(getApplicationContext()));
+                    connection.getClient().setCallback(new MyMqttCallbackHandler(getApplicationContext(),(RayanApplication) getApplication()));
                     connection.getClient().connect(connection.getConnectionOptions(), null, callback);
                     emitter.onNext(new Object(
                     ));

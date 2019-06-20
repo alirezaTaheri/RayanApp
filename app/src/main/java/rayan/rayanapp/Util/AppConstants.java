@@ -14,6 +14,7 @@ public class AppConstants {
     public final static int MQTT_MESSAGING_TIMEOUT = 4000;
     public final static int HTTP_MESSAGING_TIMEOUT = 4000;
     public final static int TOGGLE_ANIMATION_TIMEOUT = 4000;
+    public final static int ATTACH_MQTT_REQ_TO_TOPIC_TIMEOUT = 4;
 
 //    public final static String MQTT_HOST = "api.rayansmarthome.ir";
 //    public final static int MQTT_PORT = 1883;
