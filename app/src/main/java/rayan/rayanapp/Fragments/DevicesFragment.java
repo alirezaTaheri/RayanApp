@@ -137,6 +137,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         }
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
+        recyclerView.setNestedScrollingEnabled(false);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 

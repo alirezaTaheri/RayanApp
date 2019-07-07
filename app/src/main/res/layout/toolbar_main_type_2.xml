@@ -4,38 +4,14 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize">
-    <ProgressBar
-        android:visibility="invisible"
-        android:id="@+id/progress_bar"
-        android:layout_marginLeft="35dp"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_width="35dp"
-        android:layout_height="35dp" />
-    <com.polyak.iconswitch.IconSwitch
-        android:visibility="invisible"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:id="@+id/accessModeSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|center_vertical"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        app:isw_default_selection="left"
-        app:isw_background_color="@color/white"
-        app:isw_icon_left="@drawable/png_home"
-        app:isw_icon_right="@drawable/png_online_mode"
-        app:isw_thumb_color_left="@color/grey"
-        app:isw_thumb_color_right="@color/blue" />
     <com.airbnb.lottie.LottieAnimationView
-        android:layout_gravity="center"
+        android:rotationY="180"
+        android:layout_gravity="right"
         android:id="@+id/animation_view"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        app:lottie_fileName="lottie_not_connected.json"
+        android:layout_alignParentRight="true"
+        app:lottie_fileName="animation3.json"
         app:lottie_loop="true"
         app:lottie_autoPlay="true" />
-
 </RelativeLayout>

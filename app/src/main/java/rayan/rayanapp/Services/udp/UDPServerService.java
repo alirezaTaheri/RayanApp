@@ -140,10 +140,11 @@ public class UDPServerService extends Service {
                                     }
                                     deviceDatabase.updateDevice(device);
                                 } else {
-                                    JsonObject jsonObject = new JsonObject();
-                                    jsonObject.addProperty("cmd", AppConstants.TO_DEVICE_NODE);
-                                    jsonObject.addProperty("src", RayanApplication.getPref().getId());
-                                    sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
+                                    Log.e(TAG, "An Unknown Device Detected...");
+//                                    JsonObject jsonObject = new JsonObject();
+//                                    jsonObject.addProperty("cmd", AppConstants.TO_DEVICE_NODE);
+//                                    jsonObject.addProperty("src", RayanApplication.getPref().getId());
+//                                    sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
                                 }
                             } else Log.e(TAG, "There is a Unverified Device");
                             break;

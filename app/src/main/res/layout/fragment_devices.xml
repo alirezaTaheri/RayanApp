@@ -9,7 +9,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        />
     <include layout="@layout/fragment_devices_empty_list"
         android:visibility="invisible"
         android:id="@+id/empty_view"

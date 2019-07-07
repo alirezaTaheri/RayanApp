@@ -25,6 +25,7 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
 
 
     private Map<String, ValueAnimator> animatorMap = new HashMap<>();
+
     public DevicesRecyclerViewAdapter(Context context, List<Device> devices) {
         super(context);
         this.items = devices;

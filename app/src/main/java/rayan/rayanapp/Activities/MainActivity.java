@@ -307,13 +307,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void initialize(){
         if (RayanApplication.getPref().getProtocol() == null){
             RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-            accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
         }
-            if (RayanApplication.getPref().getProtocol().equals(AppConstants.MQTT)){
-                accessModeSwitch.setChecked(IconSwitch.Checked.RIGHT);
-            }
-            else
-                accessModeSwitch.setChecked(IconSwitch.Checked.LEFT);
         drawer_addNewDeviceActivity.setOnClickListener(this);
         drawer_settings.setOnClickListener(this);
         drawer_profile.setOnClickListener(this);

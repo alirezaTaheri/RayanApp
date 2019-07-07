@@ -167,29 +167,24 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
             switch (s){
                 case AppConstants.FORBIDDEN:
                     Log.e(this.getClass().getSimpleName(), "FORBIDDEN CHANGENAME");
-//                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(), device.getIp());
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"شما دسترسی لازم برای تغییر نام را ندارید");
-//                    name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.CHANGE_NAME_FALSE:
                     Log.e(this.getClass().getSimpleName(), "CHANGE_NAME_FALSE CHANGENAME");
-//                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId(), device.getSsid());
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"امکان ویرایش نام وجود ندارد");
-//                    name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.OPERATION_DONE:
                     Log.e(this.getClass().getSimpleName(), "DONE CHANGENAME");
                     setDeviceNameStatus(NameStatus.CHANGED);
+                    device.setName1(name.getText().toString());
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"ویرایش نام با موفقیت انجام شد");
                     editDeviceFragmentViewModel.getGroups();
                     break;
                 case AppConstants.SOCKET_TIME_OUT:
                     Log.e(this.getClass().getSimpleName(), "SOCKET_TIME_OUT CHANGENAME");
                     SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
-//                    editDeviceFragmentViewModel.toDeviceChangeName(device.getName1(),device.getIp());
-//                    editDeviceFragmentViewModel.editDevice(device.getId(), device.getName1(), device.getType(), device.getGroupId(), device.getSsid());
                     name.setText(device.getName1());
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
@@ -205,7 +200,6 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     @SuppressLint("CheckResult")
     @OnClick(R.id.factoryReset)
     void toDeviceFactoryReset(){
-//<<<<<<< HEAD
         YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
@@ -255,22 +249,6 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
                 Log.e("codelist items",deviceFileList.get(i));
                 Toast.makeText(getActivity(), "codelist items"+deviceFileList.get(i), Toast.LENGTH_SHORT).show();
             }
-            // TODO: 2/28/2019 uncomment below lines in the last adit of code(when connected to real device)
-
-//            editDeviceFragmentViewModel.toDeviceUpdate(device.getIp()).observe(this, s -> {
-//                assert s != null;
-//                switch (s) {
-//                    case AppConstants.DEVICE_READY_FOR_UPDATE:
-//                        editDeviceFragmentViewModel.toDeviceDoUpdate(AppConstants.DEVICE_DO_UPDATE, convertCodeStringToList(readFromFileResult), device.getIp()).observe(this, res -> {
-//                            Log.e("response", res.toString());
-//                        });
-//                        break;
-//                    case AppConstants.SOCKET_TIME_OUT:
-//                        setDeviceTopicStatus(TopicStatus.CHANGED);
-//                        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "خطای اتصال");
-//                        break;
-//                }
-//            });
         }
     }
 
@@ -311,7 +289,6 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 
     @Override
     public void submitClicked(String tag) {
-//        editDeviceFragmentViewModel.toDeviceReady4Update(device.getIp()).
         FTPClient ftpClient = new FTPClient();
         Log.e(this.getClass().getSimpleName(), "Updating device: " + device);
         ftpClient.uploadFile(getContext(), device.getIp(), device.getChipId(), device.getSecret());
