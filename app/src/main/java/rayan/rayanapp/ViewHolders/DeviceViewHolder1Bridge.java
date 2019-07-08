@@ -19,7 +19,10 @@ import android.widget.TextView;
 import com.varunest.sparkbutton.SparkButton;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -99,6 +102,8 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     @Override
     public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
+        AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
+        Log.e("UNIQUETAG", "OnBindViewHolder: Type1" +" "+ item.getName1() +"\n"+ itemView.getId());
         Log.e(TAG, "Processing this Device: " + item);
         bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         name.setText(item.getName1());
@@ -120,6 +125,11 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
         }
+    }
+
+    public void onViewRecycled(ValueAnimator v, boolean enabled){
+        AppConstants.disableEnableControls(enabled, (ViewGroup) clickableLayout);
+
     }
 
     public void startToggleAnimationPin1(ValueAnimator v){

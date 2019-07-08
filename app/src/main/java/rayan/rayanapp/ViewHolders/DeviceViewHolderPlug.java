@@ -39,6 +39,8 @@ public class DeviceViewHolderPlug extends DeviceViewHolder1Bridge {
 
     @Override
     public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
+        AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
+        Log.e("UNIQUETAG", "OnBindViewHolder: Type3" +" "+ item.getName1() +"\n"+ itemView.getId());
         Log.e(TAG, "Processing this Device: " + item);
         bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         name.setText(item.getName1());

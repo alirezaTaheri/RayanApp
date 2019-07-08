@@ -113,8 +113,40 @@ public class SendMessageToDevice {
                             List<String> arguments = new ArrayList<>();
                             arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                             arguments.add(Boolean.toString(animation));
-                            if (lastMessage != null)
-                                lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                            if (lastMessage != null){
+                                if (!lastMessage.has("lc")){
+                                    //without lc
+                                    lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                }
+                                else if (lastMessage.getJSONObject("lc").getString("cmd").contains("1")){
+                                    //with lc1 pin 1
+                                    if (lastMessage.getJSONObject("lc").has("lc")){
+                                        Object lc2 = lastMessage.getJSONObject("lc").get("lc");
+                                        lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                        lastMessage.getJSONObject("lc").put("lc", lc2);
+                                    }else {
+                                        lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                    }
+                                }
+                                else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("cmd").contains("1")){
+                                    //with lc2 pin 1
+                                    lastMessage.getJSONObject("lc").put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                }
+                                else if (!lastMessage.getJSONObject("lc").has("lc")){
+                                    //with Just one LC
+                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                }
+
+                            }
+//                            if (lastMessage != null) {
+//                                if (!lastMessage.has("lc") || !((JSONObject)lastMessage.get("lc")).has("lc") && ((String)(lastMessage).get("cmd")).contains("1"))
+//                                    lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+//                                else {
+//                                    JSONObject lc2 = (JSONObject) ((JSONObject)lastMessage.get("lc")).get("lc");
+//                                    lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+//                                    ((JSONObject)lastMessage.get("lc")).put("lc",lc2);
+//                                }
+//                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -193,7 +225,35 @@ public class SendMessageToDevice {
                             List<String> arguments = new ArrayList<>();
                             arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                             arguments.add(Boolean.toString(animation));
-                            lastMessage.put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments));
+                            if (lastMessage != null){
+                                if (!lastMessage.has("lc")){
+                                    //without lc
+                                    lastMessage.put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                }
+                                else if (((String)((JSONObject)lastMessage.get("lc")).get("cmd")).contains("2")){
+                                    //with lc1 pin 2
+                                    if (((JSONObject)lastMessage.get("lc")).has("lc")){
+                                        Object lc2 = ((JSONObject)lastMessage.get("lc")).get("lc");
+                                        lastMessage.put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                        lastMessage.getJSONObject("lc").put("lc", lc2);
+                                    }else {
+                                        lastMessage.put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                    }
+                                }
+                                else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("cmd").contains("2")){
+                                    //with lc2 pin 2
+                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                }
+                                else if (!((JSONObject)lastMessage.get("lc")).has("lc")) {
+                                    //with Just one LC
+                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                }
+
+                            }
+//                            if (lastMessage != null) {
+//                                if (!((JSONObject)lastMessage.get("lc")).has("lc"))
+//                                    lastMessage.put("lc", );
+//                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

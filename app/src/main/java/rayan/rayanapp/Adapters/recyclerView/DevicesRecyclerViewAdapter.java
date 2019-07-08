@@ -25,6 +25,8 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
 
 
     private Map<String, ValueAnimator> animatorMap = new HashMap<>();
+    private static Map<String, Boolean> pin1Enabled = new HashMap<>();
+    private static Map<String, Boolean> pin2Enabled = new HashMap<>();
 
     public DevicesRecyclerViewAdapter(Context context, List<Device> devices) {
         super(context);
@@ -54,6 +56,19 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
             return new DeviceViewHolder2Bridges(inflate(R.layout.item_device_2_bridge, parent));
         else
             return new DeviceViewHolderPlug(inflate(R.layout.item_device_plug, parent));
+    }
+
+
+        @Override
+    public void onBindViewHolder(DeviceViewHolder1Bridge holder, int position) {
+        super.onBindViewHolder(holder, position);
+//        if (animatorMap != null)
+//        if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)){
+//            ((DeviceViewHolder2Bridges)holder).
+//                    holder.onViewRecycled(animatorMap.get(items.get(position)), pin1Enabled.get(items.get(position)));
+//        }else if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
+//            holder
+//        }
     }
 
     @Override
@@ -91,6 +106,7 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
 //                    holder.accessPointChanged(getItem(position), getListener());
 //                }
                 if (key.equals("startTogglingPin1")){
+                    setPin1Enabled(items.get(position).getChipId(), false);
                     ValueAnimator v;
                     if (b.getString("status").equals(AppConstants.ON_STATUS))
                         v = ValueAnimator.ofInt(getItem(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || getItem(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2) ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth(), 0);
@@ -100,6 +116,7 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                     holder.startToggleAnimationPin1(v);
                 }
                 if (key.equals("startTogglingPin2")){
+                    setPin2Enabled(items.get(position).getChipId(), false);
                     ValueAnimator v;
                     if (b.getString("status").equals(AppConstants.ON_STATUS))
                         v = ValueAnimator.ofInt(getItem(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || getItem(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth(), 0);
@@ -109,13 +126,17 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                     ((DeviceViewHolder2Bridges)holder).startToggleAnimationPin2(v);
                 }
                 if (key.equals("stopToggleAnimationPin1")){
+                    setPin1Enabled(items.get(position).getChipId(), true);
                     holder.stopToggleAnimationPin1(animatorMap.get(b.getString("chipId")+"1"),getListener(), items.get(position));
                 }
                 if (key.equals("stopToggleAnimationPin2")){
+                    setPin2Enabled(items.get(position).getChipId(), true);
                     ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(b.getString("chipId")+"2"),getListener(), items.get(position));
                 }
             }
-        }else super.onBindViewHolder(holder, position);
+        }else {
+            onBindViewHolder(holder, position);
+        }
     }
 
 
@@ -127,5 +148,10 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
             return 2;
         return 3;
     }
-
+    public void setPin1Enabled(String chiipId, boolean enabled){
+        pin1Enabled.put(chiipId, enabled);
+    }
+    public void setPin2Enabled(String chiipId, boolean enabled){
+        pin1Enabled.put(chiipId, enabled);
+    }
 }

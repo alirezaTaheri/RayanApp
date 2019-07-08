@@ -45,6 +45,9 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
 
     @Override
     public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
+        AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
+        AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout2);
+        Log.e("UNIQUETAG", "OnBindViewHolder: Type2" +" "+ item.getName1() +"\n"+ itemView.getId());
         Log.e(TAG, "Processing this Device: " + item);
         name.setText(item.getName1());
 //        if (!item.isLocallyAccessibility() || item.getIp() == null)
