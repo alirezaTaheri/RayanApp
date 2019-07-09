@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.util.DiffUtil;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
@@ -27,10 +29,11 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
     private Map<String, ValueAnimator> animatorMap = new HashMap<>();
     private static Map<String, Boolean> pin1Enabled = new HashMap<>();
     private static Map<String, Boolean> pin2Enabled = new HashMap<>();
-
-    public DevicesRecyclerViewAdapter(Context context, List<Device> devices) {
+    private Fragment fragment;
+    public DevicesRecyclerViewAdapter(Context context, List<Device> devices, Fragment fragment) {
         super(context);
         this.items = devices;
+        this.fragment = fragment;
     }
 
 
@@ -83,13 +86,20 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                 }
                 if (key.equals("pin1")){
                     Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge1" + items.get(position));
+                    if (items.get(position).getPin1().equals(AppConstants.ON_STATUS))
+                        ((DevicesFragment)fragment).turnOnDeviceAnimationPin1(items.get(position).getChipId(), position);
+                    else ((DevicesFragment)fragment).turnOffDeviceAnimationPin1(items.get(position).getChipId(), position);
                     holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
 //                    holder.pin1Toggled(items.get(position).getPin1().endsWith(AppConstants.ON_STATUS));
                 }
                 if (key.equals("pin2")){
                     Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge2" + items.get(position));
                     if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)){
-                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
+                        if (items.get(position).getPin1().equals(AppConstants.ON_STATUS))
+                            ((DevicesFragment)fragment).turnOnDeviceAnimationPin1(items.get(position).getChipId(), position);
+                        else ((DevicesFragment)fragment).turnOffDeviceAnimationPin1(items.get(position).getChipId(), position);
+                        holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
+//                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
 //                        ((DeviceViewHolder2Bridges)holder).pin2Toggled(items.get(position).getPin2().endsWith(AppConstants.ON_STATUS));
                     }
                 }

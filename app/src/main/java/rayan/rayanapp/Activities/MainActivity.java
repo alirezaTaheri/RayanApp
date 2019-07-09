@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.arch.lifecycle.ViewModelProviders;
@@ -57,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -93,6 +95,7 @@ import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.CustomViewPager;
 import rayan.rayanapp.Util.NetworkUtil;
+import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -247,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
             initializeBottomNavigation();
             int width = (getResources().getDisplayMetrics().widthPixels * 7) / 9;
-            DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) drawerrrrr.getLayoutParams();
+            DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) drawerrrrr.getLayoutParams();
             params.width = width;
             drawerrrrr.setLayoutParams(params);
             drawerLayout.setScrimColor(Color.parseColor("#99000000"));
@@ -532,7 +535,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onDestroy();
     }
 
-    int c = 0;
     @Override
     public void onBackPressed() {
         if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {

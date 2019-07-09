@@ -131,6 +131,16 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         AppConstants.disableEnableControls(enabled, (ViewGroup) clickableLayout);
 
     }
+        public void updateBottomStripPin1(int b){
+        itemView.post(() -> {
+            bottomStrip.getLayoutParams().width = b;
+            bottomStrip.requestLayout();
+        });
+    }
+
+    public int getItemWidth(){
+        return itemView.getWidth();
+    }
 
     public void startToggleAnimationPin1(ValueAnimator v){
         Log.e("<<<<<<<<<<<<<<<<","<Starting bridge1");
@@ -150,39 +160,39 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         try {
             Log.e("<<<<<<<<<<<<<<<<", "<Stopping bridge1" + item);
             AppConstants.disableEnableControls(true, clickableLayout);
-            if (v != null) {
-                v.cancel();
-                if (item.getPin1().equals(AppConstants.ON_STATUS)) {
-//                    playSoundSwitchOn();
-                    v.setIntValues((int) v.getAnimatedValue(),
-                            ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
-                            ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
-                            itemView.getWidth());
-                } else {
-//                    playSoundSwitchOff();
-                    v.setIntValues((int) v.getAnimatedValue(),
-                            ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3),
-                            ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3 * 2),
-                            0);
-                }
-            } else {
-                if (item.getPin1().equals(AppConstants.ON_STATUS)) {
-//                    playSoundSwitchOn();
-                    v = ValueAnimator.ofInt(0, getDeviceItemWidth());
-                } else {
-//                    playSoundSwitchOff();
-                    v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
-                }
-                v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        bottomStrip.getLayoutParams().width = (int) animation.getAnimatedValue();
-                        bottomStrip.requestLayout();
-                    }
-                });
-            }
-            v.setDuration(300);
-            v.start();
+//            if (v != null) {
+//                v.cancel();
+//                if (item.getPin1().equals(AppConstants.ON_STATUS)) {
+////                    playSoundSwitchOn();
+//                    v.setIntValues((int) v.getAnimatedValue(),
+//                            ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
+//                            ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
+//                            itemView.getWidth());
+//                } else {
+////                    playSoundSwitchOff();
+//                    v.setIntValues((int) v.getAnimatedValue(),
+//                            ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3),
+//                            ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3 * 2),
+//                            0);
+//                }
+//            } else {
+//                if (item.getPin1().equals(AppConstants.ON_STATUS)) {
+////                    playSoundSwitchOn();
+//                    v = ValueAnimator.ofInt(0, getDeviceItemWidth());
+//                } else {
+////                    playSoundSwitchOff();
+//                    v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
+//                }
+//                v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                    @Override
+//                    public void onAnimationUpdate(ValueAnimator animation) {
+//                        bottomStrip.getLayoutParams().width = (int) animation.getAnimatedValue();
+//                        bottomStrip.requestLayout();
+//                    }
+//                });
+//            }
+//            v.setDuration(300);
+//            v.start();
             pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS) ? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on) : ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
 //            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
             if (listener != null) {

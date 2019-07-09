@@ -20,6 +20,7 @@ public class AppConstants {
 //    public final static int MQTT_PORT = 1883;
 //    public final static String MQTT_HOST = "api2.mahdiesrafili.ir";
     public final static String MQTT_HOST = "api2.rayansmarthome.ir";
+//    public final static String MQTT_HOST = "157.119.190.160";
     public final static int MQTT_PORT = 8883;
     //New Devices
     public final static String NEW_DEVICE_TYPE_SWITCH = "switch";
@@ -39,6 +40,8 @@ public class AppConstants {
     public final static String EXPIRED = "EXPIRED";
     public final static String NEW_DEVICE_IP = "192.168.4.1";
     public final static String GET_VERSION = "version";
+    public final static String NAMING_PREFIX_PIN1 = "_1";
+    public final static String NAMING_PREFIX_PIN2 = "_2";
 
     //Messages
     public final static String TO_DEVICE_NODE = "NODE?";
@@ -70,6 +73,7 @@ public class AppConstants {
      */
     public final static String CHANGE_NAME_FALSE = "change_hname_false";
     public final static String SOCKET_TIME_OUT = "SocketTimeoutException";
+    public final static String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
     public final static String SETTINGS = "settings";
     public final static String END_SETTINGS = "end_settings";
     public final static String SET_TOPIC_MQTT = "MQTT";

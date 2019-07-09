@@ -110,7 +110,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
             }
         };
         favoritesObservable.observe(this,favoritesObserver);
-        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices);
+        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
         devicesRecyclerViewAdapter.setListener(this);
     }
 
@@ -142,53 +142,53 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     }
 
 
-    @Override
-    public void startToggleAnimationPin1(String chipId, int position) {
-        Bundle b = new Bundle();
-        b.putString("startTogglingPin1", "startTogglingPin1");
-        b.putString("chipId", chipId);
-        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
-        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-    }
-
-    @Override
-    public void startToggleAnimationPin2(String chipId, int position) {
-        Bundle b = new Bundle();
-        b.putString("startTogglingPin2", "startTogglingPin2");
-        b.putString("chipId", chipId);
-        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin2().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
-        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-    }
-
-    @Override
-    public void stopToggleAnimationPin1(String chipId) {
-        Bundle b = new Bundle();
-        int position = findDevicePosition(chipId);
-        b.putString("stopToggleAnimationPin1", "stopToggleAnimationPin1");
-        b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-                Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
-            }
-        });
-    }
-
-    @Override
-    public void stopToggleAnimationPin2(String chipId) {
-        Bundle b = new Bundle();
-        int position = findDevicePosition(chipId);
-        b.putString("stopToggleAnimationPin2", "stopToggleAnimationPin2");
-        b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-                Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
-            }
-        });
-    }
+//    @Override
+//    public void startToggleAnimationPin1(String chipId, int position) {
+//        Bundle b = new Bundle();
+//        b.putString("startTogglingPin1", "startTogglingPin1");
+//        b.putString("chipId", chipId);
+//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+//        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+//    }
+//
+//    @Override
+//    public void startToggleAnimationPin2(String chipId, int position) {
+//        Bundle b = new Bundle();
+//        b.putString("startTogglingPin2", "startTogglingPin2");
+//        b.putString("chipId", chipId);
+//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin2().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+//        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+//    }
+//
+//    @Override
+//    public void stopToggleAnimationPin1(String chipId) {
+//        Bundle b = new Bundle();
+//        int position = findDevicePosition(chipId);
+//        b.putString("stopToggleAnimationPin1", "stopToggleAnimationPin1");
+//        b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
+//        activity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+//                Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public void stopToggleAnimationPin2(String chipId) {
+//        Bundle b = new Bundle();
+//        int position = findDevicePosition(chipId);
+//        b.putString("stopToggleAnimationPin2", "stopToggleAnimationPin2");
+//        b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
+//        activity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+//                Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
+//            }
+//        });
+//    }
 
     public int findDevicePosition(String chipId){
         for (int a = 0;a<devices.size();a++)
@@ -280,5 +280,55 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     @Override
     public void onAccessPointChanged(Device item) {
 //        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
+    }
+
+    @Override
+    public void turnOnDeviceAnimationPin1(String chipID, int position) {
+
+    }
+
+    @Override
+    public void turnOffDeviceAnimationPin1(String chipID, int position) {
+
+    }
+
+    @Override
+    public void turnOnDeviceAnimationPin2(String chipID, int position) {
+
+    }
+
+    @Override
+    public void turnOffDeviceAnimationPin2(String chipID, int position) {
+
+    }
+
+    @Override
+    public void sendingMessageTimeoutPin1(String chipId, int position) {
+
+    }
+
+    @Override
+    public void sendingMessageTimeoutPin2(String chipId, int position) {
+
+    }
+
+    @Override
+    public void updateStripPin1(int position, int width) {
+
+    }
+
+    @Override
+    public void updateStripPin2(int position, int width) {
+
+    }
+
+    @Override
+    public int getDeviceItemWidth(int position) {
+        return 0;
+    }
+
+    @Override
+    public RecyclerView getRecyclerView() {
+        return null;
     }
 }

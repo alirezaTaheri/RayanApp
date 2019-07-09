@@ -96,6 +96,12 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     }
 
 
+    public void updateBottomStripPin2(int b){
+        itemView.post(() -> {
+            bottomStrip2.getLayoutParams().width = b;
+            bottomStrip2.requestLayout();
+        });
+    }
     public void startToggleAnimationPin2(ValueAnimator v){
         AppConstants.disableEnableControls(false, (ViewGroup) clickableLayout2);
         Log.e("<<<<<<<<<<<<<<<<","<Starting bridge2 ");

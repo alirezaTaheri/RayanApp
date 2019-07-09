@@ -5,13 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize">
     <com.airbnb.lottie.LottieAnimationView
-        android:rotationY="180"
-        android:layout_gravity="right"
+        android:layout_gravity="left"
         android:id="@+id/animation_view"
-        android:layout_width="100dp"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        app:lottie_fileName="animation3.json"
+        android:layout_alignParentLeft="true"
+        app:lottie_fileName="animation9_wifi_connect.json"
         app:lottie_loop="true"
         app:lottie_autoPlay="true" />
 </RelativeLayout>

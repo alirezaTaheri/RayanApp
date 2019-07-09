@@ -98,9 +98,11 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     public void onError(@NonNull VerificationError error) {
 
     }
+
     public void setGroupTitle(String title){
         changeGroup.setText(title);
     }
+
     public void setAccessPointTitle(String title){
         changeAccessPoint.setText(title);
         View view = getActivity().getCurrentFocus();
@@ -175,6 +177,9 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                                         break;
                                     case AppConstants.SOCKET_TIME_OUT:
                                         Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                                        Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
                                         break;
                                 }
                                 callback.getStepperLayout().hideProgress();

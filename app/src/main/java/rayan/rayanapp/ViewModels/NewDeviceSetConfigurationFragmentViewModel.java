@@ -16,6 +16,8 @@ import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
 import org.reactivestreams.Subscription;
 
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -287,11 +289,16 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                     @Override
                     public void onError(Throwable e) {
                         Log.e(TAG, "onError::::" + e);
+                        SetPrimaryConfigResponse errorResponse = new SetPrimaryConfigResponse();
+                        if (e instanceof SocketTimeoutException){
+                            errorResponse.setCmd(AppConstants.SOCKET_TIME_OUT);
+                        }
+                        if (e instanceof UnknownHostException){
+                            errorResponse.setCmd(AppConstants.UNKNOWN_HOST_EXCEPTION);
+                        }
                         if (e.toString().contains("Unauthorized"))
                             login();
                         else{
-                        SetPrimaryConfigResponse errorResponse = new SetPrimaryConfigResponse();
-                        errorResponse.setCmd(AppConstants.SOCKET_TIME_OUT);
                         result.postValue(errorResponse);
                         }
                         disposable.dispose();

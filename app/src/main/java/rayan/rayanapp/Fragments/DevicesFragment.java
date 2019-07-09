@@ -29,7 +29,6 @@ import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,10 +37,13 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Helper.DeviceAnimator;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
+import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
+import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -64,6 +66,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     Observer<List<Device>> devicesObserver;
     private final String TAG = this.getClass().getSimpleName();
     public static List<String> subscribedDevices = new ArrayList<>();
+    private DeviceAnimator deviceAnimator;
     public static DevicesFragment newInstance() {
         return new DevicesFragment();
     }
@@ -72,7 +75,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices);
+        deviceAnimator = ((RayanApplication)getActivity().getApplication()).getDeviceAnimator();
+        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
         devicesRecyclerViewAdapter.setListener(this);
         dp = new DialogPresenter(getActivity().getSupportFragmentManager());
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
@@ -170,58 +174,115 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     }
 
     @Override
-    public void startToggleAnimationPin1(String chipId, int position) {
-        Bundle b = new Bundle();
-        b.putString("startTogglingPin1", "startTogglingPin1");
-        b.putString("chipId", chipId);
-        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
-        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+    public int getDeviceItemWidth(int position){
+        int width = ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
+        if (!(devices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || devices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
+            width /= 2;
+        return width;
     }
 
     @Override
-    public void startToggleAnimationPin2(String chipId, int position) {
-        Bundle b = new Bundle();
-        b.putString("startTogglingPin2", "startTogglingPin2");
-        b.putString("chipId", chipId);
-        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin2().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
-        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 
     @Override
-    public void stopToggleAnimationPin1(String chipId) {
-            Bundle b = new Bundle();
-            int position = findDevicePosition(chipId);
-            if (position != -1) {
-                b.putString("stopToggleAnimationPin1", chipId + " stopToggleAnimationPin1 for position: " + position);
-                b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
-                        Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
-                    }
-                });
-            }else
-                Log.e(TAG+" Pinn1", "Can not find Device with: " +chipId+" among list Items...");
+    public void updateStripPin1(int position, int width){
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null)
+            ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin1(width);
     }
-
     @Override
-    public void stopToggleAnimationPin2(String chipId) {
-        Bundle b = new Bundle();
-        int position = findDevicePosition(chipId);
-        if (position != -1) {
-            b.putString("stopToggleAnimationPin2", chipId + " stopToggleAnimationPin2 for position: " + position);
-            b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    devicesRecyclerViewAdapter.notifyItemChanged(position, b);
-                    Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
-                }
-            });
-        }else
-            Log.e(TAG+" Pinn2", "Can not find Device with: " +chipId+" among list Items...");
+    public void updateStripPin2(int position, int width){
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null)
+            ((DeviceViewHolder2Bridges)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin2(width);
     }
+    @Override
+    public void turnOnDeviceAnimationPin1(String chipID, int position){
+        deviceAnimator.deviceTurnedOnPin1(chipID, position, this);
+    }
+    @Override
+    public void turnOffDeviceAnimationPin1(String chipID, int position){
+        deviceAnimator.deviceTurnedOffPin1(chipID, position, this);
+    }
+    @Override
+    public void turnOnDeviceAnimationPin2(String chipID, int position){
+        deviceAnimator.deviceTurnedOnPin2(chipID, position, this);
+    }
+    @Override
+    public void turnOffDeviceAnimationPin2(String chipID, int position){
+        deviceAnimator.deviceTurnedOffPin2(chipID, position, this);
+    }
+    @Override
+    public void sendingMessageTimeoutPin1(String chipId, int position){
+        if (!deviceAnimator.isResponseReceivedPin1(chipId)){
+            if (devices.get(position).getPin1().equals(AppConstants.ON_STATUS))
+                turnOnDeviceAnimationPin1(chipId, position);
+            else
+                turnOffDeviceAnimationPin1(chipId, position);
+        }
+    }
+    @Override
+    public void sendingMessageTimeoutPin2(String chipId, int position){
+        if (!deviceAnimator.isResponseReceivedPin2(chipId)){
+            if (devices.get(position).getPin2().equals(AppConstants.ON_STATUS))
+                turnOnDeviceAnimationPin2(chipId, position);
+            else
+                turnOffDeviceAnimationPin2(chipId, position);
+        }
+    }
+//    @Override
+//    public void startToggleAnimationPin1(String chipId, int position) {
+//        Bundle b = new Bundle();
+//        b.putString("startTogglingPin1", "startTogglingPin1");
+//        b.putString("chipId", chipId);
+//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+//        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+//    }
+//
+//    @Override
+//    public void startToggleAnimationPin2(String chipId, int position) {
+//        Bundle b = new Bundle();
+//        b.putString("startTogglingPin2", "startTogglingPin2");
+//        b.putString("chipId", chipId);
+//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin2().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+//        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
+//    }
+//
+//    @Override
+//    public void stopToggleAnimationPin1(String chipId) {
+//            Bundle b = new Bundle();
+//            int position = findDevicePosition(chipId);
+//            if (position != -1) {
+//                b.putString("stopToggleAnimationPin1", chipId + " stopToggleAnimationPin1 for position: " + position);
+//                b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
+//                activity.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        devicesRecyclerViewAdapter.notifyItemChanged(position, b);
+//                        Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
+//                    }
+//                });
+//            }else
+//                Log.e(TAG+" Pinn1", "Can not find Device with: " +chipId+" among list Items...");
+//    }
+//
+//    @Override
+//    public void stopToggleAnimationPin2(String chipId) {
+//        Bundle b = new Bundle();
+//        int position = findDevicePosition(chipId);
+//        if (position != -1) {
+//            b.putString("stopToggleAnimationPin2", chipId + " stopToggleAnimationPin2 for position: " + position);
+//            b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
+//            activity.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    devicesRecyclerViewAdapter.notifyItemChanged(position, b);
+//                    Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
+//                }
+//            });
+//        }else
+//            Log.e(TAG+" Pinn2", "Can not find Device with: " +chipId+" among list Items...");
+//    }
 
     @Override
     public void onAttach(Context context) {
