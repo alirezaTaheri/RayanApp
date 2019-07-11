@@ -125,7 +125,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
         ButterKnife.bind(this, view);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
         return view;

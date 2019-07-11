@@ -135,11 +135,11 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 //                AppConstants.disableEnableControls(true, (ViewGroup) viewHolder.itemView);
 //            }
 //        });
-        if (isTablet(getActivity())) {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
-        }
+//        if (isTablet(getActivity())) {
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+//        } else {
+//            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
+//        }
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         recyclerView.setNestedScrollingEnabled(false);

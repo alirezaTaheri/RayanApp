@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:clickable="true"
-    android:layout_height="100dp"
+    android:layout_height="270dp"
     android:theme="@style/AppTheme.NoActionBarListItems"
     app:cardCornerRadius="7dp">
     <FrameLayout
@@ -20,22 +20,22 @@
             android:id="@+id/clickableLayout"
             android:layout_width="match_parent"
             android:orientation="vertical"
-            android:layout_height="100dp">
+            android:layout_height="match_parent">
 
             <RelativeLayout
                 android:clickable="false"
                 android:focusable="false"
                 android:layout_width="match_parent"
                 android:layout_marginBottom="8dp"
-                android:layout_height="100dp"
+                android:layout_height="match_parent"
                 >
                 <ImageView
                     android:clickable="false"
                     android:focusable="false"
                     android:padding="3dp"
-                    android:layout_height="50dp"
-                    android:id="@+id/pin1"
+                    android:layout_height="200dp"
                     android:layout_width="match_parent"
+                    android:id="@+id/pin1"
                     android:foregroundGravity="top"
                     android:layout_marginTop="5dp"
                     app:srcCompat="@drawable/ic_lamp_off"
@@ -60,6 +60,7 @@
         <TextView
             android:layout_gravity="center_horizontal|bottom"
             android:text="Name"
+            android:textSize="30sp"
             android:clickable="false"
             android:focusable="false"
             android:background="#00ffffff"
