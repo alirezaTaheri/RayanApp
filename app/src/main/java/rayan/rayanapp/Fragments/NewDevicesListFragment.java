@@ -153,7 +153,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
                     public void isSuccessful(boolean isSuccess) {
                         progressDialog.dismiss();
                         Log.e("SuccessfullyConnected?" , "isisisisi: " + isSuccess);
-                        Toast.makeText(getActivity(), ""+isSuccess, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(), ""+isSuccess, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .start();

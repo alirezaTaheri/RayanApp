@@ -28,10 +28,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Helper.DeviceAnimator;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
+import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
+import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.ViewModels.FavoritesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -50,6 +53,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     Activity activity;
     LiveData<List<Device>> favoritesObservable;
     Observer<List<Device>> favoritesObserver;
+    private DeviceAnimator deviceAnimator;
     DialogPresenter dp;
     public FavoritesFragment() {
     }
@@ -65,6 +69,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = getActivity();
+        deviceAnimator = new DeviceAnimator();
         dp = new DialogPresenter(getActivity().getSupportFragmentManager());
         favoritesFragmentViewModel = ViewModelProviders.of(getActivity()).get(FavoritesFragmentViewModel.class);
         favoritesObservable = favoritesFragmentViewModel.getAllDevicesLive();
@@ -283,52 +288,65 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     }
 
     @Override
-    public void turnOnDeviceAnimationPin1(String chipID, int position) {
-
-    }
-
-    @Override
-    public void turnOffDeviceAnimationPin1(String chipID, int position) {
-
-    }
-
-    @Override
-    public void turnOnDeviceAnimationPin2(String chipID, int position) {
-
-    }
-
-    @Override
-    public void turnOffDeviceAnimationPin2(String chipID, int position) {
-
-    }
-
-    @Override
-    public void sendingMessageTimeoutPin1(String chipId, int position) {
-
-    }
-
-    @Override
-    public void sendingMessageTimeoutPin2(String chipId, int position) {
-
-    }
-
-    @Override
-    public void updateStripPin1(int position, int width) {
-
-    }
-
-    @Override
-    public void updateStripPin2(int position, int width) {
-
-    }
-
-    @Override
-    public int getDeviceItemWidth(int position) {
-        return 0;
+    public int getDeviceItemWidth(int position){
+        int width = ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
+        if (!(devices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || devices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
+            width /= 2;
+        return width;
     }
 
     @Override
     public RecyclerView getRecyclerView() {
-        return null;
+        return recyclerView;
+    }
+
+    @Override
+    public DeviceAnimator getDeviceAnimator() {
+        return deviceAnimator;
+    }
+
+    @Override
+    public void updateStripPin1(int position, int width){
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null)
+            ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin1(width);
+    }
+    @Override
+    public void updateStripPin2(int position, int width){
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null)
+            ((DeviceViewHolder2Bridges)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin2(width);
+    }
+    @Override
+    public void turnOnDeviceAnimationPin1(String chipID, int position, String type){
+        deviceAnimator.deviceTurnedOnPin1(chipID, position, this, type);
+    }
+    @Override
+    public void turnOffDeviceAnimationPin1(String chipID, int position, String type){
+        deviceAnimator.deviceTurnedOffPin1(chipID, position, this, type);
+    }
+    @Override
+    public void turnOnDeviceAnimationPin2(String chipID, int position, String type){
+        deviceAnimator.deviceTurnedOnPin2(chipID, position, this, type);
+    }
+    @Override
+    public void turnOffDeviceAnimationPin2(String chipID, int position, String type){
+        deviceAnimator.deviceTurnedOffPin2(chipID, position, this, type);
+    }
+    @Override
+    public void sendingMessageTimeoutPin1(String chipId, int position, String type){
+        if (!deviceAnimator.isResponseReceivedPin1(chipId)){
+            if (devices.get(position).getPin1().equals(AppConstants.ON_STATUS))
+                turnOnDeviceAnimationPin1(chipId, position, type);
+            else
+                turnOffDeviceAnimationPin1(chipId, position, type);
+        }
+    }
+    @Override
+    public void sendingMessageTimeoutPin2(String chipId, int position, String type){
+        if (!deviceAnimator.isResponseReceivedPin2(chipId)){
+            if (devices.get(position).getPin2().equals(AppConstants.ON_STATUS))
+                turnOnDeviceAnimationPin2(chipId, position, type);
+            else
+                turnOffDeviceAnimationPin2(chipId, position, type);
+        }
     }
 }

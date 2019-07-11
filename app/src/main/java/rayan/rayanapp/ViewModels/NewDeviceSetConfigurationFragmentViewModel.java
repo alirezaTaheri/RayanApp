@@ -155,7 +155,7 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                     @Override
                     public void isSuccessful(boolean isSuccess) {
                         Log.e("isSuccessful???? " , "isisisisi: " + isSuccess);
-                        Toast.makeText(activity, ""+isSuccess, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(activity, ""+isSuccess, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .start();

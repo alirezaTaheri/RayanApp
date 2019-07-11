@@ -16,6 +16,7 @@ import java.util.Map;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
+import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
@@ -29,8 +30,8 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
     private Map<String, ValueAnimator> animatorMap = new HashMap<>();
     private static Map<String, Boolean> pin1Enabled = new HashMap<>();
     private static Map<String, Boolean> pin2Enabled = new HashMap<>();
-    private Fragment fragment;
-    public DevicesRecyclerViewAdapter(Context context, List<Device> devices, Fragment fragment) {
+    private ToggleDeviceAnimationProgress fragment;
+    public DevicesRecyclerViewAdapter(Context context, List<Device> devices, ToggleDeviceAnimationProgress fragment) {
         super(context);
         this.items = devices;
         this.fragment = fragment;
@@ -77,37 +78,38 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
     @Override
     public void onBindViewHolder(@NonNull DeviceViewHolder1Bridge holder, int position, @NonNull List<Object> payloads) {
         if (!payloads.isEmpty()) {
+            Device device = items.get(position);
             Bundle b = (Bundle) payloads.get(0);
             for (String key : b.keySet()) {
                 if (key.equals("position")){
-                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Change in Position detected: " + items.get(position));
+                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Change in Position detected: " + device);
 //                    holder.onBind(items.get(position),getListener());
-                    holder.changePosition(items.get(position), getListener());
+                    holder.changePosition(device, getListener());
                 }
                 if (key.equals("pin1")){
-                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge1" + items.get(position));
-                    if (items.get(position).getPin1().equals(AppConstants.ON_STATUS))
-                        ((DevicesFragment)fragment).turnOnDeviceAnimationPin1(items.get(position).getChipId(), position);
-                    else ((DevicesFragment)fragment).turnOffDeviceAnimationPin1(items.get(position).getChipId(), position);
-                    holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
-//                    holder.pin1Toggled(items.get(position).getPin1().endsWith(AppConstants.ON_STATUS));
+                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge1" + device);
+                    if (device.getPin1().equals(AppConstants.ON_STATUS))
+                        fragment.turnOnDeviceAnimationPin1(device.getChipId(), position, device.getType());
+                    else fragment.turnOffDeviceAnimationPin1(device.getChipId(), position, device.getType());
+                    holder.stopToggleAnimationPin1(animatorMap.get(device.getChipId()+"1"),getListener(), device);
+//                    holder.pin1Toggled(device.getPin1().endsWith(AppConstants.ON_STATUS));
                 }
                 if (key.equals("pin2")){
-                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge2" + items.get(position));
-                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)){
-                        if (items.get(position).getPin1().equals(AppConstants.ON_STATUS))
-                            ((DevicesFragment)fragment).turnOnDeviceAnimationPin1(items.get(position).getChipId(), position);
-                        else ((DevicesFragment)fragment).turnOffDeviceAnimationPin1(items.get(position).getChipId(), position);
-                        holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
-//                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
-//                        ((DeviceViewHolder2Bridges)holder).pin2Toggled(items.get(position).getPin2().endsWith(AppConstants.ON_STATUS));
+                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge2" + device);
+                    if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || device.getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)){
+                        if (device.getPin2().equals(AppConstants.ON_STATUS))
+                            fragment.turnOnDeviceAnimationPin2(device.getChipId(), position, device.getType());
+                        else fragment.turnOffDeviceAnimationPin2(device.getChipId(), position, device.getType());
+                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(device.getChipId()+"2"),getListener(), device);
+//                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(device.getChipId()+"2"),getListener(), device);
+//                        ((DeviceViewHolder2Bridges)holder).pin2Toggled(device.getPin2().endsWith(AppConstants.ON_STATUS));
                     }
                 }
                 if (key.equals("name")){
                     holder.changeName(b.getString("name"));
-                    holder.stopToggleAnimationPin1(animatorMap.get(items.get(position).getChipId()+"1"),getListener(), items.get(position));
-                    if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)|| items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2))
-                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(items.get(position).getChipId()+"2"),getListener(), items.get(position));
+                    holder.stopToggleAnimationPin1(animatorMap.get(device.getChipId()+"1"),getListener(), device);
+                    if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)|| device.getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2))
+                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(device.getChipId()+"2"),getListener(), device);
                 }
 //                if (key.equals("ssid")){
 //                    holder.accessPointChanged(getItem(position), getListener());
@@ -116,7 +118,7 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
 //                    holder.accessPointChanged(getItem(position), getListener());
 //                }
                 if (key.equals("startTogglingPin1")){
-                    setPin1Enabled(items.get(position).getChipId(), false);
+                    setPin1Enabled(device.getChipId(), false);
                     ValueAnimator v;
                     if (b.getString("status").equals(AppConstants.ON_STATUS))
                         v = ValueAnimator.ofInt(getItem(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || getItem(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2) ? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth(), 0);
@@ -126,7 +128,7 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                     holder.startToggleAnimationPin1(v);
                 }
                 if (key.equals("startTogglingPin2")){
-                    setPin2Enabled(items.get(position).getChipId(), false);
+                    setPin2Enabled(device.getChipId(), false);
                     ValueAnimator v;
                     if (b.getString("status").equals(AppConstants.ON_STATUS))
                         v = ValueAnimator.ofInt(getItem(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || getItem(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)? holder.getDeviceItemWidth()/2:holder.getDeviceItemWidth(), 0);
@@ -136,12 +138,12 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
                     ((DeviceViewHolder2Bridges)holder).startToggleAnimationPin2(v);
                 }
                 if (key.equals("stopToggleAnimationPin1")){
-                    setPin1Enabled(items.get(position).getChipId(), true);
-                    holder.stopToggleAnimationPin1(animatorMap.get(b.getString("chipId")+"1"),getListener(), items.get(position));
+                    setPin1Enabled(device.getChipId(), true);
+                    holder.stopToggleAnimationPin1(animatorMap.get(b.getString("chipId")+"1"),getListener(), device);
                 }
                 if (key.equals("stopToggleAnimationPin2")){
-                    setPin2Enabled(items.get(position).getChipId(), true);
-                    ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(b.getString("chipId")+"2"),getListener(), items.get(position));
+                    setPin2Enabled(device.getChipId(), true);
+                    ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(b.getString("chipId")+"2"),getListener(), device);
                 }
             }
         }else {
@@ -152,9 +154,10 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
 
     @Override
     public int getItemViewType(int position) {
-        if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1))
+        Device device = items.get(position);
+        if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1))
             return 1;
-        else if (items.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || items.get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2))
+        else if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || device.getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2))
             return 2;
         return 3;
     }

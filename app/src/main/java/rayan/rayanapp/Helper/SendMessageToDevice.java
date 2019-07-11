@@ -143,7 +143,7 @@ public class SendMessageToDevice {
                         }
                         Log.e(TAG, "Lastmessage is : " + lastMessage);
                         if (lastMessage != null && !rayanApplication.getMqttMessagesController().isReceivedResponse(device.getChipId())){
-                            Toast.makeText(rayanApplication, "Command Attached", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(rayanApplication, "Command Attached", Toast.LENGTH_SHORT).show();
                             publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), lastMessage.toString(), 0, true);
                         }
                         lastCommand.get(device.getChipId() + "_1").dispose();
@@ -171,8 +171,8 @@ public class SendMessageToDevice {
                 public void onSubscribe(Disposable d) {
                     if (animation)
                         if (device.getPin1().equals(AppConstants.ON_STATUS))
-                            rayanApplication.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (DevicesFragment)fragment);
-                        else rayanApplication.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (DevicesFragment)fragment);
+                            fragment.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
+                        else fragment.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
 
 //                        fragment.startToggleAnimationPin1(device.getChipId(), position);
                     rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
@@ -192,7 +192,7 @@ public class SendMessageToDevice {
                 @Override
                 public void onComplete() {
                     Log.e("/////////", "////////OnComplete/////Pin1 Stopping animation:: ");
-                    ((DevicesFragment)fragment).sendingMessageTimeoutPin1(device.getChipId(), position);
+                    fragment.sendingMessageTimeoutPin1(device.getChipId(), position, device.getType());
 //                    fragment.stopToggleAnimationPin1(device.getChipId());
                     rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                 }
@@ -255,7 +255,7 @@ public class SendMessageToDevice {
                         }
                         Log.e(TAG, "Lastmessage is : " + lastMessage);
                         if (lastMessage != null && !rayanApplication.getMqttMessagesController().isReceivedResponse(device.getChipId())){
-                            Toast.makeText(rayanApplication, "Command Attached", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(rayanApplication, "Command Attached", Toast.LENGTH_SHORT).show();
                             publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), lastMessage.toString(), 0, true);
                         }
                         lastCommand.get(device.getChipId() + "_2").dispose();
@@ -284,8 +284,8 @@ public class SendMessageToDevice {
                 if (animation)
 //                    fragment.startToggleAnimationPin2(device.getChipId(), position);
                     if (device.getPin2().equals(AppConstants.ON_STATUS))
-                        rayanApplication.getDeviceAnimator().turningOffPin2(device.getChipId(), position, (DevicesFragment)fragment);
-                    else rayanApplication.getDeviceAnimator().turningOnPin2(device.getChipId(), position, (DevicesFragment)fragment);
+                        fragment.getDeviceAnimator().turningOffPin2(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
+                    else fragment.getDeviceAnimator().turningOnPin2(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
                 rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                 rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
             }
@@ -304,7 +304,7 @@ public class SendMessageToDevice {
             public void onComplete() {
                 Log.e("/////////", "////////OnComplete/////Pin2 Stopping animation: ");
 //                fragment.stopToggleAnimationPin2(device.getChipId());
-                ((DevicesFragment)fragment).sendingMessageTimeoutPin2(device.getChipId(), position);
+                fragment.sendingMessageTimeoutPin2(device.getChipId(), position, device.getType());
                 rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
             }
         });
@@ -319,8 +319,8 @@ public class SendMessageToDevice {
                     public void onSubscribe(Disposable d) {
 //                        fragment.startToggleAnimationPin1(device.getChipId(), position);
                         if (device.getPin1().equals(AppConstants.ON_STATUS))
-                            rayanApplication.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (DevicesFragment)fragment);
-                        else rayanApplication.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (DevicesFragment)fragment);
+                            fragment.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
+                        else fragment.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().setWaitingPin1(device.getChipId(), d);
                     }
@@ -340,7 +340,7 @@ public class SendMessageToDevice {
                     public void onError(Throwable e) {
                         Log.e("/////////", "////////onError/////: " +e);
 //                        fragment.stopToggleAnimationPin1(device.getChipId());
-                        ((DevicesFragment)fragment).sendingMessageTimeoutPin1(device.getChipId(), position);
+                        fragment.sendingMessageTimeoutPin1(device.getChipId(), position, device.getType());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                     }
 
@@ -348,7 +348,7 @@ public class SendMessageToDevice {
                     public void onComplete() {
                         Log.e("/////////", "////////OnComplete/////: ");
 //                        fragment.stopToggleAnimationPin1(device.getChipId());
-                        ((DevicesFragment)fragment).sendingMessageTimeoutPin1(device.getChipId(), position);
+                        fragment.sendingMessageTimeoutPin1(device.getChipId(), position, device.getType());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                     }
                 });
@@ -364,8 +364,8 @@ public class SendMessageToDevice {
                     public void onSubscribe(Disposable d) {
 //                        fragment.startToggleAnimationPin2(device.getChipId(), position);
                         if (device.getPin2().equals(AppConstants.ON_STATUS))
-                            rayanApplication.getDeviceAnimator().turningOffPin2(device.getChipId(), position, (DevicesFragment)fragment);
-                        else rayanApplication.getDeviceAnimator().turningOnPin2(device.getChipId(), position, (DevicesFragment)fragment);
+                            fragment.getDeviceAnimator().turningOffPin2(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
+                        else fragment.getDeviceAnimator().turningOnPin2(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
                     }
@@ -380,14 +380,14 @@ public class SendMessageToDevice {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("/////////", "////////onError/////: " +e);
-                        ((DevicesFragment)fragment).sendingMessageTimeoutPin2(device.getChipId(), position);
+                        fragment.sendingMessageTimeoutPin2(device.getChipId(), position, device.getType());
                     }
 
                     @Override
                     public void onComplete() {
                         Log.e("/////////", "////////OnComplete/////: ");
 //                        fragment.stopToggleAnimationPin2(device.getChipId());
-                        ((DevicesFragment)fragment).sendingMessageTimeoutPin2(device.getChipId(), position);
+                        fragment.sendingMessageTimeoutPin2(device.getChipId(), position, device.getType());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                     }
                 });
@@ -468,7 +468,7 @@ public class SendMessageToDevice {
             public void onNext(Long aLong) {
                 Log.e(TAG, " onNext  Timer executed for Mqtt Backup pin 1: " + aLong);
                 if (aLong>0){
-                    Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
                     sendMqttPin1(rayanApplication, device, position, fragment, false, false);
                     mqttBackup.get(device.getChipId()+"_1").dispose();
                 }
@@ -530,8 +530,8 @@ public class SendMessageToDevice {
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onSubscribe");
 //                        fragment.startToggleAnimationPin1(device.getChipId(), position);
                         if (device.getPin1().equals(AppConstants.ON_STATUS))
-                            rayanApplication.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (DevicesFragment)fragment);
-                        else rayanApplication.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (DevicesFragment)fragment);
+                            fragment.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
+                        else fragment.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().setWaitingPin1(device.getChipId(), d);
                     }
@@ -546,7 +546,7 @@ public class SendMessageToDevice {
                         if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
                             mqttBackup.get(device.getChipId()+"_1").dispose();
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onError: " + e);
-                        ((DevicesFragment)fragment).sendingMessageTimeoutPin1(device.getChipId(), position);
+                        fragment.sendingMessageTimeoutPin1(device.getChipId(), position, device.getType());
 //                        fragment.stopToggleAnimationPin1(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                         e.printStackTrace();
@@ -557,7 +557,7 @@ public class SendMessageToDevice {
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onComplete ");
                         if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
                             mqttBackup.get(device.getChipId()+"_1").dispose();
-                        ((DevicesFragment)fragment).sendingMessageTimeoutPin1(device.getChipId(), position);
+                        fragment.sendingMessageTimeoutPin1(device.getChipId(), position, device.getType());
 //                        fragment.stopToggleAnimationPin1(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                     }
@@ -579,7 +579,7 @@ public class SendMessageToDevice {
                 public void onNext(Long aLong) {
                     Log.e(TAG, " onNext  Timer executed for Mqtt Backup pin 2: " + aLong);
                     if (aLong>0){
-                        Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
                         sendMqttPin2(rayanApplication, device, position, fragment, false,false);
                         mqttBackup.get(device.getChipId()+"_2").dispose();
                     }
@@ -633,8 +633,8 @@ public class SendMessageToDevice {
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onSubscribe");
 //                        fragment.startToggleAnimationPin2(device.getChipId(), position);
                         if (device.getPin2().equals(AppConstants.ON_STATUS))
-                            rayanApplication.getDeviceAnimator().turningOffPin2(device.getChipId(), position, (DevicesFragment)fragment);
-                        else rayanApplication.getDeviceAnimator().turningOnPin2(device.getChipId(), position, (DevicesFragment)fragment);
+                            fragment.getDeviceAnimator().turningOffPin2(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
+                        else fragment.getDeviceAnimator().turningOnPin2(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().setWaitingPin2(device.getChipId(), d);
                     }
@@ -649,7 +649,7 @@ public class SendMessageToDevice {
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onError: " + e);
                         if (mqttBackup.get(device.getChipId()+"_2") != null && !mqttBackup.get(device.getChipId()+"_2").isDisposed())
                             mqttBackup.get(device.getChipId()+"_2").dispose();
-                        ((DevicesFragment)fragment).sendingMessageTimeoutPin2(device.getChipId(), position);
+                        fragment.sendingMessageTimeoutPin2(device.getChipId(), position, device.getType());
 //                        fragment.stopToggleAnimationPin2(device.getChipId());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                         e.printStackTrace();
@@ -661,7 +661,7 @@ public class SendMessageToDevice {
                         if (mqttBackup.get(device.getChipId()+"_2") != null && !mqttBackup.get(device.getChipId()+"_2").isDisposed())
                             mqttBackup.get(device.getChipId()+"_2").dispose();
 //                        fragment.stopToggleAnimationPin2(device.getChipId());
-                        ((DevicesFragment)fragment).sendingMessageTimeoutPin2(device.getChipId(), position);
+                        fragment.sendingMessageTimeoutPin2(device.getChipId(), position, device.getType());
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                     }
                 });
@@ -670,7 +670,7 @@ public class SendMessageToDevice {
     public void toggleDevicePin1(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam? : " + cr);
-        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
             case "UDP":
                 sendUdpPin1(device, rayanApplication,fragment, position);
@@ -695,7 +695,7 @@ public class SendMessageToDevice {
     public void toggleDevicePin2(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam2? : " + cr);
-        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
             case "UDP":
                 sendUdpPin2(device, rayanApplication,fragment, position);

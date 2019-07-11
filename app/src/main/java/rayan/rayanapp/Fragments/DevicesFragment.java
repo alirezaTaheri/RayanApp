@@ -61,6 +61,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     LottieAnimationView lottieAnimationView;
     public DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     public List<Device> devices = new ArrayList<>();
+    List<Device> finalDevices = new ArrayList<>();
     LiveData<List<Device>> devicesObservable;
     MainActivity mainActivity;
     Observer<List<Device>> devicesObserver;
@@ -75,7 +76,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        deviceAnimator = ((RayanApplication)getActivity().getApplication()).getDeviceAnimator();
+        deviceAnimator = new DeviceAnimator();
         devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
         devicesRecyclerViewAdapter.setListener(this);
         dp = new DialogPresenter(getActivity().getSupportFragmentManager());
@@ -85,8 +86,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         devicesObserver = new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {
-                List<Device> finalDevices = new ArrayList<>();
                 DevicesFragment.this.devices = devices;
+                finalDevices = new ArrayList<>();
                 String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
                 Log.e(TAG ,"All Devices: " + devices.subList(0, devices.size()/3));
                 Log.e(TAG ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
@@ -128,12 +129,12 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
         ButterKnife.bind(this, view);
-        recyclerView.setRecyclerListener(new RecyclerView.RecyclerListener() {
-            @Override
-            public void onViewRecycled(@NonNull RecyclerView.ViewHolder viewHolder) {
-                AppConstants.disableEnableControls(true, (ViewGroup) viewHolder.itemView);
-            }
-        });
+//        recyclerView.setRecyclerListener(new RecyclerView.RecyclerListener() {
+//            @Override
+//            public void onViewRecycled(@NonNull RecyclerView.ViewHolder viewHolder) {
+//                AppConstants.disableEnableControls(true, (ViewGroup) viewHolder.itemView);
+//            }
+//        });
         if (isTablet(getActivity())) {
             recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
         } else {
@@ -142,6 +143,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
         recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setHasFixedSize(true);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
@@ -175,15 +177,19 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public int getDeviceItemWidth(int position){
-        int width = ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
-        if (!(devices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || devices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
-            width /= 2;
-        return width;
+//        if (!(finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
+//            width /= 2;
+        return ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
     }
 
     @Override
     public RecyclerView getRecyclerView() {
         return recyclerView;
+    }
+
+    @Override
+    public DeviceAnimator getDeviceAnimator() {
+        return deviceAnimator;
     }
 
     @Override
@@ -197,37 +203,39 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
             ((DeviceViewHolder2Bridges)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin2(width);
     }
     @Override
-    public void turnOnDeviceAnimationPin1(String chipID, int position){
-        deviceAnimator.deviceTurnedOnPin1(chipID, position, this);
+    public void turnOnDeviceAnimationPin1(String chipID, int position, String type){
+        deviceAnimator.deviceTurnedOnPin1(chipID, position, this, type);
     }
     @Override
-    public void turnOffDeviceAnimationPin1(String chipID, int position){
-        deviceAnimator.deviceTurnedOffPin1(chipID, position, this);
+    public void turnOffDeviceAnimationPin1(String chipID, int position, String type){
+        deviceAnimator.deviceTurnedOffPin1(chipID, position, this, type);
     }
     @Override
-    public void turnOnDeviceAnimationPin2(String chipID, int position){
-        deviceAnimator.deviceTurnedOnPin2(chipID, position, this);
+    public void turnOnDeviceAnimationPin2(String chipID, int position, String type){
+        deviceAnimator.deviceTurnedOnPin2(chipID, position, this, type);
     }
     @Override
-    public void turnOffDeviceAnimationPin2(String chipID, int position){
-        deviceAnimator.deviceTurnedOffPin2(chipID, position, this);
+    public void turnOffDeviceAnimationPin2(String chipID, int position, String type){
+        deviceAnimator.deviceTurnedOffPin2(chipID, position, this, type);
     }
     @Override
-    public void sendingMessageTimeoutPin1(String chipId, int position){
+    public void sendingMessageTimeoutPin1(String chipId, int position, String type){
+        if (position<finalDevices.size())
         if (!deviceAnimator.isResponseReceivedPin1(chipId)){
-            if (devices.get(position).getPin1().equals(AppConstants.ON_STATUS))
-                turnOnDeviceAnimationPin1(chipId, position);
+            if (finalDevices.get(position).getPin1().equals(AppConstants.ON_STATUS))
+                turnOnDeviceAnimationPin1(chipId, position, type);
             else
-                turnOffDeviceAnimationPin1(chipId, position);
+                turnOffDeviceAnimationPin1(chipId, position, type);
         }
     }
     @Override
-    public void sendingMessageTimeoutPin2(String chipId, int position){
+    public void sendingMessageTimeoutPin2(String chipId, int position, String type){
+        if (position<finalDevices.size())
         if (!deviceAnimator.isResponseReceivedPin2(chipId)){
-            if (devices.get(position).getPin2().equals(AppConstants.ON_STATUS))
-                turnOnDeviceAnimationPin2(chipId, position);
+            if (finalDevices.get(position).getPin2().equals(AppConstants.ON_STATUS))
+                turnOnDeviceAnimationPin2(chipId, position, type);
             else
-                turnOffDeviceAnimationPin2(chipId, position);
+                turnOffDeviceAnimationPin2(chipId, position, type);
         }
     }
 //    @Override

@@ -51,7 +51,6 @@ public class RayanApplication extends Application {
     private Locale locale = null;
     private MqttMessagesController mqttMessagesController;
     private MqttSubscriptionController msc;
-    private DeviceAnimator deviceAnimator;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -92,15 +91,11 @@ public class RayanApplication extends Application {
         requestManager = new RequestManager();
         msc = new MqttSubscriptionController(this);
         mqttMessagesController = new MqttMessagesController();
-        deviceAnimator = new DeviceAnimator();
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
     }
 
-    public DeviceAnimator getDeviceAnimator() {
-        return deviceAnimator;
-    }
 
     public MqttSubscriptionController getMsc() {
         return msc;
