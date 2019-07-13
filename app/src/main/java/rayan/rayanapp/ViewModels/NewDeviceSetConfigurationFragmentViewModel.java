@@ -155,7 +155,9 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                     @Override
                     public void isSuccessful(boolean isSuccess) {
                         Log.e("isSuccessful???? " , "isisisisi: " + isSuccess);
-//                        Toast.makeText(activity, ""+isSuccess, Toast.LENGTH_SHORT).show();
+                        if (!isSuccess)
+                            ((AddNewDeviceActivity) activity).getNewDevice().setFailed(true);
+                        Toast.makeText(activity, ""+isSuccess, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .start();
@@ -234,6 +236,8 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                     Device existingDevice = deviceDatabase.getDevice(activity.getNewDevice().getChip_id());
                     if (existingDevice != null){
                         Log.e(TAG, "Deleting Device From previous Group: " + existingDevice);
+                        activity.getNewDevice().setPreGroupId(existingDevice.getGroupId());
+
                         return deleteUserObservable(new DeleteUserRequest(existingDevice.getId(), existingDevice.getGroupId()));
                     }
                     else {

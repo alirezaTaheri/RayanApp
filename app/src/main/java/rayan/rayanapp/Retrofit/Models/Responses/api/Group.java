@@ -132,11 +132,11 @@ public class Group implements Parcelable {
     @Override
     public String toString() {
         return "Group{" +
-//                "id='" + id + '\'' +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
 //                ", admins=" + admins +
 //                ", humanUsers=" + humanUsers +
-                ", devices=" + devices +
+//                ", devices=" + devices +
                 '}';
     }
 

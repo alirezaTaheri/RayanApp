@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 import rayan.rayanapp.Persistance.AppDatabase;
@@ -43,6 +44,10 @@ public class DeviceDatabase {
         return deviceDAO.getAllFlowable();
     }
 
+    public Single<List<Device>> getAllDevicesSingle(){
+        return deviceDAO.getAllSingle();
+    }
+
     public void addDevice(Device device){
         deviceDAO.add(device);
     }
@@ -60,6 +65,9 @@ public class DeviceDatabase {
     }
     public List<Device> getAllInGroup(String groupId){
         return deviceDAO.getAllInGroup(groupId);
+    }
+    public Single<List<Device>> getAllInGroupSingle(String groupId){
+        return deviceDAO.getAllInGroupSingle(groupId);
     }
     public LiveData<List<Device>> getAllInGroupLive(String groupId){
         return deviceDAO.getAllInGroupLive(groupId);

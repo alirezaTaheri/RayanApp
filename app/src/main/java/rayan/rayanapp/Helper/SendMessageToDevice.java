@@ -143,7 +143,7 @@ public class SendMessageToDevice {
                         }
                         Log.e(TAG, "Lastmessage is : " + lastMessage);
                         if (lastMessage != null && !rayanApplication.getMqttMessagesController().isReceivedResponse(device.getChipId())){
-//                            Toast.makeText(rayanApplication, "Command Attached", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(rayanApplication, "Command Attached", Toast.LENGTH_SHORT).show();
                             publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), lastMessage.toString(), 0, true);
                         }
                         lastCommand.get(device.getChipId() + "_1").dispose();
@@ -255,7 +255,7 @@ public class SendMessageToDevice {
                         }
                         Log.e(TAG, "Lastmessage is : " + lastMessage);
                         if (lastMessage != null && !rayanApplication.getMqttMessagesController().isReceivedResponse(device.getChipId())){
-//                            Toast.makeText(rayanApplication, "Command Attached", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(rayanApplication, "Command Attached", Toast.LENGTH_SHORT).show();
                             publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), lastMessage.toString(), 0, true);
                         }
                         lastCommand.get(device.getChipId() + "_2").dispose();
@@ -468,7 +468,7 @@ public class SendMessageToDevice {
             public void onNext(Long aLong) {
                 Log.e(TAG, " onNext  Timer executed for Mqtt Backup pin 1: " + aLong);
                 if (aLong>0){
-//                    Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
                     sendMqttPin1(rayanApplication, device, position, fragment, false, false);
                     mqttBackup.get(device.getChipId()+"_1").dispose();
                 }
@@ -579,7 +579,7 @@ public class SendMessageToDevice {
                 public void onNext(Long aLong) {
                     Log.e(TAG, " onNext  Timer executed for Mqtt Backup pin 2: " + aLong);
                     if (aLong>0){
-//                        Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
                         sendMqttPin2(rayanApplication, device, position, fragment, false,false);
                         mqttBackup.get(device.getChipId()+"_2").dispose();
                     }
@@ -670,7 +670,7 @@ public class SendMessageToDevice {
     public void toggleDevicePin1(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam? : " + cr);
-//        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
             case "UDP":
                 sendUdpPin1(device, rayanApplication,fragment, position);
@@ -695,7 +695,7 @@ public class SendMessageToDevice {
     public void toggleDevicePin2(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam2? : " + cr);
-//        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
             case "UDP":
                 sendUdpPin2(device, rayanApplication,fragment, position);

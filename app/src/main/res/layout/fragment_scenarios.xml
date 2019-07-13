@@ -3,15 +3,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.ScenariosFragment">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <android.support.v7.widget.CardView
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+        <RelativeLayout
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="3.5dp"
+            android:background="?attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+            android:layout_alignBaseline="@+id/allOn"
+            android:id="@+id/task1"
+            android:drawableRight="@drawable/ic_dot"
+            android:gravity="center"
+            android:text="  روشن کردن همه در:"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+            <Spinner
+                android:id="@+id/allOnSpinner"
+                android:layout_below="@+id/task1"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/allOn"
+            android:layout_centerInParent="true"
+            android:theme="@style/PrimaryButton"
+            android:layout_alignParentLeft="true"
+            android:text="اجرا کردن"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="15dp"
-
-        android:text="Coming Soon..." />
-
+    <android.support.v7.widget.CardView
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+        <RelativeLayout
+            android:padding="3.5dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+            android:layout_alignBaseline="@+id/allOff"
+            android:drawableRight="@drawable/ic_dot"
+            android:gravity="center"
+            android:id="@+id/task2"
+            android:text="  خاموش کردن همه در:"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+            <Spinner
+                android:id="@+id/allOffSpinner"
+                android:layout_below="@+id/task2"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/allOff"
+            android:layout_centerInParent="true"
+            android:theme="@style/PrimaryButton"
+            android:layout_alignParentLeft="true"
+            android:text="اجرا کردن"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+    </LinearLayout>
 </FrameLayout>

@@ -48,6 +48,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     @BindView(R.id.animation_view)
     LottieAnimationView lottieAnimationView;
     List<Device> devices = new ArrayList<>();
+    List<Device> finalDevices = new ArrayList<>();
     FavoritesFragmentViewModel favoritesFragmentViewModel;
     DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     Activity activity;
@@ -76,7 +77,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
         favoritesObserver = new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {
-                List<Device> finalDevices = new ArrayList<>();
+                finalDevices = new ArrayList<>();
                 String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
 //                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(0, devices.size()/3));
 //                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
@@ -89,15 +90,6 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                         }
                     }
                 else finalDevices = devices;
-                if (finalDevices.size() == 0){
-                    lottieAnimationView.setMaxProgress(0.5f);
-                    emptyView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.INVISIBLE);
-                }
-                else{
-                    emptyView.setVisibility(View.INVISIBLE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                }
 //                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
                 Collections.sort(finalDevices, new Comparator<Device>(){
                     public int compare(Device obj1, Device obj2) {
@@ -131,6 +123,19 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (finalDevices.size() == 0){
+            lottieAnimationView.setMaxProgress(0.5f);
+            emptyView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.INVISIBLE);
+        }
+        else{
+            emptyView.setVisibility(View.INVISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
 
     @Override
     public void onPin1Clicked(Device device, int position) {

@@ -189,11 +189,12 @@ public class CreateGroupFragment extends Fragment {
             }
             else if (baseResponse.getStatus().getCode().equals("200")){
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"گروه با موفقیت ایجاد شد");
-                Intent intent=new Intent(getContext(), GroupsActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                startActivity(intent);
+                ((DoneWithFragment)getActivity()).operationDone();
+//                Intent intent=new Intent(getContext(), GroupsActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//                fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                startActivity(intent);
             }
             else
             SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"مشکلی وجود دارد");

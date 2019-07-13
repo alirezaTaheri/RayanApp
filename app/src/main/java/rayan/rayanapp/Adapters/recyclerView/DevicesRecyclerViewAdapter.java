@@ -167,4 +167,10 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
     public void setPin2Enabled(String chiipId, boolean enabled){
         pin1Enabled.put(chiipId, enabled);
     }
+
+    @Override
+    public long getItemId(int position) {
+//        return super.getItemId(position);
+        return items.get(position).getId().hashCode();
+    }
 }

@@ -176,6 +176,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                                         callback.goToNextStep();
                                         break;
                                     case AppConstants.SOCKET_TIME_OUT:
+                                        AddNewDeviceActivity.getNewDevice().setFailed(true);
                                         Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
                                         break;
                                     case AppConstants.UNKNOWN_HOST_EXCEPTION:

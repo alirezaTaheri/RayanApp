@@ -15,14 +15,24 @@ public class NewDevice {
     private String username;
     private String password;
     private Group group;
+    private String preGroupId;
     private String chip_id;
     private String pin1;
     private String pin2;
     private NodeStatus status;
     private int networkId;
+    private boolean failed = false;
     public enum NodeStatus {
             IDLE,
             NEW
+    }
+
+    public boolean isFailed() {
+        return failed;
+    }
+
+    public void setFailed(boolean failed) {
+        this.failed = failed;
     }
 
     public String getAccessPointName() {
@@ -167,6 +177,14 @@ public class NewDevice {
 
     public void setStatus(NodeStatus status) {
         this.status = status;
+    }
+
+    public String getPreGroupId() {
+        return preGroupId;
+    }
+
+    public void setPreGroupId(String preGroupId) {
+        this.preGroupId = preGroupId;
     }
 
     @Override

@@ -91,6 +91,9 @@ import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
@@ -183,6 +186,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (connectionStatusModel == null){
                  this.notConnected();
                 }else {
+                    if (AddNewDeviceActivity.getNewDevice() != null && AddNewDeviceActivity.getNewDevice().isFailed() && AddNewDeviceActivity.getNewDevice().getPreGroupId() != null){
+                    Log.e("MainActivity", "In The MainActivity: Going to addDeviceToPreviousGroup");
+                    Observable.zip(mainActivityViewModel.deleteUserObservable(new DeleteUserRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getGroup().getId())),
+                            mainActivityViewModel.addDeviceToGroupObservable(new AddDeviceToGroupRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getPreGroupId())),
+                            new BiFunction<BaseResponse, BaseResponse, Object>() {
+                                @Override
+                                public Object apply(BaseResponse baseResponse, BaseResponse baseResponse2) throws Exception {
+                                    Log.e("MainActivity", "Results of tofmal: " + baseResponse);
+                                    Log.e("MainActivity", "Results of tofmal: " + baseResponse2);
+                                    if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION) && baseResponse2.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
+                                        Log.e("MainActivity", "Both Done ");
+                                        Toast.makeText(MainActivity.this, "Fixed", Toast.LENGTH_SHORT).show();
+                                        AddNewDeviceActivity.getNewDevice().setFailed(false);
+                                    }
+                                    return new Object();
+                                }
+                            }).subscribe(new Consumer<Object>() {
+                        @Override
+                        public void accept(Object o) throws Exception {
+
+                        }
+                    });
+                    }
                     if (connectionStatusModel.getType() == AppConstants.WIFI_NETWORK) {
                         String extraInfo = connectionStatusModel.getSsid();
                         if (extraInfo != null && connectionStatusModel.getSsid().charAt(connectionStatusModel.getSsid().length()-1) == connectionStatusModel.getSsid().charAt(0) && String.valueOf(connectionStatusModel.getSsid().charAt(0)).equals("\""))

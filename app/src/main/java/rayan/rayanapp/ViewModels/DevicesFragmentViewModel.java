@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Single;
@@ -91,6 +92,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
     public List<Device> getAllDevicesInGroup(String groupId){
             return deviceDatabase.getAllInGroup(groupId);
+    }
+    public Single<List<Device>> getAllDevicesInGroupSingle(String groupId){
+            return deviceDatabase.getAllInGroupSingle(groupId);
     }
     public LiveData<List<Device>> getAllDevicesInGroupLive(String groupId){
             return deviceDatabase.getAllInGroupLive(groupId);
@@ -346,5 +350,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
 
 
+    public Single<List<Device>> getAllDevicesSingle(){
+        return deviceDatabase.getAllDevicesSingle();
+    }
 }
 

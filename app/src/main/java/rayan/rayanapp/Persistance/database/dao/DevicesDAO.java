@@ -12,6 +12,7 @@ import java.util.List;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 
@@ -33,8 +34,13 @@ public interface DevicesDAO extends BaseDAO<Device>{
     @Query("SELECT * FROM Device ")
     Flowable<List<Device>> getAllFlowable();
 
+    @Query("SELECT * FROM Device ")
+    Single<List<Device>> getAllSingle();
+
     @Query("SELECT * FROM Device WHERE groupId = :groupId")
     List<Device> getAllInGroup(String groupId);
+    @Query("SELECT * FROM Device WHERE groupId = :groupId")
+    Single<List<Device>> getAllInGroupSingle(String groupId);
 
     @Query("SELECT * FROM Device WHERE groupId = :groupId")
     LiveData<List<Device>> getAllInGroupLive(String groupId);

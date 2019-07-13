@@ -22,6 +22,7 @@ public class YesNoButtomSheetFragment extends BottomSheetDialogFragment {
     public void setOnBottomSheetSubmitClicked(OnBottomSheetSubmitClicked onBottomSheetSubmitClicked){
         this.onBottomSheetSubmitClicked=onBottomSheetSubmitClicked;
     }
+
     private String submitTxt;
     private String cancelTxt;
     private String sheetTxt;

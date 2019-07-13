@@ -129,6 +129,9 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
         ButterKnife.bind(this, view);
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(20);
 //        recyclerView.setRecyclerListener(new RecyclerView.RecyclerListener() {
 //            @Override
 //            public void onViewRecycled(@NonNull RecyclerView.ViewHolder viewHolder) {
@@ -142,8 +145,6 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         }
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
-        recyclerView.setNestedScrollingEnabled(false);
-        recyclerView.setHasFixedSize(true);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 

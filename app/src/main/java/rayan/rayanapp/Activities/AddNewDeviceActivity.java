@@ -28,7 +28,10 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.viewPager.AddNewDeviceStepperAdapter;
 import rayan.rayanapp.Data.AccessPoint;
@@ -46,7 +49,10 @@ import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Receivers.WifiScanReceiver;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
@@ -66,7 +72,7 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     public Group selectedGroup;
     BackHandledFragment currentFragment;
     private SetPrimaryConfigRequest setPrimaryConfigRequest;
-    private NewDevice newDevice;
+    private static NewDevice newDevice;
     GroupsListFragmentViewModel viewModel;
     String testCaseSSID;
 //    @BindView(R.id.toolbar)
@@ -89,6 +95,30 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
             if (connectionStatusModel == null){
                 this.notConnected();
             }else {
+                if (newDevice.isFailed() && newDevice.getPreGroupId() != null){
+                    Log.e("AddNewDeviceActivity", "In The AddNewDeviceActivity: Going to addDeviceToPreviousGroup");
+                    Observable.zip(viewModel.deleteUserObservable(new DeleteUserRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getGroup().getId())),
+                            viewModel.addDeviceToGroupObservable(new AddDeviceToGroupRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getPreGroupId())),
+                            new BiFunction<BaseResponse, BaseResponse, Object>() {
+                                @Override
+                                public Object apply(BaseResponse baseResponse, BaseResponse baseResponse2) throws Exception {
+                                    Log.e("AddNewDeviceActivity", "Results of tofmal: " + baseResponse);
+                                    Log.e("AddNewDeviceActivity", "Results of tofmal: " + baseResponse2);
+                                    if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION) && baseResponse2.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
+                                        Log.e("AddNewDeviceActivity", "Both Done ");
+                                        Toast.makeText(AddNewDeviceActivity.this, "Fixed", Toast.LENGTH_SHORT).show();
+                                        AddNewDeviceActivity.getNewDevice().setFailed(false);
+                                    }
+                                    return new Object();
+                                }
+                            }).subscribe(new Consumer<Object>() {
+                        @Override
+                        public void accept(Object o) throws Exception {
+
+                        }
+                    });
+//                    viewModel.addDeviceToGroup(new AddDeviceToGroupRequest(newDevice.getId(), newDevice.getPreGroupId()));
+                }
                 if (connectionStatusModel.getType() == AppConstants.WIFI_NETWORK) {
                     String extraInfo = connectionStatusModel.getSsid();
                     if (extraInfo != null && connectionStatusModel.getSsid().charAt(connectionStatusModel.getSsid().length()-1) == connectionStatusModel.getSsid().charAt(0) && String.valueOf(connectionStatusModel.getSsid().charAt(0)).equals("\""))
@@ -254,7 +284,7 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         return setPrimaryConfigRequest;
     }
 
-    public NewDevice getNewDevice(){
+    public static NewDevice getNewDevice(){
         return newDevice;
     }
 
