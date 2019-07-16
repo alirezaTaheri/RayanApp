@@ -30,12 +30,6 @@ import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.JsonMaker;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
-//import io.fabric.sdk.android.Fabric;
-//import com.crashlytics.android.Crashlytics;
-//<<<<<<< HEAD
-//=======
-//>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
-
 public class RayanApplication extends Application {
     private static Context context;
     private UDPMessageRxBus bus;
@@ -65,6 +59,7 @@ public class RayanApplication extends Application {
 //        Fabric.with(this, new Crashlytics());
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/IRANSans1.ttf")
+//                .setDefaultFontPath("fonts/aseman.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

@@ -7,16 +7,17 @@
     <com.airbnb.lottie.LottieAnimationView
         android:layout_gravity="left"
         android:id="@+id/connectionAnimation"
-        android:layout_width="60dp"
+        android:layout_width="65dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-
-        app:lottie_fileName="animation9_wifi_connect.json"/>
+        android:layout_centerInParent="true"
+        android:visibility="invisible"
+        app:lottie_fileName="animation10_google_loading.json"/>
     <TextView
+        android:visibility="invisible"
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:gravity="center"
-        android:text="Satus"
+        android:text=""
         android:textSize="17sp"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"

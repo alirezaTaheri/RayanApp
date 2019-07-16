@@ -447,12 +447,12 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 		return token;
 	}
 
-	// private void registerReceiver(BroadcastReceiver receiver) {
-		// IntentFilter filter = new IntentFilter();
-				// filter.addAction(MqttServiceConstants.CALLBACK_TO_ACTIVITY);
-				// LocalBroadcastManager.getInstance(myContext).registerReceiver(receiver, filter);
-				// receiverRegistered = true;
-	// }
+//	 private void registerReceiver(BroadcastReceiver receiver) {
+//		 IntentFilter filter = new IntentFilter();
+//				 filter.addAction(MqttServiceConstants.CALLBACK_TO_ACTIVITY);
+//				 LocalBroadcastManager.getInstance(myContext).registerReceiver(receiver, filter);
+//				 receiverRegistered = true;
+//	 }
 	Handler handler;
 	private void registerReceiver(BroadcastReceiver receiver) {
         if (handler == null) {

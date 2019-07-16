@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -37,9 +38,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -161,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Connection.ConnectionStatus mqttConnectionStatus;
     private RetryConnectMqtt retryConnectMqtt;
     boolean networkConnected = false;
-
+    Animation fadeIn, fadeOut;
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -177,8 +185,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
             finish();
         }else {
-            mqttConnectionStatus = Connection.ConnectionStatus.NONE;
             setContentView(R.layout.activity_main);
+            ButterKnife.bind(this);
+            initializeAnimations();
+            mqttConnectionStatus = Connection.ConnectionStatus.NONE;
             retryConnectMqtt = new RetryConnectMqtt(this);
             ConnectionLiveData connectionLiveData = new ConnectionLiveData(getApplicationContext());
             connectionLiveData.observe(this, connectionStatusModel -> {
@@ -188,26 +198,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else {
                     if (AddNewDeviceActivity.getNewDevice() != null && AddNewDeviceActivity.getNewDevice().isFailed() && AddNewDeviceActivity.getNewDevice().getPreGroupId() != null){
                     Log.e("MainActivity", "In The MainActivity: Going to addDeviceToPreviousGroup");
-                    Observable.zip(mainActivityViewModel.deleteUserObservable(new DeleteUserRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getGroup().getId())),
-                            mainActivityViewModel.addDeviceToGroupObservable(new AddDeviceToGroupRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getPreGroupId())),
-                            new BiFunction<BaseResponse, BaseResponse, Object>() {
-                                @Override
-                                public Object apply(BaseResponse baseResponse, BaseResponse baseResponse2) throws Exception {
-                                    Log.e("MainActivity", "Results of tofmal: " + baseResponse);
-                                    Log.e("MainActivity", "Results of tofmal: " + baseResponse2);
-                                    if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION) && baseResponse2.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
-                                        Log.e("MainActivity", "Both Done ");
-                                        Toast.makeText(MainActivity.this, "Fixed", Toast.LENGTH_SHORT).show();
-                                        AddNewDeviceActivity.getNewDevice().setFailed(false);
-                                    }
-                                    return new Object();
-                                }
-                            }).subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
-
-                        }
-                    });
+//                    Observable.zip(mainActivityViewModel.deleteUserObservable(new DeleteUserRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getGroup().getId())),
+//                            mainActivityViewModel.addDeviceToGroupObservable(new AddDeviceToGroupRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getPreGroupId())),
+//                            new BiFunction<BaseResponse, BaseResponse, Object>() {
+//                                @Override
+//                                public Object apply(BaseResponse baseResponse, BaseResponse baseResponse2) throws Exception {
+//                                    Log.e("MainActivity", "Results of tofmal: " + baseResponse);
+//                                    Log.e("MainActivity", "Results of tofmal: " + baseResponse2);
+//                                    if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION) && baseResponse2.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
+//                                        Log.e("MainActivity", "Both Done ");
+//                                        Toast.makeText(MainActivity.this, "Fixed", Toast.LENGTH_SHORT).show();
+//                                        AddNewDeviceActivity.getNewDevice().setFailed(false);
+//                                    }
+//                                    return new Object();
+//                                }
+//                            }).subscribe(new Consumer<Object>() {
+//                        @Override
+//                        public void accept(Object o) throws Exception {
+//
+//                        }
+//                    });
                     }
                     if (connectionStatusModel.getType() == AppConstants.WIFI_NETWORK) {
                         String extraInfo = connectionStatusModel.getSsid();
@@ -220,7 +230,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
 //        requestRecordAudioPermission();
-            ButterKnife.bind(this);
 //            ValueAnimator v = ValueAnimator.ofFloat(0f,0.6f);
 //            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 //                @Override
@@ -440,19 +449,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void mqttConnecting() {
         if (!NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
-            connectionAnimation.setVisibility(View.VISIBLE);
+//            connectionAnimation.startAnimation(fadeIn);
+//            connectionAnimation.setVisibility(View.VISIBLE);
             connectionAnimation.setMaxProgress(0.6f);
             connectionAnimation.setRepeatCount(LottieDrawable.INFINITE);
             connectionAnimation.playAnimation();
             mqttConnectionStatus = Connection.ConnectionStatus.CONNECTING;
-            String currentShowingGroup = RayanApplication.getPref().getCurrentShowingGroup();
-            if (currentShowingGroup == null)
-                actionBarStatus.setText("رایان");
-            else {
-                Group currentGroup = mainActivityViewModel.getGroup(currentShowingGroup);
-                if (currentGroup != null)
-                    actionBarStatus.setText(currentGroup.getName());
-            }
+//            connectionAnimation.startAnimation(fadeIn);
+            connectionAnimation.setVisibility(View.VISIBLE);
+//            tempText.startAnimation(fadeOut);
             if (networkConnected) {
 //            actionBarStatus.setText("در حال اتصال");
                 retryIcon.setVisibility(View.INVISIBLE);
@@ -466,8 +471,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static boolean mqttConnected;
     @Override
         public void mqttConnected() {
-        connectionAnimation.setRepeatCount(0);
-        connectionAnimation.setMaxProgress(1f);
+        connectionAnimation.startAnimation(fadeOut);
+        actionBarStatus.startAnimation(fadeIn);
+//        connectionAnimation.setRepeatCount(0);
+//        connectionAnimation.setMaxProgress(1f);
         retryConnectMqtt.stop();
         ((RayanApplication)getApplication()).getMsc().setMqttConnected(true);
         Log.e(TAG, "Mqtt ConnectionStatus: Connected Connection Retries: " + retryConnectMqtt.count);
@@ -921,7 +928,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ((DevicesFragment) getSupportFragmentManager().getFragments().get(a)).sortDevicesByGroup(item.getId());
             drawer_groupsRecyclerViewAdapter.notifyDataSetChanged();
             if (item.getName().equals("همه")){
-                actionBarStatus.setText("رایان");
+
+                String firstWord = "ر" ;
+                String secondWord = "ا" ;
+                String thirdWord = "ی" ;
+                String fourthWord = "ا" ;
+                String fifthWord = "ن" ;
+                Spannable spannable = new SpannableString(firstWord+secondWord+thirdWord+fourthWord + fifthWord);
+                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.red)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.blue)), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.ms_black)), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.deep_orange)), 3, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.pink)), 4, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                actionBarStatus.setText( spannable );
+//                actionBarStatus.setText("رایان");
             }else{
                 actionBarStatus.setText(item.getName());
             }
@@ -1015,6 +1035,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarStatus.setText("عدم اتصال به اینترنت");
         retryIcon.setVisibility(View.INVISIBLE);
         connectionAnimation.setVisibility(View.INVISIBLE);
+    }
+    public void initializeAnimations(){
+        String currentShowingGroup = RayanApplication.getPref().getCurrentShowingGroup();
+        if (currentShowingGroup == null){
+            String firstWord = "ر" ;
+            String secondWord = "ا" ;
+            String thirdWord = "ی" ;
+            String fourthWord = "ا" ;
+            String fifthWord = "ن" ;
+            Spannable spannable = new SpannableString(firstWord+secondWord+thirdWord+fourthWord + fifthWord);
+            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.red)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.blue)), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.ms_black)), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.deep_orange)), 3, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.pink)), 4, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            tempText.setText( spannable );
+            actionBarStatus.setText(spannable);
+            Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/aseman.ttf");
+//            tempText.setTextSize(29f);
+            actionBarStatus.setTextSize(29f);
+            actionBarStatus.setTypeface(custom_font);
+//            tempText.setTypeface(custom_font);
+            connectionAnimation.setSpeed(1.8f);
+//                actionBarStatus.setText("رایان");
+        }
+        else {
+            Group currentGroup = mainActivityViewModel.getGroup(currentShowingGroup);
+            if (currentGroup != null)
+                actionBarStatus.setText(currentGroup.getName());
+        }
+        fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator());
+        fadeIn.setDuration(600);
+        fadeIn.setFillAfter(true);
+        fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateInterpolator());
+        fadeOut.setDuration(700);
+        fadeOut.setFillAfter(true);
     }
 }
 

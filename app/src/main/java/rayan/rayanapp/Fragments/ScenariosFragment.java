@@ -68,6 +68,14 @@ public class ScenariosFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(ScenariosFragmentViewModel.class);
+
+        if (getArguments() != null) {
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         viewModel.getAllGroupsFlowable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<Group>>() {
                     @Override
@@ -77,15 +85,13 @@ public class ScenariosFragment extends Fragment implements
                         groupNames.add("همه گروه‌ها");
                         for (Group g : groups)
                             groupNames.add(g.getName());
-                        ArrayAdapter arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, groupNames);
+                        ArrayAdapter arrayAdapter = new ArrayAdapter(activity, android.R.layout.simple_spinner_item, groupNames);
                         ScenariosFragment.this.groups.add(0,new Group());
                         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         allOnSpinner.setAdapter(arrayAdapter);
                         allOffSpinner.setAdapter(arrayAdapter);
                     }
                 });
-        if (getArguments() != null) {
-        }
     }
 
     @Override

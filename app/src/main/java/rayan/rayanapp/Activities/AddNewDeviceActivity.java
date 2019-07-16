@@ -92,31 +92,32 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
         ButterKnife.bind(this);
         ConnectionLiveData connectionLiveData = new ConnectionLiveData(getApplicationContext());
         connectionLiveData.observe(this, connectionStatusModel -> {
+            Log.e("AddnewdeviceActivity", "connectoinStatusModel: " + connectionStatusModel);
             if (connectionStatusModel == null){
                 this.notConnected();
             }else {
                 if (newDevice.isFailed() && newDevice.getPreGroupId() != null){
                     Log.e("AddNewDeviceActivity", "In The AddNewDeviceActivity: Going to addDeviceToPreviousGroup");
-                    Observable.zip(viewModel.deleteUserObservable(new DeleteUserRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getGroup().getId())),
-                            viewModel.addDeviceToGroupObservable(new AddDeviceToGroupRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getPreGroupId())),
-                            new BiFunction<BaseResponse, BaseResponse, Object>() {
-                                @Override
-                                public Object apply(BaseResponse baseResponse, BaseResponse baseResponse2) throws Exception {
-                                    Log.e("AddNewDeviceActivity", "Results of tofmal: " + baseResponse);
-                                    Log.e("AddNewDeviceActivity", "Results of tofmal: " + baseResponse2);
-                                    if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION) && baseResponse2.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
-                                        Log.e("AddNewDeviceActivity", "Both Done ");
-                                        Toast.makeText(AddNewDeviceActivity.this, "Fixed", Toast.LENGTH_SHORT).show();
-                                        AddNewDeviceActivity.getNewDevice().setFailed(false);
-                                    }
-                                    return new Object();
-                                }
-                            }).subscribe(new Consumer<Object>() {
-                        @Override
-                        public void accept(Object o) throws Exception {
-
-                        }
-                    });
+//                    Observable.zip(viewModel.deleteUserObservable(new DeleteUserRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getGroup().getId())),
+//                            viewModel.addDeviceToGroupObservable(new AddDeviceToGroupRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getPreGroupId())),
+//                            new BiFunction<BaseResponse, BaseResponse, Object>() {
+//                                @Override
+//                                public Object apply(BaseResponse baseResponse, BaseResponse baseResponse2) throws Exception {
+//                                    Log.e("AddNewDeviceActivity", "Results of tofmal: " + baseResponse);
+//                                    Log.e("AddNewDeviceActivity", "Results of tofmal: " + baseResponse2);
+//                                    if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION) && baseResponse2.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION)){
+//                                        Log.e("AddNewDeviceActivity", "Both Done ");
+//                                        Toast.makeText(AddNewDeviceActivity.this, "Fixed", Toast.LENGTH_SHORT).show();
+//                                        AddNewDeviceActivity.getNewDevice().setFailed(false);
+//                                    }
+//                                    return new Object();
+//                                }
+//                            }).subscribe(new Consumer<Object>() {
+//                        @Override
+//                        public void accept(Object o) throws Exception {
+//
+//                        }
+//                    });
 //                    viewModel.addDeviceToGroup(new AddDeviceToGroupRequest(newDevice.getId(), newDevice.getPreGroupId()));
                 }
                 if (connectionStatusModel.getType() == AppConstants.WIFI_NETWORK) {

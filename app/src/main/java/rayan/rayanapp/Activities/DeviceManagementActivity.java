@@ -17,13 +17,16 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
 import rayan.rayanapp.Fragments.ProvideInternetFragment;
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
+import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
@@ -43,6 +46,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
     DevicesManagementActivityViewModel viewModel;
     BackHandledFragment currentFragment;
     Device device;
+    DialogPresenter dp;
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
@@ -63,6 +67,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         DevicesManagementListFragment devicesManagementListFragment = DevicesManagementListFragment.newInstance();
         transaction.replace(R.id.frameLayout, devicesManagementListFragment);
         transaction.commit();
+        dp = new DialogPresenter(getSupportFragmentManager());
     }
 
     @SuppressLint("CheckResult")
@@ -114,7 +119,15 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
                 editDeviceFragment.clickOnDeviceUpdateSubmit();
                 break;
             case "resetDevice":
-                editDeviceFragment.resetDevice();
+                viewModel.internetProvided().subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if (aBoolean)
+                            editDeviceFragment.resetDevice();
+                        else dp.showDialog(AppConstants.DIALOG_PROVIDE_INTERNET, null);
+                    }
+                });
+
                 break;
             default:
                 break;

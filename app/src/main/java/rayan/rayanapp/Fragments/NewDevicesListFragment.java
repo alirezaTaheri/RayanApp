@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -131,10 +133,11 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
         else this.connectToSame(currentSSID);
     }
 
+    ProgressDialog progressDialog;
     @Override
     public void connecting(AccessPoint target) {
         this.targetSSID = target.getSSID();
-        ProgressDialog progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
+        progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
         progressDialog.show();
         String password,chipId;
         if (target.getSSID().split("_")[target.getSSID().split("_").length-1].toLowerCase().equals("f"))
@@ -163,6 +166,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     @Override
     public void successful(String targetSSID) {
+        if (progressDialog != null)
+            progressDialog.dismiss();
         Log.e(TAG, "Successfully connected to: " + targetSSID);
         connectionStatus = ConnectionStatus.SUCCESSFUL;
         Toast.makeText(getActivity(), "باموفقیت متصل شد", Toast.LENGTH_SHORT).show();
@@ -171,6 +176,8 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     @Override
     public void failure() {
+        if (progressDialog != null)
+            progressDialog.dismiss();
         connectionStatus = ConnectionStatus.FAILURE;
         SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"اتصال ناموفق بود. لطفا دوباره تلاش کنید");
     }
@@ -269,17 +276,17 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     @Override
     public void wifiNetwork(boolean connected, String ssid) {
-        if (connected)
-            ((RayanApplication)(activity.getApplication())).getNetworkBus().send(ssid);
-        if (targetSSID != null) {
-            currentSSID = ssid;
-            if (currentSSID.equals(targetSSID)) {
-                this.successful(targetSSID);
-            } else {
-                this.failure();
+        if (connected) {
+            ((RayanApplication) (activity.getApplication())).getNetworkBus().send(ssid);
+            if (targetSSID != null) {
+                currentSSID = ssid;
+                if (currentSSID.equals(targetSSID)) {
+                    this.successful(targetSSID);
+                } else {
+                    this.failure();
+                }
             }
-            currentSSID = ssid;
-        }
+        }else this.failure();
     }
 
     @Override
@@ -322,13 +329,27 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     }
 
     private String getCurrentSSID(){
-        wifiInfo = wifiManager.getConnectionInfo();
-        String currentSSID  = wifiInfo.getSSID();
-        if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
+//        wifiInfo = wifiManager.getConnectionInfo();
+//        String currentSSID  = wifiInfo.getSSID();
+//        if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
+//            currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
+//        }
+//        Log.e("thisisCurrent SSID: ", "Current SSID: : " + currentSSID);
+        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            currentSSID = info.getExtraInfo();
+            Log.d(TAG, "WiFi SSID: " + currentSSID);
+            if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
             currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
+        }
+        }else {
+            currentSSID = AppConstants.UNKNOWN_SSID;
+            Log.d(TAG, "WiFi SSID: " + "null");
         }
         return currentSSID;
     }
+
     private boolean isItemExist(String BSSID, String SSID, List<ScanResult> items){
         for (int a = 0;a<items.size();a++)
             if (BSSID.equals(items.get(a).BSSID) && SSID.equals(items.get(a).SSID))

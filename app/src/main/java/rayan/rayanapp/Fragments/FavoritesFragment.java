@@ -90,6 +90,16 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                         }
                     }
                 else finalDevices = devices;
+
+                if (finalDevices.size() == 0){
+                    lottieAnimationView.setMaxProgress(0.5f);
+                    emptyView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    emptyView.setVisibility(View.INVISIBLE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
 //                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
                 Collections.sort(finalDevices, new Comparator<Device>(){
                     public int compare(Device obj1, Device obj2) {
@@ -106,7 +116,6 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                 FavoritesFragment.this.devices = finalDevices;
             }
         };
-        favoritesObservable.observe(this,favoritesObserver);
         devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
         devicesRecyclerViewAdapter.setListener(this);
     }
@@ -126,15 +135,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     @Override
     public void onResume() {
         super.onResume();
-        if (finalDevices.size() == 0){
-            lottieAnimationView.setMaxProgress(0.5f);
-            emptyView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.INVISIBLE);
-        }
-        else{
-            emptyView.setVisibility(View.INVISIBLE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
+        favoritesObservable.observe(this,favoritesObserver);
     }
 
     @Override
@@ -294,10 +295,9 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
 
     @Override
     public int getDeviceItemWidth(int position){
-        int width = ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
-        if (!(devices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || devices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
-            width /= 2;
-        return width;
+//        if (!(finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
+//            width /= 2;
+        return ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
     }
 
     @Override
