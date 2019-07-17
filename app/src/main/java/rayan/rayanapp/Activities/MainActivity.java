@@ -196,8 +196,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (connectionStatusModel == null){
                  this.notConnected();
                 }else {
-                    if (AddNewDeviceActivity.getNewDevice() != null && AddNewDeviceActivity.getNewDevice().isFailed() && AddNewDeviceActivity.getNewDevice().getPreGroupId() != null){
-                    Log.e("MainActivity", "In The MainActivity: Going to addDeviceToPreviousGroup");
+//                    if (AddNewDeviceActivity.getNewDevice() != null && AddNewDeviceActivity.getNewDevice().isFailed() && AddNewDeviceActivity.getNewDevice().getPreGroupId() != null){
+//                    Log.e("MainActivity", "In The MainActivity: Going to addDeviceToPreviousGroup");
 //                    Observable.zip(mainActivityViewModel.deleteUserObservable(new DeleteUserRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getGroup().getId())),
 //                            mainActivityViewModel.addDeviceToGroupObservable(new AddDeviceToGroupRequest(AddNewDeviceActivity.getNewDevice().getId(), AddNewDeviceActivity.getNewDevice().getPreGroupId())),
 //                            new BiFunction<BaseResponse, BaseResponse, Object>() {
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //
 //                        }
 //                    });
-                    }
+//                    }
                     if (connectionStatusModel.getType() == AppConstants.WIFI_NETWORK) {
                         String extraInfo = connectionStatusModel.getSsid();
                         if (extraInfo != null && connectionStatusModel.getSsid().charAt(connectionStatusModel.getSsid().length()-1) == connectionStatusModel.getSsid().charAt(0) && String.valueOf(connectionStatusModel.getSsid().charAt(0)).equals("\""))
@@ -458,12 +458,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            connectionAnimation.startAnimation(fadeIn);
             connectionAnimation.setVisibility(View.VISIBLE);
 //            tempText.startAnimation(fadeOut);
-            if (networkConnected) {
+//            if (networkConnected) {
 //            actionBarStatus.setText("در حال اتصال");
                 retryIcon.setVisibility(View.INVISIBLE);
-                connectionAnimation.setVisibility(View.VISIBLE);
+//                connectionAnimation.setVisibility(View.VISIBLE);
 //            ((RayanApplication)getApplication()).getMtd().updateMqttStatus(false);
-            }
+//            }
         }
         Log.e(TAG, "Mqtt ConnectionStatus: CONNECTING Connection Retries:" + retryConnectMqtt.count);
     }
@@ -481,14 +481,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mqttConnectionStatus = Connection.ConnectionStatus.CONNECTED;
         mqttConnected = true;
         connectionRetries = 0;
-//        String currentShowingGroup = RayanApplication.getPref().getCurrentShowingGroup();
-//        if (currentShowingGroup == null)
-//            actionBarStatus.setText("رایان");
-//        else {
-//            Group currentGroup = mainActivityViewModel.getGroup(currentShowingGroup);
-//            if (currentGroup != null)
-//                actionBarStatus.setText(currentGroup.getName());
-//        }
+        String currentShowingGroup = RayanApplication.getPref().getCurrentShowingGroup();
+        if (currentShowingGroup == null)
+            actionBarStatus.setText("رایان");
+        else {
+            Group currentGroup = mainActivityViewModel.getGroup(currentShowingGroup);
+            if (currentGroup != null)
+                actionBarStatus.setText(currentGroup.getName());
+        }
         retryIcon.setVisibility(View.INVISIBLE);
 //        progressBar.setVisibility(View.INVISIBLE);
         RayanApplication.getPref().saveProtocol(AppConstants.MQTT);
@@ -929,19 +929,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawer_groupsRecyclerViewAdapter.notifyDataSetChanged();
             if (item.getName().equals("همه")){
 
-                String firstWord = "ر" ;
-                String secondWord = "ا" ;
-                String thirdWord = "ی" ;
-                String fourthWord = "ا" ;
-                String fifthWord = "ن" ;
-                Spannable spannable = new SpannableString(firstWord+secondWord+thirdWord+fourthWord + fifthWord);
-                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.red)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.blue)), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.ms_black)), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.deep_orange)), 3, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.pink)), 4, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                actionBarStatus.setText( spannable );
-//                actionBarStatus.setText("رایان");
+//                String firstWord = "ر" ;
+//                String secondWord = "ا" ;
+//                String thirdWord = "ی" ;
+//                String fourthWord = "ا" ;
+//                String fifthWord = "ن" ;
+//                Spannable spannable = new SpannableString(firstWord+secondWord+thirdWord+fourthWord + fifthWord);
+//                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.red)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.blue)), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.ms_black)), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.deep_orange)), 3, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.pink)), 4, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                actionBarStatus.setText( spannable );
+                actionBarStatus.setText("رایان");
             }else{
                 actionBarStatus.setText(item.getName());
             }
@@ -1001,6 +1001,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             connectToMqtt();
         }
         if (connected){
+            if (!retryConnectMqtt.isRunning())
+                retryConnectMqtt.start();
             ((RayanApplication)getApplication()).getMtd().setCurrentSSID(ssid);
             mainActivityViewModel.getGroups();
             RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
@@ -1017,8 +1019,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.e("///////////////", "////connecting to mqtt");
             connectToMqtt();
         }
-        if (connected)
+        if (connected){
+            if (!retryConnectMqtt.isRunning())
+                retryConnectMqtt.start();
             mainActivityViewModel.getGroups();
+        }
     }
 
     @Override
@@ -1039,26 +1044,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void initializeAnimations(){
         String currentShowingGroup = RayanApplication.getPref().getCurrentShowingGroup();
         if (currentShowingGroup == null){
-            String firstWord = "ر" ;
-            String secondWord = "ا" ;
-            String thirdWord = "ی" ;
-            String fourthWord = "ا" ;
-            String fifthWord = "ن" ;
-            Spannable spannable = new SpannableString(firstWord+secondWord+thirdWord+fourthWord + fifthWord);
-            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.red)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.blue)), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.ms_black)), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.deep_orange)), 3, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.pink)), 4, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            String firstWord = "ر" ;
+//            String secondWord = "ا" ;
+//            String thirdWord = "ی" ;
+//            String fourthWord = "ا" ;
+//            String fifthWord = "ن" ;
+//            Spannable spannable = new SpannableString(firstWord+secondWord+thirdWord+fourthWord + fifthWord);
+//            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.red)), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.blue)), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.ms_black)), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.deep_orange)), 3, 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this,R.color.pink)), 4, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //            tempText.setText( spannable );
-            actionBarStatus.setText(spannable);
-            Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/aseman.ttf");
+//            actionBarStatus.setText(spannable);
+//            Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/aseman.ttf");
 //            tempText.setTextSize(29f);
-            actionBarStatus.setTextSize(29f);
-            actionBarStatus.setTypeface(custom_font);
+//            actionBarStatus.setTextSize(29f);
+//            actionBarStatus.setTypeface(custom_font);
 //            tempText.setTypeface(custom_font);
             connectionAnimation.setSpeed(1.8f);
-//                actionBarStatus.setText("رایان");
+                actionBarStatus.setText("رایان");
         }
         else {
             Group currentGroup = mainActivityViewModel.getGroup(currentShowingGroup);

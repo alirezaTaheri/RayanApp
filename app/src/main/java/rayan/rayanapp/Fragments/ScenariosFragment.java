@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Activities.CreateScenarioActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.R;
@@ -73,6 +76,7 @@ public class ScenariosFragment extends Fragment implements
         }
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void onResume() {
         super.onResume();
@@ -167,6 +171,11 @@ public class ScenariosFragment extends Fragment implements
                         }
                     }
                 });
+    }
+
+    @OnClick(R.id.createScenarioButton)
+    public void createScenarioButtonClicked(){
+        startActivity(new Intent(activity, CreateScenarioActivity.class));
     }
 
     @Override
