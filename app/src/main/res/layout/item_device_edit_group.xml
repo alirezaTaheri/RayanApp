@@ -14,13 +14,21 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/deviceImage"
+            android:id="@+id/pin1"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="15dp"
-            app:srcCompat="@drawable/ic_rayan"
+            app:srcCompat="@drawable/ic_lamp_off"
+           />
+        <ImageView
+            android:id="@+id/pin2"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_toLeftOf="@+id/pin1"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/ic_lamp_off"
            />
     <TextView
         android:id="@+id/name"

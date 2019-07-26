@@ -20,6 +20,9 @@ public interface ScenariosDAO extends BaseDAO<Scenario>{
     @Query("SELECT * FROM Scenario ")
     List<Scenario> getAll();
 
+    @Query("SELECT * FROM Scenario ")
+    LiveData<List<Scenario>> getAllLive();
+
     @Query("SELECT * FROM Scenario WHERE id = :id")
     Scenario getScenario(int id);
 
@@ -31,5 +34,8 @@ public interface ScenariosDAO extends BaseDAO<Scenario>{
 
     @Delete
     void deleteScenario(Scenario scenario);
+
+    @Query("DELETE FROM Scenario WHERE id = :id")
+    void deleteScenarioWithId(int id);
 
 }

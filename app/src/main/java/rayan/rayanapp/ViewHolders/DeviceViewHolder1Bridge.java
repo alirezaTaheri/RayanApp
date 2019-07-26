@@ -53,51 +53,6 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     public DeviceViewHolder1Bridge(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
-//        switchOffSound = new MediaPlayer();
-//        switchOffPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_off");
-//        try {
-//            switchOffSound.setDataSource(itemView.getContext(), switchOffPath);
-//            switchOffSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
-//            switchOffSound.prepare();
-//            switchOffSound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                @Override
-//                public void onCompletion(MediaPlayer mp) {
-//                    mp.reset();
-////                    mp.release();
-//                }
-//            });
-////            switchOffSound.start();
-//        } catch (IllegalArgumentException e) {
-//            e.printStackTrace();
-//        } catch (SecurityException e) {
-//            e.printStackTrace();
-//        } catch (IllegalStateException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        switchOnSound = new MediaPlayer();
-//        switchOnPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_on");
-//        try {
-//            switchOnSound.setDataSource(itemView.getContext(), switchOnPath);
-//            switchOnSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
-//            switchOnSound.prepare();
-//            switchOnSound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                @Override
-//                public void onCompletion(MediaPlayer mp) {
-//                    mp.reset();
-//                }
-//            });
-////            switchOnSound.start();
-//        } catch (IllegalArgumentException e) {
-//            e.printStackTrace();
-//        } catch (SecurityException e) {
-//            e.printStackTrace();
-//        } catch (IllegalStateException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override

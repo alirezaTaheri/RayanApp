@@ -319,18 +319,19 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     }
 
     @Override
-    public void onYesClicked(YesNoDialog yesNoDialog) {
+    public void onYesClicked(YesNoDialog yesNoDialog, Bundle data) {
         startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         yesNoDialog.dismiss();
     }
 
     @Override
-    public void onNoClicked(YesNoDialog yesNoDialog) {
+    public void onNoClicked(YesNoDialog yesNoDialog, Bundle data) {
         yesNoDialog.dismiss();
         AddNewDeviceActivity.super.onBackPressed();
     }
+
     private void buildAlertMessageNoGps() {
-        YesNoDialog yesNoDialog = new YesNoDialog(this, R.style.ProgressDialogTheme, this,"برای ادامه نیاز به سرویس Location داریم");
+        YesNoDialog yesNoDialog = new YesNoDialog(this, this,"برای ادامه نیاز به سرویس Location داریم", null);
         yesNoDialog.show();
     }
 

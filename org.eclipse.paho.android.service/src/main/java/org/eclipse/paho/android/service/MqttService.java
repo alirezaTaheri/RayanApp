@@ -273,7 +273,7 @@ public class MqttService extends Service implements MqttTraceHandler {
       Bundle dataBundle) {
     // Don't call traceDebug, as it will try to callbackToActivity leading
     // to recursion.
-    Intent callbackIntent = new Intent(
+    final Intent callbackIntent = new Intent(
         MqttServiceConstants.CALLBACK_TO_ACTIVITY);
     if (clientHandle != null) {
       callbackIntent.putExtra(
@@ -283,7 +283,12 @@ public class MqttService extends Service implements MqttTraceHandler {
     if (dataBundle != null) {
       callbackIntent.putExtras(dataBundle);
     }
-//     LocalBroadcastManager.getInstance(this).sendBroadcast(callbackIntent);
+//    new Thread(new Runnable() {
+//        @Override
+//        public void run() {
+//     LocalBroadcastManager.getInstance(MqttService.this).sendBroadcast(callbackIntent);
+//        }
+//    }).start();
 	getApplicationContext().sendBroadcast(callbackIntent);
   }
 

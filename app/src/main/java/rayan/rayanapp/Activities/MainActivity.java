@@ -42,6 +42,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -90,6 +91,7 @@ import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.ConnectionStatusModel;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Helper.ControlRequests;
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
@@ -97,12 +99,15 @@ import rayan.rayanapp.Helper.RetryConnectMqtt;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnGroupClicked;
+import rayan.rayanapp.Persistance.database.UserDatabase;
+import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
@@ -246,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             cr = new ControlRequests(this);
             actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name);
             drawerLayout.addDrawerListener(actionBarDrawerToggle);
+            actionBarDrawerToggle.setDrawerIndicatorEnabled(false);
             actionBarDrawerToggle.syncState();
             mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
             MainActivityViewModel.connection.observe(this, connection -> {
@@ -317,6 +323,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 }
+
+    @OnClick(R.id.drawerMenuIcon)
+    public void clickOnDrawerIcon(){
+        drawerLayout.openDrawer(Gravity.RIGHT);
+    }
 
     public Observable<Object> writeLog(){
         return Observable.create(new ObservableOnSubscribe<Object>() {
@@ -607,8 +618,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getScanResults(@NonNull final List<ScanResult> results){
-        if (results.isEmpty())
-        {
+        if (results.isEmpty()) {
             Log.i(TAG, "SCAN RESULTS IT'S EMPTY");
             return;
         }

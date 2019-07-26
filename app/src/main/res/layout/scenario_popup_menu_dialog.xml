@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/parent"
+    android:layout_gravity="center"
+    android:layout_margin="20dp"
+    android:padding="10dp"
+    android:background="@drawable/background_progress_dialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout
+        android:padding="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:id="@+id/editContainer"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:clickable="false"
+            android:focusable="false"
+            android:text="ویرایش کردن"
+            android:textColor="@color/ms_black"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:enabled="false"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:clickable="false"
+            android:enabled="false"
+            app:srcCompat="@drawable/ic_edit_group_basic"
+            android:focusable="false"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/editIcon"
+            android:layout_centerVertical="true"
+            android:layout_width="35dp"
+            android:layout_height="35dp"/>
+    </RelativeLayout>
+    <View
+        android:layout_below="@+id/editContainer"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey"/>
+    <RelativeLayout
+        android:padding="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:layout_below="@+id/editContainer"
+        android:layout_width="match_parent"
+        android:id="@+id/deleteContainer"
+        android:layout_height="wrap_content">
+        <TextView
+            android:enabled="false"
+            android:clickable="false"
+            android:focusable="false"
+            android:textColor="@color/ms_black"
+            android:text="حذف کردن"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:clickable="false"
+            android:enabled="false"
+            android:focusable="false"
+            app:srcCompat="@drawable/ic_delete"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/deleteIcon"
+            android:layout_centerVertical="true"
+            android:layout_width="35dp"
+            android:layout_height="35dp"/>
+    </RelativeLayout>
+</RelativeLayout>

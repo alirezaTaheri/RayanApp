@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_visibility_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_dehaze_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,8 +28,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_visibility_on" />
-                            <entry key="sourceFile" value="C:\Users\Milad\Downloads\Telegram Desktop\Devices icons (svg)_6\7-Switch-on-1.svg" />
+                            <entry key="outputName" value="ic_hamburger_menu" />
+                            <entry key="sourceFile" value="C:\Users\Alireza\Downloads\light-bulb.svg" />
                           </map>
                         </option>
                       </PersistentState>

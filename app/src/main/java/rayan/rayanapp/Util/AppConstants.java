@@ -92,6 +92,8 @@ public class AppConstants {
     /**
      * API
      */
+    public final static String ADMIN_TYPE = "admin";
+    public final static String USER_TYPE = "user";
     public final static String DUPLICATE_USER = "duplicate user";
     public final static String UNKNOWN_SSID = "Unknown SSID";
     public final static String NULL_SSID = "Null SSID";
@@ -119,8 +121,8 @@ public class AppConstants {
     public final static String ERROR_OCCURRED = "error_occurred";
 
     public static String getDeviceAddress(String ip){
-//        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-        return "http://192.168.137.1/test.php";
+        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+//        return "http://192.168.137.1/test.php";
     }
 
     public static void disableEnableControls(boolean enable, ViewGroup vg){

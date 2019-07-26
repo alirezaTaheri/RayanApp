@@ -13,6 +13,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Util.AppConstants;
 
 import static rayan.rayanapp.App.RayanApplication.getContext;
 
@@ -47,21 +48,21 @@ public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> 
                 contactName.setText(item.getContactNameOnPhone());
             }
        }
-        if (adminsPhoneNumber.contains(item.getUsername())){
+        if (item.getUserType().equals(AppConstants.ADMIN_TYPE)){
             adminTxt.setVisibility(View.VISIBLE);
-            adminTxt.setText("مدیر");
-        }
+        }else
+            adminTxt.setVisibility(View.INVISIBLE);
 
-        if (parentFragment.equals("admins_users")){
-            adminTxt.setVisibility(View.VISIBLE);
-            adminTxt.setText("");
-            Drawable drawableTop = AppCompatResources.getDrawable(getContext(), R.drawable.ic_more);
-            adminTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableTop, null);
-            adminTxt.setOnClickListener(v -> listener.onRemoveAdminClicked(item));
-            if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
-                adminTxt.setVisibility(View.INVISIBLE);
-            }
-        }
+//        if (parentFragment.equals("admins_users")){
+//            adminTxt.setVisibility(View.VISIBLE);
+//            adminTxt.setText("");
+//            Drawable drawableTop = AppCompatResources.getDrawable(getContext(), R.drawable.ic_more);
+//            adminTxt.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableTop, null);
+//            adminTxt.setOnClickListener(v -> listener.onRemoveAdminClicked(item));
+//            if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
+//                adminTxt.setVisibility(View.INVISIBLE);
+//            }
+//        }
         if (item.getUsername().equals(RayanApplication.getPref().getUsername())){
             if (RayanApplication.getPref().getNameKey()!=null){
                 contactName.setText(RayanApplication.getPref().getNameKey());

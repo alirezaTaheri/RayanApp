@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.ScenariosFragment">
     <LinearLayout
+        android:id="@+id/container"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <android.support.v7.widget.CardView
         android:layout_margin="4dp"
         android:layout_width="match_parent"
-        android:layout_height="80dp">
+        android:layout_height="70dp">
         <RelativeLayout
             android:clickable="true"
             android:focusable="true"
@@ -21,11 +22,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <TextView
-            android:layout_alignBaseline="@+id/allOn"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="15dp"
             android:id="@+id/task1"
             android:drawableRight="@drawable/ic_dot"
             android:gravity="center"
             android:text="  روشن کردن همه در:"
+            android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -50,7 +53,7 @@
     <android.support.v7.widget.CardView
         android:layout_margin="4dp"
         android:layout_width="match_parent"
-        android:layout_height="80dp">
+        android:layout_height="70dp">
         <RelativeLayout
             android:padding="3.5dp"
             android:background="?attr/selectableItemBackground"
@@ -59,11 +62,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <TextView
-            android:layout_alignBaseline="@+id/allOff"
             android:drawableRight="@drawable/ic_dot"
             android:gravity="center"
             android:id="@+id/task2"
             android:text="  خاموش کردن همه در:"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="15dp"
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -84,14 +88,21 @@
             android:layout_height="wrap_content" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
+        <android.support.v7.widget.RecyclerView
+            android:paddingBottom="50dp"
+            android:clipToPadding="false"
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/createScenarioButton"
-        app:fabSize="auto"
+        app:fabSize="mini"
         app:srcCompat="@drawable/ic_add"
+        app:layout_anchorGravity="bottom|right"
         android:backgroundTint="@color/blue"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="15dp"
+        app:layout_anchor="@id/container"
+        android:layout_margin="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -1,12 +1,11 @@
 package rayan.rayanapp.Fragments;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -16,13 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -30,7 +24,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Activities.GroupsActivity;
-import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -42,7 +35,7 @@ public class EditGroupFragment2 extends Fragment{
    // OnToolbarNameChange onToolbarNameChange;
     private String groupId;
     private List<User> admins;
-    private List<User> humanUsers;
+    private List<User> users;
     @BindView(R.id.name)
     EditText name;
     @BindView(R.id.saveGroupName)
@@ -53,30 +46,19 @@ public class EditGroupFragment2 extends Fragment{
     TextView userCount;
    private EditGroupFragmentViewModel editGroupFragmentViewModel;
 
-    public static EditGroupFragment2 newInstance() {
+    public static EditGroupFragment2 newInstance(String id) {
         EditGroupFragment2 fragment = new EditGroupFragment2();
+        Bundle b = new Bundle();
+        b.putString("id", id);
+        fragment.setArguments(b);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        groupId = getArguments().getString("id");
         editGroupFragmentViewModel = ViewModelProviders.of(this).get(EditGroupFragmentViewModel.class);
-        admins=EditGroupFragment.admins;
-        humanUsers=EditGroupFragment.humanUsers;
-        group=EditGroupFragment.group;
-        groupId=group.getId();
-       // Toast.makeText(getContext(), String.valueOf(admins.size()), Toast.LENGTH_SHORT).show();
-       // Toast.makeText(getContext(), String.valueOf(humanUsers.size()), Toast.LENGTH_SHORT).show();
-
-//        editGroupFragmentViewModel.getGroupLive(group.getId()).observe(this, group1 -> {
-//            this.group = group1;
-//            admins = group1.getAdmins();
-//            humanUsers = group1.getHumanUsers();
-//
-//        });
-//        onToolbarNameChange=(OnToolbarNameChange)getActivity();
-//        onToolbarNameChange.toolbarNameChanged(group.getName());
         ((GroupsActivity) getActivity()).toolbarNameChanged("مدیریت گروه");
     }
 
@@ -85,7 +67,6 @@ public class EditGroupFragment2 extends Fragment{
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_group_2, container, false);
         ButterKnife.bind(this, view);
-        name.setText(EditGroupFragment.group.getName());
         name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -104,8 +85,8 @@ public class EditGroupFragment2 extends Fragment{
             public void afterTextChanged(Editable s) {
             }
         });
-        adminCount.setText(String.valueOf(admins.size()));
-        userCount.setText(String.valueOf(humanUsers.size()));
+//        adminCount.setText(String.valueOf(admins.size()));
+//        userCount.setText(String.valueOf(users.size()));
         return view;
     }
 
@@ -136,7 +117,7 @@ public class EditGroupFragment2 extends Fragment{
 
     @OnClick(R.id.saveGroupName)
     void saveGroupName() {
-        editGroupFragmentViewModel.editGroup(name.getText().toString(), EditGroupFragment.group.getId()).observe(this, baseResponse -> {
+        editGroupFragmentViewModel.editGroup(name.getText().toString(), group.getId()).observe(this, baseResponse -> {
             if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("Invalid group_id")) {
                 SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "شماره گروه نادرست است");
             } else if (baseResponse.getStatus().getCode().equals("422") && baseResponse.getData().getMessage().equals("You must enter group_id")) {
@@ -171,15 +152,15 @@ public class EditGroupFragment2 extends Fragment{
 
     @OnClick(R.id.adminsLayout)
     void adminsLayoutClicked(){
-        clickOnButton.OnAdminButtonClicked();
+        clickOnButton.OnAdminButtonClicked(groupId);
     }
     @OnClick(R.id.usersLayout)
     void userslayoutClicked(){
-        clickOnButton.onUserButtonClicked();
+        clickOnButton.onUserButtonClicked(groupId);
     }
     public interface ClickOnButton{
-        void OnAdminButtonClicked();
-        void onUserButtonClicked();
+        void OnAdminButtonClicked(String id);
+        void onUserButtonClicked(String id);
     }
     ClickOnButton clickOnButton;
 
@@ -195,6 +176,11 @@ public class EditGroupFragment2 extends Fragment{
     }
 
     @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         clickOnButton = null;
@@ -202,7 +188,27 @@ public class EditGroupFragment2 extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-//        onToolbarNameChange.toolbarNameChanged(group.getName());
+        editGroupFragmentViewModel.getJustAdminsInGroup(groupId).observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(@Nullable List<User> users) {
+                admins=users;
+                adminCount.setText(String.valueOf(admins.size()));
+            }
+        });
+        editGroupFragmentViewModel.getAllUsersInGroupLive(groupId).observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(@Nullable List<User> users) {
+                EditGroupFragment2.this.users =users;
+                userCount.setText(String.valueOf(EditGroupFragment2.this.users.size()));
+            }
+        });
+        editGroupFragmentViewModel.getGroupLive(groupId).observe(this, new Observer<Group>() {
+            @Override
+            public void onChanged(@Nullable Group g) {
+                group = g;
+                name.setText(group.getName());
+            }
+        });
         ((GroupsActivity) getActivity()).toolbarNameChanged("مدیریت گروه");
     }
 

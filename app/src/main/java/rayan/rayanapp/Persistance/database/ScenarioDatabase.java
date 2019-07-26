@@ -29,6 +29,9 @@ public class ScenarioDatabase {
     public List<Scenario> getScenarios(){
         return scenariosDAO.getAll();
     }
+    public LiveData<List<Scenario>> getScenariosLive(){
+        return scenariosDAO.getAllLive();
+    }
 
     public Scenario getScenario(int id){
         return scenariosDAO.getScenario(id);
@@ -44,5 +47,9 @@ public class ScenarioDatabase {
 
     public void deleteScenario(Scenario scenario){
         scenariosDAO.deleteScenario(scenario);
+    }
+
+    public void deleteScenarioWithId(int id){
+        scenariosDAO.deleteScenarioWithId(id);
     }
 }

@@ -39,6 +39,7 @@ import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
+import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Helper.Encryptor;
@@ -46,6 +47,8 @@ import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.Persistance.database.UserDatabase;
+import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
@@ -62,11 +65,15 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     protected DeviceDatabase deviceDatabase;
     private GroupDatabase groupDatabase;
     private ExecutorService executorService;
+    private UserDatabase userDatabase;
     private SendUDPMessage sendUDPMessage;
+    private UserMembershipDatabase membershipDatabase;
     public DevicesFragmentViewModel(@NonNull Application application) {
         super(application);
         deviceDatabase = new DeviceDatabase(application);
         groupDatabase = new GroupDatabase(application);
+        userDatabase = new UserDatabase(application);
+        membershipDatabase = new UserMembershipDatabase(application);
         sendUDPMessage = new SendUDPMessage();
         executorService= Executors.newSingleThreadExecutor();
     }
@@ -201,14 +208,14 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         protected Void doInBackground(Void... voids) {
             List<Device> newDevices = new ArrayList<>();
             List<User> newUsers = new ArrayList<>();
+            List<UserMembership> memberships = new ArrayList<>();
             for (int a = 0;a<serverGroups.size();a++){
                 Group g = serverGroups.get(a);
+                List<User> admins = g.getAdmins();
                 List<Device> devices = new ArrayList<>();
-                List<User> users = new ArrayList<>();
 //                if (g.getDevices() != null)
 //                devices.addAll(g.getDevices());
                 if (g.getHumanUsers() != null)
-                    users.addAll(g.getHumanUsers());
                 for (int b = 0;b<g.getDevices().size();b++){
                     Device u = g.getDevices().get(b);
                     Device existing = deviceDatabase.getDevice(u.getChipId());
@@ -235,15 +242,43 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         devices.add(existing);
                         nOd++;
                     }
+                } for (int c = 0;c<g.getHumanUsers().size();c++){
+                    User user = g.getHumanUsers().get(c);
+                    UserMembership userMembership = new UserMembership(g.getId(), user.getId());
+                    User existingUser = userDatabase.getUser(user.getId());
+                    boolean admin = false;
+                    if (existingUser != null){
+                        for (User u: admins) {
+                            if (existingUser.getId().equals(u.getId()))
+                                admin = true;
+                        }
+                        if (admin){
+                            userMembership.setUserType(AppConstants.ADMIN_TYPE);
+                        }else{
+                            userMembership.setUserType(AppConstants.USER_TYPE);
+                        }
+                        existingUser.setUserInfo(user.getUserInfo());
+                        newUsers.add(existingUser);
+                    }else{
+                        for (User u: admins) {
+                            if (user.getId().equals(u.getId()))
+                                admin = true;
+                        }
+                        if (admin)
+                            userMembership.setUserType(AppConstants.ADMIN_TYPE);
+                        else userMembership.setUserType(AppConstants.USER_TYPE);
+                        newUsers.add(user);
+                    }
+                    memberships.add(userMembership);
                 }
                 g.setDevices(devices);
-                g.setHumanUsers(users);
                 newDevices.addAll(devices);
-                newUsers.addAll(users);
             }
             ((RayanApplication)getApplication()).getMsc().setNewArrivedTopics(tempTopics);
             List<Device> oldDevices = deviceDatabase.getAllDevices();
             List<Group> oldGroups = groupDatabase.getAllGroups();
+            List<User> oldUsers = userDatabase.getAllUsers();
+            List<UserMembership> oldMemberships = membershipDatabase.getAllUserMemberships();
             deviceDatabase.addDevices(newDevices);
 //            ((RayanApplication)getApplication()).getMtd().setDevices(newDevices);
             if (oldDevices != null){
@@ -254,6 +289,26 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         if (cId.equals(newDevices.get(b).getChipId())) exist = true;
                     }
                     if (!exist) deviceDatabase.deleteDevice(oldDevices.get(a));
+                }
+            }
+            if (oldUsers != null){
+                for (int a = 0;a<oldUsers.size();a++){
+                    String uId = oldUsers.get(a).getId();
+                    boolean exist = false;
+                    for (int b = 0;b<newUsers.size();b++){
+                        if (uId.equals(newUsers.get(b).getId())) exist = true;
+                    }
+                    if (!exist) userDatabase.deleteUser(oldUsers.get(a));
+                }
+            }
+            if (oldMemberships != null){
+                for (int a = 0;a<oldMemberships.size();a++){
+                    String mid = oldMemberships.get(a).getMembershipId();
+                    boolean exist = false;
+                    for (int b = 0;b<memberships.size();b++){
+                        if (mid.equals(memberships.get(b).getMembershipId())) exist = true;
+                    }
+                    if (!exist) membershipDatabase.deleteUserMembership(oldMemberships.get(a));
                 }
             }
             if (serverGroups != null && oldGroups != null){
@@ -267,6 +322,10 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 }
             }
             groupDatabase.addGroups(serverGroups);
+            Log.e("?>?>?>?>?>", "Adding users: " + newUsers.size() + newUsers);
+            Log.e("?>?>?>?>?>", "Adding memberships: " + memberships.size() + memberships);
+            userDatabase.addUsers(newUsers);
+            membershipDatabase.addUserMemberships(memberships);
             nOd = 0;
 //            try {
 //            if (MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().getClient()!= null && MainActivityViewModel.connection.getValue().getClient().isConnected()) {

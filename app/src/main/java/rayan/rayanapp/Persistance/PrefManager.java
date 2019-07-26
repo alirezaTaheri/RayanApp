@@ -30,6 +30,9 @@ public class PrefManager {
     private final String KEY_MQTT_SSL = "KEY_MQTT_SSL";
     private final String KEY_TOKEN_VALID = "KEY_TOKEN";
     private final String KEY_CURRENT_SHOWING_GROUP = "KEY_CURRENT_SHOWING_GROUP";
+    private final String KEY_SELECTED_GROUP_ALL_ON_SCENARIO = "KEY_SELECTED_GROUP_ALL_ON_SCENARIO";
+    private final String KEY_SELECTED_GROUP_ALL_OFF_SCENARIO = "KEY_SELECTED_GROUP_ALL_OFF_SCENARIO";
+
     public PrefManager(){
         pref = RayanApplication.getContext().getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
@@ -185,12 +188,20 @@ public void setIsNodeSoundOn(Boolean nodeSoundOn){
         return pref.getString(KEY_APPLICATION_LANGUAGE,"HARD");
     }
 
-//    public void setIsGroupsActivityFirstLunch(Boolean isGroupsActivityFirstLunch){
-//        editor.putBoolean(KEY_GROUPSACTIVITY_FIRSTLAUNCH, isGroupsActivityFirstLunch);
-//        editor.commit();
-//    }
-//    public Boolean getIsGroupsActivityFirstLunch(){
-//        return pref.getBoolean(KEY_GROUPSACTIVITY_FIRSTLAUNCH,true);
-//    }
+    public void setSelectedGroupAllOnScenario(String groupId){
+        editor.putString(KEY_SELECTED_GROUP_ALL_ON_SCENARIO, groupId);
+        editor.commit();
+    }
+    public String getSelectedGroupAllOnScenario(){
+        return pref.getString(KEY_SELECTED_GROUP_ALL_ON_SCENARIO, null);
+    }
+
+    public void setSelectedGroupAllOffScenario(String groupId){
+        editor.putString(KEY_SELECTED_GROUP_ALL_OFF_SCENARIO, groupId);
+        editor.commit();
+    }
+    public String getSelectedGroupAllOffScenario(){
+        return pref.getString(KEY_SELECTED_GROUP_ALL_OFF_SCENARIO, null);
+    }
 
 }

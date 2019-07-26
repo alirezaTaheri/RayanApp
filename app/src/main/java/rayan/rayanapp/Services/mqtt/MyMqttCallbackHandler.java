@@ -58,6 +58,7 @@ public class MyMqttCallbackHandler implements MqttCallback {
 
   @Override
   public void messageArrived(String topic, MqttMessage message) throws Exception {
+      Log.e("-----------" ,"-----------------------: " + Thread.currentThread().getName());
       resolveMessage(topic, message);
   }
 

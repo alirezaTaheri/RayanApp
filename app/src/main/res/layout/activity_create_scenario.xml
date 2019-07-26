@@ -28,6 +28,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                 <TextView
+                    android:layout_marginRight="15dp"
                     android:id="@+id/status"
                     android:layout_width="wrap_content"
                     android:gravity="center"
@@ -38,10 +39,12 @@
                     android:layout_height="wrap_content" />
                 <ImageView
                     android:layout_margin="15dp"
-                    app:srcCompat="@drawable/ic_wifi"
+                    app:srcCompat="@drawable/ic_cancel"
+                    android:id="@+id/dismiss"
+                    android:tint="@color/red_dark_4"
                     android:layout_alignParentLeft="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_width="35dp"
+                    android:layout_height="35dp" />
                 </RelativeLayout>
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.AppBarLayout>
@@ -58,4 +61,12 @@
                 android:layout_height="match_parent" />
         </LinearLayout>
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_gravity="bottom|right"
+        android:id="@+id/createScenarioButton"
+        android:layout_margin="20dp"
+        app:srcCompat="@drawable/ic_tick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </android.support.design.widget.CoordinatorLayout>

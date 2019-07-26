@@ -1,6 +1,7 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -13,8 +14,10 @@ import java.util.List;
 import io.reactivex.Flowable;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Scenario;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.Persistance.database.ScenarioDatabase;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Util.AppConstants;
@@ -23,9 +26,18 @@ public class ScenariosFragmentViewModel extends DevicesFragmentViewModel{
 
     private final String TAG = this.getClass().getCanonicalName();
     GroupDatabase groupDatabase;
+    ScenarioDatabase scenarioDatabase;
     public ScenariosFragmentViewModel(@NonNull Application application) {
         super(application);
         groupDatabase = new GroupDatabase(application);
+        scenarioDatabase = new ScenarioDatabase(application);
+    }
+
+    public LiveData<List<Scenario>> getAllScenariosLive(){
+        return scenarioDatabase.getScenariosLive();
+    }
+    public Scenario getScenario(int id){
+        return scenarioDatabase.getScenario(id);
     }
 
     public void sendMqttPin1(RayanApplication rayanApplication, Device device, boolean on){
@@ -75,5 +87,9 @@ public class ScenariosFragmentViewModel extends DevicesFragmentViewModel{
 
     public Flowable<List<Group>> getAllGroupsFlowable(){
         return groupDatabase.getAllGroupsFlowable();
+    }
+
+    public void deleteScenarioWithId(int id){
+        scenarioDatabase.deleteScenarioWithId(id);
     }
 }

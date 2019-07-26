@@ -28,7 +28,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.Persistance.database.UserDatabase;
+import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
@@ -43,10 +46,14 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 
 public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
     GroupDatabase groupDatabase;
+    UserDatabase userDatabase;
+    UserMembershipDatabase membershipDatabase;
     private final String TAG = EditGroupFragmentViewModel.class.getSimpleName();
     public EditGroupFragmentViewModel(@NonNull Application application) {
         super(application);
         groupDatabase = new GroupDatabase(application);
+        userDatabase = new UserDatabase(application);
+        membershipDatabase = new UserMembershipDatabase(application);
     }
     public LiveData<Group> getGroupLive(String id){
         return groupDatabase.getGroupLive(id);
@@ -64,7 +71,24 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         return groupDatabase.getGroup(id).getHumanUsers();
     }
 
+    public LiveData<List<User>> getJustUsersInGroup(String groupId){
+        return membershipDatabase.getJustUsersInGroup(groupId);
+    }
+    public LiveData<List<User>> getJustAdminsInGroup(String groupId){
+        return membershipDatabase.getJustAdminsInGroup(groupId);
+    }
 
+    public LiveData<List<User>> getAllUsersInGroupLive(String groupId){
+        return membershipDatabase.getAllUsersInGroup(groupId);
+    }
+
+    public LiveData<List<Group>> getAllGroupsLive(){
+        return groupDatabase.getAllGroupsLive();
+    }
+
+    public LiveData<List<User>> getUsersLive(){
+        return userDatabase.getAllUsersLive();
+    }
 
     public LiveData<BaseResponse> addUserByMobile(String phone, String groupId){
         List<String> phones = new ArrayList<>();

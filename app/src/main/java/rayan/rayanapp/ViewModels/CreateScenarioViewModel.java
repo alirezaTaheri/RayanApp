@@ -1,4 +1,4 @@
-package rayan.rayanapp.Fragments;
+package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
 import android.arch.lifecycle.ViewModel;

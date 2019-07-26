@@ -1411,7 +1411,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 		else if (MqttServiceConstants.TRACE_ACTION.equals(action)) {
 			traceAction(data);
 		}else{
-			mqttService.traceError(MqttService.TAG, "Callback action doesn't exist.");	
+			mqttService.traceError(MqttService.TAG, "Callback action doesn't exist.");
 		}
 
 	}

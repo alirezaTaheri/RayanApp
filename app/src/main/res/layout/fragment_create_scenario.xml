@@ -1,30 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/root"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.CreateScenarioFragment">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp">
+        <ImageView
+            android:layout_alignParentRight="true"
+            app:srcCompat="@drawable/ic_tick"
+            android:layout_margin="4dp"
+            android:id="@+id/doneButton"
+            android:tint="@color/green_dark_3"
+            android:layout_width="35dp"
+            android:layout_height="35dp" />
+        <ImageView
+            android:id="@+id/cancelButton"
+            android:layout_margin="4dp"
+            app:srcCompat="@drawable/ic_cancel"
+            android:tint="@color/red_acc_3"
+            android:layout_width="35dp"
+            android:layout_height="35dp" />
+        <View
+            android:layout_alignParentBottom="true"
+            android:background="@color/green_light_1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+    </RelativeLayout>
     <LinearLayout
+        android:layout_marginTop="45dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <EditText
-            android:id="@+id/name"
+        <android.support.design.widget.TextInputLayout
+            android:textDirection="rtl"
+            android:layoutDirection="rtl"
+            android:id="@+id/nameInputLayout"
+            android:layout_margin="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:hint="نام سناریو"
+                android:textColorHint="#676767"
+                android:inputType="text"
+                android:textSize="14sp"
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:imeOptions="actionDone"/>
+        </android.support.design.widget.TextInputLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content">
-                <include
-                    layout="@layout/item_device_1_bridge"
-                    />
-            </LinearLayout>
-            <LinearLayout
+                android:padding="10dp"
                 android:gravity="right"
                 android:layout_gravity="center"
                 android:orientation="vertical"
@@ -32,31 +67,25 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
                 <Spinner
+                    android:spinnerMode="dialog"
+                    android:textDirection="rtl"
+                    android:layout_marginBottom="20dp"
                     android:gravity="right"
                     android:id="@+id/groupsSpinner"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <Spinner
+                    android:spinnerMode="dialog"
                     android:gravity="right"
                     android:id="@+id/devicesSpinner"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-
-                <Button
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:id="@+id/confirm"
-                    android:layout_centerInParent="true"
-                    android:theme="@style/PrimaryButton"
-                    android:layout_alignParentLeft="true"
-                    android:text="تایید"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
         <android.support.v7.widget.RecyclerView
+            android:paddingBottom="40dp"
             android:id="@+id/actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </LinearLayout>
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

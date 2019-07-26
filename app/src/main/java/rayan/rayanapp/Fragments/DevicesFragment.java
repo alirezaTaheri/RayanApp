@@ -130,8 +130,9 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
         ButterKnife.bind(this, view);
         recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setItemViewCacheSize(100);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setItemViewCacheSize(20);
+//        recyclerView.setItemViewCacheSize(20);
 //        recyclerView.setRecyclerListener(new RecyclerView.RecyclerListener() {
 //            @Override
 //            public void onViewRecycled(@NonNull RecyclerView.ViewHolder viewHolder) {

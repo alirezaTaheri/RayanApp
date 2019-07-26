@@ -90,8 +90,10 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                         }
                     }
                 else finalDevices = devices;
-
+                Log.e("lsdkfjkldsfjsdfkjl: " , "sdlfk: " + finalDevices);
+                Log.e("lsdkfjkldsfjsdfkjl: " , "sdlfk: " + finalDevices.size());
                 if (finalDevices.size() == 0){
+                Log.e("lsdkfjkldsfjsdfkjl: " , "sdlfk: " + finalDevices);
                     lottieAnimationView.setMaxProgress(0.5f);
                     emptyView.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.INVISIBLE);
@@ -136,6 +138,15 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     public void onResume() {
         super.onResume();
         favoritesObservable.observe(this,favoritesObserver);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            if (favoritesObservable != null)
+                favoritesObservable.observe(this,favoritesObserver);
+        }
     }
 
     @Override

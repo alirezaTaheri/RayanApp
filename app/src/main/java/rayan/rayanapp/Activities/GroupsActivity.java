@@ -69,7 +69,6 @@ public class GroupsActivity extends AppCompatActivity implements EditGroupFragme
         groupsListFragment = GroupsListFragment.newInstance();
         transaction.replace(R.id.frameLayout, groupsListFragment);
         transaction.commit();
-
     }
 
     @Override
@@ -78,7 +77,6 @@ public class GroupsActivity extends AppCompatActivity implements EditGroupFragme
             onBackPressed();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -161,33 +159,34 @@ public class GroupsActivity extends AppCompatActivity implements EditGroupFragme
 }
 
     @Override
-    public void OnAdminButtonClicked() {
+    public void OnAdminButtonClicked(String id) {
         transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
-        editGroupAdminsFragment = EditGroupAdminsFragment.newInstance();
+        editGroupAdminsFragment = EditGroupAdminsFragment.newInstance(id);
         transaction.replace(R.id.frameLayout, editGroupAdminsFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
     @Override
-    public void onUserButtonClicked() {
+    public void onUserButtonClicked(String id) {
         transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
-        editGroupUsersFragment = EditGroupUsersFragment.newInstance();
+        editGroupUsersFragment = EditGroupUsersFragment.newInstance(id);
         transaction.replace(R.id.frameLayout, editGroupUsersFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
     public void toolbarNameChanged(String name) {
         status.setText(name);
     }
 
     @Override
-    public void OnEditGroupButtonClicked() {
+    public void OnEditGroupButtonClicked(String id) {
         transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
-        editGroupFragment2 = EditGroupFragment2.newInstance();
+        editGroupFragment2 = EditGroupFragment2.newInstance(id);
         transaction.replace(R.id.frameLayout, editGroupFragment2);
         transaction.addToBackStack(null);
         transaction.commit();

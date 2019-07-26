@@ -21,9 +21,21 @@
         <item name="bottomSheetStyle">@style/AppModalStyle</item>
     </style>
 
+    <style name="AppBottomSheetDialogTheme_light"
+        parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle_light</item>
+    </style>
+
     <style name="AppModalStyle"
         parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/layout_border</item>
+    </style>
+    <style name="addScenarioBottomSheet" parent="AppTheme.NoActionBar">
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme_light</item>
+    </style>
+    <style name="AppModalStyle_light"
+        parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/background_rounded_corner_light</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="CustomTheme">

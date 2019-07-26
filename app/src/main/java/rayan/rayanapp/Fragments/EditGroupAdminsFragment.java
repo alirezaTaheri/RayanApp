@@ -1,10 +1,14 @@
 package rayan.rayanapp.Fragments;
 
 import android.Manifest;
+import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +27,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
-import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Adapters.recyclerView.GroupUsersRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnAdminClicked;
-import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -38,40 +40,49 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
     private List<User> admins;
     private String userId;
     Group group;
+    String groupId;
     ArrayList<String> adminsUserNames = new ArrayList<>();
     private EditGroupFragmentViewModel editGroupFragmentViewModel;
-    AdminsRecyclerViewAdapter managersRecyclerViewAdapter;
+    GroupUsersRecyclerViewAdapter managersRecyclerViewAdapter;
     @BindView(R.id.recyclerView)
     RecyclerView adminsRecyclerView;
     @BindView(R.id.addToGrouptxt)
     TextView addToGrouptxt;
-    public static EditGroupAdminsFragment newInstance() {
-        return new EditGroupAdminsFragment();
+    Activity activity;
+    public static EditGroupAdminsFragment newInstance(String id) {
+        EditGroupAdminsFragment fragment = new EditGroupAdminsFragment();
+        Bundle b = new Bundle();
+        b.putString("id", id);
+        fragment.setArguments(b);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         editGroupFragmentViewModel = ViewModelProviders.of(this).get(EditGroupFragmentViewModel.class);
-        admins=EditGroupFragment.admins;
-        group=EditGroupFragment.group;
-
-        for (int i = 0; i <= admins.size() - 1; i++) {
-          adminsUserNames.add(admins.get(i).getUsername());
-      }
-        editGroupFragmentViewModel.getGroupLive(group.getId()).observe(this, group1 -> {
-            this.group = group1;
-            admins = group1.getAdmins();
-            for (int i = 0; i <= admins.size() - 1; i++) {
-                adminsUserNames.add(admins.get(i).getUsername());
-            }
-               for (int i = 0; i <= admins.size() - 1; i++) {
+        editGroupFragmentViewModel.getJustAdminsInGroup(getArguments().getString("id")).observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(@Nullable List<User> users) {
+                admins=users;
+                for (int i = 0; i <= admins.size() - 1; i++) {
+                    adminsUserNames.add(admins.get(i).getUsername());
+                }
+                managersRecyclerViewAdapter.setItems(admins);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
+                for (int i = 0; i <= admins.size() - 1; i++) {
                     admins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(admins.get(i).getUsername(), getActivity()));
                     admins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(admins.get(i).getUsername(), getActivity()));
                 }
-            managersRecyclerViewAdapter.setItems(admins);
+            }
         });
-     managersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(getActivity(),adminsUserNames,"admins_users");
+        editGroupFragmentViewModel.getGroupLive(getArguments().getString("id")).observe(this, new Observer<Group>() {
+            @Override
+            public void onChanged(@Nullable Group g) {
+                group = g;
+            }
+        });
+     managersRecyclerViewAdapter = new GroupUsersRecyclerViewAdapter(getActivity(),adminsUserNames,"admins_users");
      managersRecyclerViewAdapter.setListener(this);
 //        onToolbarNameChange=(OnToolbarNameChange)getActivity();
 //        onToolbarNameChange.toolbarNameChanged("مدیران گروه");
@@ -86,7 +97,6 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
         adminsRecyclerView.setItemViewCacheSize(100);
        adminsRecyclerView.setAdapter(managersRecyclerViewAdapter);
        addToGrouptxt.setText("اضافه کردن مدیر گروه");
-       init(group);
         return view;
     }
 
@@ -115,9 +125,7 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
 //        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupAdminsFragmentRemoveAdmin", "حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
 //        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
-    public void init(Group group) {
-        managersRecyclerViewAdapter.setItems(group.getAdmins());
-    }
+
     @OnClick(R.id.addToGroupLayout)
     void addManager() {
         UsersListDialogFragment usersListDialogFragment = UsersListDialogFragment.newInstance(group);
@@ -151,5 +159,11 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
         ((GroupsActivity) getActivity()).toolbarNameChanged("مدیران گروه");
        // onToolbarNameChange.toolbarNameChanged("مدیران گروه");
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activity = (Activity) context;
     }
+}
 

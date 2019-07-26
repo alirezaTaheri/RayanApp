@@ -1,5 +1,8 @@
 package rayan.rayanapp.Retrofit.Models.Responses.api;
 
+import android.arch.persistence.room.Embedded;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.graphics.Bitmap;
 import android.os.Parcel;
@@ -9,6 +12,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class User implements Parcelable {
     @PrimaryKey
     @NonNull
@@ -30,6 +34,7 @@ public class User implements Parcelable {
 
     @SerializedName("info")
     @Expose
+    @Embedded(prefix = "info_")
     private UserInfo userInfo;
 
     private String groupId;
@@ -40,13 +45,20 @@ public class User implements Parcelable {
     @Expose
     private String role;
     private String contactNameOnPhone;
-
-
+    private String userType;
+    @Ignore
     private Bitmap contactImageOnPhone;
 
 
+    public String getUserType() {
+        return userType;
+    }
 
-    protected User(Parcel in) {
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public User(Parcel in) {
         id = in.readString();
         username = in.readString();
         contactName = in.readString();
@@ -172,12 +184,14 @@ public class User implements Parcelable {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "پی{" +
                 "id='" + id + '\'' +
                 ", username='" + username + '\'' +
-                ", contactName='" + contactName + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+                ", registered='" + registered + '\'' +
+                ", userInfo=" + userInfo +
+                ", UserTypetype='" + userType + '\''+
+                ", groupId='" + groupId + '\'' +
+                ", type='" + type + '\'';
     }
 
     public boolean isSelected() {

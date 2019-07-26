@@ -99,7 +99,7 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
                     break;
                 case AppConstants.PRIMARY_CONFIG_FALSE:
                     Toast.makeText(getActivity(), "دسترسی شما تایید نشد\nدوباره تلاش کنید", Toast.LENGTH_SHORT).show();
-                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
+                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟", null);
                     yesNoDialog.show();
                     break;
                 case AppConstants.EXPIRED:
@@ -115,7 +115,7 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
     }
 
     @Override
-    public void onYesClicked(YesNoDialog dialog) {
+    public void onYesClicked(YesNoDialog dialog, Bundle data) {
         viewModel.toDeviceFirstConfig(
                 new SetPrimaryConfigRequest(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid(),
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getPwd(),
@@ -143,7 +143,7 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
     }
 
     @Override
-    public void onNoClicked(YesNoDialog dialog) {
+    public void onNoClicked(YesNoDialog dialog, Bundle data) {
         getActivity().onBackPressed();
         dialog.dismiss();
     }

@@ -79,7 +79,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                     break;
                 case AppConstants.NEW_DEVICE_PHV_FALSE:
 //                    Toast.makeText(getActivity(), "غلط", Toast.LENGTH_SHORT).show();
-                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
+                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟", null);
                     yesNoDialog.show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_TIMEOUT:
@@ -104,7 +104,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                     Toast.makeText(getActivity(), "درست", Toast.LENGTH_SHORT).show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_FALSE:
-                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
+                    YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), this,"دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟", null);
                     yesNoDialog.show();
 //                    Toast.makeText(getActivity(), "غلط", Toast.LENGTH_SHORT).show();
                     break;
@@ -141,7 +141,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
     }
 
     @Override
-    public void onYesClicked(YesNoDialog yesNoDialog) {
+    public void onYesClicked(YesNoDialog yesNoDialog, Bundle data) {
         viewModel.toDeviceFirstConfig(
                 new SetPrimaryConfigRequest(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid(),
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getPwd(),
@@ -166,7 +166,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
     }
 
     @Override
-    public void onNoClicked(YesNoDialog yesNoDialog) {
+    public void onNoClicked(YesNoDialog yesNoDialog, Bundle data) {
         getActivity().onBackPressed();
         yesNoDialog.dismiss();
     }

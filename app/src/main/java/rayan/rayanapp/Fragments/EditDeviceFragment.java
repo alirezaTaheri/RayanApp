@@ -235,7 +235,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
         editDeviceFragmentViewModel.getDeviceVersion(device).observe(this, s -> Toast.makeText(getActivity(), ""+s, Toast.LENGTH_SHORT).show());
-        YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), R.style.ProgressDialogTheme, this, "دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟");
+        YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), this, "دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟", null);
         yesNoDialog.show();
     }
 
@@ -295,7 +295,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     }
 
     @Override
-    public void onYesClicked(YesNoDialog yesNoDialog) {
+    public void onYesClicked(YesNoDialog yesNoDialog, Bundle data) {
         editDeviceFragmentViewModel.toDeviceReady4Update(device.getIp()).observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -318,7 +318,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     }
 
     @Override
-    public void onNoClicked(YesNoDialog yesNoDialog) {
+    public void onNoClicked(YesNoDialog yesNoDialog, Bundle data) {
         yesNoDialog.dismiss();
     }
 

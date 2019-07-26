@@ -14,13 +14,16 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnDeviceClickListenerManagement;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
 
 public class GroupDevicesViewHolder extends BaseViewHolder<Device, OnDeviceClickListenerManagement<Device>> {
     private final String TAG = GroupDevicesViewHolder.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.deviceImage)
-    ImageView deviceImage;
+    @BindView(R.id.pin1)
+    ImageView pin1;
+    @BindView(R.id.pin2)
+    ImageView pin2;
     Context context;
     public GroupDevicesViewHolder(View itemView, Context context) {
         super(itemView);
@@ -31,10 +34,18 @@ public class GroupDevicesViewHolder extends BaseViewHolder<Device, OnDeviceClick
     @Override
     public void onBind(Device item, @Nullable OnDeviceClickListenerManagement<Device> listener) {
         name.setText(item.getName1());
-        if (item.getType().equals("switch_1")){ deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
-        }else if (item.getType().equals("switch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
-        }else if (item.getType().equals("touch_2")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_lamp_off));
-        }else if (item.getType().equals("plug")) { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_plug_off_1));
-        }else { deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_device)); }
+        if (item.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1)){
+            pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)?context.getResources().getDrawable(R.drawable.ic_lamp_on) : context.getResources().getDrawable(R.drawable.ic_lamp_off));
+            pin2.setVisibility(View.INVISIBLE);
+        }else if (item.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)) {
+            pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)?context.getResources().getDrawable(R.drawable.ic_lamp_on) : context.getResources().getDrawable(R.drawable.ic_lamp_off));
+            pin2.setImageDrawable(item.getPin2().equals(AppConstants.ON_STATUS)?context.getResources().getDrawable(R.drawable.ic_lamp_on) : context.getResources().getDrawable(R.drawable.ic_lamp_off));
+        }else if (item.getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)) {
+            pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)?context.getResources().getDrawable(R.drawable.ic_lamp_on) : context.getResources().getDrawable(R.drawable.ic_lamp_off));
+            pin2.setImageDrawable(item.getPin2().equals(AppConstants.ON_STATUS)?context.getResources().getDrawable(R.drawable.ic_lamp_on) : context.getResources().getDrawable(R.drawable.ic_lamp_off));
+        }else if (item.getType().equals(AppConstants.DEVICE_TYPE_PLUG)) {
+            pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)?context.getResources().getDrawable(R.drawable.ic_plug_on) : context.getResources().getDrawable(R.drawable.ic_plug_off));
+            pin2.setVisibility(View.INVISIBLE);
+        }else { pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)?context.getResources().getDrawable(R.drawable.ic_device) : context.getResources().getDrawable(R.drawable.ic_device)); }
         }
 }
