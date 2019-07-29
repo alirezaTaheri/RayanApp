@@ -47,6 +47,7 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.MqttToken;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -59,7 +60,11 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.util.SparseArray;
+
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Enables an android application to communicate with an MQTT server using non-blocking methods.
@@ -454,7 +459,9 @@ public class MqttAndroidClient extends BroadcastReceiver implements
 //				 receiverRegistered = true;
 //	 }
 	Handler handler;
-	private void registerReceiver(BroadcastReceiver receiver) {
+	public static MqttEventBus mqttEventBus;
+	@SuppressLint("CheckResult")
+    private void registerReceiver(BroadcastReceiver receiver) {
         if (handler == null) {
             HandlerThread handlerThread = new HandlerThread("MyNewThread");
             handlerThread.start();
@@ -463,9 +470,77 @@ public class MqttAndroidClient extends BroadcastReceiver implements
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction(MqttServiceConstants.CALLBACK_TO_ACTIVITY);
-        myContext.registerReceiver(receiver, filter, null, handler);
+//        myContext.registerReceiver(receiver, filter, null, handler);
+//        if (mqttEventBus == null){
+            mqttEventBus = new MqttEventBus();
+            mqttEventBus.toObservable().observeOn(Schedulers.io()).subscribeOn(Schedulers.io()).subscribe(eventBusOnReceive());
+//        }
         receiverRegistered = true;
     }
+
+    public Consumer<Intent> eventBusOnReceive(){
+        return new Consumer<Intent>() {
+            @Override
+            public void accept(Intent intent) throws Exception {
+                Bundle data = intent.getExtras();
+
+                String handleFromIntent = data
+                        .getString(MqttServiceConstants.CALLBACK_CLIENT_HANDLE);
+
+                if ((handleFromIntent == null)
+                        || (!handleFromIntent.equals(clientHandle))) {
+                    return;
+                }
+
+                String action = data.getString(MqttServiceConstants.CALLBACK_ACTION);
+
+                if (MqttServiceConstants.CONNECT_ACTION.equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","CONNECT_ACTION");
+                    connectAction(data);
+                }
+                else if (MqttServiceConstants.CONNECT_EXTENDED_ACTION.equals(action)){
+                    Log.e("MQTT_EVENT_LISTENER","CONNECT_EXTENDED_ACTION");
+                    connectExtendedAction(data);
+                }
+                else if (MqttServiceConstants.MESSAGE_ARRIVED_ACTION.equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","MESSAGE_ARRIVED_ACTION");
+                    messageArrivedAction(data);
+                }
+                else if (MqttServiceConstants.SUBSCRIBE_ACTION.equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","SUBSCRIBE_ACTION");
+                    subscribeAction(data);
+                }
+                else if (MqttServiceConstants.UNSUBSCRIBE_ACTION.equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","UNSUBSCRIBE_ACTION");
+                    unSubscribeAction(data);
+                }
+                else if (MqttServiceConstants.SEND_ACTION.equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","SEND_ACTION");
+                    sendAction(data);
+                }
+                else if (MqttServiceConstants.MESSAGE_DELIVERED_ACTION.equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","MESSAGE_DELIVERED_ACTION");
+                    messageDeliveredAction(data);
+                }
+                else if (MqttServiceConstants.ON_CONNECTION_LOST_ACTION
+                        .equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","ON_CONNECTION_LOST_ACTION");
+                    connectionLostAction(data);
+                }
+                else if (MqttServiceConstants.DISCONNECT_ACTION.equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","DISCONNECT_ACTION");
+                    disconnected(data);
+                }
+                else if (MqttServiceConstants.TRACE_ACTION.equals(action)) {
+                    Log.e("MQTT_EVENT_LISTENER","TRACE_ACTION");
+                    traceAction(data);
+                }else{
+                    mqttService.traceError(MqttService.TAG, "Callback action doesn't exist.");
+                }
+            }
+        };
+    }
+
 
 	/**
 	 * Actually do the mqtt connect operation
