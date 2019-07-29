@@ -181,7 +181,9 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     public int getDeviceItemWidth(int position){
 //        if (!(finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
 //            width /= 2;
-        return ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null)
+            return ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
+        else return -1;
     }
 
     @Override
@@ -201,9 +203,14 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     }
     @Override
     public void updateStripPin2(int position, int width){
-        if (recyclerView.findViewHolderForAdapterPosition(position) != null)
-            ((DeviceViewHolder2Bridges)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin2(width);
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null &&
+                devicesRecyclerViewAdapter.getItems().get(position) != null &&
+                (devicesRecyclerViewAdapter.getItems().get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)
+                        || devicesRecyclerViewAdapter.getItems().get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)))
+            if (recyclerView.findViewHolderForAdapterPosition(position) instanceof DeviceViewHolder2Bridges)
+                ((DeviceViewHolder2Bridges)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin2(width);
     }
+
     @Override
     public void turnOnDeviceAnimationPin1(String chipID, int position, String type){
         deviceAnimator.deviceTurnedOnPin1(chipID, position, this, type);
