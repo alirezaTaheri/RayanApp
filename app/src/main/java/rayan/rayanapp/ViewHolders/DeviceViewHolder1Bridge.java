@@ -168,7 +168,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     public void changePosition(Device item, OnToggleDeviceListener<Device> listener){
         if (listener != null){
-            clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+            clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, item.getPosition()));
         }
     }
     public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){

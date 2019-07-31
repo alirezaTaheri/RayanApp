@@ -171,8 +171,8 @@ public class SendMessageToDevice {
                 public void onSubscribe(Disposable d) {
                     if (animation)
                         if (device.getPin1().equals(AppConstants.ON_STATUS))
-                            fragment.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
-                        else fragment.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
+                            fragment.getDeviceAnimator().turningOffPin1(device.getChipId(), device.getPosition(), (ToggleDeviceAnimationProgress)fragment, device.getType());
+                        else fragment.getDeviceAnimator().turningOnPin1(device.getChipId(), device.getPosition(), (ToggleDeviceAnimationProgress)fragment, device.getType());
 
 //                        fragment.startToggleAnimationPin1(device.getChipId(), position);
                     rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());

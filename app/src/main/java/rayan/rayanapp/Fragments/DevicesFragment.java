@@ -199,15 +199,15 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     @Override
     public void updateStripPin1(int position, int width){
         if (recyclerView.findViewHolderForAdapterPosition(position) != null)
-            ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin1(width);
+            ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(findAdapterPositionByRealPosition(position))).updateBottomStripPin1(width);
     }
     @Override
     public void updateStripPin2(int position, int width){
-        if (recyclerView.findViewHolderForAdapterPosition(position) != null &&
-                devicesRecyclerViewAdapter.getItems().get(position) != null &&
-                (devicesRecyclerViewAdapter.getItems().get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)
-                        || devicesRecyclerViewAdapter.getItems().get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)))
-            if (recyclerView.findViewHolderForAdapterPosition(position) instanceof DeviceViewHolder2Bridges)
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null )
+//                && devicesRecyclerViewAdapter.getItems().get(position) != null &&
+//                (devicesRecyclerViewAdapter.getItems().get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)
+//                        || devicesRecyclerViewAdapter.getItems().get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)))
+//            if (recyclerView.findViewHolderForAdapterPosition(position) instanceof DeviceViewHolder2Bridges)
                 ((DeviceViewHolder2Bridges)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin2(width);
     }
 
@@ -246,6 +246,12 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
             else
                 turnOffDeviceAnimationPin2(chipId, position, type);
         }
+    }
+    public int findAdapterPositionByRealPosition(int realPosition){
+        for (int a = 0;a<finalDevices.size();a++)
+            if (finalDevices.get(a).getPosition() == realPosition)
+                return a;
+        return -1;
     }
 //    @Override
 //    public void startToggleAnimationPin1(String chipId, int position) {

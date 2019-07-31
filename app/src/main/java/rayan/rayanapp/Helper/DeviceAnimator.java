@@ -31,6 +31,19 @@ public class DeviceAnimator {
         ValueAnimator v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN1);
         if (v != null){
             ValueAnimator finalV1 = v;
+            v.removeAllUpdateListeners();
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.getRecyclerView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            fragment.updateStripPin1(position, (int) animation.getAnimatedValue());
+
+                        }
+                    });
+                }
+            });
             fragment.getRecyclerView().post(new Runnable() {
                 @Override
                 public void run() {
@@ -79,6 +92,19 @@ public class DeviceAnimator {
         ValueAnimator v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN1);
         if (v != null){
             Log.e("deviceanimator;:: " , "current is: " + (int)v.getAnimatedValue());
+            v.removeAllUpdateListeners();
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.getRecyclerView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            fragment.updateStripPin1(position, (int) animation.getAnimatedValue());
+
+                        }
+                    });
+                }
+            });
             v.setIntValues((int)v.getAnimatedValue(), 0);
             v.setDuration(300);
             ValueAnimator finalV1 = v;
@@ -136,6 +162,13 @@ public class DeviceAnimator {
             animatorMap.put(chipId+AppConstants.NAMING_PREFIX_PIN1, v);
         }else {
             v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN1);
+            v.removeAllUpdateListeners();
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.updateStripPin1(position, (int) animation.getAnimatedValue());
+                }
+            });
             v.setIntValues(0, singleBridge?itemWidth:halfItemWidth);
         }
         v.setDuration(4000);
@@ -165,6 +198,13 @@ public class DeviceAnimator {
             animatorMap.put(chipId+AppConstants.NAMING_PREFIX_PIN1, v);
         }else {
             v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN1);
+            v.removeAllUpdateListeners();
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.updateStripPin1(position, (int) animation.getAnimatedValue());
+                }
+            });
             v.setIntValues(singleBridge?itemWidth:halfItemWidth,0);
         }
         v.setDuration(4000);
@@ -186,6 +226,30 @@ public class DeviceAnimator {
         ValueAnimator v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN2);
         if (v != null){
             ValueAnimator finalV1 = v;
+            v.removeAllUpdateListeners();
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.getRecyclerView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            fragment.updateStripPin2(position, (int) animation.getAnimatedValue());
+                        }
+                    });
+                }
+            });
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.getRecyclerView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            fragment.updateStripPin1(position, (int) animation.getAnimatedValue());
+
+                        }
+                    });
+                }
+            });
             fragment.getRecyclerView().post(new Runnable() {
                 @Override
                 public void run() {
@@ -234,6 +298,18 @@ public class DeviceAnimator {
         if (v != null){
             Log.e("deviceanimator;:: " , "current is: " + (int)v.getAnimatedValue());
             v.setIntValues((int)v.getAnimatedValue(), 0);
+            v.removeAllUpdateListeners();
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.getRecyclerView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            fragment.updateStripPin2(position, (int) animation.getAnimatedValue());
+                        }
+                    });
+                }
+            });
             v.setDuration(300);
             ValueAnimator finalV1 = v;
             fragment.getRecyclerView().post(new Runnable() {
@@ -290,6 +366,13 @@ public class DeviceAnimator {
             animatorMap.put(chipId+AppConstants.NAMING_PREFIX_PIN2, v);
         }else {
             v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN2);
+            v.removeAllUpdateListeners();
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.updateStripPin2(position, (int) animation.getAnimatedValue());
+                }
+            });
             v.setIntValues(0, singleBridge?itemWidth:halfItemWidth);
         }
         v.setDuration(4000);
@@ -319,6 +402,13 @@ public class DeviceAnimator {
             animatorMap.put(chipId+AppConstants.NAMING_PREFIX_PIN2, v);
         }else {
             v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN2);
+            v.removeAllUpdateListeners();
+            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    fragment.updateStripPin2(position, (int) animation.getAnimatedValue());
+                }
+            });
             v.setIntValues(singleBridge?itemWidth:halfItemWidth,0);
         }
         v.setDuration(4000);
