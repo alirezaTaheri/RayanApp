@@ -200,8 +200,28 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     @SuppressLint("CheckResult")
     @OnClick(R.id.factoryReset)
     void toDeviceFactoryReset(){
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
-        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+        editDeviceFragmentViewModel.toDeviceFactoryReset(device).observe(EditDeviceFragment.this, s -> {
+            assert s != null;
+            switch (s){
+                case AppConstants.FACTORY_RESET_DONE:
+                    Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
+                    setDeviceTopicStatus(EditDeviceFragment.TopicStatus.CHANGED);
+                    editDeviceFragmentViewModel.getGroups();
+                    break;
+                case AppConstants.SOCKET_TIME_OUT:
+                    setDeviceTopicStatus(EditDeviceFragment.TopicStatus.CHANGED);
+                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.ERROR:
+                    Toast.makeText(getActivity(), "خطایی رخ داد", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.USER_NOT_FOUND_RESPONSE:
+                    Toast.makeText(getActivity(), "دستگاهی با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
+//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
+//        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
     @SuppressLint("CheckResult")
     public void resetDevice(){

@@ -16,19 +16,30 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
@@ -38,8 +49,10 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitReques
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.FactoryResetRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 //<<<<<<< HEAD
+import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 //=======
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
@@ -49,6 +62,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitRespo
 import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.FactoryResetResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Util.AppConstants;
 
@@ -262,17 +276,124 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     @SuppressLint("CheckResult")
     public LiveData<String> toDeviceFactoryReset(Device device){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId())).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
-                .flatMap(deviceBaseResponse -> {
-                    if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
-                        return toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET), device.getIp());
-                    else if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.ERROR_DESCRIPTION) &&
-                            deviceBaseResponse.getData().getMessage().equals(AppConstants.USER_NOT_FOUND_RESPONSE)){
-                        results.postValue(AppConstants.USER_NOT_FOUND_RESPONSE);
-                        return null;
+        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
+                Observable.just(1).flatMap(integer -> {
+                    return toDeviceFactoryResetObservable(device);
+                })
+                        .repeatWhen(completed -> {
+                            Log.e("TAGTAGTAG", "repeatwhen: " + completed);
+                            return completed.delay(200, TimeUnit.MILLISECONDS);
+                        }).flatMap(new Function<FactoryResetResponse, ObservableSource<?>>() {
+                    @Override
+                    public ObservableSource<?> apply(FactoryResetResponse factoryResetResponse) throws Exception {
+                        if (factoryResetResponse.getCmd().equals(AppConstants.FACTORY_RESET_DONE)) {
+                            Log.e(TAG, "dddddddddddddddddddddddddddddd");
+                            results.postValue(AppConstants.FACTORY_RESET_DONE);
+                            return deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId()));
+//                            return Observable.just(0);
+                        }
+                        else{
+                            Log.e(TAG, "dddddddddddddddddddddddddddddd000000000000000000");
+                            return Observable.just(1);
+                        }
                     }
-                    return null;
-                }).subscribe(toDeviceFactoryResetObserver(results));
+                })
+                        .takeWhile(toggleDeviceResponse -> {
+                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
+                            if (toggleDeviceResponse instanceof Integer && (int)toggleDeviceResponse == 1)
+                                return true;
+                            else return false;
+//                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0])+1));
+//                            if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
+//                                return true;
+//                            else if (toggleDeviceResponse.getCmd().equals(AppConstants.FACTORY_RESET_DONE)){
+//                                    Log.e(TAG, "Device Responsed with ok Message");
+////                                    return deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId()));
+//                                return false;
+//                            }
+//                            Log.e(TAG, "Device didn't responsed right");
+//                            results.postValue(AppConstants.ERROR);
+//                            return null;
+//                            result.postValue(AppConstants.SETTINGS);
+//                            deviceDatabase.updateDevice(device);
+//                            else {
+//                                Log.e(this.getClass().getSimpleName(), "So What received? " + toggleDeviceResponse.getCmd());
+//                                result.postValue(toggleDeviceResponse.getCmd());
+//                            }
+//                            return false;
+                        }),
+                (changeNameResponse, deviceResponse) -> {
+                    return deviceResponse;})
+                .timeout(4, TimeUnit.SECONDS)
+//                .takeWhile(aLong -> aLong<1)
+                .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.e("//////////","onSubscribe");
+                    }
+
+                    @Override
+                    public void onNext(Object aLong) {
+                        Log.e("//////////","onNext: " + aLong);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("//////////", "/onError/////" + e + e.getClass());
+                        if (e instanceof SocketTimeoutException || e instanceof TimeoutException){
+                            results.postValue(AppConstants.SOCKET_TIME_OUT);
+                        }
+                        results.postValue(e.toString());
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e("//////////","onComplete");
+                    }
+                });
+//        toDeviceFactoryResetObservable().subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+//                .flatMap(new Function<DeviceBaseResponse, ObservableSource<?>>() {
+//                    @Override
+//                    public ObservableSource<?> apply(DeviceBaseResponse deviceBaseResponse) throws Exception {
+//
+//                    }
+//                }).subscribe(new Observer<Object>() {
+//            @Override
+//            public void onSubscribe(Disposable d) {
+//
+//            }
+//
+//            @Override
+//            public void onNext(Object o) {
+//                results.postValue(AppConstants.FACTORY_RESET_DONE);
+//                Log.e("JEnsESHJENSHE" ,"jenesh: " + o);
+//                Log.e("JEnsESHJENSHE" ,"jenesh: " + o.getClass());
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//
+//            }
+//        });
+
+//        deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId())).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+//                .flatMap(deviceBaseResponse -> {
+//                    if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+//                        return toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET), device.getIp());
+//                    else if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.ERROR_DESCRIPTION) &&
+//                            deviceBaseResponse.getData().getMessage().equals(AppConstants.USER_NOT_FOUND_RESPONSE)){
+//                        results.postValue(AppConstants.USER_NOT_FOUND_RESPONSE);
+//                        return null;
+//                    }
+//                    return null;
+//                }).subscribe(toDeviceFactoryResetObserver(results));
 //        toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
         return results;
     }
@@ -286,10 +407,11 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<DeviceBaseResponse> toDeviceFactoryResetObservable(BaseRequest baseRequest, String ip){
+    private Observable<FactoryResetResponse> toDeviceFactoryResetObservable(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        Log.e(TAG, "Sending StWord Is: " + device.getStatusWord());
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .factoryReset(AppConstants.getDeviceAddress(ip), baseRequest)
+                .factoryReset(AppConstants.sha1(new FactoryResetRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new FactoryResetRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

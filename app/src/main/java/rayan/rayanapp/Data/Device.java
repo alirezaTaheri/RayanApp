@@ -56,6 +56,8 @@ public class Device implements Parcelable {
     private String secret;
     private boolean hidden;
     private int position;
+    private int inGroupPosition;
+    private int favoritePosition;
 
     public Device(Device device) {
         this.pin1 = device.getPin1();
@@ -77,8 +79,26 @@ public class Device implements Parcelable {
         this.statusWord = device.getStatusWord();
         this.hidden = device.isHidden();
         this.position = device.getPosition();
+        this.inGroupPosition = device.getInGroupPosition();
         this.locallyAccessibility = device.isLocallyAccessibility();
         this.onlineAccessibility = device.isOnlineAccessibility();
+        this.favoritePosition = device.getFavoritePosition();
+    }
+
+    public int getFavoritePosition() {
+        return favoritePosition;
+    }
+
+    public void setFavoritePosition(int favoritePosition) {
+        this.favoritePosition = favoritePosition;
+    }
+
+    public int getInGroupPosition() {
+        return inGroupPosition;
+    }
+
+    public void setInGroupPosition(int inGroupPosition) {
+        this.inGroupPosition = inGroupPosition;
     }
 
     public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId, String secret) {
@@ -120,6 +140,8 @@ public class Device implements Parcelable {
         secret = in.readString();
         hidden = in.readByte() != 0;
         position = in.readInt();
+        inGroupPosition = in.readInt();
+        favoritePosition = in.readInt();
     }
 
     @Override
@@ -146,6 +168,9 @@ public class Device implements Parcelable {
         dest.writeString(secret);
         dest.writeByte((byte) (hidden ? 1 : 0));
         dest.writeInt(position);
+        dest.writeInt(inGroupPosition);
+        dest.writeInt(favoritePosition);
+
     }
 
     @Override
@@ -338,29 +363,31 @@ public class Device implements Parcelable {
 
     @Override
     public String toString() {
-        return "Device{" +
+        return "{" +
                 "chipId='" + chipId + '\'' +
                 ", name1='" + name1 + '\'' +
-                ", name2='" + name2 + '\'' +
+////                ", name2='" + name2 + '\'' +
                 ", pin1='" + pin1 + '\'' +
                 ", pin2='" + pin2 + '\'' +
                 ", id='" + id + '\'' +
                 ", type='" + type + '\'' +
-                ", username='" + username + '\'' +
+//                ", username='" + username + '\'' +
                 ", topic=" + topic +
                 ", groupId='" + groupId + '\'' +
-                ", style='" + style + '\'' +
+//                ", style='" + style + '\'' +
                 ", ssid='" + ssid + '\'' +
-                ", devicePassword='" + devicePassword + '\'' +
+//                ", devicePassword='" + devicePassword + '\'' +
                 ", ip='" + ip + '\'' +
-                ", password='" + password + '\'' +
+//                ", password='" + password + '\'' +
                 ", favorite=" + favorite +
-                ", locallyAccessibility=" + locallyAccessibility +
-                ", onlineAccessibility=" + onlineAccessibility +
+//                ", locallyAccessibility=" + locallyAccessibility +
+//                ", onlineAccessibility=" + onlineAccessibility +
                 ", statusWord='" + statusWord + '\'' +
                 ", secret='" + secret + '\'' +
                 ", hidden=" + hidden +
                 ", position=" + position +
+                ", inGroupPosition=" + inGroupPosition +
+                ", favoritePosition=" + favoritePosition +
                 '}';
     }
 

@@ -1,11 +1,18 @@
 package rayan.rayanapp.Fragments;
 
+import android.Manifest;
+import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +46,7 @@ public class UsersListDialogFragment extends BottomSheetDialogFragment implement
         final UsersListDialogFragment fragment = new UsersListDialogFragment();
         final Bundle args = new Bundle();
         args.putParcelable("group", group);
+        args.putString("id", group.getId());
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,7 +78,6 @@ public class UsersListDialogFragment extends BottomSheetDialogFragment implement
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_device_list_dialog, container, false);
         ButterKnife.bind(this, view);
-        editGroupFragmentViewModel = ViewModelProviders.of(this).get(EditGroupFragmentViewModel.class);
         contactsRecyclerViewAdapter = new ContactsRecyclerViewAdapter(getActivity());
         contactsRecyclerViewAdapter.setItems(nonAdmins);
         contactsRecyclerViewAdapter.setListener(this);
@@ -87,20 +94,41 @@ public class UsersListDialogFragment extends BottomSheetDialogFragment implement
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         group = getArguments().getParcelable("group");
+        editGroupFragmentViewModel = ViewModelProviders.of(this).get(EditGroupFragmentViewModel.class);
         nonAdmins = new ArrayList<>();
-        for (int a= 0;a<group.getHumanUsers().size(); a++){
-            boolean flag = false;
-            for (int b = 0; b<group.getAdmins().size();b++){
-                if (group.getHumanUsers().get(a).getId().equals(group.getAdmins().get(b).getId()))
-                    flag = true;
+        editGroupFragmentViewModel.getJustUsersInGroup(getArguments().getString("id")).observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(@Nullable List<User> users) {
+                Log.e("justjustjust", "jus:" + users + getArguments().getString("id"));
+                nonAdmins = users;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
+                    for (int i = 0; i <= users.size() - 1; i++) {
+                        nonAdmins.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(nonAdmins.get(i).getUsername(), getActivity()));
+                        nonAdmins.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(nonAdmins.get(i).getUsername(), getActivity()));
+                    }
+                    contactsRecyclerViewAdapter.setItems(nonAdmins);
+                if (nonAdmins.size()==0){
+                    Toast.makeText(getActivity(), "عضوی برای مدیریت وجود ندارد", Toast.LENGTH_SHORT).show();
+                    dismiss();
+                }
             }
-            if (!flag) nonAdmins.add(group.getHumanUsers().get(a));
-        }
-        if (nonAdmins.size()==0){
-            Toast.makeText(getActivity(), "عضوی برای مدیریت وجود ندارد", Toast.LENGTH_SHORT).show();
-            dismiss();
-        }
+        });
+//        for (int a= 0;a<group.getHumanUsers().size(); a++){
+//            boolean flag = false;
+//            for (int b = 0; b<group.getAdmins().size();b++){
+//                if (group.getHumanUsers().get(a).getId().equals(group.getAdmins().get(b).getId()))
+//                    flag = true;
+//            }
+//            if (!flag) nonAdmins.add(group.getHumanUsers().get(a));
+//        }
 
+    }
+
+    Activity activity;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activity = (Activity) context;
     }
 
     @Override

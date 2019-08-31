@@ -67,6 +67,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
                 <Spinner
+                    android:layoutDirection="rtl"
                     android:spinnerMode="dialog"
                     android:textDirection="rtl"
                     android:layout_marginBottom="20dp"
@@ -75,6 +76,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <Spinner
+                    android:layoutDirection="rtl"
+                    android:textDirection="anyRtl"
                     android:spinnerMode="dialog"
                     android:gravity="right"
                     android:id="@+id/devicesSpinner"

@@ -1,6 +1,7 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -30,7 +31,11 @@ public class ScenarioViewHolder extends BaseViewHolder<Scenario, OnScenarioClick
     @Override
     public void onBind(Scenario item, @Nullable OnScenarioClicked<Scenario> listener) {
         name.setText(item.getName());
-        executeButton.setOnClickListener(v -> listener.onExecuteClicked(item, getAdapterPosition()));
+        Log.e("OOOOOOOO", "" + item);
+        executeButton.setOnClickListener(v -> {
+            Log.e("OOOOOOOO", "clicked" + item);
+            listener.onExecuteClicked(item, getAdapterPosition());
+        });
         container.setOnClickListener(v -> listener.onScenarioClicked(item, getAdapterPosition()));
     }
 }

@@ -2,10 +2,13 @@ package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,6 +26,7 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Observable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,12 +34,14 @@ import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.Adapters.recyclerView.ScenariosRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Scenario;
 import rayan.rayanapp.Dialogs.ScenarioPopupMenuDialog;
 import rayan.rayanapp.Dialogs.YesNoDialog;
+import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Listeners.OnScenarioClicked;
 import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
@@ -63,7 +69,7 @@ public class ScenariosFragment extends Fragment implements
     List<Scenario> scenarios = new ArrayList<>();
     ScenariosRecyclerViewAdapter recyclerViewAdapter;
     ScenarioPopupMenuDialog menuDialog;
-
+    private final String TAG = "ScenariosFragment";
     public ScenariosFragment() {
     }
 
@@ -123,7 +129,7 @@ public class ScenariosFragment extends Fragment implements
             public void onChanged(@Nullable List<Scenario> scenarios) {
                 recyclerViewAdapter.setItems(scenarios);
             }
-        });
+            });
     }
 
     @Override
@@ -142,17 +148,21 @@ public class ScenariosFragment extends Fragment implements
     @SuppressLint("CheckResult")
     @OnClick(R.id.allOn)
     public void allOn(){
+        Log.d(TAG, "allOn() called with selectedGroup: " + allOnSelectedGroup);
         if (allOnSelectedGroup.getId() != null)
             viewModel.getAllDevicesInGroupSingle(allOnSelectedGroup.getId()).observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
                     .subscribe(new Consumer<List<Device>>() {
                         @Override
                         public void accept(List<Device> devices) throws Exception {
                             for (Device device : devices){
+                                device.setPin1(AppConstants.ON_STATUS);
+                                List<String> args = new ArrayList<>();
+                                args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                                 if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
-                                    viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true);
+                                    viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true, true);
                                 }else {
-                                    viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true);
-                                    viewModel.sendMqttPin2((RayanApplication)activity.getApplication(), device, true);
+                                    device.setPin2(AppConstants.ON_STATUS);
+                                    viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.ON_1_ON_2, args));
                                 }
                             }
                         }
@@ -161,11 +171,14 @@ public class ScenariosFragment extends Fragment implements
         viewModel.getAllDevicesSingle().subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .subscribe(devices -> {
                     for (Device device : devices){
+                        List<String> args = new ArrayList<>();
+                        device.setPin1(AppConstants.ON_STATUS);
+                        args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                         if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
-                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true);
+                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true, true);
                         }else {
-                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true);
-                            viewModel.sendMqttPin2((RayanApplication)activity.getApplication(), device, true);
+                            device.setPin2(AppConstants.ON_STATUS);
+                            viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.ON_1_ON_2, args));
                         }
                     }
                 });
@@ -174,17 +187,21 @@ public class ScenariosFragment extends Fragment implements
     @SuppressLint("CheckResult")
     @OnClick(R.id.allOff)
     public void allOff(){
+        Log.d(TAG, "allOff() called with selectedGroup: " + allOffSelectedGroup);
         if (allOffSelectedGroup.getId() != null)
         viewModel.getAllDevicesInGroupSingle(allOffSelectedGroup.getId()).observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<List<Device>>() {
                     @Override
                     public void accept(List<Device> devices) throws Exception {
                         for (Device device : devices){
+                            List<String> args = new ArrayList<>();
+                            device.setPin1(AppConstants.OFF_STATUS);
+                            args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                             if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
-                                viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false);
+                                viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false, true);
                             }else {
-                                viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false);
-                                viewModel.sendMqttPin2((RayanApplication)activity.getApplication(), device, false);
+                                device.setPin2(AppConstants.OFF_STATUS);
+                                viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.OFF_1_OFF_2, args));
                             }
                         }
                     }
@@ -193,11 +210,14 @@ public class ScenariosFragment extends Fragment implements
         viewModel.getAllDevicesSingle().subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .subscribe(devices -> {
                     for (Device device : devices){
+                        List<String> args = new ArrayList<>();
+                        device.setPin1(AppConstants.OFF_STATUS);
+                        args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                         if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
-                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false);
+                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false, true);
                         }else {
-                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false);
-                            viewModel.sendMqttPin2((RayanApplication)activity.getApplication(), device, false);
+                            device.setPin2(AppConstants.OFF_STATUS);
+                            viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.OFF_1_OFF_2, args));
                         }
                     }
                 });
@@ -222,13 +242,13 @@ public class ScenariosFragment extends Fragment implements
                 allOnSelectedGroup = groups.get(parent.getSelectedItemPosition());
                 if (groups.get(parent.getSelectedItemPosition()).getId() != null){
                     RayanApplication.getPref().setSelectedGroupAllOnScenario(groups.get(parent.getSelectedItemPosition()).getId());
-                }
+                }else RayanApplication.getPref().setSelectedGroupAllOnScenario(null);
                 break;
             case R.id.allOffSpinner:
                 allOffSelectedGroup = groups.get(parent.getSelectedItemPosition());
                 if (groups.get(parent.getSelectedItemPosition()).getId() != null){
                     RayanApplication.getPref().setSelectedGroupAllOffScenario(groups.get(parent.getSelectedItemPosition()).getId());
-                }
+                }else RayanApplication.getPref().setSelectedGroupAllOffScenario(null);
                 break;
         }
     }
@@ -246,23 +266,29 @@ public class ScenariosFragment extends Fragment implements
 
     @Override
     public void onExecuteClicked(Scenario item, int position) {
+        Log.d(TAG, "onExecuteClicked() called with: item = [" + item + "], position = [" + position + "]");
         for (Device device: item.getDevices()){
+            List<String> args = new ArrayList<>();
+            args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
             if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
                 if (device.getPin1().equals(AppConstants.ON_STATUS))
-                    viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true);
+                    viewModel.sendMessageToDevicePin1(device, true);
                 else
-                    viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false);
+                    viewModel.sendMessageToDevicePin1(device, false);
             }else {
-                if (device.getPin1().equals(AppConstants.ON_STATUS))
-                    viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true);
-                else viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false);
-                if (device.getPin2().equals(AppConstants.ON_STATUS))
-                    viewModel.sendMqttPin2((RayanApplication)activity.getApplication(), device, true);
-                else viewModel.sendMqttPin2((RayanApplication)activity.getApplication(), device, false);
+                if (device.getPin1().equals(AppConstants.ON_STATUS) && device.getPin2().equals(AppConstants.ON_STATUS))
+                    viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.ON_1_ON_2, args));
+                else if (device.getPin1().equals(AppConstants.ON_STATUS) && device.getPin2().equals(AppConstants.OFF_STATUS))
+                    viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.ON_1_OFF_2, args));
+                else if (device.getPin1().equals(AppConstants.OFF_STATUS) && device.getPin2().equals(AppConstants.ON_STATUS))
+                    viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.OFF_1_ON_2, args));
+                else if (device.getPin1().equals(AppConstants.OFF_STATUS) && device.getPin2().equals(AppConstants.OFF_STATUS))
+                    viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.OFF_1_OFF_2, args));
+
             }
         }
     }
-
+//Irancell-TD-i40-A1_4CEB
     @Override
     public void onDeleteClicked(int id) {
         menuDialog.dismiss();
@@ -291,7 +317,9 @@ public class ScenariosFragment extends Fragment implements
 
     public int getGroupPosition(String id){
         for (int a = 0;a<groups.size();a++)
-            if (groups.get(a).getId() != null &&groups.get(a).getId().equals(id))
+            if (groups.get(a).getId() != null &&groups.get(a).getId().equals(id)) {
+                return a;
+            }else if (id == null && groups.get(a).getId() == null)
                 return a;
         return -1;
 

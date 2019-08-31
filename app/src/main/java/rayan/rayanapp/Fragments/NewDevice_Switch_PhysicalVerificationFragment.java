@@ -105,6 +105,20 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
                 case AppConstants.EXPIRED:
                     Toast.makeText(getActivity(), "زمان شما به اتمام رسیده است", Toast.LENGTH_SHORT).show();
                     break;
+                case AppConstants.SOCKET_TIME_OUT:
+                    AddNewDeviceActivity.getNewDevice().setFailed(true);
+                    Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.UNKNOWN_EXCEPTION:
+                    Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.CONNECT_EXCEPTION:
+                    Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
+                    break;
+                case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                    Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
+                    break;
+                    default: Toast.makeText(getActivity(), "مشکلی در نصب دستگاه وجود دارد", Toast.LENGTH_SHORT).show();
             }
         });
     }

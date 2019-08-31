@@ -22,7 +22,7 @@ android {
         applicationId "rayan.rayanapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 4
+        versionCode 5
         versionName "2.60.14"
 //        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -171,5 +171,6 @@ dependencies {
     implementation 'android.arch.persistence.room:rxjava2:1.1.1'
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.3'
     implementation 'com.airbnb.android:lottie:2.5.5'
+    implementation 'com.android.volley:volley:1.1.0'
     implementation project(':org.eclipse.paho.android.service')
 }

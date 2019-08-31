@@ -57,7 +57,9 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
                 && oldDevice.isFavorite() == newDevice.isFavorite()
                 && oldDevice.isLocallyAccessibility() == newDevice.isLocallyAccessibility()
                 && oldDevice.getSsid().equals(newDevice.getSsid())
-                && oldDevice.getPosition() == (newDevice.getPosition());
+                && oldDevice.getPosition() == (newDevice.getPosition())
+                && oldDevice.isHidden() == (newDevice.isHidden())
+                && oldDevice.getIp().equals(newDevice.getIp());
 //                && oldDevice.getState2_1().equals(newDevice.getState2_1())
 //                && oldDevice.getIp().equals(newDevice.getIp())
 //                && (oldDevice.isReadyForMqtt() == newDevice.isReadyForMqtt());
@@ -82,6 +84,10 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
         }
         if (!newDevice.getPin1().equals(oldDevice.getPin1())){
             b.putString("pin1", newDevice.getPin1());
+        }
+        if (!newDevice.getIp().equals(oldDevice.getIp())){
+            Log.e(this.getClass().getCanonicalName(), "ipchangedchanged" + newDevice.getIp() + oldDevice.getIp() + newDevice.getName1());
+            b.putString("ip", newDevice.getIp());
         }
         if (!newDevice.getPin2().equals(oldDevice.getPin2())){
             b.putString("pin2", newDevice.getPin2());

@@ -45,8 +45,16 @@ public class MqttSubscriptionController {
 
     public void setMqttConnected(boolean mqttConnected){
         Log.e(TAG, "setMqttConnected..."+mqttConnected);
+        subscribedTopics.clear();
         this.mqttConnected = mqttConnected;
-        check();
+        if (mqttConnected){
+            Log.d("pakidam", "chitooshe? : " + subscribedTopics);
+            check();
+        }
+        else {
+            Log.d("pakidam", "pakidam");
+            check();
+        }
     }
 
     public void check(){

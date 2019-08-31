@@ -3,6 +3,9 @@ package rayan.rayanapp.ViewModels;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -66,7 +69,6 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     private GroupDatabase groupDatabase;
     private ExecutorService executorService;
     private UserDatabase userDatabase;
-    private SendUDPMessage sendUDPMessage;
     private UserMembershipDatabase membershipDatabase;
     public DevicesFragmentViewModel(@NonNull Application application) {
         super(application);
@@ -74,8 +76,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         groupDatabase = new GroupDatabase(application);
         userDatabase = new UserDatabase(application);
         membershipDatabase = new UserMembershipDatabase(application);
-        sendUDPMessage = new SendUDPMessage();
         executorService= Executors.newSingleThreadExecutor();
+        initSounds();
     }
 
     public void addDevices(List<Device> devices){
@@ -224,6 +226,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
                         deviceUser.setIp(AppConstants.UNKNOWN_IP);
                         deviceUser.setPosition(nOd);
+                        deviceUser.setFavoritePosition(nOd);
+                        deviceUser.setInGroupPosition(b);
                         tempTopics.add(deviceUser.getTopic().getTopic());
                         if (deviceUser.getType()!= null && deviceUser.getName1() != null){
                             devices.add(deviceUser);
@@ -411,6 +415,41 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
     public Single<List<Device>> getAllDevicesSingle(){
         return deviceDatabase.getAllDevicesSingle();
+    }
+
+    MediaPlayer switchOnSound, switchOffSound;
+    Uri switchOnPath, switchOffPath;
+
+    public void playOnSound(){
+        switchOnSound.start();
+    }
+
+    public void playOffSound(){
+        switchOffSound.start();
+    }
+    public void initSounds(){
+        switchOnSound = new MediaPlayer();
+        switchOnPath = Uri.parse("android.resource://"+getApplication().getPackageName()+"/raw/sound_switch_on_3");
+
+        switchOffSound = new MediaPlayer();
+        switchOffPath = Uri.parse("android.resource://"+getApplication().getPackageName()+"/raw/sound_switch_off");
+        try {
+            switchOnSound.setDataSource(getApplication(), switchOnPath);
+            switchOnSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+            switchOnSound.prepareAsync();
+
+            switchOffSound.setDataSource(getApplication(), switchOffPath);
+            switchOffSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+            switchOffSound.prepareAsync();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.DeviceAnimator;
 import rayan.rayanapp.Helper.DialogPresenter;
+import rayan.rayanapp.Listeners.DevicesAndFavoritesListener;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
@@ -83,13 +85,14 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
 //                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
 //                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3*2, devices.size()));
 //                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"currentGroup: " + currentGroup);
-                if (currentGroup != null)
-                    for (int a = 0; a<devices.size();a++){
-                        if (devices.get(a).getGroupId().equals(currentGroup)){
-                            finalDevices.add(devices.get(a));
-                        }
-                    }
-                else finalDevices = devices;
+//                if (currentGroup != null)
+//                    for (int a = 0; a<devices.size();a++){
+//                        if (devices.get(a).getGroupId().equals(currentGroup)){
+//                            finalDevices.add(devices.get(a));
+//                        }
+//                    }
+//                else
+                    finalDevices = devices;
                 Log.e("lsdkfjkldsfjsdfkjl: " , "sdlfk: " + finalDevices);
                 Log.e("lsdkfjkldsfjsdfkjl: " , "sdlfk: " + finalDevices.size());
                 if (finalDevices.size() == 0){
@@ -107,7 +110,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                     public int compare(Device obj1, Device obj2) {
                         // ## Ascending order
 //                    return obj1.firstName.compareToIgnoreCase(obj2.firstName); // To compare string values
-                        return Integer.compare(obj1.getPosition(), obj2.getPosition()); // To compare integer values
+                        return Integer.compare(obj1.getFavoritePosition(), obj2.getFavoritePosition()); // To compare integer values
                         // ## Descending order
                         // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
                         // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
@@ -246,27 +249,34 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
             Log.e("///////////" , "reallyMoved From: " + from);
             Log.e("///////////" , "reallyMoved To: " + to);
             Log.e("oooooooooooo" , "reallyMoved: oldList:: " + devices);
+            List<Device> devicesToUpdate = new ArrayList<>();
             if (from < to) {
                 for (int i = from; i < to; i++) {
-                    Device d = devices.get(i);
-                    d.setPosition(i+1);
-                    Device d1 = devices.get(i+1);
-                    d1.setPosition(i);
+                    Device d = new Device(devices.get(i));
+                    d.setFavoritePosition(i+1);
+                    Device d1 = new Device(devices.get(i+1));
+                    d1.setFavoritePosition(i);
                     Collections.swap(devices, i, i + 1);
-                    favoritesFragmentViewModel.updateDevice(d);
-                    favoritesFragmentViewModel.updateDevice(d1);
+                    if (!updateIfExists(d, devicesToUpdate))
+                        devicesToUpdate.add(d);
+                    if (!updateIfExists(d1, devicesToUpdate))
+                        devicesToUpdate.add(d1);
                 }
             } else {
                 for (int i = from; i > to; i--) {
-                    Device d = devices.get(i);
-                    d.setPosition(i-1);
-                    Device d2 = devices.get(i-1);
-                    d2.setPosition(i);
+                    Device d = new Device(devices.get(i));
+                    d.setFavoritePosition(i-1);
+                    Device d2 = new Device(devices.get(i-1));
+                    d2.setFavoritePosition(i);
                     Collections.swap(devices, i, i - 1);
-                    favoritesFragmentViewModel.updateDevice(d);
-                    favoritesFragmentViewModel.updateDevice(d2);
+
+                    if (!updateIfExists(d, devicesToUpdate))
+                        devicesToUpdate.add(d);
+                    if (!updateIfExists(d2, devicesToUpdate))
+                        devicesToUpdate.add(d2);
                 }
             }
+            favoritesFragmentViewModel.updateDevices(devicesToUpdate);
             Log.e("nnnnnnnnnnnnn" , "reallyMoved: NewList:: " + devices);
         }
 
@@ -347,6 +357,35 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     public void turnOffDeviceAnimationPin2(String chipID, int position, String type){
         deviceAnimator.deviceTurnedOffPin2(chipID, position, this, type);
     }
+
+    @Override
+    public void turnOnDevicePin1(String chipID, int position, String type) {
+//        if (!devicesAndFavoritesListener.isInDevicesFragment(chipID))
+//            favoritesFragmentViewModel.playOnSound();
+        deviceAnimator.deviceTurnedOnPin1(chipID, position, this, type);
+    }
+
+    @Override
+    public void turnOffDevicePin1(String chipID, int position, String type) {
+//        if (!devicesAndFavoritesListener.isInDevicesFragment(chipID))
+//            favoritesFragmentViewModel.playOffSound();
+        deviceAnimator.deviceTurnedOffPin1(chipID, position, this, type);
+    }
+
+    @Override
+    public void turnOnDevicePin2(String chipID, int position, String type) {
+//        if (!devicesAndFavoritesListener.isInDevicesFragment(chipID))
+//            favoritesFragmentViewModel.playOnSound();
+        deviceAnimator.deviceTurnedOnPin2(chipID, position, this, type);
+    }
+
+    @Override
+    public void turnOffDevicePin2(String chipID, int position, String type) {
+//        if (!devicesAndFavoritesListener.isInDevicesFragment(chipID))
+//            favoritesFragmentViewModel.playOffSound();
+        deviceAnimator.deviceTurnedOffPin2(chipID, position, this, type);
+    }
+
     @Override
     public void sendingMessageTimeoutPin1(String chipId, int position, String type){
         if (!deviceAnimator.isResponseReceivedPin1(chipId)){
@@ -364,5 +403,22 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
             else
                 turnOffDeviceAnimationPin2(chipId, position, type);
         }
+    }
+
+    DevicesAndFavoritesListener devicesAndFavoritesListener;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof DevicesAndFavoritesListener)
+            devicesAndFavoritesListener = (DevicesAndFavoritesListener) context;
+    }
+
+    public boolean updateIfExists(Device d, List<Device> devices){
+        for (Device device: devices)
+            if (d.getChipId().equals(device.getChipId())){
+                device.setFavoritePosition(d.getFavoritePosition());
+                return true;
+            }
+        return false;
     }
 }

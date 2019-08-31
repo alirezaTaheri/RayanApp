@@ -46,10 +46,12 @@ import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Adapters.arrayAdapter.ScenarioDevicesSpinnerCustomAdapter;
 import rayan.rayanapp.Adapters.arrayAdapter.SpinnerCustomAdapter;
 import rayan.rayanapp.Adapters.recyclerView.ScenarioActionsRecyclerViewAdapter;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Scenario;
+import rayan.rayanapp.Data.ScenarioDeviceSpinnerItem;
 import rayan.rayanapp.Listeners.ScenarioOnActionClickedListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
@@ -178,9 +180,19 @@ public class CreateScenarioFragment extends BottomSheetDialogFragment implements
                         Log.e("ererererer" , "erererer: " + groupNames.size() + groupNames.get(groupNames.size()-1) + arrayAdapter.getCount());
                         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         groupsSpinner.setAdapter(arrayAdapter);
-                        groupsSpinner.setSelection(arrayAdapter.getCount());
+//                        if (selectedGroup == null)
+                            groupsSpinner.setSelection(arrayAdapter.getCount());
+//                        else
+//                            groupsSpinner.setSelection(getGroupPosition(selectedGroup));
                     }
                 });
+    }
+
+    public int getGroupPosition(Group group){
+        for (int a = 0;a<groups.size();a++)
+            if (groups.get(a).getId().equals(group.getId()))
+                return a;
+        return -1;
     }
 
     Activity activity;
@@ -201,30 +213,47 @@ public class CreateScenarioFragment extends BottomSheetDialogFragment implements
                         @Override
                         public void onChanged(@Nullable List<Device> devices) {
                             CreateScenarioFragment.this.currentDevices = devices;
-                            List<String> devicesName = new ArrayList<>();
-                            for (Device d : devices)
-                                devicesName.add(d.getName1());
-                            devicesName.add("دستگاه مورد نظر خود را انتخاب کنید");
-                            ArrayAdapter arrayAdapter = new SpinnerCustomAdapter(activity, android.R.layout.simple_spinner_item, devicesName);
-                            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            devicesSpinner.setAdapter(arrayAdapter);
-                            devicesSpinner.setSelection(arrayAdapter.getCount());
+                            selectedGroup.setDevices(devices);
+                            List<ScenarioDeviceSpinnerItem> devicesName = new ArrayList<>();
+                            if (devices.size() == 0)
+                                devicesName.add(new ScenarioDeviceSpinnerItem("0","دستگاهی در این گروه وجود ندارد"));
+                            else {
+                                devicesName.add(new ScenarioDeviceSpinnerItem("0", "همه دستگاه‌ها"));
+                                for (Device d : devices)
+                                    devicesName.add(new ScenarioDeviceSpinnerItem(d.getChipId(), d.getName1()));
+                                devicesName.add(new ScenarioDeviceSpinnerItem("0","دستگاه مورد نظر خود را انتخاب کنید"));
+                                ArrayAdapter arrayAdapter = new ScenarioDevicesSpinnerCustomAdapter(activity, android.R.layout.simple_spinner_item, devicesName);
+                                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                devicesSpinner.setAdapter(arrayAdapter);
+                                devicesSpinner.setSelection(arrayAdapter.getCount());
+                            }
                         }
                     });
                 }
                 break;
             case R.id.devicesSpinner:
                 if (parent.getSelectedItemPosition() < currentDevices.size()) {
-                    selectedDevice = currentDevices.get(parent.getSelectedItemPosition());
-                    boolean exist = false;
-                    if (selectedDevice != null) {
-                        for (Device d : actions)
-                            if (d.getChipId().equals(selectedDevice.getChipId()))
-                                exist = true;
-                        if (!exist) {
-                            actions.add(0, selectedDevice);
-                            recyclerViewAdapter.updateItems(actions);
+                    if (((ScenarioDeviceSpinnerItem)parent.getSelectedItem()).getId().equals("0")){
+                        for (Device device: selectedGroup.getDevices()) {
+                            boolean exist = false;
+                            for (Device d : actions)
+                                if (d.getChipId().equals(device.getChipId()))
+                                    exist = true;
+                            if (!exist) {
+                                actions.add(0, device);
+                                recyclerViewAdapter.updateItems(actions);
+                            }
                         }
+                    }else {
+                        selectedDevice = currentDevices.get(parent.getSelectedItemPosition()-1);
+                        boolean exist = false;
+                            for (Device d : actions)
+                                if (d.getChipId().equals(selectedDevice.getChipId()))
+                                    exist = true;
+                            if (!exist) {
+                                actions.add(0, selectedDevice);
+                                recyclerViewAdapter.updateItems(actions);
+                            }
                     }
                 }
                 break;

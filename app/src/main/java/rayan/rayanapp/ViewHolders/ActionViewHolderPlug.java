@@ -59,6 +59,7 @@ public class ActionViewHolderPlug extends ActionViewHolder1Bridge {
 
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.pin1Clicked(item, this.getAdapterPosition()));
+            remove.setOnClickListener(v -> listener.removeClicked(item, getAdapterPosition()));
         }
     }
 

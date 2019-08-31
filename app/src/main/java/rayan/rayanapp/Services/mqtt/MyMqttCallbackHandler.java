@@ -100,6 +100,7 @@ public class MyMqttCallbackHandler implements MqttCallback {
                                   String pin1 = jsonMessage.getString("pin1");
                                   String pin2 = jsonMessage.getString("pin2");
                                   rayanApplication.getMqttMessagesController().responseReceived(src, jsonMessage);
+                                  rayanApplication.getScenariosMqttMessagesController().responseReceived(src, jsonMessage);
                                   getDeviceAsync(src).subscribe(device -> {
                                       if (device != null) {
 //                          ((RayanApplication)context.getApplicationContext()).getDevicesAccessibilityBus().send(src);

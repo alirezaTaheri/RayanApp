@@ -6,6 +6,10 @@ import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
@@ -52,6 +56,21 @@ public class NewDevicePhysicalVerificationViewModel extends NewDeviceSetConfigur
             @Override
             public void onError(@NonNull Throwable e) {
                 Log.d(TAG,"Error"+e);
+                DeviceBaseResponse errorResponse = new DeviceBaseResponse();
+                if (e instanceof SocketTimeoutException){
+                    errorResponse.setCmd(AppConstants.SOCKET_TIME_OUT);
+                }
+                else if (e instanceof UnknownHostException){
+                    errorResponse.setCmd(AppConstants.UNKNOWN_HOST_EXCEPTION);
+                }
+                else if (e.toString().contains("Unauthorized"))
+                    login();
+                else if (e instanceof ConnectException)
+                    errorResponse.setCmd(AppConstants.CONNECT_EXCEPTION);
+                else {
+                    errorResponse.setCmd(AppConstants.UNKNOWN_EXCEPTION);
+                }
+                results.postValue(errorResponse);
                 e.printStackTrace();
             }
 

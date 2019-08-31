@@ -16,6 +16,14 @@ public class BaseRequest {
         this.cmd = cmd;
     }
 
+    public String getCmd() {
+        return cmd;
+    }
+
+    public String getSrc() {
+        return src;
+    }
+
     public void setSrc(String src) {
         this.src = src;
     }

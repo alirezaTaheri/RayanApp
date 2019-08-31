@@ -8,7 +8,13 @@ import android.content.res.Configuration;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.support.multidex.MultiDex;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonObject;
 
 import org.json.JSONObject;
 
@@ -20,6 +26,7 @@ import rayan.rayanapp.Helper.MessageTransmissionDecider;
 import rayan.rayanapp.Helper.MqttMessagesController;
 import rayan.rayanapp.Helper.MqttSubscriptionController;
 import rayan.rayanapp.Helper.RequestManager;
+import rayan.rayanapp.Helper.ScenariosMqttMessagesController;
 import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.R;
@@ -31,6 +38,7 @@ import rayan.rayanapp.Util.JsonMaker;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class RayanApplication extends Application {
+    private static final String TAG = "RayanApplication";
     private static Context context;
     private UDPMessageRxBus bus;
     private WifiScanResultsBus wifiBus;
@@ -44,6 +52,7 @@ public class RayanApplication extends Application {
     private RequestManager requestManager;
     private Locale locale = null;
     private MqttMessagesController mqttMessagesController;
+    private ScenariosMqttMessagesController scenariosMqttMessagesController;
     private MqttSubscriptionController msc;
     @Override
     public void onCreate() {
@@ -86,6 +95,7 @@ public class RayanApplication extends Application {
         requestManager = new RequestManager();
         msc = new MqttSubscriptionController(this);
         mqttMessagesController = new MqttMessagesController();
+        scenariosMqttMessagesController = new ScenariosMqttMessagesController();
 //        Intent detailsIntent =  new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
 //        sendOrderedBroadcast(
 //                detailsIntent, null, new LanguageDetailsChecker(), null, Activity.RESULT_OK, null, null);
@@ -124,7 +134,11 @@ public class RayanApplication extends Application {
         return wifiBus;
     }
 
-    public JSONObject getJson(String cmd, List<String> values){
+    public JSONObject getJSON(String cmd, List<String> values){
+        return jsonMaker.getJSON(cmd, values);
+    }
+
+    public JsonObject getJson(String cmd, List<String> values){
         return jsonMaker.getJson(cmd, values);
     }
 
@@ -201,5 +215,35 @@ public class RayanApplication extends Application {
 
     public MqttMessagesController getMqttMessagesController() {
         return mqttMessagesController;
+    }
+    public ScenariosMqttMessagesController getScenariosMqttMessagesController() {
+        return scenariosMqttMessagesController;
+    }
+
+
+    private static RequestQueue mRequestQueue;
+    public static RequestQueue getRequestQueue() {
+        if (mRequestQueue == null) {
+            mRequestQueue = Volley.newRequestQueue(context);
+        }
+
+        return mRequestQueue;
+    }
+
+    public static <T> void addToRequestQueue(Request<T> req, String tag) {
+        // set the default tag if tag is empty
+        req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
+        getRequestQueue().add(req);
+    }
+
+    public static <T> void addToRequestQueue(Request<T> req) {
+        req.setTag(TAG);
+        getRequestQueue().add(req);
+    }
+
+    public static void cancelPendingRequests(Object tag) {
+        if (mRequestQueue != null) {
+            mRequestQueue.cancelAll(tag);
+        }
     }
 }

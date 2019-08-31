@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.pm.ShortcutInfoCompat;
 import android.support.v4.content.pm.ShortcutManagerCompat;
 import android.support.v4.graphics.drawable.IconCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -67,13 +68,13 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
         groupsRecyclerViewAdapter.setListener(this);
         groupsListFragmentViewModel = ViewModelProviders.of(this).get(GroupsListFragmentViewModel.class);
         groupsListFragmentViewModel.getAllGroupsLive().observe(Objects.requireNonNull(getActivity()), groups -> {
-            groupsRecyclerViewAdapter.updateItems(groups, groups.get(groups.size()-1).getId());
+            groupsRecyclerViewAdapter.updateItems(groups);
         });
 
 //       onToolbarNameChange=(OnToolbarNameChange)getActivity();
 //        onToolbarNameChange.toolbarNameChanged("گروه\u200cها");
 
-        ((GroupsActivity) getActivity()).toolbarNameChanged("گروه\u200cها");
+        ((GroupsActivity) clickOnGroup).toolbarNameChanged("گروه\u200cها");
     }
 
     @Override
@@ -169,6 +170,5 @@ public class GroupsListFragment extends Fragment implements OnGroupClicked<Group
             Toast.makeText(getContext(), R.string.shortcut_not_supported, Toast.LENGTH_LONG).show();
         }
     }
-
 
 }

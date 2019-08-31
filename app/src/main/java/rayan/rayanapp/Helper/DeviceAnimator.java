@@ -15,8 +15,10 @@ public class DeviceAnimator {
     Map<String, Boolean> responseReceived = new HashMap<>();
     private int itemWidth = -1;
     private int halfItemWidth = -1;
+    private final String TAG = "DeviceAnimator";
 
     public void deviceTurnedOnPin1(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
+        Log.d(TAG, "deviceTurnedOnPin1() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");
         boolean singleBridge = type.equals(AppConstants.DEVICE_TYPE_SWITCH_1) || type.equals(AppConstants.DEVICE_TYPE_PLUG);
         if (itemWidth == -1)
             fragment.getRecyclerView().post(new Runnable() {
@@ -26,11 +28,10 @@ public class DeviceAnimator {
                     halfItemWidth = itemWidth/2;
                 }
             });
-        responseReceived.put(chipId, true);
-        Log.e("DeviceAnimator", "device Turned On");
+        responseReceived.put(chipId+AppConstants.NAMING_PREFIX_PIN1, true);
+        Log.e("DeviceAnimator", "device Turned On Animation Starting");
         ValueAnimator v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN1);
         if (v != null){
-            ValueAnimator finalV1 = v;
             v.removeAllUpdateListeners();
             v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -39,11 +40,11 @@ public class DeviceAnimator {
                         @Override
                         public void run() {
                             fragment.updateStripPin1(position, (int) animation.getAnimatedValue());
-
                         }
                     });
                 }
             });
+            ValueAnimator finalV1 = v;
             fragment.getRecyclerView().post(new Runnable() {
                 @Override
                 public void run() {
@@ -78,6 +79,7 @@ public class DeviceAnimator {
 
     }
     public void deviceTurnedOffPin1(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
+        Log.d(TAG, "deviceTurnedOffPin1() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");
         boolean singleBridge = type.equals(AppConstants.DEVICE_TYPE_SWITCH_1) || type.equals(AppConstants.DEVICE_TYPE_PLUG);
         if (itemWidth == -1)
             fragment.getRecyclerView().post(new Runnable() {
@@ -87,8 +89,8 @@ public class DeviceAnimator {
                     halfItemWidth = itemWidth/2;
                 }
             });
-        responseReceived.put(chipId, true);
-        Log.e("DeviceAnimator", "device Turned off");
+        responseReceived.put(chipId+AppConstants.NAMING_PREFIX_PIN1, true);
+        Log.e("DeviceAnimator", "device Turned Off Animation Starting");
         ValueAnimator v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN1);
         if (v != null){
             Log.e("deviceanimator;:: " , "current is: " + (int)v.getAnimatedValue());
@@ -139,6 +141,7 @@ public class DeviceAnimator {
         }
     }
     public void turningOnPin1(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
+        Log.d(TAG, "turningOnPin1() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");
         boolean singleBridge = type.equals(AppConstants.DEVICE_TYPE_SWITCH_1) || type.equals(AppConstants.DEVICE_TYPE_PLUG);
         if (itemWidth == -1)
             fragment.getRecyclerView().post(new Runnable() {
@@ -149,7 +152,7 @@ public class DeviceAnimator {
                 }
             });
         responseReceived.put(chipId+AppConstants.NAMING_PREFIX_PIN1, false);
-        Log.e(this.getClass().getSimpleName(), "Starting The Animation");
+        Log.e(this.getClass().getSimpleName(), "Starting Turning on Animation");
         ValueAnimator v;
         if (animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN1) == null){
             v = ValueAnimator.ofInt(0,singleBridge?itemWidth:halfItemWidth);
@@ -175,6 +178,7 @@ public class DeviceAnimator {
         v.start();
     }
     public void turningOffPin1(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
+        Log.d(TAG, "turningOffPin1() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");
         boolean singleBridge = type.equals(AppConstants.DEVICE_TYPE_SWITCH_1) || type.equals(AppConstants.DEVICE_TYPE_PLUG);
         if (itemWidth == -1)
             fragment.getRecyclerView().post(new Runnable() {
@@ -185,7 +189,7 @@ public class DeviceAnimator {
                 }
             });
         responseReceived.put(chipId+AppConstants.NAMING_PREFIX_PIN1, false);
-        Log.e(this.getClass().getSimpleName(), "turning off animation...Pin1");
+        Log.e(this.getClass().getSimpleName(), "turning off animation...Pin2" + (singleBridge?itemWidth:halfItemWidth));
         ValueAnimator v;
         if (animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN1) == null){
             v = ValueAnimator.ofInt(singleBridge?itemWidth:halfItemWidth,0);
@@ -212,6 +216,7 @@ public class DeviceAnimator {
     }
 
     public void deviceTurnedOnPin2(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
+        Log.d(TAG, "deviceTurnedOnPin2() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");
         boolean singleBridge = type.equals(AppConstants.DEVICE_TYPE_SWITCH_1) || type.equals(AppConstants.DEVICE_TYPE_PLUG);
         if (itemWidth == -1)
             fragment.getRecyclerView().post(new Runnable() {
@@ -222,7 +227,7 @@ public class DeviceAnimator {
                 }
             });
         responseReceived.put(chipId+AppConstants.NAMING_PREFIX_PIN2, true);
-        Log.e("DeviceAnimator", "device Turned On");
+        Log.e("DeviceAnimator", "device Turned On Pin 2");
         ValueAnimator v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN2);
         if (v != null){
             ValueAnimator finalV1 = v;
@@ -234,18 +239,6 @@ public class DeviceAnimator {
                         @Override
                         public void run() {
                             fragment.updateStripPin2(position, (int) animation.getAnimatedValue());
-                        }
-                    });
-                }
-            });
-            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    fragment.getRecyclerView().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            fragment.updateStripPin1(position, (int) animation.getAnimatedValue());
-
                         }
                     });
                 }
@@ -284,6 +277,7 @@ public class DeviceAnimator {
 
     }
     public void deviceTurnedOffPin2(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
+        Log.d(TAG, "deviceTurnedOffPin2() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");
         boolean singleBridge = type.equals(AppConstants.DEVICE_TYPE_SWITCH_1) || type.equals(AppConstants.DEVICE_TYPE_PLUG);
         if (itemWidth == -1)
             fragment.getRecyclerView().post(new Runnable() {
@@ -297,7 +291,6 @@ public class DeviceAnimator {
         ValueAnimator v = animatorMap.get(chipId+AppConstants.NAMING_PREFIX_PIN2);
         if (v != null){
             Log.e("deviceanimator;:: " , "current is: " + (int)v.getAnimatedValue());
-            v.setIntValues((int)v.getAnimatedValue(), 0);
             v.removeAllUpdateListeners();
             v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -306,10 +299,12 @@ public class DeviceAnimator {
                         @Override
                         public void run() {
                             fragment.updateStripPin2(position, (int) animation.getAnimatedValue());
+
                         }
                     });
                 }
             });
+            v.setIntValues((int)v.getAnimatedValue(), 0);
             v.setDuration(300);
             ValueAnimator finalV1 = v;
             fragment.getRecyclerView().post(new Runnable() {
@@ -343,6 +338,7 @@ public class DeviceAnimator {
         }
     }
     public void turningOnPin2(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
+        Log.d(TAG, "turningOnPin2() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");
         boolean singleBridge = type.equals(AppConstants.DEVICE_TYPE_SWITCH_1) || type.equals(AppConstants.DEVICE_TYPE_PLUG);
         if (itemWidth == -1)
             fragment.getRecyclerView().post(new Runnable() {
@@ -379,6 +375,7 @@ public class DeviceAnimator {
         v.start();
     }
     public void turningOffPin2(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
+        Log.d(TAG, "turningOffPin2() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");
         boolean singleBridge = type.equals(AppConstants.DEVICE_TYPE_SWITCH_1) || type.equals(AppConstants.DEVICE_TYPE_PLUG);
         if (itemWidth == -1)
             fragment.getRecyclerView().post(new Runnable() {

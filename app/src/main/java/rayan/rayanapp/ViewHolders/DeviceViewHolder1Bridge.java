@@ -167,12 +167,18 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     }
 
     public void changePosition(Device item, OnToggleDeviceListener<Device> listener){
+        Log.d(TAG, "changePosition() called with: item = [" + item + "], listener = [" + listener + "]");
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, item.getPosition()));
         }
     }
     public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
         l.onAccessPointChanged(device);
+    }
+
+    public void ipChanged(OnToggleDeviceListener<Device> listener, Device item){
+        Log.e(TAG, "ipchangedchanged oneBridge: " + item);
+        clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
     }
 
     public void playSoundSwitchOn(){

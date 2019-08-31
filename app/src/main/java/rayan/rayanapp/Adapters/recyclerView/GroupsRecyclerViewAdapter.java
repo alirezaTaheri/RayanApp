@@ -1,6 +1,7 @@
 package rayan.rayanapp.Adapters.recyclerView;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ public class GroupsRecyclerViewAdapter extends GenericRecyclerViewAdapter<Group,
         this.items = groups;
     }
 
-    public void updateItems(List<Group> items,  String groupId ){
+    public void updateItems(List<Group> items){
         if (items == null) {
             throw new IllegalArgumentException("Cannot set `null` item to the Recycler adapter");
         }
@@ -38,6 +39,17 @@ public class GroupsRecyclerViewAdapter extends GenericRecyclerViewAdapter<Group,
 
     @Override
     public GroupViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new GroupViewHolder(inflate(R.layout.item_group, parent),groupId);
+        return new GroupViewHolder(inflate(R.layout.item_group, parent));
+    }
+
+    @Override
+    public void onBindViewHolder(GroupViewHolder holder, int position) {
+        holder.bind(items.get(position), getListener(), position == items.size()-1);
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull GroupViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        holder.bind(items.get(holder.getAdapterPosition()),getListener(),holder.getAdapterPosition() == items.size());
     }
 }

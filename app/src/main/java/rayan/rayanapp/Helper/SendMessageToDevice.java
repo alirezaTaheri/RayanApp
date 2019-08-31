@@ -5,16 +5,23 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.apache.commons.net.util.Base64;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -23,7 +30,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
@@ -37,6 +43,7 @@ import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
+import retrofit2.Response;
 
 public class SendMessageToDevice {
     private final String TAG = getClass().getSimpleName();
@@ -73,7 +80,6 @@ public class SendMessageToDevice {
             };
             if (connection != null && connection.getClient() != null)
                 connection.getClient().publish(topic, message.getBytes(), qos, retain, null, iMqttActionListener);
-
         } catch(Exception ex){
             Log.e(TAG, "Exception occurred during publish: " + ex.getMessage());
         }
@@ -107,34 +113,34 @@ public class SendMessageToDevice {
                             if (lastMessage != null){
                                 if (!lastMessage.has("lc")){
                                     //without lc
-                                    lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                    lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                 }
                                 else if (lastMessage.getJSONObject("lc").getString("cmd").contains("1")){
                                     //with lc1 pin 1
                                     if (lastMessage.getJSONObject("lc").has("lc")){
                                         Object lc2 = lastMessage.getJSONObject("lc").get("lc");
-                                        lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                        lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                         lastMessage.getJSONObject("lc").put("lc", lc2);
                                     }else {
-                                        lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                        lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                     }
                                 }
                                 else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("cmd").contains("1")){
                                     //with lc2 pin 1
-                                    lastMessage.getJSONObject("lc").put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                    lastMessage.getJSONObject("lc").put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                 }
                                 else if (!lastMessage.getJSONObject("lc").has("lc")){
                                     //with Just one LC
-                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                 }
 
                             }
 //                            if (lastMessage != null) {
 //                                if (!lastMessage.has("lc") || !((JSONObject)lastMessage.get("lc")).has("lc") && ((String)(lastMessage).get("cmd")).contains("1"))
-//                                    lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+//                                    lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
 //                                else {
 //                                    JSONObject lc2 = (JSONObject) ((JSONObject)lastMessage.get("lc")).get("lc");
-//                                    lastMessage.put("lc", rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
+//                                    lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
 //                                    ((JSONObject)lastMessage.get("lc")).put("lc",lc2);
 //                                }
 //                            }
@@ -165,14 +171,14 @@ public class SendMessageToDevice {
         arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
         arguments.add(Boolean.toString(animation));
         Log.e(TAG, "Need MQTT-Backup? : " + (!animation));
-        publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString(), 0, false);
+        publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString(), 0, false);
             timerObservable.subscribe(new Observer<Long>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     if (animation)
                         if (device.getPin1().equals(AppConstants.ON_STATUS))
-                            fragment.getDeviceAnimator().turningOffPin1(device.getChipId(), device.getPosition(), (ToggleDeviceAnimationProgress)fragment, device.getType());
-                        else fragment.getDeviceAnimator().turningOnPin1(device.getChipId(), device.getPosition(), (ToggleDeviceAnimationProgress)fragment, device.getType());
+                            fragment.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
+                        else fragment.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
 
 //                        fragment.startToggleAnimationPin1(device.getChipId(), position);
                     rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
@@ -224,25 +230,25 @@ public class SendMessageToDevice {
                             if (lastMessage != null){
                                 if (!lastMessage.has("lc")){
                                     //without lc
-                                    lastMessage.put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                    lastMessage.put("lc", rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
                                 }
                                 else if (((String)((JSONObject)lastMessage.get("lc")).get("cmd")).contains("2")){
                                     //with lc1 pin 2
                                     if (((JSONObject)lastMessage.get("lc")).has("lc")){
                                         Object lc2 = ((JSONObject)lastMessage.get("lc")).get("lc");
-                                        lastMessage.put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                        lastMessage.put("lc", rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
                                         lastMessage.getJSONObject("lc").put("lc", lc2);
                                     }else {
-                                        lastMessage.put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                        lastMessage.put("lc", rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
                                     }
                                 }
                                 else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("cmd").contains("2")){
                                     //with lc2 pin 2
-                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
                                 }
                                 else if (!((JSONObject)lastMessage.get("lc")).has("lc")) {
                                     //with Just one LC
-                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
+                                    ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
                                 }
 
                             }
@@ -277,7 +283,7 @@ public class SendMessageToDevice {
         arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
         arguments.add(Boolean.toString(animation));
         Log.e(TAG, "Need MQTT-Backup? : " + (!animation));
-        publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString(), 0, false);
+        publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString(), 0, false);
         timerObservable.subscribe(new Observer<Long>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -333,7 +339,7 @@ public class SendMessageToDevice {
 
                         arguments.set(0,Encryptor.encrypt(String.valueOf(Integer.parseInt(device.getStatusWord().split("#")[0])+aLong).concat("#"), device.getSecret()));
                         Log.e("/////////", "////////OnNext////: " + aLong + arguments.get(0));
-                        sendUDPMessage.sendUdpMessage(device.getIp(),rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString());
+                        sendUDPMessage.sendUdpMessage(device.getIp(),rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString());
                     }
 
                     @Override
@@ -352,7 +358,7 @@ public class SendMessageToDevice {
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                     }
                 });
-//        sendUDPMessage.sendUdpMessage(device.getIp(), rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString());
+//        sendUDPMessage.sendUdpMessage(device.getIp(), rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString());
     }
 
     private void sendUdpPin2(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position){
@@ -374,7 +380,7 @@ public class SendMessageToDevice {
                     public void onNext(Long aLong) {
                         arguments.set(0,Encryptor.encrypt(String.valueOf(Integer.parseInt(device.getStatusWord().split("#")[0])+aLong).concat("#"), device.getSecret()));
                         Log.e("/////////", "////////OnNext////: " + aLong);
-                        sendUDPMessage.sendUdpMessage(device.getIp(),rayanApplication.getJson(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString());
+                        sendUDPMessage.sendUdpMessage(device.getIp(),rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString());
                     }
 
                     @Override
@@ -391,7 +397,7 @@ public class SendMessageToDevice {
                         rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
                     }
                 });
-//        sendUDPMessage.sendUdpMessage(device.getIp(), rayanApplication.getJson(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString());
+//        sendUDPMessage.sendUdpMessage(device.getIp(), rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString());
     }
 
     private Observable<TlmsDoneResponse> getNewStatusWord(Device device){
@@ -437,13 +443,14 @@ public class SendMessageToDevice {
                  });
     }
     @SuppressLint("CheckResult")
-    private Observable<ToggleDeviceResponse> toDeviceHttpPin1(Device device){
-         return apiService.togglePin1(AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
+    private Observable<Response<ToggleDeviceResponse>> toDeviceHttpPin1(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+         return apiService.togglePin1(sha1(new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
                 .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
     }
+//                long sendTime;
     @SuppressLint("CheckResult")
-    private Observable<ToggleDeviceResponse> toDeviceHttpPin2(Device device){
-         return apiService.togglePin1(AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
+    private Observable<Response<ToggleDeviceResponse>> toDeviceHttpPin2(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+         return apiService.togglePin1(sha1(new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
                 .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
     }
 
@@ -451,8 +458,7 @@ public class SendMessageToDevice {
     HashMap<String , Disposable> lastCommand = new HashMap<>();
     @SuppressLint("CheckResult")
     private void sendHttpPin1(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position, boolean withBackup){
-        Log.e("******",
-                        "\nsendToThisDevice " + device);
+        Log.e("******","\nsendToThisDevice " + device);
         if (withBackup && rayanApplication.getMtd().getListOfAvailableRouts(device.getChipId()).contains(MessageTransmissionDecider.PROTOCOL.MQTT))
         Observable.interval(0,700, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
@@ -469,7 +475,7 @@ public class SendMessageToDevice {
                 Log.e(TAG, " onNext  Timer executed for Mqtt Backup pin 1: " + aLong);
                 if (aLong>0){
 //                    Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
-                    sendMqttPin1(rayanApplication, device, position, fragment, false, false);
+                    sendMqttPin1(rayanApplication, device, position, fragment, false, true);
                     mqttBackup.get(device.getChipId()+"_1").dispose();
                 }
             }
@@ -495,26 +501,38 @@ public class SendMessageToDevice {
                     return completed.delay(200, TimeUnit.MILLISECONDS);
                 })
                         .takeWhile(toggleDeviceResponse -> {
-                            if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
-                                mqttBackup.get(device.getChipId()+"_1").dispose();
-                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0])+1));
-                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
-                    if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
-                        return true;
-                    else{
-                        Device deviceToUpdate = new Device(device);
-                        deviceToUpdate.setPin1(toggleDeviceResponse.getPin1());
-                        deviceToUpdate.setPin2(toggleDeviceResponse.getPin2());
-                        Log.e("******",
-                        "\ndataBaseDevice: " + deviceDatabase.getDevice(device.getChipId())+
-                        "\nreplacing this Device: " + device +
-                        "\nreplacing this Device: " + deviceToUpdate
-                        );
-                        deviceDatabase.updateDevice(deviceToUpdate);
+                            Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
+                            Log.e("rerererererere", "Headers: " + toggleDeviceResponse.headers());
+                            Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
+                            Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                            Log.e("rerererererere", "HMAC of Body: " + sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
+                            if (toggleDeviceResponse.headers().get("auth") != null){
+                                Log.e("rererererere", "Auth Is Not NUll");
+                                if (sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                                    Log.e("rererererere", "HMACs Are Equal");
+                                    if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
+                                        mqttBackup.get(device.getChipId()+"_1").dispose();
+                                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0])+1));
+                                    Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
+                                    if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                                        return true;
+                                    else{
+                                        Device deviceToUpdate = new Device(device);
+                                        deviceToUpdate.setPin1(toggleDeviceResponse.body().getPin1());
+                                        deviceToUpdate.setPin2(toggleDeviceResponse.body().getPin2());
+                                        Log.e("******",
+                                                "\ndataBaseDevice: " + deviceDatabase.getDevice(device.getChipId())+
+                                                        "\nreplacing this Device: " + device +
+                                                        "\nreplacing this Device: " + deviceToUpdate
+                                        );
+                                        deviceDatabase.updateDevice(deviceToUpdate);
 //                        fragment.stopToggleAnimationPin1(device.getChipId());
-                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
-                        return false;
-                    }
+                                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+                                        return false;
+                                    }
+                                }else Log.e("rererererere", "HMACs Are NOT Equal");
+                            }else Log.e("rererererere", "Auth IS NULL");
+                            return false;
                 })
                 ,
                 (changeNameResponse, deviceResponse) -> {
@@ -580,7 +598,7 @@ public class SendMessageToDevice {
                     Log.e(TAG, " onNext  Timer executed for Mqtt Backup pin 2: " + aLong);
                     if (aLong>0){
 //                        Toast.makeText(rayanApplication, "MQTT-BACKUP", Toast.LENGTH_SHORT).show();
-                        sendMqttPin2(rayanApplication, device, position, fragment, false,false);
+                        sendMqttPin2(rayanApplication, device, position, fragment, false,true);
                         mqttBackup.get(device.getChipId()+"_2").dispose();
                     }
                 }
@@ -606,20 +624,34 @@ public class SendMessageToDevice {
                     return completed.delay(200, TimeUnit.MILLISECONDS);
                 })
                         .takeWhile(toggleDeviceResponse -> {
-                            if (mqttBackup.get(device.getChipId()+"_2") != null && !mqttBackup.get(device.getChipId()+"_2").isDisposed())
-                                mqttBackup.get(device.getChipId()+"_2").dispose();
-                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0])+1));
-                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
-                    if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
-                        return true;
-                    else{
-                        device.setPin1(toggleDeviceResponse.getPin1());
-                        device.setPin2(toggleDeviceResponse.getPin2());
-                        deviceDatabase.updateDevice(device);
+                            Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
+                            Log.e("rerererererere", "Headers: " + toggleDeviceResponse.headers());
+                            Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
+                            Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                            Log.e("rerererererere", "HMAC of Body: " + sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
+                            if (toggleDeviceResponse.headers().get("auth") != null) {
+                                Log.e("rererererere", "Auth Is Not NUll");
+                                if (sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))) {
+                                    Log.e("rererererere", "HMACs Are Equal");
+                                    if (mqttBackup.get(device.getChipId() + "_2") != null && !mqttBackup.get(device.getChipId() + "_2").isDisposed())
+                                        mqttBackup.get(device.getChipId() + "_2").dispose();
+                                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(), device.getSecret()).split("#")[0]) + 1));
+                                    Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
+                                    if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                                        return true;
+                                    else {
+                                        Device deviceToUpdate = new Device(device);
+                                        deviceToUpdate.setPin1(toggleDeviceResponse.body().getPin1());
+                                        deviceToUpdate.setPin2(toggleDeviceResponse.body().getPin2());
+                                        Log.e("DeviceAnimator", "Congradulations: " + deviceToUpdate);
+                                        deviceDatabase.updateDevice(deviceToUpdate);
 //                        fragment.stopToggleAnimationPin2(device.getChipId());
-                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
-                        return false;
-                    }
+                                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+                                        return false;
+                                    }
+                                }else Log.e("rererererere", "HMACs Are NOT Equal");
+                            }else Log.e("rererererere", "Auth IS NULL");
+                            return false;
                 })
                 ,
                 (changeNameResponse, deviceResponse) -> {
@@ -670,18 +702,18 @@ public class SendMessageToDevice {
     public void toggleDevicePin1(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam? : " + cr);
-//        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
-            case "UDP":
+            case AppConstants.MESSAGE_ROUTE_UDP:
                 sendUdpPin1(device, rayanApplication,fragment, position);
                 break;
-            case "MQTT":
+            case AppConstants.MESSAGE_ROUTE_MQTT:
                 sendMqttPin1(rayanApplication,device, position, fragment, true, RayanApplication.getPref().getIsNodeSoundOn());
                 break;
             case "STANDALONE":
                 //Toast.makeText(rayanApplication, "دستگاه فقط از طریق اتصال مستقیم قابل دسترسی است", Toast.LENGTH_SHORT).show();
                 break;
-            case "HTTP":
+            case AppConstants.MESSAGE_ROUTE_HTTP:
                 sendHttpPin1(device, rayanApplication, fragment, position, RayanApplication.getPref().getIsNodeSoundOn());
                 break;
             case "NONE":
@@ -695,7 +727,7 @@ public class SendMessageToDevice {
     public void toggleDevicePin2(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam2? : " + cr);
-//        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
             case "UDP":
                 sendUdpPin2(device, rayanApplication,fragment, position);
@@ -718,4 +750,16 @@ public class SendMessageToDevice {
         }
     }
 
+    public static String sha1(String s, String keyString) throws
+            UnsupportedEncodingException, NoSuchAlgorithmException,
+            InvalidKeyException {
+
+        SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), "HmacSHA1");
+        Mac mac = Mac.getInstance("HmacSHA1");
+        mac.init(key);
+
+        byte[] bytes = mac.doFinal(s.getBytes("UTF-8"));
+
+        return new String( Base64.encodeBase64(bytes) );
+    }
 }

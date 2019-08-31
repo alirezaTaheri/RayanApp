@@ -32,6 +32,7 @@ public class RetryConnectMqtt {
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
+                        Log.e(TAG, "Try To Connect...");
                         if (aLong > 5) rest();
                         count++;
                         mainActivity.connectToMqtt();
@@ -43,9 +44,13 @@ public class RetryConnectMqtt {
         count = 0;
         d.dispose();
         running = false;
-        mainActivity.mqttReallyDisconnected();
+        start();
+//        mainActivity.mqttReallyDisconnected();
     }
 
+    public void reset(){
+
+    }
     public void stop(){
         count = 0;
         if (d!=null)

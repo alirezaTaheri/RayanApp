@@ -120,36 +120,36 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     public void stopToggleAnimationPin2(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
         AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout2);
         Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge2" + item);
-        pin2.setEnabled(true);
-        if (v != null) {
-            v.cancel();
-            if (item.getPin2().equals(AppConstants.ON_STATUS)) {
-                v.setIntValues((int) v.getAnimatedValue(),
-                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
-                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
-                        itemView.getWidth());
-            } else {
-                v.setIntValues((int) v.getAnimatedValue(),
-                        ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3),
-                        ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3 * 2),
-                        0);
-            }
-        }
-        else {
-            if (item.getPin2().equals(AppConstants.ON_STATUS))
-                v = ValueAnimator.ofInt(0,getDeviceItemWidth());
-            else
-                v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
-            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    bottomStrip2.getLayoutParams().width = (int) animation.getAnimatedValue();
-                    bottomStrip2.requestLayout();
-                }
-            });
-        }
-        v.setDuration(300);
-        v.start();
+//        pin2.setEnabled(true);
+//        if (v != null) {
+//            v.cancel();
+//            if (item.getPin2().equals(AppConstants.ON_STATUS)) {
+//                v.setIntValues((int) v.getAnimatedValue(),
+//                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
+//                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
+//                        itemView.getWidth());
+//            } else {
+//                v.setIntValues((int) v.getAnimatedValue(),
+//                        ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3),
+//                        ((int) v.getAnimatedValue() - ((int) v.getAnimatedValue()) / 3 * 2),
+//                        0);
+//            }
+//        }
+//        else {
+//            if (item.getPin2().equals(AppConstants.ON_STATUS))
+//                v = ValueAnimator.ofInt(0,getDeviceItemWidth());
+//            else
+//                v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
+//            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                @Override
+//                public void onAnimationUpdate(ValueAnimator animation) {
+//                    bottomStrip2.getLayoutParams().width = (int) animation.getAnimatedValue();
+//                    bottomStrip2.requestLayout();
+//                }
+//            });
+//        }
+//        v.setDuration(300);
+//        v.start();
 //        pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
         pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)?ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
         pin2.setImageDrawable(item.getPin2().equals(AppConstants.ON_STATUS)?ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
@@ -164,12 +164,22 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
         l.onAccessPointChanged(device);
     }
+
     public void changePosition(Device item, OnToggleDeviceListener<Device> listener){
+        Log.d(TAG, "changePosition() called with: item = [" + item + "], listener = [" + listener + "]");
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
             clickableLayout2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));
         }
     }
+
+    @Override
+    public void ipChanged(OnToggleDeviceListener<Device> listener, Device item){
+        Log.e(TAG, "ipchangedchanged twoBridges: " + item);
+        clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
+        clickableLayout2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));
+    }
+
     @SuppressLint("CheckResult")
     public void pin2Toggled(boolean on){
         if (on){

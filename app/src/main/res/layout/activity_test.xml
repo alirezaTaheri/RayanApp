@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.TestActivity">
+
+    <EditText
+        android:id="@+id/chipId"
+        android:inputType="number"
+        android:text="5958528"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+    <EditText
+        android:id="@+id/stword"
+        app:layout_constraintTop_toBottomOf="@+id/chipId"
+        android:inputType="number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="stword" />
+
+    <EditText
+        android:id="@+id/cmd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="turn_on_1"
+        app:layout_constraintTop_toBottomOf="@+id/stword"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <EditText
+        android:id="@+id/lc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="turn_off_2"
+        app:layout_constraintTop_toBottomOf="@+id/cmd"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <Button
+        android:id="@+id/send"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/button_backgrand"
+        android:text="Send"
+        app:layout_constraintTop_toBottomOf="@+id/lc"
+        tools:layout_editor_absoluteX="0dp" />
+</android.support.constraint.ConstraintLayout>

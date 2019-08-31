@@ -1,6 +1,7 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -20,19 +21,23 @@ public class GroupViewHolder  extends BaseViewHolder<Group, OnGroupClicked<Group
     RelativeLayout groupItemLayout;
     @BindView(R.id.grouplistLinee)
     View grouplistLine;
-    String groupId;
-    public GroupViewHolder(View itemView, String groupId) {
+    private final String TAG = "GroupViewHolder";
+    public GroupViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
-        this.groupId=groupId;
+    }
+
+    public void bind(Group item, OnGroupClicked<Group> listener, boolean hideDivider){
+        name.setText(item.getName());
+        groupItemLayout.setOnClickListener((v)-> listener.onGroupClicked(item));
+//        Log.d(TAG, "bind() called with: item = [" + item + "], listener = [" + listener + "], hideDivider = [" + hideDivider + "]");
+//        if (hideDivider){
+//            grouplistLine.setVisibility(View.INVISIBLE);
+//        }
     }
 
     @Override
     public void onBind(Group item, @Nullable OnGroupClicked<Group> listener) {
-        name.setText(item.getName());
-        groupItemLayout.setOnClickListener((v)-> listener.onGroupClicked(item));
-        if (groupId != null && groupId.equals(item.getId())){
-            grouplistLine.setVisibility(View.INVISIBLE);
-        }
     }
+
 }

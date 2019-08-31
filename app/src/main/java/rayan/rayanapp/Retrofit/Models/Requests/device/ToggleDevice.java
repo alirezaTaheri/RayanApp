@@ -1,13 +1,33 @@
 package rayan.rayanapp.Retrofit.Models.Requests.device;
 
+import com.google.gson.JsonObject;
+
 import rayan.rayanapp.App.RayanApplication;
 
 public class ToggleDevice extends BaseRequest{
     private String stword;
-
     public ToggleDevice(String cmd, String stword) {
         this.setSrc(RayanApplication.getPref().getId());
         this.stword = stword;
         this.setCmd(cmd);
     }
+
+    public String ToString(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("stword", stword);
+        jsonObject.addProperty("cmd", getCmd());
+        jsonObject.addProperty("src", getSrc());
+        return jsonObject.toString();
+    }
+
+    //    public ToggleDevice(String cmd, String stword,String lc) {
+//        this.setCmd(cmd);
+//        this.setSrc(RayanApplication.getPref().getId());
+//        this.stword = stword;
+//        this.lc = new ToggleDevice(lc, RayanApplication.getPref().getId(), 0);
+//    }
+//    public ToggleDevice(String lc, String src, int a ) {
+//        this.setCmd(lc);
+//        this.setSrc(src);
+//    }
 }

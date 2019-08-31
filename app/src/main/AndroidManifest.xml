@@ -92,7 +92,13 @@
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <activity android:name=".Activities.ScenarioActivity"></activity>
+        <activity android:name=".Activities.ScenarioActivity" />
+        <activity android:name=".Activities.TestActivity" />
+
+        <service
+            android:name=".Services.AlwaysOnService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

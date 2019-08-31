@@ -1,5 +1,9 @@
 package rayan.rayanapp.Retrofit;
 
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
+
 import io.reactivex.Observable;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
@@ -13,13 +17,16 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitReques
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.FactoryResetRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
+import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDeviceWithLastCommand;
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.VerifyDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
@@ -33,18 +40,22 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ForgetPasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.RegisterUserRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.device.FactoryResetResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.VerifyDeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Url;
 
@@ -114,19 +125,31 @@ public interface ApiService {
     @POST
     Observable<ToggleDeviceResponse> toggle(@Url String url, @Body BaseRequest baseRequest);
     @POST
-    Observable<ToggleDeviceResponse> togglePin1(@Url String url, @Body ToggleDevice toggleDevice);
+    @Headers("Cache-Control: no-cache")
+    Observable<Response<ToggleDeviceResponse>> togglePin1(@Header("auth") String auth, @Url String url, @Body ToggleDevice toggleDevice);
+    @POST
+    @Headers("Cache-Control: no-cache")
+    Observable<Response<ToggleDeviceResponse>> togglePin123(@Header("auth") String auth, @Url String url, @Body ToggleDevice toggleDevice);
+    @POST
+    @Headers("Cache-Control: no-cache")
+    Observable<VerifyDeviceResponse> verifyDevice(@Header("auth") String auth, @Url String url, @Body VerifyDeviceRequest verifyDeviceRequest);
     @POST
     Observable<ToggleDeviceResponse> togglePin2(@Url String url, @Body ToggleDevice toggleDevice);
+//    @Headers( "Content-Type: application/json; charset=utf-8")
+//    @Headers("Cache-Control: no-cache")
+    @Headers("Cache-Control: no-cache")
+    @POST
+    Observable<ToggleDeviceResponse> togglePin1Pin2(@Url String url, @Body ToggleDeviceWithLastCommand toggleDevice);
     @POST
     Observable<TlmsDoneResponse> tlms(@Url String url, @Body BaseRequest baseRequest);
     @POST
     Observable<YesResponse> NODE(@Url String url, @Body BaseRequest baseRequest);
     @POST
-    Observable<Ready4SettingsResponse> settings(@Url String url, @Body Ready4SettingsRequest ready4SettingsRequest);
+    Observable<Ready4SettingsResponse> settings(@Header("auth") String auth, @Url String url, @Body Ready4SettingsRequest ready4SettingsRequest);
     @POST
     Observable<SetPrimaryConfigResponse> sendFirstConfig(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST
-    Observable<DeviceBaseResponse> factoryReset(@Url String url, @Body BaseRequest baseRequest);
+    Observable<FactoryResetResponse> factoryReset(@Header("auth") String auth, @Url String url, @Body FactoryResetRequest baseRequest);
     //
     @POST
     Observable<DeviceBaseResponse> deviceUpdate(@Url String url, @Body BaseRequest baseRequest);

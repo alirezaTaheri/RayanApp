@@ -5,12 +5,12 @@ import com.google.gson.Gson;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Util.AppConstants;
 
-public class Ready4SettingsRequest extends BaseRequest{
+public class FactoryResetRequest extends BaseRequest{
     private String stword;
 
-    public Ready4SettingsRequest(String stword) {
+    public FactoryResetRequest(String stword) {
         this.stword = stword;
-        this.setCmd(AppConstants.SETTINGS);
+        this.setCmd(AppConstants.FACTORY_RESET);
         this.setSrc(RayanApplication.getPref().getId());
     }
 
@@ -22,6 +22,6 @@ public class Ready4SettingsRequest extends BaseRequest{
     }
 
     public String ToString(){
-        return new Gson().toJson(this, Ready4SettingsRequest.class);
+        return new Gson().toJson(this, FactoryResetRequest.class);
     }
 }

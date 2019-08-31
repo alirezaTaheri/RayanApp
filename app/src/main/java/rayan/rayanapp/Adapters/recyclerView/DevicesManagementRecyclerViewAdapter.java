@@ -1,6 +1,7 @@
 package rayan.rayanapp.Adapters.recyclerView;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -39,5 +40,15 @@ public class DevicesManagementRecyclerViewAdapter extends GenericRecyclerViewAda
     @Override
     public DeviceViewHolderManagement onCreateViewHolder(ViewGroup parent, int viewType) {
         return new DeviceViewHolderManagement(inflate(R.layout.item_device_management, parent), waiting, context);
+    }
+
+    @Override
+    public void onBindViewHolder(DeviceViewHolderManagement holder, int position) {
+        holder.onBind(items.get(position), getListener());
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull DeviceViewHolderManagement holder, int position, @NonNull List<Object> payloads) {
+        holder.onBind(items.get(position), getListener());
     }
 }

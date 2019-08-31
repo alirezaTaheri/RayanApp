@@ -152,29 +152,36 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     }
 
     @Override
-    public void onFavoriteIconClicked(Device item, ImageView optionsIcon) {
-        DeviceManagementPopupDialog popupDialog = new DeviceManagementPopupDialog(getActivity(), this, item);
-        popupDialog.show();
+    public void onFavoriteIconClicked(Device item) {
+        Device deviceToUpdate = new Device(item);
+        deviceToUpdate.setFavorite(!item.isFavorite());
+        devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
+        if (deviceToUpdate.isFavorite()){
+            Toast.makeText(getActivity(),item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
+        }
+        else Toast.makeText(getActivity(),item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public void onVisibilityIconClicked(Device item) {
+        Device deviceToUpdate = new Device(item);
+        deviceToUpdate.setHidden(!item.isHidden());
+        devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
+        if (deviceToUpdate.isHidden())
+            Toast.makeText(getActivity(),item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
+        else Toast.makeText(getActivity(),item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onFavoriteClicked(Device item) {
 //        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
-        devicesManagementListFragmentViewModel.updateDevice(item);
-        if (item.isFavorite()){
-            Toast.makeText(getActivity(),item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
-        }
-        else Toast.makeText(getActivity(),item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
     public void onVisibilityClicked(Device item) {
 //        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
 //        d.setHidden(!d.isHidden());
-        devicesManagementListFragmentViewModel.updateDevice(item);
-        if (item.isHidden())
-            Toast.makeText(getActivity(),item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
-        else Toast.makeText(getActivity(),item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
+
     }
 
     public interface ClickOnDevice {

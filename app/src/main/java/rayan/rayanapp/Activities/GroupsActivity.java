@@ -179,7 +179,8 @@ public class GroupsActivity extends AppCompatActivity implements EditGroupFragme
     }
 
     public void toolbarNameChanged(String name) {
-        status.setText(name);
+        if (status != null)
+            status.setText(name);
     }
 
     @Override

@@ -39,6 +39,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.DeviceAnimator;
 import rayan.rayanapp.Helper.DialogPresenter;
+import rayan.rayanapp.LayoutManagers.CustomGridLayoutManager;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
@@ -97,8 +98,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                     for (int a = 0; a<devices.size();a++){
                         if (devices.get(a).getGroupId().equals(currentGroup) && !devices.get(a).isHidden()){
                             finalDevices.add(devices.get(a));
+                            }
                         }
-                }
                         else
                     for (int a = 0; a<devices.size();a++){
                         if (!devices.get(a).isHidden()){
@@ -114,14 +115,25 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                         emptyView.setVisibility(View.INVISIBLE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
-            Collections.sort(finalDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
-                Log.e(TAG ,"ShowingDevices: " + finalDevices);
+                if (RayanApplication.getPref().getCurrentShowingGroup() == null)
+                    Collections.sort(finalDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                else Collections.sort(finalDevices, (obj1, obj2) -> Integer.compare(obj1.getInGroupPosition(), obj2.getInGroupPosition()));
+                Log.e(TAG ,"FinalDevices: " + finalDevices.subList(0, finalDevices.size()/3));
+                Log.e(TAG ,"FinalDevices: " + finalDevices.subList(finalDevices.size()/3,finalDevices.size()/3*2));
+                Log.e(TAG ,"FinalDevices: " + finalDevices.subList(finalDevices.size()/3*2, finalDevices.size()));
+//                for (Device d:finalDevices)
+//                    if (d.getChipId().equals("5958528"))
+//                        d.setType(AppConstants.DEVICE_TYPE_SWITCH_2);
                 devicesRecyclerViewAdapter.updateItems(finalDevices);
                 DevicesFragment.this.devices = finalDevices;
             }
         };
         devicesObservable.observe(this, devicesObserver);
         activity = getActivity();
+
+        Device d = devicesFragmentViewModel.getDevice("222222");
+        d.setIp("192.168.1.105");
+        devicesFragmentViewModel.updateDevice(d);
     }
 
     @Override
@@ -130,7 +142,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         View view = inflater.inflate(R.layout.fragment_devices, container, false);
         ButterKnife.bind(this, view);
         recyclerView.setNestedScrollingEnabled(false);
-        recyclerView.setItemViewCacheSize(100);
+//        recyclerView.setItemViewCacheSize(100);
         recyclerView.setHasFixedSize(true);
 //        recyclerView.setItemViewCacheSize(20);
 //        recyclerView.setRecyclerListener(new RecyclerView.RecyclerListener() {
@@ -140,9 +152,9 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 //            }
 //        });
         if (isTablet(getActivity())) {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
+            recyclerView.setLayoutManager(new CustomGridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180), CustomGridLayoutManager.VERTICAL, false));
         } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180)));
+            recyclerView.setLayoutManager(new CustomGridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180), CustomGridLayoutManager.VERTICAL, false));
         }
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(devicesRecyclerViewAdapter);
@@ -198,35 +210,50 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     @Override
     public void updateStripPin1(int position, int width){
-        if (recyclerView.findViewHolderForAdapterPosition(position) != null)
-            ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(findAdapterPositionByRealPosition(position))).updateBottomStripPin1(width);
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null){
+            ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin1(width);
+        }
     }
     @Override
     public void updateStripPin2(int position, int width){
-        if (recyclerView.findViewHolderForAdapterPosition(position) != null )
-//                && devicesRecyclerViewAdapter.getItems().get(position) != null &&
-//                (devicesRecyclerViewAdapter.getItems().get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2)
-//                        || devicesRecyclerViewAdapter.getItems().get(position).getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)))
-//            if (recyclerView.findViewHolderForAdapterPosition(position) instanceof DeviceViewHolder2Bridges)
-                ((DeviceViewHolder2Bridges)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin2(width);
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null ){
+            ((DeviceViewHolder2Bridges)recyclerView.findViewHolderForAdapterPosition(position)).updateBottomStripPin2(width);
+        }
     }
 
     @Override
     public void turnOnDeviceAnimationPin1(String chipID, int position, String type){
         deviceAnimator.deviceTurnedOnPin1(chipID, position, this, type);
     }
+    public void turnOnDevicePin1(String chipId, int position, String type){
+//        devicesFragmentViewModel.playOnSound();
+        turnOnDeviceAnimationPin1(chipId, position, type);
+    }
     @Override
     public void turnOffDeviceAnimationPin1(String chipID, int position, String type){
         deviceAnimator.deviceTurnedOffPin1(chipID, position, this, type);
+    }
+    public void turnOffDevicePin1(String chipId, int position, String type){
+//        devicesFragmentViewModel.playOffSound();
+        turnOffDeviceAnimationPin1(chipId, position, type);
     }
     @Override
     public void turnOnDeviceAnimationPin2(String chipID, int position, String type){
         deviceAnimator.deviceTurnedOnPin2(chipID, position, this, type);
     }
+    public void turnOnDevicePin2(String chipId, int position, String type){
+//        devicesFragmentViewModel.playOnSound();
+        turnOnDeviceAnimationPin2(chipId, position, type);
+    }
     @Override
     public void turnOffDeviceAnimationPin2(String chipID, int position, String type){
         deviceAnimator.deviceTurnedOffPin2(chipID, position, this, type);
     }
+    public void turnOffDevicePin2(String chipId, int position, String type){
+//        devicesFragmentViewModel.playOffSound();
+        turnOffDeviceAnimationPin2(chipId, position, type);
+    }
+
     @Override
     public void sendingMessageTimeoutPin1(String chipId, int position, String type){
         if (position<finalDevices.size())
@@ -367,37 +394,56 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         private void reallyMoved(int from, int to) {
 //            Log.e("///////////" , "reallyMoved From: " + from + " to: " + to);
 //            Log.e("oooooooooooo" , "reallyMoved: oldList:: " + devices);
-            Bundle b = new Bundle();
-            b.putString("position", "position");
+//            Bundle b = new Bundle();
+//            b.putString("position", "position");
+            List<Device> changed = new ArrayList<>();
             if (from < to) {
                 for (int i = from; i < to; i++) {
-                    Device d = devices.get(i);
-                    d.setPosition(i+1);
-                    Device d1 = devices.get(i+1);
-                    d1.setPosition(i);
-                    Collections.swap(devices, i, i + 1);
-                    List<Device> changed = new ArrayList<>();
-                    changed.add(d);
-                    changed.add(d1);
-                    devicesRecyclerViewAdapter.notifyItemChanged(i,b);
-                    devicesRecyclerViewAdapter.notifyItemChanged(i+1,b);
-                    devicesFragmentViewModel.updateDevices(changed);
+                    Device d = new Device(finalDevices.get(i));
+                    if (RayanApplication.getPref().getCurrentShowingGroup() == null)
+                        d.setPosition(i+1);
+                    else d.setInGroupPosition(i+1);
+                    Device d1 = new Device(finalDevices.get(i+1));
+                    if (RayanApplication.getPref().getCurrentShowingGroup() == null)
+                        d1.setPosition(i);
+                    else d1.setInGroupPosition(i);
+                    Collections.swap(finalDevices, i, i + 1);
+                    if (!updateIfExists(d, changed, RayanApplication.getPref().getCurrentShowingGroup()))
+                        changed.add(d);
+                    if (!updateIfExists(d1, changed, RayanApplication.getPref().getCurrentShowingGroup()))
+                        changed.add(d1);
+//                    Log.e("DeviceAnimator", "changePosition(): " + changed);
+//                    devicesFragmentViewModel.updateDevices(changed);
+//                    devicesRecyclerViewAdapter.notifyItemChanged(i,b);
+//                    devicesRecyclerViewAdapter.notifyItemChanged(i+1,b);
                 }
             } else {
                 for (int i = from; i > to; i--) {
-                    Device d = devices.get(i);
-                    d.setPosition(i-1);
-                    Device d2 = devices.get(i-1);
-                    d2.setPosition(i);
-                    Collections.swap(devices, i, i - 1);
-                    List<Device> changed = new ArrayList<>();
-                    changed.add(d);
-                    changed.add(d2);
-                    devicesRecyclerViewAdapter.notifyItemChanged(i,b);
-                    devicesRecyclerViewAdapter.notifyItemChanged(i-1,b);
-                    devicesFragmentViewModel.updateDevices(changed);
+                    Device d = new Device(finalDevices.get(i));
+                    if (RayanApplication.getPref().getCurrentShowingGroup() == null)
+                        d.setPosition(i-1);
+                    else d.setInGroupPosition(i-1);
+                    Device d2 = new Device(finalDevices.get(i-1));
+                    if (RayanApplication.getPref().getCurrentShowingGroup() == null)
+                        d2.setPosition(i);
+                    else d2.setInGroupPosition(i);
+                    Collections.swap(finalDevices, i, i - 1);
+
+                    if (!updateIfExists(d, changed, RayanApplication.getPref().getCurrentShowingGroup()))
+                        changed.add(d);
+                    if (!updateIfExists(d2, changed, RayanApplication.getPref().getCurrentShowingGroup()))
+                        changed.add(d2);
+//                    List<Device> changed = new ArrayList<>();
+//                    changed.add(d);
+//                    changed.add(d2);
+//                    Log.e("DeviceAnimator", "changePosition(): " + changed);
+//                    devicesFragmentViewModel.updateDevices(changed);
+//                    devicesRecyclerViewAdapter.notifyItemChanged(i,b);
+//                    devicesRecyclerViewAdapter.notifyItemChanged(i-1,b);
+//                    devicesFragmentViewModel.updateDevices(changed);
                 }
             }
+            devicesFragmentViewModel.updateDevices(changed);
 //            Log.e("nnnnnnnnnnnnn" , "reallyMoved: NewList:: " + devices);
         }
 
@@ -431,4 +477,18 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 
     };
 
+    public List<Device> getFinalDevices(){
+        return finalDevices;
+    }
+
+    public boolean updateIfExists(Device d, List<Device> devices, String selectedGroup){
+        for (Device device: devices)
+            if (d.getChipId().equals(device.getChipId())){
+            if (selectedGroup == null)
+                device.setPosition(d.getPosition());
+            else device.setInGroupPosition(d.getInGroupPosition());
+                return true;
+            }
+        return false;
+    }
 }

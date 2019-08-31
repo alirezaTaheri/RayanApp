@@ -2,34 +2,33 @@ package rayan.rayanapp.ViewModels;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
 
@@ -56,7 +55,7 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
 
                     @Override
                     public void onNext(Long aLong) {
-                        sendUDPMessage.sendUdpMessage(device.getIp(), ((RayanApplication)getApplication()).getJson(AppConstants.SETTINGS, null).toString());
+                        sendUDPMessage.sendUdpMessage(device.getIp(), ((RayanApplication)getApplication()).getJSON(AppConstants.SETTINGS, null).toString());
                         Log.e("//////////", "////onNext//" + aLong);
                     }
 
@@ -78,8 +77,8 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
         return result;
     }
 
-    public Observable<Ready4SettingsResponse> setReady4SettingsObservable(Device device){
-        return ApiUtils.getApiService().settings(AppConstants.getDeviceAddress(device.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
+    public Observable<Ready4SettingsResponse> setReady4SettingsObservable(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        return ApiUtils.getApiService().settings(AppConstants.sha1(new Ready4SettingsRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
                 .subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
     }
     @SuppressLint("CheckResult")
