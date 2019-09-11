@@ -120,7 +120,13 @@ public class MainActivityViewModel extends DevicesFragmentViewModel {
                     InputStream input =
                             context.getApplicationContext().getAssets().open("ca_certificate.pem");
                     Log.e("/////////////" ,"/////////////Input: " + input);
-                Connection connection = Connection.createConnection("ClientHandle" + System.currentTimeMillis(),"ClientId"+ System.currentTimeMillis(),AppConstants.MQTT_HOST,AppConstants.MQTT_PORT,context,true);
+                Connection connection = Connection.createConnection("ClientHandle" + System.currentTimeMillis(),
+//                        "ClientId"+ System.currentTimeMillis(),
+                        RayanApplication.getPref().getId(),
+                        AppConstants.MQTT_HOST,
+                        AppConstants.MQTT_PORT,
+                        context,
+                        true);
                 connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTING);
 //                connection.setSubscriptions(getSubscriptions(connection));
                     Log.e("/////////////" ,"/////////////000000");
@@ -225,7 +231,7 @@ public class MainActivityViewModel extends DevicesFragmentViewModel {
         jsonObject.addProperty("src", RayanApplication.getPref().getId());
         jsonObject.addProperty("cmd", AppConstants.TO_DEVICE_NODE);
         sendUDPMessage.sendUdpMessage(RayanApplication.getPref().getLocalBroadcastAddress(), jsonObject.toString());
-        counterObservable.takeWhile(aLong -> aLong<5)
+        counterObservable.takeWhile(aLong -> aLong<2)
                 .subscribe(new Observer<Long>() {
                     @Override
                     public void onSubscribe(Disposable d) {

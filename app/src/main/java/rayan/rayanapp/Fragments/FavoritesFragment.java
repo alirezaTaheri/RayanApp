@@ -79,6 +79,8 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
         favoritesObserver = new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {
+                if (FavoritesFragment.this.finalDevices.size() == 0 && devices.size() > 0)
+                    deviceAnimator.setItemWidth(FavoritesFragment.this);
                 finalDevices = new ArrayList<>();
                 String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
 //                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(0, devices.size()/3));
@@ -241,7 +243,8 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                 dragFrom =  fromPosition;
             }
             dragTo = toPosition;
-            devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
+            if (fromPosition != -1 && toPosition != -1)
+                devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
             return true;
         }
 

@@ -5,9 +5,9 @@ import android.util.Log;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-public class ChangeNameResponse extends DeviceBaseResponse{
-    private String name;
-    private String stword;
+public class ChangeAccessPointResponse extends DeviceBaseResponse{
+    private String name, stword;
+
     public String getName() {
         return name;
     }
@@ -22,7 +22,6 @@ public class ChangeNameResponse extends DeviceBaseResponse{
         jsonObject.addProperty("cmd", getCmd());
         jsonObject.addProperty("src", getSrc());
         jsonObject.addProperty("stword", stword);
-        jsonObject.addProperty("name", name);
         return jsonObject.toString();
     }
 

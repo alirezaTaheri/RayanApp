@@ -226,7 +226,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
                         deviceUser.setIp(AppConstants.UNKNOWN_IP);
                         deviceUser.setPosition(nOd);
-                        deviceUser.setFavoritePosition(nOd);
+//                        deviceUser.setFavoritePosition(nOd);
                         deviceUser.setInGroupPosition(b);
                         tempTopics.add(deviceUser.getTopic().getTopic());
                         if (deviceUser.getType()!= null && deviceUser.getName1() != null){

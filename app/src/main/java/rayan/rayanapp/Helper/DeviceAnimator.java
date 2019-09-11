@@ -1,7 +1,9 @@
 package rayan.rayanapp.Helper;
 
 import android.animation.ValueAnimator;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +18,16 @@ public class DeviceAnimator {
     private int itemWidth = -1;
     private int halfItemWidth = -1;
     private final String TAG = "DeviceAnimator";
+
+    public void setItemWidth(ToggleDeviceAnimationProgress fragment){
+        fragment.getRecyclerView().post(new Runnable() {
+            @Override
+            public void run() {
+                itemWidth = fragment.getDeviceItemWidth(0);
+                halfItemWidth = itemWidth/2;
+            }
+        });
+    }
 
     public void deviceTurnedOnPin1(String chipId, int position, ToggleDeviceAnimationProgress fragment, String type){
         Log.d(TAG, "deviceTurnedOnPin1() called with: chipId = [" + chipId + "], position = [" + position + "], fragment = [" + fragment + "], type = [" + type + "]");

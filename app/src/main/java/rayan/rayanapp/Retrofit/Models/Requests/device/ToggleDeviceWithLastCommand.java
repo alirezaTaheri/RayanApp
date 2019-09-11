@@ -1,5 +1,8 @@
 package rayan.rayanapp.Retrofit.Models.Requests.device;
 
+import android.util.Log;
+
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import rayan.rayanapp.App.RayanApplication;
@@ -14,5 +17,11 @@ public class ToggleDeviceWithLastCommand extends BaseRequest{
         lc = new JsonObject();
         lc.addProperty("cmd", lc_cmd);
         this.setCmd(cmd);
+    }
+
+    public String ToString(){
+        String s = new GsonBuilder().disableHtmlEscaping().create().toJson(this);
+        Log.e("><><><", "Gson: " + s);
+        return s;
     }
 }

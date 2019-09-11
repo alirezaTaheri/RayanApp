@@ -25,6 +25,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -86,7 +89,25 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     @Override
     public boolean onBackPressed() {
         Log.e("///////", "/////onbakcmanamanaman");
-        editDeviceFragmentViewModel.toDeviceEndSettings(device.getIp());
+        try {
+            editDeviceFragmentViewModel.toDeviceEndSettings(device).observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable String s) {
+                    if (s.equals(AppConstants.END_SETTINGS)){
+                        Toast.makeText(getContext(), "تنظیمات با موفقیت ذخیره شد", Toast.LENGTH_SHORT).show();
+                    }else {
+//                        Toast.makeText(getContext(), "تنظیمات با موفقیت ذخیره شد", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+
         ((DeviceManagementActivity)getActivity()).setActionBarTitle();
         getActivity().getSupportFragmentManager().popBackStack();
         return true;
@@ -163,7 +184,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     @OnClick(R.id.editDevice)
     void toDeviceChangeName(){
         setDeviceNameStatus(NameStatus.CHANGING);
-        editDeviceFragmentViewModel.zipChangeName(device.getId(), name.getText().toString(), device.getType(), device.getGroupId(), device.getIp(), device.getSsid()).observe(this, s -> {
+        editDeviceFragmentViewModel.zipChangeName(device ,device.getId(), name.getText().toString(), device.getType(), device.getGroupId(), device.getIp(), device.getSsid()).observe(this, s -> {
             switch (s){
                 case AppConstants.FORBIDDEN:
                     Log.e(this.getClass().getSimpleName(), "FORBIDDEN CHANGENAME");
@@ -176,6 +197,13 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
                     setDeviceNameStatus(NameStatus.CHANGED);
                     break;
                 case AppConstants.OPERATION_DONE:
+                    Log.e(this.getClass().getSimpleName(), "DONE CHANGENAME");
+                    setDeviceNameStatus(NameStatus.CHANGED);
+                    device.setName1(name.getText().toString());
+                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"ویرایش نام با موفقیت انجام شد");
+                    editDeviceFragmentViewModel.getGroups();
+                    break;
+                case AppConstants.CHANGE_NAME_TRUE:
                     Log.e(this.getClass().getSimpleName(), "DONE CHANGENAME");
                     setDeviceNameStatus(NameStatus.CHANGED);
                     device.setName1(name.getText().toString());
@@ -200,28 +228,28 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     @SuppressLint("CheckResult")
     @OnClick(R.id.factoryReset)
     void toDeviceFactoryReset(){
-        editDeviceFragmentViewModel.toDeviceFactoryReset(device).observe(EditDeviceFragment.this, s -> {
-            assert s != null;
-            switch (s){
-                case AppConstants.FACTORY_RESET_DONE:
-                    Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
-                    setDeviceTopicStatus(EditDeviceFragment.TopicStatus.CHANGED);
-                    editDeviceFragmentViewModel.getGroups();
-                    break;
-                case AppConstants.SOCKET_TIME_OUT:
-                    setDeviceTopicStatus(EditDeviceFragment.TopicStatus.CHANGED);
-                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
-                    break;
-                case AppConstants.ERROR:
-                    Toast.makeText(getActivity(), "خطایی رخ داد", Toast.LENGTH_SHORT).show();
-                    break;
-                case AppConstants.USER_NOT_FOUND_RESPONSE:
-                    Toast.makeText(getActivity(), "دستگاهی با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        });
-//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
-//        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+//        editDeviceFragmentViewModel.toDeviceFactoryReset(device).observe(EditDeviceFragment.this, s -> {
+//            assert s != null;
+//            switch (s){
+//                case AppConstants.FACTORY_RESET_DONE:
+//                    Toast.makeText(getActivity(), "دستگاه با موفقیت ریست شد", Toast.LENGTH_SHORT).show();
+//                    setDeviceTopicStatus(EditDeviceFragment.TopicStatus.CHANGED);
+//                    editDeviceFragmentViewModel.getGroups();
+//                    break;
+//                case AppConstants.SOCKET_TIME_OUT:
+//                    setDeviceTopicStatus(EditDeviceFragment.TopicStatus.CHANGED);
+//                    Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+//                    break;
+//                case AppConstants.ERROR:
+//                    Toast.makeText(getActivity(), "خطایی رخ داد", Toast.LENGTH_SHORT).show();
+//                    break;
+//                case AppConstants.USER_NOT_FOUND_RESPONSE:
+//                    Toast.makeText(getActivity(), "دستگاهی با این مشخصات وجود ندارد", Toast.LENGTH_SHORT).show();
+//                    break;
+//            }
+//        });
+        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
+        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
     @SuppressLint("CheckResult")
     public void resetDevice(){
@@ -254,9 +282,31 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 
     @OnClick(R.id.deviceUpdate)
     void toDeviceUpdate(){
-        editDeviceFragmentViewModel.getDeviceVersion(device).observe(this, s -> Toast.makeText(getActivity(), ""+s, Toast.LENGTH_SHORT).show());
-        YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), this, "دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟", null);
-        yesNoDialog.show();
+        editDeviceFragmentViewModel.toDeviceReady4Update(device).observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                switch (s){
+                    case AppConstants.DEVICE_READY_FOR_UPDATE:
+                        Toast.makeText(getActivity(), "شروع بروزرسانی", Toast.LENGTH_SHORT).show();
+                        FTPClient ftpClient = new FTPClient();
+                        Log.e(this.getClass().getSimpleName(), "Updating device: " + device);
+                        ftpClient.uploadFile(getContext(), device.getIp(), device.getChipId(), device.getSecret());
+                        break;
+                    case AppConstants.SOCKET_TIME_OUT:
+                        Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+                        break;
+                    case AppConstants.ERROR:
+                        Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Toast.makeText(getActivity(), "پاسخ نامرتبط دریافت شد", Toast.LENGTH_SHORT).show();
+                }
+//                yesNoDialog.dismiss();
+            }
+        });
+//        editDeviceFragmentViewModel.getDeviceVersion(device).observe(this, s -> Toast.makeText(getActivity(), ""+s, Toast.LENGTH_SHORT).show());
+//        YesNoDialog yesNoDialog = new YesNoDialog(getActivity(), this, "دسترسی شما تایید نشد"+"\nآیا مایل به تلاش دوباره هستید؟", null);
+//        yesNoDialog.show();
     }
 
 
@@ -295,11 +345,15 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
         editDeviceFragmentViewModel.toDeviceChangeAccessPoint(device, ssid, pass).observe(this, s -> {
             assert s != null;
                 switch (s){
-                    case AppConstants.CHANGE_WIFI:
+                    case AppConstants.CHANGING_WIFI:
                         Toast.makeText(getActivity(), "دستگاه در‌حال اعمال تغییرات می‌باشد", Toast.LENGTH_SHORT).show();
                         setDeviceTopicStatus(TopicStatus.CHANGED);
                         break;
                     case AppConstants.SOCKET_TIME_OUT:
+                        setDeviceTopicStatus(TopicStatus.CHANGED);
+                        Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
+                        break;
+                    case AppConstants.ERROR:
                         setDeviceTopicStatus(TopicStatus.CHANGED);
                         Toast.makeText(getActivity(), "خطای اتصال", Toast.LENGTH_SHORT).show();
                         break;
@@ -316,7 +370,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 
     @Override
     public void onYesClicked(YesNoDialog yesNoDialog, Bundle data) {
-        editDeviceFragmentViewModel.toDeviceReady4Update(device.getIp()).observe(this, new Observer<String>() {
+        editDeviceFragmentViewModel.toDeviceReady4Update(device).observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 switch (s){
@@ -327,6 +381,9 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
                         ftpClient.uploadFile(getContext(), device.getIp(), device.getChipId(), device.getSecret());
                         break;
                     case AppConstants.SOCKET_TIME_OUT:
+                        Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
+                        break;
+                    case AppConstants.ERROR:
                         Toast.makeText(getActivity(), "دستگاه در دسترس نیست", Toast.LENGTH_SHORT).show();
                         break;
                         default:

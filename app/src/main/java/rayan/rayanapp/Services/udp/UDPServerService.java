@@ -46,6 +46,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.VerifyDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Retrofit.Models.Responses.device.VerifyDeviceResponse;
 import rayan.rayanapp.Util.AppConstants;
+import retrofit2.Response;
 import se.simbio.encryption.Encryption;
 
 public class UDPServerService extends Service {
@@ -107,14 +108,6 @@ public class UDPServerService extends Service {
                                             device.setIp(senderIP);
                                             deviceDatabase.updateDevice(device);
                                         }
-                                        break;
-                                    case "en":
-                                        String a = jsonMessage.getString("text");
-                                        Log.e("Encrypting", "Encrypted is: " + Encryptor.encrypt(a, jsonMessage.getString("k")));
-                                        break;
-                                    case "de":
-                                        String b = jsonMessage.getString("text");
-                                        Log.e("Decrypting", "Decrypted is: " + Encryptor.decrypt(b, jsonMessage.getString("k")));
                                         break;
                                     case "TLMSDONE":
                                         Log.d(TAG, "TLMSDONE message Received");
@@ -215,8 +208,31 @@ public class UDPServerService extends Service {
                                     case "hmac":
                                         Log.e(TAG, "HMAC Is: " + sha1(jsonObject.getString("text"), jsonObject.getString("k")));
                                         break;
+                                case "en":
+                                    String a = jsonObject.getString("text");
+                                    Log.e("Encrypting", "Encrypted is: " + Encryptor.encrypt(a, jsonObject.getString("k")));
+                                    break;
+                                case "de":
+                                    String b = jsonObject.getString("text");
+                                    Log.e("Decrypting", "Decrypted is: " + Encryptor.decrypt(b, jsonObject.getString("k")));
+                                    break;
                             }
-                        }else Log.d(TAG, "No Device With ChipId: " + src);
+                        }else {
+                            Log.d(TAG, "No Device With ChipId: " + src);
+                            switch (jsonObject.getString("cmd")){
+                                case "hmac":
+                                    Log.e(TAG, "HMAC Is: " + sha1(jsonObject.getString("text"), jsonObject.getString("k")));
+                                    break;
+                                case "en":
+                                    String a = jsonObject.getString("text");
+                                    Log.e("Encrypting", "Encrypted is: " + Encryptor.encrypt(a, jsonObject.getString("k")));
+                                    break;
+                                case "de":
+                                    String b = jsonObject.getString("text");
+                                    Log.e("Decrypting", "Decrypted is: " + Encryptor.decrypt(b, jsonObject.getString("k")));
+                                    break;
+                            }
+                        }
                     }
                 }
                 //{"src":"5bf94a4ec7b255005bbed354", "cmd":"YES", "type":"switch_2", "ssid":"SomeSSID", "style":"connected", "name":"2KrYsdiq2LDYqtiw\n"}
@@ -311,34 +327,34 @@ public class UDPServerService extends Service {
         Log.e(TAG, "Putting Auth To Header: " + verifyDeviceRequest.ToString());
         Log.e(TAG, "Putting Auth To Header: " + sha1(verifyDeviceRequest.ToString(), device.getSecret()));
         apiService.verifyDevice(sha1(verifyDeviceRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(ip), verifyDeviceRequest).subscribeOn(Schedulers.io())
-        .subscribe(new Observer<VerifyDeviceResponse>() {
+        .subscribe(new Observer<Response<VerifyDeviceResponse>>() {
             @Override
             public void onSubscribe(Disposable d) {
 
             }
 
             @Override
-            public void onNext(VerifyDeviceResponse verifyDeviceResponse) {
+            public void onNext(Response<VerifyDeviceResponse> verifyDeviceResponse) {
                 Log.e(TAG, "onNext() called with: verifyDeviceResponse = [" + verifyDeviceResponse + "]");
-                if (verifyDeviceResponse.getAuth() != null){
-                    Log.e(TAG, "Auth Detected: "+ verifyDeviceResponse.getAuth());
+                if (verifyDeviceResponse.body().getAuth() != null){
+                    Log.e(TAG, "Auth Detected: "+ verifyDeviceResponse.body().getAuth());
                     try {
                         Log.e(TAG, "String Auth Was: " + tempVerification.get(device.getChipId()));
-                        String originalAuth = sha1(tempVerification.get(device.getChipId()), device.getSecret());
+                        String originalAuth = AppConstants.sha1(tempVerification.get(device.getChipId()), device.getSecret());
                         Log.e(TAG, "Orginal Auth: " + originalAuth);
-                        if (originalAuth.equals(verifyDeviceResponse.getAuth())){
+                        if (originalAuth.equals(verifyDeviceResponse.body().getAuth())){
                             Log.e(TAG, "Auth is OK");
-                            if (verifyDeviceResponse.getCmd().equals(AppConstants.FROM_DEVICE_VERIFY_DONE)) {
+                            if (verifyDeviceResponse.body().getCmd().equals(AppConstants.FROM_DEVICE_VERIFY_DONE)) {
                                 Log.e(TAG, "Verify_done received from device");
                                 String pin1, pin2, name, statusWord, src;
                                 byte[] decodedName;
-                                src = verifyDeviceResponse.getSrc();
-                                pin1 = verifyDeviceResponse.getPin1();
-                                pin2 = verifyDeviceResponse.getPin2();
-                                name = verifyDeviceResponse.getName();
+                                src = verifyDeviceResponse.body().getSrc();
+                                pin1 = verifyDeviceResponse.body().getPin1();
+                                pin2 = verifyDeviceResponse.body().getPin2();
+                                name = verifyDeviceResponse.body().getName();
                                 statusWord = null;
-                                if (verifyDeviceResponse.getStword() != null) {
-                                    statusWord = verifyDeviceResponse.getStword();
+                                if (verifyDeviceResponse.body().getStword() != null) {
+                                    statusWord = verifyDeviceResponse.body().getStword();
                                 } else Log.e(TAG, "There is no stword");
                                 decodedName = Base64.decode(name, Base64.DEFAULT);
                                 Log.d(TAG, "Verifying This Device: " + device);
@@ -352,8 +368,9 @@ public class UDPServerService extends Service {
                                     if (statusWord != null) {
                                         Log.e(getClass().getSimpleName(), "Received Stword: " + statusWord + " Decoding with Key: " + device.getSecret());
                                         Log.e("Decrypting", "Plain text Decrypted is: " + Encryptor.decrypt(statusWord, device.getSecret()));
-                                        Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
-                                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
+                                        Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
+                                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
+                                        device.setHeader(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]);
                                         Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
                                     }
                                     deviceDatabase.updateDevice(device);

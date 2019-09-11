@@ -1,5 +1,7 @@
 package rayan.rayanapp.Retrofit.Models.Requests.device;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -31,14 +33,11 @@ public class VerifyDeviceRequest extends BaseRequest{
         return sb.toString();
     }
 
+
     public String ToString(){
-//        JsonObject jsonObject = new JsonObject();
-//        jsonObject.addProperty("auth",auth);
-//        jsonObject.addProperty("cmd", getCmd());
-//        jsonObject.addProperty("src", getSrc());
-//        return jsonObject.toString();
-        Gson gson = new Gson();
-        return gson.toJson(this, VerifyDeviceRequest.class);
+        String s = new GsonBuilder().disableHtmlEscaping().create().toJson(this);
+        Log.e("><><><", "Gson: " + s);
+        return s;
     }
 
     @Override

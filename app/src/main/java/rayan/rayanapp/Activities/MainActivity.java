@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -616,71 +617,123 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
 //        startService(new Intent(this, AlwaysOnService.class));
-//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-//            this.drawerLayout.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-        Observable.just(counter)
-                .flatMap(new Function<Integer, ObservableSource<?>>() {
-            @Override
-            public ObservableSource<?> apply(Integer integer) throws Exception {
-                return Observable.create(new ObservableOnSubscribe<Object>() {
-                    @Override
-                    public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
-                        Log.e(TAG, "emminting :" + counter + " Time: " + System.currentTimeMillis());
-                        emitter.onNext(counter);
-//                        emitter.onComplete();
-                        counter ++;
-                    }
-                });
-            }
-        })
-                .repeat(20)
-                .takeWhile(new Predicate<Object>() {
-            @Override
-            public boolean test(Object o) throws Exception {
-                Log.d(TAG, "test() called with: o = [" + o + "]");
-                if ((int)o < 10)
-                    return true;
-                return false;
-            }
-        })
-                .flatMap(new Function<Object, ObservableSource<?>>() {
-                    @Override
-                    public ObservableSource<?> apply(Object o) throws Exception {
-                        Log.e(TAG, "apply() called with: o = [" + o + "]");
-                        return new ObservableSource<Object>() {
-                            @Override
-                            public void subscribe(Observer<? super Object> observer) {
-                                observer.onError(new RuntimeException());
-//                                observer.onNext(o);
-//                                observer.onComplete();
-                            }
-                        };
-                    }
-                })
-                .subscribe(new Observer<Object>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(Object o) {
-                Log.e(TAG, "onNext() called with: o = [" + o + "]");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.e(TAG, "onError() called with: e = [" + e + "]");
-            }
-
-            @Override
-            public void onComplete() {
-                Log.d(TAG, "onComplete() called");
-            }
-        });
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+//        Observable<Integer> o1 =
+//                Observable.just(1,10,20,30,40, 140, 150, 170)
+//                        .flatMap(new Function<Integer, Observable<Integer>>() {
+//                            @Override
+//                            public Observable<Integer> apply(Integer integer) throws Exception {
+//                                return Observable.just(integer);
+//                            }
+//                        })
+////                .map(new Function<Integer, ObservableSource<?>>() {
+////                    @Override
+////                    public ObservableSource<?> apply(Integer integer) throws Exception {
+////                        Log.e("?>?>?>?>?>?>", "First FlatMap " + counter);
+////                        counter++;
+////                        return Observable.just(counter);
+////                    }
+////                })
+//                .repeatWhen(objectObservable -> objectObservable.delay(100, TimeUnit.MILLISECONDS))
+////                .repeat(20)
+//                .takeWhile(new Predicate<Object>() {
+//                    @Override
+//                    public boolean test(Object o) throws Exception {
+//                        Log.d(TAG, "test() called with: o = [" + o + "]" + ((int)o < 100));
+//                        if ((int)o < 100)
+//                            return true;
+//                        return false;
+//                    }
+//                });
+//        Observable<Integer> o2 = Observable.just(6,7,8,9,10);
+//        Observable.concat(o1, o2).subscribe(new Observer<Integer>() {
+//            @Override
+//            public void onSubscribe(Disposable d) {
+//                Log.e(TAG, "onSubscribe() called with: d = [" + d + "]");
+//            }
+//
+//            @Override
+//            public void onNext(Integer integer) {
+//                Log.e(TAG, "onNext() called with: integer = [" + integer + "]");
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                Log.e(TAG, "onError() called with: e = [" + e + "]");
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//                Log.e(TAG, "onComplete() called");
+//            }
+//        });
+////        Observable.just(counter)
+////                .flatMap(new Function<Integer, ObservableSource<?>>() {
+////            @Override
+////            public ObservableSource<?> apply(Integer integer) throws Exception {
+////                Log.e("?>?>?>?>?>?>", "First FlatMap " + counter);
+////                counter++;
+////                return Observable.just(counter);
+////            }
+////        })
+////                .repeatWhen(objectObservable -> objectObservable.delay(100, TimeUnit.MILLISECONDS))
+//////                .repeat(20)
+////                .takeWhile(new Predicate<Object>() {
+////            @Override
+////            public boolean test(Object o) throws Exception {
+////                Log.d(TAG, "test() called with: o = [" + o + "]" + ((int)o < 10));
+////                if ((int)o < 10)
+////                    return true;
+////                return false;
+////            }
+////        })
+////                .concatWith(new ObservableSource<Object>() {
+////            @Override
+////            public void subscribe(Observer<? super Object> observer) {
+////                Log.e("CCCCCCCCCCCCC", "Concated Man>>>>" + observer);
+////                observer.onNext(1000);
+////
+////            }
+////        })
+//////                .flatMap(new Function<Object, ObservableSource<?>>() {
+//////                    @Override
+//////                    public ObservableSource<?> apply(Object o) throws Exception {
+//////                        Log.e(TAG, "apply() called with: o = [" + o + "]");
+//////                        return new ObservableSource<Object>() {
+//////                            @Override
+//////                            public void subscribe(Observer<? super Object> observer) {
+//////                                observer.onError(new RuntimeException());
+////////                                observer.onNext(o);
+////////                                observer.onComplete();
+//////                            }
+//////                        };
+//////                    }
+//////                })
+////                .subscribe(new Observer<Object>() {
+////            @Override
+////            public void onSubscribe(Disposable d) {
+////
+////            }
+////
+////            @Override
+////            public void onNext(Object o) {
+////                Log.e(TAG, "onNext() called with: o = [" + o + "]");
+////            }
+////
+////            @Override
+////            public void onError(Throwable e) {
+////                Log.e(TAG, "onError() called with: e = [" + e + "]");
+////            }
+////
+////            @Override
+////            public void onComplete() {
+////                Log.d(TAG, "onComplete() called");
+////            }
+////        });
     }
 
     private final static char[] hexArray = "0123456789abcdef".toCharArray();
@@ -1199,10 +1252,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "cmd":"de", "src":"", "k":"vg4mseo0ouo2zf1j"}
 //{"src":"222222","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"juO+H8ZKWVwZvMP8r/RQgw=="}
 //{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}
-//{"text":"123asdf48d6d8e2s", "cmd":"hmac", "src":"5958528", "k":"2kd6xdeesfc8kh2i"}
+//{"text":"tffd9rtikd202gcw", "cmd":"hmac", "src":"5958528", "k":"zmk4rid5h3e1mk66"}
+//{"text":"5mrr48f1nlgex7cy", "cmd":"en", "src":"137067", "k":"zmk4rid5h3e1mk66"}
 
-//{"text":"18#", "cmd":"en", "src":"", "k":"2kd6xdeesfc8kh2i"}
+//{"text":"abcdefgh#25#", "cmd":"en", "src":"5958528", "k":"2kd6xdeesfc8kh2i"}
 //
 /*
-{"text":"juO+H8ZKWVwZvMP8r/RQgw==", "cmd":"de", "src":"", "k":"2kd6xdeesfc8kh2i"}
+{"text":"AYtQrq0+qTAY8Pk5JgUYRQ==", "cmd":"de", "src":"", "k":"zmk4rid5h3e1mk66"}
  */

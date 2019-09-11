@@ -12,6 +12,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
+import rayan.rayanapp.Util.AppConstants;
 
 @Entity
 public class Device implements Parcelable {
@@ -57,7 +58,9 @@ public class Device implements Parcelable {
     private boolean hidden;
     private int position;
     private int inGroupPosition;
-    private int favoritePosition;
+    private int favoritePosition = -1;
+    private String header = AppConstants.UNKNOWN_HEADER;
+
 
     public Device(Device device) {
         this.pin1 = device.getPin1();
@@ -83,6 +86,11 @@ public class Device implements Parcelable {
         this.locallyAccessibility = device.isLocallyAccessibility();
         this.onlineAccessibility = device.isOnlineAccessibility();
         this.favoritePosition = device.getFavoritePosition();
+        this.header = device.getHeader();
+    }
+
+    public String getHeader() {
+        return header;
     }
 
     public int getFavoritePosition() {
@@ -142,6 +150,7 @@ public class Device implements Parcelable {
         position = in.readInt();
         inGroupPosition = in.readInt();
         favoritePosition = in.readInt();
+        header = in.readString();
     }
 
     @Override
@@ -170,7 +179,7 @@ public class Device implements Parcelable {
         dest.writeInt(position);
         dest.writeInt(inGroupPosition);
         dest.writeInt(favoritePosition);
-
+        dest.writeString(header);
     }
 
     @Override
@@ -388,7 +397,12 @@ public class Device implements Parcelable {
                 ", position=" + position +
                 ", inGroupPosition=" + inGroupPosition +
                 ", favoritePosition=" + favoritePosition +
+                ", Header=" + header +
                 '}';
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
     }
 
     //    @Override

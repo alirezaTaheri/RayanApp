@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,10 +50,12 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitReques
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.EndSettingsRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.FactoryResetRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
 //<<<<<<< HEAD
 import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 //=======
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
@@ -60,11 +63,17 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeAccessPointResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.EndSettingsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.FactoryResetResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.UpdateResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Util.AppConstants;
+import retrofit2.HttpException;
+import retrofit2.Response;
 
 public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
@@ -80,6 +89,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return results;
     }
     private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
+        Log.e("?><?><?><?><?><", "editing: " + editDeviceRequest);
         ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .editDevice(RayanApplication.getPref().getToken(), editDeviceRequest)
@@ -146,55 +156,213 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
-    public MutableLiveData<String> zipChangeName(String id , String name, String type, String groupId, String ip, String ssid){
+    public MutableLiveData<String> zipChangeName(Device device, String id , String name, String type, String groupId, String ip, String ssid){
         MutableLiveData<String> response = new MutableLiveData<>();
         byte[] data = name.getBytes();
         String baseName = Base64.encodeToString(data, Base64.DEFAULT);
-        Observable.zip(
-                toDeviceChangeNameObservable(new ChangeNameRequest(baseName),ip).subscribeOn(Schedulers.io())
-                        .doOnError(throwable -> {
-                            Log.e(TAG, "error occurred: "+throwable);
+        Observable<Response<ChangeNameResponse>> deviceChangeNameObservable =
+                Observable.just(device)
+                        .flatMap(new Function<Device, Observable<Response<ChangeNameResponse>>>() {
+                            @Override
+                            public Observable<Response<ChangeNameResponse>> apply(Device ready4SettingsResponse) throws Exception {
+                                return toDeviceChangeNameObservable(new ChangeNameRequest(baseName, Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())),device);
+                            }
                         })
-                        .doOnNext(changeNameResponse -> {
-                    Log.e(TAG, " 00000000 ChangeNameResponse: " + changeNameResponse);
-                }),
-                editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
-                    Log.e(TAG, "000000000 DeviceResponse: " + deviceResponse);
-                }),
-                (BiFunction<ChangeNameResponse, DeviceResponse, Object>) (changeNameResponse, deviceResponse) -> {
-                    Log.e(TAG, "ChangeNameResponse: " + changeNameResponse);
-                    Log.e(TAG, "DeviceResponse: " + deviceResponse);
-                    if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR)){
-                        if (deviceResponse.getData().getMessage() != null)
-                        return deviceResponse.getData().getMessage();
-                        else return AppConstants.ERROR;
+                        .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                .repeatWhen(throwableObservable -> throwableObservable.delay(3500, TimeUnit.MILLISECONDS))
+                .takeWhile(changeNameResponse -> {
+                    Log.e("rerererererere", "Toggle Device Response: " + changeNameResponse);
+                    Log.e("rerererererere", "Auth: " + changeNameResponse.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + changeNameResponse.body().ToString());
+                    Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
+                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(changeNameResponse.body().ToString(), device.getSecret()));
+                    if (changeNameResponse.headers().get("auth") != null){
+                    Log.e("rererererere", "Auth Is Not NUll");
+                        if (AppConstants.sha1(changeNameResponse.body().ToString(), device.getSecret()).equals(changeNameResponse.headers().get("auth"))){
+                    Log.e("rererererere", "HMACs Are Equal");
+                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeNameResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
+                    device.setHeader(Encryptor.decrypt(changeNameResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                    Log.e("TAGTAGTAG", "Should I go: " + changeNameResponse.body().getCmd().equals("wrong_stword"));
+                    if (changeNameResponse.body().getCmd().equals("wrong_stword")) {
+                        Log.e(TAG, "stword is wrong");
+                        return true;
                     }
-                    if (deviceResponse.getData().getMessage()!=null && deviceResponse.getData().getMessage().toLowerCase().contains(AppConstants.FORBIDDEN)){
-                        return AppConstants.FORBIDDEN;
+                    else{
+                        Log.e(TAG, "Continue to Rest Of Stream");
+//                        Device deviceToUpdate = new Device(device);
+//                        deviceToUpdate.setPin1(changeNameResponse.body().getPin1());
+//                        deviceToUpdate.setPin2(changeNameResponse.body().getPin2());
+//                        deviceDatabase.updateDevice(deviceToUpdate);
+                        return false;
                     }
-                    if (changeNameResponse.getCmd().contains(AppConstants.CHANGE_NAME_FALSE)){
-                        return AppConstants.CHANGE_NAME_FALSE;
+                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+                    }else Log.e("rererererere", "Auth IS NULL");
+                    return false;
+                });
+//                .subscribe(new Observer<Response<ChangeNameResponse>>() {
+//            @Override
+//            public void onSubscribe(Disposable d) {
+//                Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
+//            }
+//
+//            @Override
+//            public void onNext(Response<ChangeNameResponse> changeNameResponseResponse) {
+//                Log.d(TAG, "onNext() called with: changeNameResponseResponse = [" + changeNameResponseResponse + "]");
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                Log.e(TAG, "onError: ", e);
+//                if (e instanceof SocketTimeoutException || e instanceof TimeoutException){
+//                    response.postValue(AppConstants.SOCKET_TIME_OUT);
+//                }
+//                response.postValue(e.toString());
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//                Log.d(TAG, "onComplete() called");
+//            }
+//        });
+//        Observable.concat(deviceChangeNameObservable, Observable.just(1,2,3,4,5,6))
+        Observable.concat(deviceChangeNameObservable, editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)))
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG+"?><?><?><?><", "onSubscribe() called with: d = [" + d + "]");
                     }
-                    return AppConstants.OPERATION_DONE;
-                }).observeOn(AndroidSchedulers.mainThread()).subscribe(new DisposableObserver<Object>() {
-            @Override
-            public void onNext(Object o) {
-                Log.e(TAG, "onNext: " + o);
-                response.postValue((String)o);
-            }
 
-            @Override
-            public void onError(Throwable e) {
-                if (e instanceof SocketTimeoutException){
-                    response.postValue(AppConstants.SOCKET_TIME_OUT);
-                }
-            }
+                    @Override
+                    public void onNext(Object o) {
+                        if (o instanceof DeviceResponse){
+                            DeviceResponse deviceResponse = (DeviceResponse) o;
+                            if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+                                response.postValue(AppConstants.CHANGE_NAME_TRUE);
+                            else if (deviceResponse.getData().getMessage() != null)
+                                response.postValue(deviceResponse.getData().getMessage());
+                            else response.postValue(AppConstants.CHANGE_NAME_FALSE);
+                        }
+                        Log.d(TAG+"?><?><?><?><", "onNext() called with: o = [" + o + "]");
+                    }
 
-            @Override
-            public void onComplete() {
-                Log.e(TAG, "ChangeName: onComplete " );
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG+"?><?><?><?><", "onError() called with: e = [" + e + "]");
+                        if (e instanceof HttpException)
+                            response.postValue(AppConstants.CHANGE_NAME_FALSE);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG+"?><?><?><?><", "onComplete() called");
+                    }
+                });
+//        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
+//                Observable.just(1).flatMap(integer -> {
+//                    return
+//                })
+//                        .repeatWhen(completed -> {
+//                            Log.e("TAGTAGTAG", "repeatwhen: " + completed);
+//                            return completed.delay(200, TimeUnit.MILLISECONDS);
+//                        }).flatMap(new Function<ChangeNameResponse, ObservableSource<?>>() {
+//                    @Override
+//                    public ObservableSource<?> apply(ChangeNameResponse factoryResetResponse) throws Exception {
+//                        if (factoryResetResponse.getStword() != null){
+//                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[1])+1));
+//                            device.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[0]);
+//                            updateDevice(device);
+//                        }
+//                        if (factoryResetResponse.getCmd().equals(AppConstants.CHANGE_NAME_TRUE)) {
+//                            Log.e(TAG, "dddddddddddddddddddddddddddddd");
+//                            response.postValue(AppConstants.OPERATION_DONE);
+//                            return editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid));
+////                            return Observable.just(0);
+//                        }
+//                        else{
+//                            Log.e(TAG, "dddddddddddddddddddddddddddddd000000000000000000");
+//                            return Observable.just(1);
+//                        }
+//                    }
+//                })
+//                        .takeWhile(toggleDeviceResponse -> {
+//                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
+//                            if (toggleDeviceResponse instanceof Integer && (int)toggleDeviceResponse == 1)
+//                                return true;
+//                            else return false;
+//                        }),
+//                (changeNameResponse, deviceResponse) -> {
+//                    return deviceResponse;})
+//                .timeout(4, TimeUnit.SECONDS)
+////                .takeWhile(aLong -> aLong<1)
+//                .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+//                .subscribe(new Observer<Object>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        Log.e("//////////","onSubscribe");
+//                    }
+//
+//                    @Override
+//                    public void onNext(Object aLong) {
+//                        Log.e("//////////","onNext: " + aLong);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("//////////", "/onError/////" + e + e.getClass());
+//
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.e("//////////","onComplete");
+//                    }
+//                });
+//        Observable.zip(
+//                toDeviceChangeNameObservable(new ChangeNameRequest(baseName),ip).subscribeOn(Schedulers.io())
+//                        .doOnError(throwable -> {
+//                            Log.e(TAG, "error occurred: "+throwable);
+//                        })
+//                        .doOnNext(changeNameResponse -> {
+//                    Log.e(TAG, " 00000000 ChangeNameResponse: " + changeNameResponse);
+//                }),
+//                editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
+//                    Log.e(TAG, "000000000 DeviceResponse: " + deviceResponse);
+//                }),
+//                (BiFunction<ChangeNameResponse, DeviceResponse, Object>) (changeNameResponse, deviceResponse) -> {
+//                    Log.e(TAG, "ChangeNameResponse: " + changeNameResponse);
+//                    Log.e(TAG, "DeviceResponse: " + deviceResponse);
+//                    if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR)){
+//                        if (deviceResponse.getData().getMessage() != null)
+//                        return deviceResponse.getData().getMessage();
+//                        else return AppConstants.ERROR;
+//                    }
+//                    if (deviceResponse.getData().getMessage()!=null && deviceResponse.getData().getMessage().toLowerCase().contains(AppConstants.FORBIDDEN)){
+//                        return AppConstants.FORBIDDEN;
+//                    }
+//                    if (changeNameResponse.getCmd().contains(AppConstants.CHANGE_NAME_FALSE)){
+//                        return AppConstants.CHANGE_NAME_FALSE;
+//                    }
+//                    return AppConstants.OPERATION_DONE;
+//                }).observeOn(AndroidSchedulers.mainThread()).subscribe(new DisposableObserver<Object>() {
+//            @Override
+//            public void onNext(Object o) {
+//                Log.e(TAG, "onNext: " + o);
+//                response.postValue((String)o);
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                if (e instanceof SocketTimeoutException){
+//                    response.postValue(AppConstants.SOCKET_TIME_OUT);
+//                }
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//                Log.e(TAG, "ChangeName: onComplete " );
+//            }
+//        });
         return response;
     }
 
@@ -237,17 +405,26 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return result;
     }
 
-    public LiveData<ChangeNameResponse> toDeviceChangeName(String name, String ip){
-        final MutableLiveData<ChangeNameResponse> results = new MutableLiveData<>();
-        toDeviceChangeNameObservable(new ChangeNameRequest(name),ip).subscribe(toDeviceChangeNameObserver(results));
-        return results;
-    }
-    private Observable<ChangeNameResponse> toDeviceChangeNameObservable(ChangeNameRequest changeNameRequest, String ip){
+//    public LiveData<ChangeNameResponse> toDeviceChangeName(String name, String ip){
+//        final MutableLiveData<ChangeNameResponse> results = new MutableLiveData<>();
+//        toDeviceChangeNameObservable(new ChangeNameRequest(name),ip).subscribe(toDeviceChangeNameObserver(results));
+//        return results;
+//    }
+    private Observable<Response<ChangeNameResponse>> toDeviceChangeNameObservable(ChangeNameRequest changeNameRequest, Device device) {
         ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .changeName(AppConstants.getDeviceAddress(ip), changeNameRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        try {
+            return apiService
+                    .changeName(AppConstants.sha1(changeNameRequest.ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), changeNameRequest)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
     private DisposableObserver<ChangeNameResponse> toDeviceChangeNameObserver(MutableLiveData<ChangeNameResponse> results){
         return new DisposableObserver<ChangeNameResponse>() {
@@ -276,125 +453,140 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     @SuppressLint("CheckResult")
     public LiveData<String> toDeviceFactoryReset(Device device){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
-                Observable.just(1).flatMap(integer -> {
-                    return toDeviceFactoryResetObservable(device);
-                })
-                        .repeatWhen(completed -> {
-                            Log.e("TAGTAGTAG", "repeatwhen: " + completed);
-                            return completed.delay(200, TimeUnit.MILLISECONDS);
-                        }).flatMap(new Function<FactoryResetResponse, ObservableSource<?>>() {
+        Observable<Response<FactoryResetResponse>> toDeviceReset =
+                Observable.just(device)
+                .flatMap(new Function<Device, Observable<Response<FactoryResetResponse>>>() {
                     @Override
-                    public ObservableSource<?> apply(FactoryResetResponse factoryResetResponse) throws Exception {
-                        if (factoryResetResponse.getCmd().equals(AppConstants.FACTORY_RESET_DONE)) {
-                            Log.e(TAG, "dddddddddddddddddddddddddddddd");
-                            results.postValue(AppConstants.FACTORY_RESET_DONE);
-                            return deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId()));
-//                            return Observable.just(0);
-                        }
-                        else{
-                            Log.e(TAG, "dddddddddddddddddddddddddddddd000000000000000000");
-                            return Observable.just(1);
-                        }
+                    public Observable<Response<FactoryResetResponse>> apply(Device device) throws Exception {
+                        return toDeviceFactoryResetObservable(device);
                     }
                 })
-                        .takeWhile(toggleDeviceResponse -> {
-                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
-                            if (toggleDeviceResponse instanceof Integer && (int)toggleDeviceResponse == 1)
+                        .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                        .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
+                        .takeWhile(toggleDeviceResponse ->{
+                            Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
+                            Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
+                            Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                            Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
+                            Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
+                    if (toggleDeviceResponse.headers().get("auth") != null){
+                            Log.e("rererererere", "Auth Is Not NUll");
+                        if (AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                            Log.e("rererererere", "HMACs Are Equal");
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
+                            device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
+                            if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
                                 return true;
-                            else return false;
-//                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0])+1));
-//                            if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
-//                                return true;
-//                            else if (toggleDeviceResponse.getCmd().equals(AppConstants.FACTORY_RESET_DONE)){
-//                                    Log.e(TAG, "Device Responsed with ok Message");
-////                                    return deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId()));
-//                                return false;
-//                            }
-//                            Log.e(TAG, "Device didn't responsed right");
-//                            results.postValue(AppConstants.ERROR);
-//                            return null;
-//                            result.postValue(AppConstants.SETTINGS);
-//                            deviceDatabase.updateDevice(device);
-//                            else {
-//                                Log.e(this.getClass().getSimpleName(), "So What received? " + toggleDeviceResponse.getCmd());
-//                                result.postValue(toggleDeviceResponse.getCmd());
-//                            }
-//                            return false;
-                        }),
-                (changeNameResponse, deviceResponse) -> {
-                    return deviceResponse;})
-                .timeout(4, TimeUnit.SECONDS)
-//                .takeWhile(aLong -> aLong<1)
-                .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+                            else{
+                                Device deviceToUpdate = new Device(device);
+                                device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
+                                device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                                deviceDatabase.updateDevice(deviceToUpdate);
+                                return false;
+                            }
+                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+                    }else Log.e("rererererere", "Auth IS NULL");
+                    return false;
+                        }).timeout(4, TimeUnit.SECONDS)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io());
+
+        Observable.concat(toDeviceReset, deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId())))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .subscribe(new Observer<Object>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                        Log.e("//////////","onSubscribe");
+
                     }
 
                     @Override
-                    public void onNext(Object aLong) {
-                        Log.e("//////////","onNext: " + aLong);
+                    public void onNext(Object o) {
+                        if (o instanceof DeviceResponse){
+                            DeviceResponse deviceResponse = (DeviceResponse) o;
+                            if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+                                results.postValue(AppConstants.FACTORY_RESET_DONE);
+                            else if (deviceResponse.getData().getMessage() != null)
+                                results.postValue(deviceResponse.getData().getMessage());
+                            else results.postValue(AppConstants.ERROR);
+                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("//////////", "/onError/////" + e + e.getClass());
-                        if (e instanceof SocketTimeoutException || e instanceof TimeoutException){
-                            results.postValue(AppConstants.SOCKET_TIME_OUT);
-                        }
-                        results.postValue(e.toString());
-                        e.printStackTrace();
+
                     }
 
                     @Override
                     public void onComplete() {
-                        Log.e("//////////","onComplete");
+
                     }
                 });
-//        toDeviceFactoryResetObservable().subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
-//                .flatMap(new Function<DeviceBaseResponse, ObservableSource<?>>() {
+//        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
+//                Observable.just(1).flatMap(integer -> {
+//                    return toDeviceFactoryResetObservable(device);
+//                })
+//                        .repeatWhen(completed -> {
+//                            Log.e("TAGTAGTAG", "repeatwhen: " + completed);
+//                            return completed.delay(200, TimeUnit.MILLISECONDS);
+//                        }).flatMap(new Function<FactoryResetResponse, ObservableSource<?>>() {
 //                    @Override
-//                    public ObservableSource<?> apply(DeviceBaseResponse deviceBaseResponse) throws Exception {
-//
+//                    public ObservableSource<?> apply(FactoryResetResponse factoryResetResponse) throws Exception {
+//                        if (factoryResetResponse.getStword() != null){
+//                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[1])+1));
+//                            device.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[0]);
+//                            updateDevice(device);
+//                        }
+//                        if (factoryResetResponse.getCmd().equals(AppConstants.FACTORY_RESET_DONE)) {
+//                            Log.e(TAG, "dddddddddddddddddddddddddddddd");
+//                            results.postValue(AppConstants.FACTORY_RESET_DONE);
+//                            return ;
+////                            return Observable.just(0);
+//                        }
+//                        else{
+//                            Log.e(TAG, "dddddddddddddddddddddddddddddd000000000000000000");
+//                            return Observable.just(1);
+//                        }
 //                    }
-//                }).subscribe(new Observer<Object>() {
-//            @Override
-//            public void onSubscribe(Disposable d) {
-//
-//            }
-//
-//            @Override
-//            public void onNext(Object o) {
-//                results.postValue(AppConstants.FACTORY_RESET_DONE);
-//                Log.e("JEnsESHJENSHE" ,"jenesh: " + o);
-//                Log.e("JEnsESHJENSHE" ,"jenesh: " + o.getClass());
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//
-//            }
-//
-//            @Override
-//            public void onComplete() {
-//
-//            }
-//        });
-
-//        deleteUserObservable(new DeleteUserRequest(device.getId(), device.getGroupId())).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
-//                .flatMap(deviceBaseResponse -> {
-//                    if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
-//                        return toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET), device.getIp());
-//                    else if (deviceBaseResponse.getStatus().getDescription().equals(AppConstants.ERROR_DESCRIPTION) &&
-//                            deviceBaseResponse.getData().getMessage().equals(AppConstants.USER_NOT_FOUND_RESPONSE)){
-//                        results.postValue(AppConstants.USER_NOT_FOUND_RESPONSE);
-//                        return null;
+//                })
+//                        .takeWhile(toggleDeviceResponse -> {
+//                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
+//                            if (toggleDeviceResponse instanceof Integer && (int)toggleDeviceResponse == 1)
+//                                return true;
+//                            else return false;
+//                        }),
+//                (changeNameResponse, deviceResponse) -> {
+//                    return deviceResponse;})
+//                .timeout(4, TimeUnit.SECONDS)
+////                .takeWhile(aLong -> aLong<1)
+//                .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+//                .subscribe(new Observer<Object>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        Log.e("//////////","onSubscribe");
 //                    }
-//                    return null;
-//                }).subscribe(toDeviceFactoryResetObserver(results));
-//        toDeviceFactoryResetObservable(new BaseRequest(AppConstants.FACTORY_RESET),ip).subscribe(toDeviceFactoryResetObserver(results));
+//
+//                    @Override
+//                    public void onNext(Object aLong) {
+//                        Log.e("//////////","onNext: " + aLong);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("//////////", "/onError/////" + e + e.getClass());
+//                        if (e instanceof SocketTimeoutException || e instanceof TimeoutException){
+//                            results.postValue(AppConstants.SOCKET_TIME_OUT);
+//                        }
+//                        results.postValue(e.toString());
+//                        e.printStackTrace();
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.e("//////////","onComplete");
+//                    }
+//                });
         return results;
     }
 
@@ -407,11 +599,11 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<FactoryResetResponse> toDeviceFactoryResetObservable(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    private Observable<Response<FactoryResetResponse>> toDeviceFactoryResetObservable(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         Log.e(TAG, "Sending StWord Is: " + device.getStatusWord());
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .factoryReset(AppConstants.sha1(new FactoryResetRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new FactoryResetRequest(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
+                .factoryReset(AppConstants.sha1(new FactoryResetRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new FactoryResetRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -443,58 +635,191 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     @SuppressLint("CheckResult")
     public LiveData<String> toDeviceChangeAccessPoint(Device device, String ssid, String password){
         final MutableLiveData<String> results = new MutableLiveData<>();
+        Observable<Response<ChangeAccessPointResponse>> toDeviceChangeAccessPoint = Observable.just(device)
+                .flatMap(new Function<Device, Observable<Response<ChangeAccessPointResponse>>>() {
+                    @Override
+                    public Observable<Response<ChangeAccessPointResponse>> apply(Device device) throws Exception {
+                        return toDeviceChangeAccessPointObservable(device, new ChangeAccessPointRequest(device.getName1(), password, ssid, device.getStyle(), Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())));
+                    }
+                })
+                .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
+                .takeWhile(toggleDeviceResponse ->{
+                    Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
+                    Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                    Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
+                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
+                    if (toggleDeviceResponse.headers().get("auth") != null){
+                    Log.e("rererererere", "Auth Is Not NUll");
+                        if (AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                    Log.e("rererererere", "HMACs Are Equal");
+                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
+                    device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                    Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
+                    if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                        return true;
+                    else{
+                        Device deviceToUpdate = new Device(device);
+                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
+                        device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                        deviceDatabase.updateDevice(deviceToUpdate);
+                        return false;
+                    }
+                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+                    }else Log.e("rererererere", "Auth IS NULL");
+                    return false;
+                }).timeout(4, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
+        Observable.concat(toDeviceChangeAccessPoint, editDeviceObservable(new EditDeviceRequest(device.getId(), device.getGroupId(), device.getName1(), device.getType(), ssid)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        Log.d(TAG, "onNext() called with: o = [" + o + "]");
+                        if (o instanceof DeviceResponse){
+                            DeviceResponse deviceResponse = (DeviceResponse) o;
+                            if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+                                results.postValue(AppConstants.CHANGING_WIFI);
+                            else if (deviceResponse.getData().getMessage() != null)
+                                results.postValue(deviceResponse.getData().getMessage());
+                            else results.postValue(AppConstants.ERROR);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "onError() called with: e = [" + e + "]");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete() called");
+                    }
+                });
+
+//        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
+//                Observable.just(1).flatMap(integer -> {
+//                    return
+//                })
+//                        .repeatWhen(completed -> {
+//                            Log.e("TAGTAGTAG", "repeatwhen: " + completed);
+//                            return completed.delay(200, TimeUnit.MILLISECONDS);
+//                        }).flatMap(new Function<ChangeAccessPointResponse, ObservableSource<?>>() {
+//                    @Override
+//                    public ObservableSource<?> apply(ChangeAccessPointResponse factoryResetResponse) throws Exception {
+//                        if (factoryResetResponse.getStword() != null){
+//                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[1])+1));
+//                            device.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[0]);
+//                            updateDevice(device);
+//                        }
+//                        if (factoryResetResponse.getCmd().equals(AppConstants.CHANGING_WIFI)) {
+//                            Log.e(TAG, "dddddddddddddddddddddddddddddd");
+//                            results.postValue(AppConstants.CHANGE_WIFI);
+//                            return
+////                            return Observable.just(0);
+//                        }
+//                        else{
+//                            Log.e(TAG, "dddddddddddddddddddddddddddddd000000000000000000");
+//                            return Observable.just(1);
+//                        }
+//                    }
+//                })
+//                        .takeWhile(toggleDeviceResponse -> {
+//                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
+//                            if (toggleDeviceResponse instanceof Integer && (int)toggleDeviceResponse == 1)
+//                                return true;
+//                            else return false;
+//                        }),
+//                (changeNameResponse, deviceResponse) -> {
+//                    return deviceResponse;})
+//                .timeout(4, TimeUnit.SECONDS)
+////                .takeWhile(aLong -> aLong<1)
+//                .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
+//                .subscribe(new Observer<Object>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        Log.e("//////////","onSubscribe");
+//                    }
+//
+//                    @Override
+//                    public void onNext(Object aLong) {
+//                        Log.e("//////////","onNext: " + aLong);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("//////////", "/onError/////" + e + e.getClass());
+//                        if (e instanceof SocketTimeoutException || e instanceof TimeoutException){
+//                            results.postValue(AppConstants.SOCKET_TIME_OUT);
+//                        }
+//                        results.postValue(e.toString());
+//                        e.printStackTrace();
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.e("//////////","onComplete");
+//                    }
+//                });
 //        toDeviceChangeAccessPointObservable(new ChangeAccessPointRequest(hname, pwd, ssid, style),ip).subscribe(toDeviceChangeAccessPointObserver(results));
-        Observable.zip(
-                toDeviceChangeAccessPointObservable(new ChangeAccessPointRequest(device.getName1(), password, ssid, device.getStyle()), device.getIp())
-                        .doOnNext(deviceBaseResponse -> {
-                            Log.e(TAG, "Do on next for changing accessPoint: " + deviceBaseResponse);
-                        }),
-                editDeviceObservable(new EditDeviceRequest(device.getId(), device.getGroupId(), device.getName1(), device.getType(), ssid)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
-                    Log.e(TAG, "000000000 DeviceResponse: " + deviceResponse);
-                }), (deviceBaseResponse, deviceResponse) -> {
-                    Log.e(TAG, "ChangeAccessPointResponse: " + deviceBaseResponse);
-                    Log.e(TAG, "DeviceResponse: " + deviceResponse);
-                    if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR)){
-                        if (deviceResponse.getData().getMessage() != null)
-                            return deviceResponse.getData().getMessage();
-                        else return AppConstants.ERROR;
-                    }
-                    if (deviceResponse.getData().getMessage()!=null && deviceResponse.getData().getMessage().toLowerCase().contains(AppConstants.FORBIDDEN)){
-                        return AppConstants.FORBIDDEN;
-                    }
-                    if (deviceBaseResponse.getCmd().contains(AppConstants.CHANGE_NAME_FALSE)){
-                        return AppConstants.CHANGE_NAME_FALSE;
-                    }
-                    return AppConstants.OPERATION_DONE;
-                }
-        ).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Observer<String>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                Log.e(TAG, "OnSubscribe whole zip change accessPoint");
-            }
-
-            @Override
-            public void onNext(String s) {
-                Log.e(TAG, "OnNext Change AccessPoint: " + s);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.e(TAG, "onError Change AccessPoint: " + e);
-            }
-
-            @Override
-            public void onComplete() {
-                Log.e(TAG, "onComplete Change AccessPoint: ");
-            }
-        });
+//        Observable.zip(
+//                toDeviceChangeAccessPointObservable(new ChangeAccessPointRequest(device.getName1(), password, ssid, device.getStyle()), device.getIp())
+//                        .doOnNext(deviceBaseResponse -> {
+//                            Log.e(TAG, "Do on next for changing accessPoint: " + deviceBaseResponse);
+//                        }),
+//                editDeviceObservable(new EditDeviceRequest(device.getId(), device.getGroupId(), device.getName1(), device.getType(), ssid)).subscribeOn(Schedulers.io()).doOnNext(deviceResponse -> {
+//                    Log.e(TAG, "000000000 DeviceResponse: " + deviceResponse);
+//                }), (deviceBaseResponse, deviceResponse) -> {
+//                    Log.e(TAG, "ChangeAccessPointResponse: " + deviceBaseResponse);
+//                    Log.e(TAG, "DeviceResponse: " + deviceResponse);
+//                    if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR)){
+//                        if (deviceResponse.getData().getMessage() != null)
+//                            return deviceResponse.getData().getMessage();
+//                        else return AppConstants.ERROR;
+//                    }
+//                    if (deviceResponse.getData().getMessage()!=null && deviceResponse.getData().getMessage().toLowerCase().contains(AppConstants.FORBIDDEN)){
+//                        return AppConstants.FORBIDDEN;
+//                    }
+//                    if (deviceBaseResponse.getCmd().contains(AppConstants.CHANGE_NAME_FALSE)){
+//                        return AppConstants.CHANGE_NAME_FALSE;
+//                    }
+//                    return AppConstants.OPERATION_DONE;
+//                }
+//        ).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Observer<String>() {
+//            @Override
+//            public void onSubscribe(Disposable d) {
+//                Log.e(TAG, "OnSubscribe whole zip change accessPoint");
+//            }
+//
+//            @Override
+//            public void onNext(String s) {
+//                Log.e(TAG, "OnNext Change AccessPoint: " + s);
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                Log.e(TAG, "onError Change AccessPoint: " + e);
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//                Log.e(TAG, "onComplete Change AccessPoint: ");
+//            }
+//        });
 
         return results;
     }
-    private Observable<DeviceBaseResponse> toDeviceChangeAccessPointObservable(ChangeAccessPointRequest changeAccessPointRequest, String ip){
+    private Observable<Response<ChangeAccessPointResponse>> toDeviceChangeAccessPointObservable(Device device, ChangeAccessPointRequest changeAccessPointRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .changeAccessPoint(AppConstants.getDeviceAddress(ip), changeAccessPointRequest)
+                .changeAccessPoint(AppConstants.sha1(changeAccessPointRequest.ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), changeAccessPointRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -561,23 +886,86 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
 
-    public LiveData<String> toDeviceEndSettings(String ip){
-        final MutableLiveData<String> results = new MutableLiveData<>();
-        toDeviceEndSettingsObservable(new BaseRequest(AppConstants.END_SETTINGS), ip).subscribe(toDeviceEndSettingsObserver(results));
-        return results;
+    public LiveData<String> toDeviceEndSettings(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        final MutableLiveData<String> result = new MutableLiveData<>();
+        Observable.just(device)
+                .flatMap(new Function<Device, Observable<Response<EndSettingsResponse>>>() {
+                    @Override
+                    public Observable<Response<EndSettingsResponse>> apply(Device device) throws Exception {
+                        return toDeviceEndSettingsObservable(device, new EndSettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())));
+                    }
+                })
+                .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
+                .takeWhile(settingsResponseResponse ->{
+                    Log.e("rerererererere", "Toggle Device Response: " + settingsResponseResponse);
+                    Log.e("rerererererere", "Auth: " + settingsResponseResponse.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + settingsResponseResponse.body().ToString());
+                    Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
+                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(settingsResponseResponse.body().ToString(), device.getSecret()));
+                    if (settingsResponseResponse.headers().get("auth") != null){
+                        Log.e("rererererere", "Auth Is Not NUll");
+                        if (AppConstants.sha1(settingsResponseResponse.body().ToString(), device.getSecret()).equals(settingsResponseResponse.headers().get("auth"))
+                                || AppConstants.sha1(settingsResponseResponse.body().wrongToString(), device.getSecret()).equals(settingsResponseResponse.headers().get("auth"))){
+                            Log.e("rererererere", "HMACs Are Equal");
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(settingsResponseResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
+                            device.setHeader(Encryptor.decrypt(settingsResponseResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                            Log.e("TAGTAGTAG", "Should I go: " + settingsResponseResponse.body().getCmd());
+                            if (settingsResponseResponse.body().getCmd().equals("wrong_stword"))
+                                return true;
+                            else{
+                                Device deviceToUpdate = new Device(device);
+                                deviceDatabase.updateDevice(deviceToUpdate);
+                                result.postValue(AppConstants.END_SETTINGS);
+                                return false;
+                            }
+                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+                    }else Log.e("rererererere", "Auth IS NULL");
+                    return false;
+                }).timeout(4, TimeUnit.SECONDS)
+                .retry(3)
+                .subscribe(new Observer<Response<EndSettingsResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
+                    }
+
+                    @Override
+                    public void onNext(Response<EndSettingsResponse> endSettingsResponseResponse) {
+                        Log.d(TAG, "onNext() called with: endSettingsResponseResponse = [" + endSettingsResponseResponse + "]");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("//////////", "/onError/////" + e + e.getClass());
+                        if (e instanceof SocketTimeoutException || e instanceof TimeoutException){
+                            result.postValue(AppConstants.SOCKET_TIME_OUT);
+                        }
+                        result.postValue(e.toString());
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete() called");
+                    }
+                });
+        return result;
     }
-    private Observable<DeviceBaseResponse> toDeviceEndSettingsObservable(BaseRequest baseRequest, String ip){
+
+    private Observable<Response<EndSettingsResponse>> toDeviceEndSettingsObservable(Device device, EndSettingsRequest endSettingsRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .endSettings(AppConstants.getDeviceAddress(ip), baseRequest)
+                .endSettings(AppConstants.sha1(endSettingsRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()), endSettingsRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    private DisposableObserver<DeviceBaseResponse> toDeviceEndSettingsObserver(MutableLiveData<String> results){
-        return new DisposableObserver<DeviceBaseResponse>() {
+
+    private DisposableObserver<EndSettingsResponse> toDeviceEndSettingsObserver(MutableLiveData<String> results){
+        return new DisposableObserver<EndSettingsResponse>() {
 
             @Override
-            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
+            public void onNext(@NonNull EndSettingsResponse baseResponse) {
                 Log.e(TAG,"OnNext "+baseResponse);
                 results.postValue(baseResponse.getCmd());
             }
@@ -649,18 +1037,80 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return code;
     }
 
-    public LiveData<String> toDeviceReady4Update(String ip ){
-        final MutableLiveData<String> results = new MutableLiveData<>();
-        toDeviceReady4UpdateObservable(new BaseRequest(AppConstants.DEVICE_IS_READY_FOR_UPDATE),ip).subscribe(toDeviceReady4UpdateObserver(results));
-        return results;
+    public LiveData<String> toDeviceReady4Update(Device device){
+        final MutableLiveData<String> result = new MutableLiveData<>();
+        Observable.just(device).
+                flatMap(new Function<Device, Observable<Response<UpdateResponse>>>() {
+                    @Override
+                    public Observable<Response<UpdateResponse>> apply(Device device) throws Exception {
+                        return toDeviceReady4UpdateObservable(new UpdateRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())),device);
+                    }
+                }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
+                .takeWhile(toggleDeviceResponse ->{
+                    Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
+                    Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                    Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
+                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
+                    if (toggleDeviceResponse.headers().get("auth") != null){
+                    Log.e("rererererere", "Auth Is Not NUll");
+                        if (AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                    Log.e("rererererere", "HMACs Are Equal");
+                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
+                    device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                    Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
+                    if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                        return true;
+                    else{
+                        Device deviceToUpdate = new Device(device);
+                        deviceDatabase.updateDevice(deviceToUpdate);
+                        result.postValue(AppConstants.DEVICE_READY_FOR_UPDATE);
+                        return false;
+                    }
+                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+                    }else Log.e("rererererere", "Auth IS NULL");
+                    return false;
+                }).timeout(4, TimeUnit.SECONDS)
+                .subscribe(new Observer<Response<UpdateResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Response<UpdateResponse> updateResponseResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        result.postValue(AppConstants.ERROR);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+        return result;
     }
 
-    private Observable<DeviceBaseResponse> toDeviceReady4UpdateObservable(BaseRequest baseRequest, String ip){
+    private Observable<Response<UpdateResponse>> toDeviceReady4UpdateObservable(UpdateRequest baseRequest, Device device){
         ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .deviceUpdate(AppConstants.getDeviceAddress(ip), baseRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        try {
+            return apiService
+                    .deviceUpdate(AppConstants.sha1(baseRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()), baseRequest)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private DisposableObserver<DeviceBaseResponse> toDeviceReady4UpdateObserver(MutableLiveData<String> results){

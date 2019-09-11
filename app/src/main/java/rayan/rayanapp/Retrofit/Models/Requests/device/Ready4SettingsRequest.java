@@ -1,6 +1,10 @@
 package rayan.rayanapp.Retrofit.Models.Requests.device;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Util.AppConstants;
@@ -22,6 +26,8 @@ public class Ready4SettingsRequest extends BaseRequest{
     }
 
     public String ToString(){
-        return new Gson().toJson(this, Ready4SettingsRequest.class);
+        String s = new GsonBuilder().disableHtmlEscaping().create().toJson(this);
+        Log.e("><><><", "Gson: " + s);
+        return s;
     }
 }

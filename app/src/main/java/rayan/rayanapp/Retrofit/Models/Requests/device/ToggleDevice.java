@@ -1,5 +1,8 @@
 package rayan.rayanapp.Retrofit.Models.Requests.device;
 
+import android.util.Log;
+
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import rayan.rayanapp.App.RayanApplication;
@@ -12,12 +15,19 @@ public class ToggleDevice extends BaseRequest{
         this.setCmd(cmd);
     }
 
+//    public String ToString(){
+//        JsonObject jsonObject = new JsonObject();
+//        jsonObject.addProperty("stword", stword);
+//        jsonObject.addProperty("cmd", getCmd());
+//        jsonObject.addProperty("src", getSrc());
+//        return jsonObject.toString();
+//    }
+
+
     public String ToString(){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("stword", stword);
-        jsonObject.addProperty("cmd", getCmd());
-        jsonObject.addProperty("src", getSrc());
-        return jsonObject.toString();
+        String s = new GsonBuilder().disableHtmlEscaping().create().toJson(this);
+        Log.e("><><><", "Gson: " + s);
+        return s;
     }
 
     //    public ToggleDevice(String cmd, String stword,String lc) {

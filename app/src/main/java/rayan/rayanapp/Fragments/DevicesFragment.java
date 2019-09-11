@@ -87,6 +87,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         devicesObserver = new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {
+                if (DevicesFragment.this.finalDevices.size() == 0 && devices.size() > 0)
+                    deviceAnimator.setItemWidth(DevicesFragment.this);
                 DevicesFragment.this.devices = devices;
                 finalDevices = new ArrayList<>();
                 String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
@@ -132,8 +134,10 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         activity = getActivity();
 
         Device d = devicesFragmentViewModel.getDevice("222222");
-        d.setIp("192.168.1.105");
-        devicesFragmentViewModel.updateDevice(d);
+        if (d != null) {
+            d.setIp("192.168.1.105");
+            devicesFragmentViewModel.updateDevice(d);
+        }
     }
 
     @Override

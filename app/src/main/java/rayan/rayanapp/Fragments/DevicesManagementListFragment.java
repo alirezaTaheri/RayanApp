@@ -44,6 +44,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     CoordinatorLayout coordinatorLayout;
     DevicesManagementRecyclerViewAdapter devicesRecyclerViewAdapterManagement;
     List<Device> devices = new ArrayList<>();
+    List<Device> favoriteDevices = new ArrayList<>();
     DevicesManagementListFragmentViewModel devicesManagementListFragmentViewModel;
     ClickOnDevice sendDevice;
     List<String> waiting = new ArrayList<>();
@@ -71,8 +72,11 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         devicesRecyclerViewAdapterManagement.setListener(this);
         devicesManagementListFragmentViewModel = ViewModelProviders.of(this).get(DevicesManagementListFragmentViewModel.class);
         devicesManagementListFragmentViewModel.getAllDevicesLive().observe(this, devices -> {
-            devicesRecyclerViewAdapterManagement.updateItems(devices);
             Log.e("devdevdevdev: ", ": " + devices);
+            devicesRecyclerViewAdapterManagement.updateItems(devices);
+            for (Device d: devices)
+                if (d.isFavorite())
+                    favoriteDevices.add(d);
         });
         fragmentManager = getActivity().getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
@@ -155,6 +159,10 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     public void onFavoriteIconClicked(Device item) {
         Device deviceToUpdate = new Device(item);
         deviceToUpdate.setFavorite(!item.isFavorite());
+        if (deviceToUpdate.isFavorite())
+            deviceToUpdate.setFavoritePosition(favoriteDevices.size());
+        else if (!deviceToUpdate.isFavorite())
+            deviceToUpdate.setFavoritePosition(-1);
         devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
         if (deviceToUpdate.isFavorite()){
             Toast.makeText(getActivity(),item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();

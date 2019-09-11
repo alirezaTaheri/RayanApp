@@ -6,9 +6,13 @@ import android.view.ViewGroup;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import rayan.rayanapp.Helper.Encryptor;
 
 public class AppConstants {
     public final static String MQTT = "mqtt";
@@ -31,6 +35,7 @@ public class AppConstants {
 //    public final static int MQTT_PORT = 1883;
 //    public final static String MQTT_HOST = "api2.mahdiesrafili.ir";
     public final static String MQTT_HOST = "api2.rayansmarthome.ir";
+//    public final static String MQTT_HOST = "api3.mahdiesrafili.ir";
 //    public final static String MQTT_HOST = "157.119.190.160";
     public final static int MQTT_PORT = 8883;
     //New Devices
@@ -62,6 +67,7 @@ public class AppConstants {
     public final static String TO_DEVICE_NOT_VERIFY = "not_verify";
     public final static String FROM_DEVICE_VERIFY_DONE = "verify_done";
     public final static String OPERATION_DONE = "Done";
+    public final static String DEVICE_TOGGLE = "tgl";
     public final static String ERROR = "error";
     public final static String FORBIDDEN = "Forbidden";
     public final static int MOBILE_DATA = 0;
@@ -73,6 +79,10 @@ public class AppConstants {
     public final static int NOT_CONNECTED_NETWORK = -1;
     public final static String NO_HTTP = "no_http";
 
+
+    public final static String STWORD = "stword";
+    public final static String STWORD_HEADER = "header#stword";
+    public final static String UNKNOWN_HEADER = "Unknown_header";
     //Operations
     public final static String ON_1 = "turn_on_1";
     public final static String ON_2 = "turn_on_2";
@@ -91,6 +101,7 @@ public class AppConstants {
      * Device Settings
      */
     public final static String CHANGE_NAME_FALSE = "change_hname_false";
+    public final static String CHANGE_NAME_TRUE = "change_hname_true";
     public final static String SOCKET_TIME_OUT = "SocketTimeoutException";
     public final static String CONNECT_EXCEPTION = "ConnectException";
     public final static String UNKNOWN_EXCEPTION = "UnknownException";
@@ -99,6 +110,7 @@ public class AppConstants {
     public final static String END_SETTINGS = "end_settings";
     public final static String SET_TOPIC_MQTT = "MQTT";
     public final static String CHANGE_WIFI = "change_wifi";
+    public final static String CHANGING_WIFI = "changing_wifi";
     public final static String SET_TOPIC_MQTT_Response = "MQTTR";
     public final static String DEVICE_CONNECTED_STYLE = "connected";
     public final static String DEVICE_STANDALONE_STYLE = "standalone";
@@ -142,8 +154,8 @@ public class AppConstants {
     public final static String ERROR_OCCURRED = "error_occurred";
 
     public static String getDeviceAddress(String ip){
-//        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-        return "http://192.168.1.105/test.php";
+        return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
+//        return "http://192.168.1.105/test.php";
     }
 
     public static void disableEnableControls(boolean enable, ViewGroup vg){
@@ -169,4 +181,12 @@ public class AppConstants {
 
         return new String( org.apache.commons.net.util.Base64.encodeBase64(bytes) );
     }
+
+    public static Map<String, String> separateStword(String stword, String secret, String header){
+        Map<String, String> data = new HashMap<>();
+        data.put(STWORD, Encryptor.decrypt(stword, secret));
+        data.put(STWORD_HEADER, header.concat("#").concat(Encryptor.decrypt(stword, secret)));
+        return data;
+    }
+
 }

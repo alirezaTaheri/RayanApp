@@ -1,6 +1,7 @@
 package rayan.rayanapp.Helper;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -24,9 +25,13 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
@@ -108,7 +113,7 @@ public class SendMessageToDevice {
                         try {
                             lastMessage = rayanApplication.getMqttMessagesController().getLastMessageOfDevice(device.getChipId());
                             List<String> arguments = new ArrayList<>();
-                            arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
+                            arguments.add(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret()));
                             arguments.add(Boolean.toString(animation));
                             if (lastMessage != null){
                                 if (!lastMessage.has("lc")){
@@ -168,7 +173,7 @@ public class SendMessageToDevice {
                 }
             });
         List<String> arguments = new ArrayList<>();
-        arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
+        arguments.add(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret()));
         arguments.add(Boolean.toString(animation));
         Log.e(TAG, "Need MQTT-Backup? : " + (!animation));
         publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,arguments).toString(), 0, false);
@@ -225,7 +230,7 @@ public class SendMessageToDevice {
                         try {
                             lastMessage = rayanApplication.getMqttMessagesController().getLastMessageOfDevice(device.getChipId());
                             List<String> arguments = new ArrayList<>();
-                            arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
+                            arguments.add(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret()));
                             arguments.add(Boolean.toString(animation));
                             if (lastMessage != null){
                                 if (!lastMessage.has("lc")){
@@ -280,7 +285,7 @@ public class SendMessageToDevice {
                 }
             });
         List<String> arguments = new ArrayList<>();
-        arguments.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
+        arguments.add(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret()));
         arguments.add(Boolean.toString(animation));
         Log.e(TAG, "Need MQTT-Backup? : " + (!animation));
         publishMqtt(device.getChipId(), rayanApplication, MainActivityViewModel.connection.getValue(), device.getTopic().getTopic(), rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,arguments).toString(), 0, false);
@@ -424,7 +429,8 @@ public class SendMessageToDevice {
                              device.setPin2(yesResponse.getPin2());
                              device.setSsid(yesResponse.getSsid());
                              device.setStyle(yesResponse.getStyle());
-                             device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(yesResponse.getStword(),device.getSecret()).split("#")[0])+1));
+                             device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(yesResponse.getStword(),device.getSecret()).split("#")[1])+1));
+                             device.setHeader(Encryptor.decrypt(yesResponse.getStword(),device.getSecret()).split("#")[0]);
                              device.setIp(ip);
                              deviceDatabase.updateDevice(device);
                          }
@@ -443,21 +449,39 @@ public class SendMessageToDevice {
                  });
     }
     @SuppressLint("CheckResult")
-    private Observable<Response<ToggleDeviceResponse>> toDeviceHttpPin1(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-         return apiService.togglePin1(sha1(new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
-                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
+    private Observable<Response<ToggleDeviceResponse>> toDeviceHttpPin1(Device device) {
+        try {
+            return apiService.togglePin1(sha1(new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
+                   .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 //                long sendTime;
     @SuppressLint("CheckResult")
-    private Observable<Response<ToggleDeviceResponse>> toDeviceHttpPin2(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-         return apiService.togglePin1(sha1(new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret())))
-                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
+    private Observable<Response<ToggleDeviceResponse>> toDeviceHttpPin2(Device device)  {
+        try {
+            return apiService.togglePin1(sha1(new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
+                   .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     HashMap<String , Disposable> mqttBackup = new HashMap<>();
     HashMap<String , Disposable> lastCommand = new HashMap<>();
     @SuppressLint("CheckResult")
-    private void sendHttpPin1(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position, boolean withBackup){
+    private void sendHttpPin1(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position, boolean withBackup)  {
         Log.e("******","\nsendToThisDevice " + device);
         if (withBackup && rayanApplication.getMtd().getListOfAvailableRouts(device.getChipId()).contains(MessageTransmissionDecider.PROTOCOL.MQTT))
         Observable.interval(0,700, TimeUnit.MILLISECONDS)
@@ -491,62 +515,49 @@ public class SendMessageToDevice {
                 Log.e(TAG, "onComplete  Timer executed for Mqtt Backup pin 1");
             }
         });
-        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
-                Observable.just(1).flatMap(a -> {
-                    Log.e("TAGTAGTAGTAG", "Sending stword is: " + device.getStatusWord());
-                    return toDeviceHttpPin1(device);
+        Observable.just(device)
+                .flatMap(new Function<Device, Observable<Response<ToggleDeviceResponse>>>() {
+                    @Override
+                    public Observable<Response<ToggleDeviceResponse>> apply(Device device) throws Exception {
+                        return toDeviceHttpPin1(device);
+                    }
                 })
-                .repeatWhen(completed -> {
-                    Log.e("TAGTAGTAG", "repeatwhen: " + completed);
-                    return completed.delay(200, TimeUnit.MILLISECONDS);
-                })
-                        .takeWhile(toggleDeviceResponse -> {
-                            Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
-                            Log.e("rerererererere", "Headers: " + toggleDeviceResponse.headers());
-                            Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
-                            Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
-                            Log.e("rerererererere", "HMAC of Body: " + sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
-                            if (toggleDeviceResponse.headers().get("auth") != null){
-                                Log.e("rererererere", "Auth Is Not NUll");
-                                if (sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
-                                    Log.e("rererererere", "HMACs Are Equal");
-                                    if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
-                                        mqttBackup.get(device.getChipId()+"_1").dispose();
-                                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0])+1));
-                                    Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
-                                    if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
-                                        return true;
-                                    else{
-                                        Device deviceToUpdate = new Device(device);
-                                        deviceToUpdate.setPin1(toggleDeviceResponse.body().getPin1());
-                                        deviceToUpdate.setPin2(toggleDeviceResponse.body().getPin2());
-                                        Log.e("******",
-                                                "\ndataBaseDevice: " + deviceDatabase.getDevice(device.getChipId())+
-                                                        "\nreplacing this Device: " + device +
-                                                        "\nreplacing this Device: " + deviceToUpdate
-                                        );
-                                        deviceDatabase.updateDevice(deviceToUpdate);
-//                        fragment.stopToggleAnimationPin1(device.getChipId());
-                                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
-                                        return false;
-                                    }
-                                }else Log.e("rererererere", "HMACs Are NOT Equal");
-                            }else Log.e("rererererere", "Auth IS NULL");
-                            return false;
-                })
-                ,
-                (changeNameResponse, deviceResponse) -> {
-            return changeNameResponse;})
-                .timeout(4, TimeUnit.SECONDS)
-                .takeWhile(aLong ->{
-                    return aLong<1;
-                })
+                .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
+                .takeWhile(toggleDeviceResponse ->{
+                    Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
+                    Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                    Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
+                    Log.e("rerererererere", "HMAC of Body: " + sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
+                    if (toggleDeviceResponse.headers().get("auth") != null){
+                        Log.e("rererererere", "Auth Is Not NUll");
+                        if (sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                            Log.e("rererererere", "HMACs Are Equal");
+                            if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
+                                mqttBackup.get(device.getChipId()+"_1").dispose();
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
+                            device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
+                            if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                                return true;
+                            else if (toggleDeviceResponse.body().getCmd().equals(AppConstants.DEVICE_TOGGLE)){
+                                Device deviceToUpdate = new Device(device);
+                                deviceToUpdate.setPin1(toggleDeviceResponse.body().getPin1());
+                                deviceToUpdate.setPin2(toggleDeviceResponse.body().getPin2());
+                                deviceDatabase.updateDevice(deviceToUpdate);
+                                rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
+                                return false;
+                            }
+                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+                    }else Log.e("rererererere", "Auth IS NULL");
+                    return false;
+                }).timeout(4, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
-                .subscribe(new Observer<Long>() {
+                .subscribe(new Observer<Response<ToggleDeviceResponse>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onSubscribe");
-//                        fragment.startToggleAnimationPin1(device.getChipId(), position);
+                        Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
                         if (device.getPin1().equals(AppConstants.ON_STATUS))
                             fragment.getDeviceAnimator().turningOffPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
                         else fragment.getDeviceAnimator().turningOnPin1(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
@@ -555,12 +566,13 @@ public class SendMessageToDevice {
                     }
 
                     @Override
-                    public void onNext(Long aLong) {
-                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onNext: " + aLong);
+                    public void onNext(Response<ToggleDeviceResponse> toggleDeviceResponseResponse) {
+                        Log.d(TAG, "onNext() called with: toggleDeviceResponseResponse = [" + toggleDeviceResponseResponse + "]");
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        Log.d(TAG, "onError() called with: e = [" + e + "]");
                         if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
                             mqttBackup.get(device.getChipId()+"_1").dispose();
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onError: " + e);
@@ -572,6 +584,7 @@ public class SendMessageToDevice {
 
                     @Override
                     public void onComplete() {
+                        Log.d(TAG, "onComplete() called");
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onComplete ");
                         if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
                             mqttBackup.get(device.getChipId()+"_1").dispose();
@@ -581,7 +594,7 @@ public class SendMessageToDevice {
                     }
                 });
     }
-    private void sendHttpPin2(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position, boolean withBackup){
+    private void sendHttpPin2(Device device, RayanApplication rayanApplication, ToggleDeviceAnimationProgress fragment, int position, boolean withBackup)  {
         if (withBackup && rayanApplication.getMtd().getListOfAvailableRouts(device.getChipId()).contains(MessageTransmissionDecider.PROTOCOL.MQTT))
             Observable.interval(0,700, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
@@ -614,56 +627,52 @@ public class SendMessageToDevice {
                     Log.e(TAG, "onComplete  Timer executed for Mqtt Backup pin 2");
                 }
             });
-        Observable.zip(Observable.interval(0, AppConstants.HTTP_MESSAGING_TIMEOUT, TimeUnit.MILLISECONDS),
-                Observable.just(1).flatMap(a -> {
-                    Log.e("TAGTAGTAGTAG", "Sending stword is: " + device.getStatusWord());
-                    return toDeviceHttpPin2(device);
+        Observable.just(device)
+                .flatMap(new Function<Device, Observable<Response<ToggleDeviceResponse>>>() {
+                    @Override
+                    public Observable<Response<ToggleDeviceResponse>> apply(Device device) throws Exception {
+                        return toDeviceHttpPin2(device);
+                    }
                 })
-                .repeatWhen(completed -> {
-                    Log.e("TAGTAGTAG", "Should I go in repeatwhen: " + completed);
-                    return completed.delay(200, TimeUnit.MILLISECONDS);
-                })
-                        .takeWhile(toggleDeviceResponse -> {
-                            Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
-                            Log.e("rerererererere", "Headers: " + toggleDeviceResponse.headers());
-                            Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
-                            Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
-                            Log.e("rerererererere", "HMAC of Body: " + sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
-                            if (toggleDeviceResponse.headers().get("auth") != null) {
-                                Log.e("rererererere", "Auth Is Not NUll");
-                                if (sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))) {
-                                    Log.e("rererererere", "HMACs Are Equal");
-                                    if (mqttBackup.get(device.getChipId() + "_2") != null && !mqttBackup.get(device.getChipId() + "_2").isDisposed())
-                                        mqttBackup.get(device.getChipId() + "_2").dispose();
-                                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(), device.getSecret()).split("#")[0]) + 1));
-                                    Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
-                                    if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
-                                        return true;
-                                    else {
-                                        Device deviceToUpdate = new Device(device);
-                                        deviceToUpdate.setPin1(toggleDeviceResponse.body().getPin1());
-                                        deviceToUpdate.setPin2(toggleDeviceResponse.body().getPin2());
-                                        Log.e("DeviceAnimator", "Congradulations: " + deviceToUpdate);
-                                        deviceDatabase.updateDevice(deviceToUpdate);
+                .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
+                .takeWhile(toggleDeviceResponse -> {
+                    Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
+                    Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                    Log.e("rerererererere", "Sending Stword is: " + device.getStatusWord());
+                    Log.e("rerererererere", "HMAC of Body: " + sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
+                    if (toggleDeviceResponse.headers().get("auth") != null) {
+                        Log.e("rererererere", "Auth Is Not NUll");
+                        if (sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))) {
+                            Log.e("rererererere", "HMACs Are Equal");
+                            if (mqttBackup.get(device.getChipId() + "_2") != null && !mqttBackup.get(device.getChipId() + "_2").isDisposed())
+                                mqttBackup.get(device.getChipId() + "_2").dispose();
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(), device.getSecret()).split("#")[1]) + 1));
+                            device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
+                            if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                                return true;
+                            else if (toggleDeviceResponse.body().getCmd().equals(AppConstants.DEVICE_TOGGLE)){
+                                Device deviceToUpdate = new Device(device);
+                                deviceToUpdate.setPin1(toggleDeviceResponse.body().getPin1());
+                                deviceToUpdate.setPin2(toggleDeviceResponse.body().getPin2());
+                                Log.e("DeviceAnimator", "Congradulations: " + deviceToUpdate);
+                                deviceDatabase.updateDevice(deviceToUpdate);
 //                        fragment.stopToggleAnimationPin2(device.getChipId());
-                                        rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
-                                        return false;
-                                    }
-                                }else Log.e("rererererere", "HMACs Are NOT Equal");
-                            }else Log.e("rererererere", "Auth IS NULL");
-                            return false;
+                                rayanApplication.getDevicesAccessibilityBus().removeWaitingPin2(device.getChipId());
+                                return false;
+                            }
+                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+                    }else Log.e("rererererere", "Auth IS NULL");
+                    return false;
                 })
-                ,
-                (changeNameResponse, deviceResponse) -> {
-            return changeNameResponse;})
                 .timeout(4, TimeUnit.SECONDS)
-                .takeWhile(aLong -> aLong<1)
-                .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
-                .subscribe(new Observer<Long>() {
+                .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Response<ToggleDeviceResponse>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onSubscribe");
-//                        fragment.startToggleAnimationPin2(device.getChipId(), position);
+                        Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
                         if (device.getPin2().equals(AppConstants.ON_STATUS))
                             fragment.getDeviceAnimator().turningOffPin2(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
                         else fragment.getDeviceAnimator().turningOnPin2(device.getChipId(), position, (ToggleDeviceAnimationProgress)fragment, device.getType());
@@ -672,12 +681,13 @@ public class SendMessageToDevice {
                     }
 
                     @Override
-                    public void onNext(Long aLong) {
-                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz: onNext: " + aLong);
+                    public void onNext(Response<ToggleDeviceResponse> toggleDeviceResponseResponse) {
+                        Log.d(TAG, "onNext() called with: toggleDeviceResponseResponse = [" + toggleDeviceResponseResponse + "]");
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        Log.d(TAG, "onError() called with: e = [" + e + "]");
                         Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onError: " + e);
                         if (mqttBackup.get(device.getChipId()+"_2") != null && !mqttBackup.get(device.getChipId()+"_2").isDisposed())
                             mqttBackup.get(device.getChipId()+"_2").dispose();
@@ -689,7 +699,7 @@ public class SendMessageToDevice {
 
                     @Override
                     public void onComplete() {
-                        Log.e("zzzzzzzzzzzz","zzzzzzzzzzz:onComplete ");
+                        Log.d(TAG, "onComplete() called");
                         if (mqttBackup.get(device.getChipId()+"_2") != null && !mqttBackup.get(device.getChipId()+"_2").isDisposed())
                             mqttBackup.get(device.getChipId()+"_2").dispose();
 //                        fragment.stopToggleAnimationPin2(device.getChipId());
@@ -714,7 +724,7 @@ public class SendMessageToDevice {
                 //Toast.makeText(rayanApplication, "دستگاه فقط از طریق اتصال مستقیم قابل دسترسی است", Toast.LENGTH_SHORT).show();
                 break;
             case AppConstants.MESSAGE_ROUTE_HTTP:
-                sendHttpPin1(device, rayanApplication, fragment, position, RayanApplication.getPref().getIsNodeSoundOn());
+                    sendHttpPin1(device, rayanApplication, fragment, position, RayanApplication.getPref().getIsNodeSoundOn());
                 break;
             case "NONE":
                 Map<String,String> params = new HashMap<>();
@@ -724,7 +734,7 @@ public class SendMessageToDevice {
                 break;
         }
     }
-    public void toggleDevicePin2(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
+    public void toggleDevicePin2(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication)  {
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
         Log.e(TAG,"Be Chi Befrestam2? : " + cr);
         Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
@@ -761,5 +771,55 @@ public class SendMessageToDevice {
         byte[] bytes = mac.doFinal(s.getBytes("UTF-8"));
 
         return new String( Base64.encodeBase64(bytes) );
+    }
+
+    public Observable<Response<ToggleDeviceResponse>> synchStatusWord(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        return toDeviceHttpPin1(device).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                .repeatWhen(throwableObservable -> throwableObservable.delay(100, TimeUnit.MILLISECONDS))
+                .takeWhile(toggleDeviceResponseResponse -> {
+                    Log.e("?>?>?>?>?>?>", "cmd: " + toggleDeviceResponseResponse.body().getCmd() + (toggleDeviceResponseResponse.body().getCmd().equals("wrong_stword")));
+                    if (toggleDeviceResponseResponse.body().getCmd().equals("wrong_stword"))
+                        return true;
+                    else return false;
+                });
+    }
+
+    public void concatMan(Device device, RayanApplication activity){
+        try {
+            Observable.concat(synchStatusWord(device), new ObservableSource<Response<ToggleDeviceResponse>>() {
+                @Override
+                public void subscribe(Observer<? super Response<ToggleDeviceResponse>> observer) {
+                    observer.onComplete();
+                }
+            })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Response<ToggleDeviceResponse>>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
+                }
+
+                @Override
+                public void onNext(Response<ToggleDeviceResponse> toggleDeviceResponseResponse) {
+                    Log.e(TAG, "onNext() called with: toggleDeviceResponseResponse = [" + toggleDeviceResponseResponse + "]");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "onError() called with: e = [" + e + "]");
+                }
+
+                @Override
+                public void onComplete() {
+                    Toast.makeText(activity, "Done", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
     }
 }

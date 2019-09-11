@@ -2,24 +2,23 @@ package rayan.rayanapp.Retrofit.Models.Requests.device;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Util.AppConstants;
 
-public class FactoryResetRequest extends BaseRequest{
+public class EndSettingsRequest extends BaseRequest{
     private String stword;
 
-    public FactoryResetRequest(String stword) {
+    public EndSettingsRequest(String stword) {
         this.stword = stword;
-        this.setCmd(AppConstants.FACTORY_RESET);
+        this.setCmd(AppConstants.END_SETTINGS);
         this.setSrc(RayanApplication.getPref().getId());
     }
 
     @Override
     public String toString() {
-        return "Ready4SettingsRequest{" +
+        return "EndSettingsRequest{" +
                 "stword='" + stword + '\'' +
                 '}';
     }
