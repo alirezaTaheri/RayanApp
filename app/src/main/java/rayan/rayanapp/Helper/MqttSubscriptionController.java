@@ -1,5 +1,6 @@
 package rayan.rayanapp.Helper;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -11,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
-import rayan.rayanapp.ViewModels.MainActivityViewModel;
 
 public class MqttSubscriptionController {
     public List<String> dbTopics = new ArrayList<>();
@@ -21,9 +22,11 @@ public class MqttSubscriptionController {
     public List<String> subscribedTopics = new ArrayList<>();
     private final String TAG = "MqttSubConLevellll";
     DeviceDatabase deviceDatabase;
+    Application application;
     public MqttSubscriptionController(Context context) {
         deviceDatabase = new DeviceDatabase(context);
         Log.e(TAG, "created...");
+        application = (Application) context.getApplicationContext();
     }
 
     public void init(){
@@ -65,7 +68,7 @@ public class MqttSubscriptionController {
                     for (int a = 0; a < dbTopics.size(); a++) {
                         if (!subscribedTopics.contains(dbTopics.get(a))) {
                             int finalA = a;
-                            MainActivityViewModel.connection.getValue().getClient().subscribe(dbTopics.get(a), 0).setActionCallback(new IMqttActionListener() {
+                            MqttClientService.getMqttClientInstance(application).getConnection().getClient().subscribe(dbTopics.get(a), 0).setActionCallback(new IMqttActionListener() {
                                 @Override
                                 public void onSuccess(IMqttToken asyncActionToken) {
                                     Log.e(TAG, "Subscribed Successfully to: " + dbTopics.get(finalA));
@@ -99,7 +102,7 @@ public class MqttSubscriptionController {
                 for (int a = 0; a < newArrivedTopics.size(); a++) {
                     if (!subscribedTopics.contains(newArrivedTopics.get(a))) {
                         int finalA = a;
-                        MainActivityViewModel.connection.getValue().getClient().subscribe(newArrivedTopics.get(a), 0).setActionCallback(new IMqttActionListener() {
+                        MqttClientService.getMqttClientInstance(application).getConnection().getClient().subscribe(newArrivedTopics.get(a), 0).setActionCallback(new IMqttActionListener() {
                             @Override
                             public void onSuccess(IMqttToken asyncActionToken) {
                                 Log.e(TAG, "Fast Subscribed Successfully to: " + newArrivedTopics.get(finalA));

@@ -65,6 +65,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         fragmentManager = getSupportFragmentManager();
          transaction = fragmentManager.beginTransaction();
         DevicesManagementListFragment devicesManagementListFragment = DevicesManagementListFragment.newInstance();
+//        EditDeviceFragment devicesManagementListFragment = EditDeviceFragment.newInstance(viewModel.getDevice("222222"));
         transaction.replace(R.id.frameLayout, devicesManagementListFragment);
         transaction.commit();
         dp = new DialogPresenter(getSupportFragmentManager());

@@ -77,7 +77,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         userDatabase = new UserDatabase(application);
         membershipDatabase = new UserMembershipDatabase(application);
         executorService= Executors.newSingleThreadExecutor();
-        initSounds();
+//        initSounds();
     }
 
     public void addDevices(List<Device> devices){
@@ -283,7 +283,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             List<Group> oldGroups = groupDatabase.getAllGroups();
             List<User> oldUsers = userDatabase.getAllUsers();
             List<UserMembership> oldMemberships = membershipDatabase.getAllUserMemberships();
-            deviceDatabase.addDevices(newDevices);
+//            deviceDatabase.addDevices(newDevices);
 //            ((RayanApplication)getApplication()).getMtd().setDevices(newDevices);
             if (oldDevices != null){
                 for (int a = 0;a<oldDevices.size();a++){
@@ -294,6 +294,16 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     }
                     if (!exist) deviceDatabase.deleteDevice(oldDevices.get(a));
                 }
+            }
+            for (int a = 0; a<newDevices.size();a++){
+                Device newDevice = newDevices.get(a);
+                boolean exists = false;
+                for (int b = 0; b<oldDevices.size(); b++){
+                    if (newDevice.getChipId().equals(oldDevices.get(b).getChipId()))
+                        exists = true;
+                }
+                if (!exists)
+                    deviceDatabase.addDevice(newDevice);
             }
             if (oldUsers != null){
                 for (int a = 0;a<oldUsers.size();a++){
@@ -429,10 +439,10 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
     public void initSounds(){
         switchOnSound = new MediaPlayer();
-        switchOnPath = Uri.parse("android.resource://"+getApplication().getPackageName()+"/raw/sound_switch_on_3");
+        switchOnPath = Uri.parse("android.resource://"+getApplication().getPackageName()+"/raw/sound_switch_on_");
 
         switchOffSound = new MediaPlayer();
-        switchOffPath = Uri.parse("android.resource://"+getApplication().getPackageName()+"/raw/sound_switch_off");
+        switchOffPath = Uri.parse("android.resource://"+getApplication().getPackageName()+"/raw/sound_switch_off_");
         try {
             switchOnSound.setDataSource(getApplication(), switchOnPath);
             switchOnSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);

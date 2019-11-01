@@ -118,7 +118,8 @@ public class CreateScenarioFragment extends BottomSheetDialogFragment implements
         parent.setFitsSystemWindows(true);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(parent);
         view.measure(0, 0);
-        DisplayMetrics displaymetrics = new DisplayMetrics();        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int screenHeight = displaymetrics.heightPixels;
         bottomSheetBehavior.setPeekHeight(screenHeight);
         if (params.getBehavior() instanceof BottomSheetBehavior) {
@@ -218,7 +219,7 @@ public class CreateScenarioFragment extends BottomSheetDialogFragment implements
                             if (devices.size() == 0)
                                 devicesName.add(new ScenarioDeviceSpinnerItem("0","دستگاهی در این گروه وجود ندارد"));
                             else {
-                                devicesName.add(new ScenarioDeviceSpinnerItem("0", "همه دستگاه‌ها"));
+                                devicesName.add(new ScenarioDeviceSpinnerItem("1", "همه دستگاه‌ها"));
                                 for (Device d : devices)
                                     devicesName.add(new ScenarioDeviceSpinnerItem(d.getChipId(), d.getName1()));
                                 devicesName.add(new ScenarioDeviceSpinnerItem("0","دستگاه مورد نظر خود را انتخاب کنید"));
@@ -232,8 +233,8 @@ public class CreateScenarioFragment extends BottomSheetDialogFragment implements
                 }
                 break;
             case R.id.devicesSpinner:
-                if (parent.getSelectedItemPosition() < currentDevices.size()) {
-                    if (((ScenarioDeviceSpinnerItem)parent.getSelectedItem()).getId().equals("0")){
+//                if (parent.getSelectedItemPosition() < currentDevices.size()) {
+                    if (((ScenarioDeviceSpinnerItem)parent.getSelectedItem()).getId().equals("1")){
                         for (Device device: selectedGroup.getDevices()) {
                             boolean exist = false;
                             for (Device d : actions)
@@ -244,7 +245,7 @@ public class CreateScenarioFragment extends BottomSheetDialogFragment implements
                                 recyclerViewAdapter.updateItems(actions);
                             }
                         }
-                    }else {
+                    }else if (!((ScenarioDeviceSpinnerItem)parent.getSelectedItem()).getId().equals("0")){
                         selectedDevice = currentDevices.get(parent.getSelectedItemPosition()-1);
                         boolean exist = false;
                             for (Device d : actions)
@@ -255,7 +256,7 @@ public class CreateScenarioFragment extends BottomSheetDialogFragment implements
                                 recyclerViewAdapter.updateItems(actions);
                             }
                     }
-                }
+//                }
                 break;
         }
     }

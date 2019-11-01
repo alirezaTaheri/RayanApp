@@ -37,7 +37,8 @@ public class AppConstants {
     public final static String MQTT_HOST = "api2.rayansmarthome.ir";
 //    public final static String MQTT_HOST = "api3.mahdiesrafili.ir";
 //    public final static String MQTT_HOST = "157.119.190.160";
-    public final static int MQTT_PORT = 8883;
+    public final static int MQTT_PORT_SSL = 8883;
+    public final static int MQTT_PORT = 1883;
     //New Devices
     public final static String NEW_DEVICE_TYPE_SWITCH = "switch";
     public final static String NEW_DEVICE_TYPE_PLUG = "plug";
@@ -155,7 +156,7 @@ public class AppConstants {
 
     public static String getDeviceAddress(String ip){
         return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
-//        return "http://192.168.1.105/test.php";
+//        return "http://192.168.137.1/test.php";
     }
 
     public static void disableEnableControls(boolean enable, ViewGroup vg){

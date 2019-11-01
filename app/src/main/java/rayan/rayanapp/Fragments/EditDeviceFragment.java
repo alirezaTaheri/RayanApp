@@ -56,18 +56,16 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     int startIndex=0, packetSize =150;
     @BindView(R.id.name)
     EditText name;
-    @BindView(R.id.onlineAccessTextView)
-    TextView onlineAccess;
     @BindView(R.id.editDevice)
     TextView editDevice;
     @BindView(R.id.progressBar)
     ProgressBar editDeviceProgressBar;
-    @BindView(R.id.setTopicProgressBar)
-    ProgressBar setTopicProgressBar;
-    @BindView(R.id.setTopicIcon)
-    ImageView setTopicIcon;
-    @BindView(R.id.setTopic)
-    TextView setTopic;
+//    @BindView(R.id.setTopicProgressBar)
+//    ProgressBar setTopicProgressBar;
+//    @BindView(R.id.setTopicIcon)
+//    ImageView setTopicIcon;
+//    @BindView(R.id.setTopic)
+//    TextView setTopic;
     @BindView(R.id.changeAccessPoint)
     TextView changeAccessPoint;
     @BindView(R.id.changeAccessPointIcon)
@@ -76,6 +74,8 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     ProgressBar changeAccessPointProgressBar;
     EditDeviceFragmentViewModel editDeviceFragmentViewModel;
     Device device;
+    @BindView(R.id.deviceUpdate)
+    TextView deviceUpdateButton;
     public EditDeviceFragment() {
     }
 
@@ -132,6 +132,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_device, container, false);
         ButterKnife.bind(this, view);
+        deviceUpdateButton.setVisibility(View.GONE);
         init();
         editDeviceFragmentViewModel = ViewModelProviders.of(this).get(EditDeviceFragmentViewModel.class);
         name.addTextChangedListener(new TextWatcher() {
@@ -160,10 +161,10 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 
     public void init(){
         name.setText(device.getName1());
-        onlineAccess.setVisibility(device.isReady4Mqtt()? View.VISIBLE : View.INVISIBLE);
+//        onlineAccess.setVisibility(device.isReady4Mqtt()? View.VISIBLE : View.INVISIBLE);
     }
 
-    @OnClick(R.id.setTopic)
+//    @OnClick(R.id.setTopic)
     void createTopic(){
         setDeviceTopicStatus(TopicStatus.CHANGING);
         editDeviceFragmentViewModel.flatMqtt(device).observe(this, s -> {
@@ -427,15 +428,15 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
     }
 
     public void setDeviceTopicStatus(TopicStatus topicStatus){
-        if (topicStatus.equals(TopicStatus.CHANGING)){
-            setTopicIcon.setVisibility(View.INVISIBLE);
-            setTopicProgressBar.setVisibility(View.VISIBLE);
-            setTopic.setEnabled(false);
-        } else{
-            setTopic.setEnabled(true);
-            setTopicProgressBar.setVisibility(View.INVISIBLE);
-            setTopicIcon.setVisibility(View.VISIBLE);
-        }
+//        if (topicStatus.equals(TopicStatus.CHANGING)){
+//            setTopicIcon.setVisibility(View.INVISIBLE);
+//            setTopicProgressBar.setVisibility(View.VISIBLE);
+//            setTopic.setEnabled(false);
+//        } else{
+//            setTopic.setEnabled(true);
+//            setTopicProgressBar.setVisibility(View.INVISIBLE);
+//            setTopicIcon.setVisibility(View.VISIBLE);
+//        }
     }
     public void setChangeAccessPointStatus(ChangeAccessPointStatus changeAccessPointStatus){
         if (changeAccessPointStatus.equals(ChangeAccessPointStatus.CHANGING)){

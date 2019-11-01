@@ -12,4 +12,9 @@ public class ApiUtils {
     public static ApiService getApiService(){
         return RetrofitClient.getRetrofitInstance(BASE_URL).create(ApiService.class);
     }
+    public static ApiService getApiServiceScalar(){
+        return RetrofitClient.getRetrofitInstanceScalar(BASE_URL).create(ApiService.class);
+    }
+
+
 }

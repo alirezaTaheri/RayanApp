@@ -135,7 +135,7 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getPwd(),
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getName(),
                         AppConstants.MQTT_HOST,
-                        String.valueOf(AppConstants.MQTT_PORT),
+                        String.valueOf(AppConstants.MQTT_PORT_SSL),
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getTopic().getTopic(),
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getUsername(),
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getPassword(),

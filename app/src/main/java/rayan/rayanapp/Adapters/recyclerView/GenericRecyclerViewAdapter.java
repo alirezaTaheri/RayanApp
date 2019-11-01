@@ -62,10 +62,12 @@ public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListen
     }
 
     public void onItemMove(int fromPosition, int toPosition){
-        Log.e("!@#" , "old: " + items);
-        items.add(toPosition, items.remove(fromPosition));
-        notifyItemMoved(fromPosition, toPosition);
-        Log.e("!@#" , "new: " + items);
+        if (fromPosition != -1 && toPosition != -1) {
+            Log.e("!@#", "old: " + items);
+            items.add(toPosition, items.remove(fromPosition));
+            notifyItemMoved(fromPosition, toPosition);
+            Log.e("!@#", "new: " + items);
+        }else Log.e("GenericRecyclerAdapter", "Index Problem => from: " + fromPosition + " to: " +toPosition);
     }
 
     public void clear() {

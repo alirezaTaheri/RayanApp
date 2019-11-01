@@ -15,6 +15,9 @@ public class ConnectionStatusModel {
         this.state = state;
     }
 
+    public ConnectionStatusModel() {
+    }
+
     @Override
     public String toString() {
         return "ConnectionStatusModel{" +
@@ -39,5 +42,21 @@ public class ConnectionStatusModel {
 
     public NetworkInfo.State getState() {
         return state;
+    }
+
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public void setState(NetworkInfo.State state) {
+        this.state = state;
     }
 }

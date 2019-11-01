@@ -52,6 +52,7 @@ public class EditGroupFragment extends Fragment {
     public List<User> admins;
     public List<User> users;
     ArrayList<String> adminsUserNames = new ArrayList<>();
+    ArrayList<String> usersUserName = new ArrayList<>();
     private final String TAG = EditGroupFragment.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     @BindView(R.id.managersRecyclerView)
@@ -87,13 +88,20 @@ public class EditGroupFragment extends Fragment {
                     devicesRecyclerViewAdapter.setItems(devices);
                 }
             });
+            editGroupFragmentViewModel.getJustAdminsInGroup(getArguments().getString("id")).observe(this, new Observer<List<User>>() {
+                @Override
+                public void onChanged(@Nullable List<User> users) {
+                    for (int a = 0; a<users.size();a++)
+                        adminsUserNames.add(users.get(a).getUsername());
+                }
+            });
             editGroupFragmentViewModel.getAllUsersInGroupLive(getArguments().getString("id")).observe(this, new Observer<List<User>>() {
                 @Override
                 public void onChanged(@Nullable List<User> users) {
                     EditGroupFragment.this.users = users;
                     int temp = 0;
                     for (int i = 0; i <EditGroupFragment.this.users.size(); i++) {
-                        adminsUserNames.add(EditGroupFragment.this.users.get(i).getUsername());
+                        usersUserName.add(EditGroupFragment.this.users.get(i).getUsername());
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                             EditGroupFragment.this.users.get(i).setContactNameOnPhone(editGroupFragmentViewModel.getContactNameFromPhone(users.get(i).getUsername(), activity));
                             EditGroupFragment.this.users.get(i).setContactImageOnPhone(editGroupFragmentViewModel.getContactImageFromPhone(users.get(i).getUsername(), activity));
@@ -122,7 +130,7 @@ public class EditGroupFragment extends Fragment {
                 ((GroupsActivity) activity).toolbarNameChanged(group.getName());
             });
         }
-        usersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(activity,adminsUserNames,"");
+        usersRecyclerViewAdapter = new AdminsRecyclerViewAdapter(activity,usersUserName,"");
         devicesRecyclerViewAdapter = new GroupDevicesRecyclerViewAdapter(activity, new ArrayList<>());
         setHasOptionsMenu(true);
     }

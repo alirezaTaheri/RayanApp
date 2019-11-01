@@ -40,10 +40,10 @@ public class SettingssActivity extends AppCompatActivity {
         soundswitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 RayanApplication.getPref().setIsNodeSoundOn(true);
-                Toast.makeText(SettingssActivity.this, RayanApplication.getPref().getIsNodeSoundOn() + "", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "صدای دستگاه‌ها فعال شد", Toast.LENGTH_SHORT).show();
             } else {
                 RayanApplication.getPref().setIsNodeSoundOn(false);
-                Toast.makeText(SettingssActivity.this, RayanApplication.getPref().getIsNodeSoundOn() + "", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"صدای دستگاه‌ها غیر‌فعال شد", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -24,15 +24,20 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.CustomResponse;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.Encryptor;
+import rayan.rayanapp.Helper.RayanUtils;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
+import retrofit2.Call;
 import retrofit2.Response;
+import retrofit2.adapter.rxjava2.Result;
 
 public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewModel {
 
@@ -80,10 +85,10 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
         return result;
     }
 
-    public Observable<Response<Ready4SettingsResponse>> setReady4SettingsObservable(Device device) {
+    public Observable<Response<String>> setReady4SettingsObservable(Device device) {
         Log.e(TAG, "device: " + device);
         try {
-            return ApiUtils.getApiService().settings(AppConstants.sha1(new Ready4SettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
+            return ApiUtils.getApiServiceScalar().settings(AppConstants.sha1(new Ready4SettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
                     .subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -100,9 +105,9 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
         Log.e("//////////","Sending ready to device: " + device);
         MutableLiveData<String> result = new MutableLiveData<>();
             Observable.just(device)
-                    .flatMap(new Function<Device, Observable<Response<Ready4SettingsResponse>>>() {
+                    .flatMap(new Function<Device, Observable<Response<String>>>() {
                         @Override
-                        public Observable<Response<Ready4SettingsResponse>> apply(Device ready4SettingsResponse) throws Exception {
+                        public Observable<Response<String>> apply(Device ready4SettingsResponse) throws Exception {
                             Log.d(TAG, "apply() called with: upstream = [" + ready4SettingsResponse + "]");
                             Log.d(TAG, "StatusWord: " + ready4SettingsResponse.getStatusWord());
                             return setReady4SettingsObservable(device);
@@ -110,57 +115,45 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
                     })
                     .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                     .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
-                    .takeWhile(ready4SettingsResponse -> {
-                        Log.e("rerererererere", "Toggle Device Response: " + ready4SettingsResponse);
-//                        Log.e("TAGTAGTAG", "Should I go: " + ready4SettingsResponse.body());
-//                        Log.e("TAGTAGTAG", "raw: " + ready4SettingsResponse.raw());
-//                        Log.e("TAGTAGTAG", "raw.body: " + ready4SettingsResponse.raw().body());
-//                        Log.e("TAGTAGTAG", "raw.netResponse: " + ready4SettingsResponse.raw().networkResponse());
-//                        Log.e("TAGTAGTAG", "raw.body.string: " + ready4SettingsResponse.raw().body().string());
-//                        Log.e("TAGTAGTAG", "toString: " + ready4SettingsResponse.raw().toString());
-//                        Log.e("TAGTAGTAG", "message: " + ready4SettingsResponse.raw().message());
-//                        Log.e("TAGTAGTAG", "body: " + ready4SettingsResponse.raw().body());
-//                        Log.e("TAGTAGTAG", "source " + ready4SettingsResponse.raw().body().source());
-//                        Log.e("TAGTAGTAG", "contentLength: " + ready4SettingsResponse.raw().body().contentLength());
-//                        Log.e("TAGTAGTAG", "charStream: " + ready4SettingsResponse.raw().body().charStream());
-//                        Log.e("TAGTAGTAG", "contentType: " + ready4SettingsResponse.raw().body().contentType());
-//                        Log.e("TAGTAGTAG", "Should I go: " + ready4SettingsResponse.raw().body().bytes());
-//                        Log.e("TAGTAGTAG", "string: " + ready4SettingsResponse.raw().body().string());
+                    .takeWhile(response -> {
+                        Log.e("rerererererere", "Toggle Device RawResponse: " + response);
+                        Log.e("rerererererere", "Toggle Device RawResponse: " + response.body());
                         Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
-                        Log.e("rerererererere", "Body Expected To Be: " + ready4SettingsResponse.body().ToString());
-                        Log.e("rerererererere", "Auth: " + ready4SettingsResponse.headers().get("auth"));
-                        Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(ready4SettingsResponse.body().ToString(), device.getSecret()));
-                    if (ready4SettingsResponse.headers().get("auth") != null){
-                        Log.e("rererererere", "Auth Is Not NUll");
-                        if (AppConstants.sha1(ready4SettingsResponse.body().ToString(), device.getSecret()).equals(ready4SettingsResponse.headers().get("auth"))){
-                        Log.e("rererererere", "HMACs Are Equal");
-                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(ready4SettingsResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                        device.setHeader(Encryptor.decrypt(ready4SettingsResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                        if (ready4SettingsResponse.body().getCmd().equals("wrong_stword"))
+                        Log.e("rerererererere", "Body Expected To Be: " + response.body());
+                        Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                        Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(response.body(), device.getSecret()));
+//                    if (response.headers().get("auth") != null){
+//                        Log.e("rererererere", "Auth Is Not NUll");
+//                        if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
+//                        Log.e("rererererere", "HMACs Are Equal");
+                        Ready4SettingsResponse ready4SettingsResponse = RayanUtils.convertToObject(Ready4SettingsResponse.class, response.body());
+//                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(ready4SettingsResponse.getStword(),device.getSecret()).split("#")[1])+1));
+//                        device.setHeader(Encryptor.decrypt(ready4SettingsResponse.getStword(),device.getSecret()).split("#")[0]);
+                        if (ready4SettingsResponse.getCmd().equals("wrong_stword"))
                             return true;
-                        else if (ready4SettingsResponse.body().getCmd().equals(AppConstants.SETTINGS)){
+                        else if (ready4SettingsResponse.getCmd().equals(AppConstants.SETTINGS)){
                             result.postValue(AppConstants.SETTINGS);
                             deviceDatabase.updateDevice(device);
                             return false;
                         }
                         else {
-                            Log.e(this.getClass().getSimpleName(), "So What received? " + ready4SettingsResponse.body().getCmd());
-                            result.postValue(ready4SettingsResponse.body().getCmd());
+                            Log.e(this.getClass().getSimpleName(), "So What received? " + ready4SettingsResponse.getCmd());
+                            result.postValue(ready4SettingsResponse.getCmd());
                             return false;
                         }
-                        }else Log.e("rererererere", "HMACs Are NOT Equal");
-                    }else Log.e("rererererere", "Auth IS NULL");
-                    return false;
+//                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+//                    }else Log.e("rererererere", "Auth IS NULL");
+//                    return false;
                     })
                     .timeout(4, TimeUnit.SECONDS)
-                    .subscribe(new Observer<Response<Ready4SettingsResponse>>() {
+                    .subscribe(new Observer<Response<String>>() {
                         @Override
                         public void onSubscribe(Disposable d) {
                             Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
                         }
 
                         @Override
-                        public void onNext(Response<Ready4SettingsResponse> ready4SettingsResponse) {
+                        public void onNext(Response<String> ready4SettingsResponse) {
                             Log.d(TAG, "onNext() called with: ready4SettingsResponse = [" + ready4SettingsResponse + "]");
                         }
 

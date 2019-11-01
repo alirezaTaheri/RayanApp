@@ -28,16 +28,20 @@ public class RetryConnectMqtt {
 
     public void start(){
         running = true;
-        d = Observable.interval(0, 2, TimeUnit.SECONDS).observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
+        d = Observable.interval(10000, 6, TimeUnit.SECONDS).observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
-                        Log.e(TAG, "Try To Connect...");
+                        Log.e(TAG, "Try To Connect... " + aLong);
                         if (aLong > 5) rest();
                         count++;
                         mainActivity.connectToMqtt();
                     }
                 });
+    }
+
+    public void start2(){
+
     }
 
     public void rest(){

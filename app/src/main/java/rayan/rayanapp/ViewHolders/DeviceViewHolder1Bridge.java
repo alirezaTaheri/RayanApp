@@ -183,7 +183,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
 
     public void playSoundSwitchOn(){
         switchOnSound = new MediaPlayer();
-        switchOnPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_off");
+        switchOnPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_off_");
         try {
             switchOnSound.setDataSource(itemView.getContext(), switchOnPath);
             switchOnSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
@@ -212,7 +212,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     }
     public void playSoundSwitchOff(){
         switchOffSound = new MediaPlayer();
-        switchOffPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_off");
+        switchOffPath = Uri.parse("android.resource://"+itemView.getContext().getPackageName()+"/raw/sound_switch_off_");
         try {
             switchOffSound.setDataSource(itemView.getContext(), switchOffPath);
             switchOffSound.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);

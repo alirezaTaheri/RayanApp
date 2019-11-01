@@ -1,5 +1,6 @@
 package rayan.rayanapp.Helper;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
@@ -20,6 +21,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.DeviceCommunicationParams;
+import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
@@ -51,7 +53,7 @@ public class MessageTransmissionDecider {
     private List<Device> devices;
     private Map<String ,List<PROTOCOL>> communicationRoutes;
     private Map<String ,Pair<DeviceCommunicationParams, List<PROTOCOL>>> routes;
-
+    private Context context;
 
     public MessageTransmissionDecider(Context context) {
         communicationRoutes = new HashMap<>();
@@ -71,6 +73,7 @@ public class MessageTransmissionDecider {
                 connectionStatus = ConnectionStatus.VPN;
                 break;
         }
+        this.context = context;
         Log.e(TAG, "I am created Going to Compute...Devices: " + devices + "\nConnectionStatus: " + connectionStatus);
         currentSSID = AppConstants.NULL_SSID;
 //        computeCommunicationRoutes(devices);
@@ -119,6 +122,10 @@ public class MessageTransmissionDecider {
                             Log.e(TAG,"http addeddd ");
                         }
                         if (mqttConnected && device.getTopic()!= null && MainActivityViewModel.connection.getValue() != null && MainActivityViewModel.connection.getValue().isConnected()){
+                            protocols.add(PROTOCOL.MQTT);
+                            Log.e(TAG,"mqtt addeddd");
+                        }
+                        if (mqttConnected && device.getTopic()!= null && MqttClientService.getMqttClientInstance((Application) context.getApplicationContext()) != null && MqttClientService.getMqttClientInstance((Application) context.getApplicationContext()).getConnection().isConnected()){
                             protocols.add(PROTOCOL.MQTT);
                             Log.e(TAG,"mqtt addeddd");
                         }

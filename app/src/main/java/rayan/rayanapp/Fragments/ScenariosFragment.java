@@ -159,7 +159,8 @@ public class ScenariosFragment extends Fragment implements
                                 List<String> args = new ArrayList<>();
                                 args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                                 if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
-                                    viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true, true);
+//                                    viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true, true);
+                                    viewModel.sendMessageToDevicePin1(device, true);
                                 }else {
                                     device.setPin2(AppConstants.ON_STATUS);
                                     viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.ON_1_ON_2, args));
@@ -175,7 +176,8 @@ public class ScenariosFragment extends Fragment implements
                         device.setPin1(AppConstants.ON_STATUS);
                         args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                         if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
-                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true, true);
+//                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, true, true);
+                            viewModel.sendMessageToDevicePin1(device, true);
                         }else {
                             device.setPin2(AppConstants.ON_STATUS);
                             viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.ON_1_ON_2, args));
@@ -198,7 +200,8 @@ public class ScenariosFragment extends Fragment implements
                             device.setPin1(AppConstants.OFF_STATUS);
                             args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                             if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
-                                viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false, true);
+//                                viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false, true);
+                                viewModel.sendMessageToDevicePin1(device, false);
                             }else {
                                 device.setPin2(AppConstants.OFF_STATUS);
                                 viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.OFF_1_OFF_2, args));
@@ -214,7 +217,8 @@ public class ScenariosFragment extends Fragment implements
                         device.setPin1(AppConstants.OFF_STATUS);
                         args.add(Encryptor.encrypt(device.getStatusWord().concat("#"), device.getSecret()));
                         if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || device.getType().equals(AppConstants.DEVICE_TYPE_PLUG)){
-                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false, true);
+//                            viewModel.sendMqttPin1((RayanApplication)activity.getApplication(), device, false, true);
+                            viewModel.sendMessageToDevicePin1(device, false);
                         }else {
                             device.setPin2(AppConstants.OFF_STATUS);
                             viewModel.sendMessageToDevicePin1Pin2(device, ((RayanApplication)activity.getApplication()).getJson(AppConstants.OFF_1_OFF_2, args));

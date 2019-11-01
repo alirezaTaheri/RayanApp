@@ -41,6 +41,7 @@ import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.Encryptor;
+import rayan.rayanapp.Helper.RayanUtils;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
@@ -69,6 +70,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.EndSettingsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.FactoryResetResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.UpdateResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Util.AppConstants;
@@ -78,19 +80,23 @@ import retrofit2.Response;
 public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     private final String TAG = EditDeviceFragmentViewModel.class.getSimpleName();
+    ApiService apiService;
+    ApiService apiServiceScalar;
+
     public EditDeviceFragmentViewModel(@NonNull Application application) {
         super(application);
+        apiService = ApiUtils.getApiService();
+        apiServiceScalar = ApiUtils.getApiServiceScalar();
     }
 
 
-    public LiveData<DeviceResponse> editDevice(String id, String name, String type, String groupId, String ssid){
-        final MutableLiveData<DeviceResponse> results = new MutableLiveData<>();
-        editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribe(editDeviceObserver(results));
-        return results;
-    }
+//    public LiveData<DeviceResponse> editDevice(String id, String name, String type, String groupId, String ssid){
+//        final MutableLiveData<DeviceResponse> results = new MutableLiveData<>();
+//        editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribe(editDeviceObserver(results));
+//        return results;
+//    }
     private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
         Log.e("?><?><?><?><?><", "editing: " + editDeviceRequest);
-        ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .editDevice(RayanApplication.getPref().getToken(), editDeviceRequest)
                 .subscribeOn(Schedulers.io())
@@ -126,7 +132,6 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return results;
     }
     private Observable<DeviceResponse> createTopicObservable(CreateTopicRequest createTopicRequest){
-        ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .createTopic(RayanApplication.getPref().getToken(), createTopicRequest)
                 .subscribeOn(Schedulers.io())
@@ -157,33 +162,34 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     public MutableLiveData<String> zipChangeName(Device device, String id , String name, String type, String groupId, String ip, String ssid){
-        MutableLiveData<String> response = new MutableLiveData<>();
+        MutableLiveData<String> results = new MutableLiveData<>();
         byte[] data = name.getBytes();
         String baseName = Base64.encodeToString(data, Base64.DEFAULT);
-        Observable<Response<ChangeNameResponse>> deviceChangeNameObservable =
+        Observable<Response<String>> deviceChangeNameObservable =
                 Observable.just(device)
-                        .flatMap(new Function<Device, Observable<Response<ChangeNameResponse>>>() {
+                        .flatMap(new Function<Device, Observable<Response<String>>>() {
                             @Override
-                            public Observable<Response<ChangeNameResponse>> apply(Device ready4SettingsResponse) throws Exception {
+                            public Observable<Response<String>> apply(Device ready4SettingsResponse) throws Exception {
                                 return toDeviceChangeNameObservable(new ChangeNameRequest(baseName, Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())),device);
                             }
                         })
                         .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .repeatWhen(throwableObservable -> throwableObservable.delay(3500, TimeUnit.MILLISECONDS))
-                .takeWhile(changeNameResponse -> {
-                    Log.e("rerererererere", "Toggle Device Response: " + changeNameResponse);
-                    Log.e("rerererererere", "Auth: " + changeNameResponse.headers().get("auth"));
-                    Log.e("rerererererere", "Body Expected To Be: " + changeNameResponse.body().ToString());
+                .takeWhile(response -> {
+                    Log.e("rerererererere", "Toggle Device Response: " + response);
+                    Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + response.body());
                     Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
-                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(changeNameResponse.body().ToString(), device.getSecret()));
-                    if (changeNameResponse.headers().get("auth") != null){
+                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(response.body(), device.getSecret()));
+                    if (response.headers().get("auth") != null){
                     Log.e("rererererere", "Auth Is Not NUll");
-                        if (AppConstants.sha1(changeNameResponse.body().ToString(), device.getSecret()).equals(changeNameResponse.headers().get("auth"))){
+                        if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                     Log.e("rererererere", "HMACs Are Equal");
-                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeNameResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                    device.setHeader(Encryptor.decrypt(changeNameResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                    Log.e("TAGTAGTAG", "Should I go: " + changeNameResponse.body().getCmd().equals("wrong_stword"));
-                    if (changeNameResponse.body().getCmd().equals("wrong_stword")) {
+                    ChangeNameResponse changeNameResponse = RayanUtils.convertToObject(ChangeNameResponse.class, response.body());
+                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeNameResponse.getStword(),device.getSecret()).split("#")[1])+1));
+                    device.setHeader(Encryptor.decrypt(changeNameResponse.getStword(),device.getSecret()).split("#")[0]);
+                    Log.e("TAGTAGTAG", "Should I go: " + changeNameResponse.getCmd().equals("wrong_stword"));
+                    if (changeNameResponse.getCmd().equals("wrong_stword")) {
                         Log.e(TAG, "stword is wrong");
                         return true;
                     }
@@ -238,10 +244,10 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                         if (o instanceof DeviceResponse){
                             DeviceResponse deviceResponse = (DeviceResponse) o;
                             if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
-                                response.postValue(AppConstants.CHANGE_NAME_TRUE);
+                                results.postValue(AppConstants.CHANGE_NAME_TRUE);
                             else if (deviceResponse.getData().getMessage() != null)
-                                response.postValue(deviceResponse.getData().getMessage());
-                            else response.postValue(AppConstants.CHANGE_NAME_FALSE);
+                                results.postValue(deviceResponse.getData().getMessage());
+                            else results.postValue(AppConstants.CHANGE_NAME_FALSE);
                         }
                         Log.d(TAG+"?><?><?><?><", "onNext() called with: o = [" + o + "]");
                     }
@@ -250,7 +256,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     public void onError(Throwable e) {
                         Log.d(TAG+"?><?><?><?><", "onError() called with: e = [" + e + "]");
                         if (e instanceof HttpException)
-                            response.postValue(AppConstants.CHANGE_NAME_FALSE);
+                            results.postValue(AppConstants.CHANGE_NAME_FALSE);
                     }
 
                     @Override
@@ -363,7 +369,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 //                Log.e(TAG, "ChangeName: onComplete " );
 //            }
 //        });
-        return response;
+        return results;
     }
 
     @SuppressLint("CheckResult")
@@ -410,10 +416,10 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 //        toDeviceChangeNameObservable(new ChangeNameRequest(name),ip).subscribe(toDeviceChangeNameObserver(results));
 //        return results;
 //    }
-    private Observable<Response<ChangeNameResponse>> toDeviceChangeNameObservable(ChangeNameRequest changeNameRequest, Device device) {
-        ApiService apiService = ApiUtils.getApiService();
+    private Observable<Response<String>> toDeviceChangeNameObservable(ChangeNameRequest changeNameRequest, Device device) {
+
         try {
-            return apiService
+            return apiServiceScalar
                     .changeName(AppConstants.sha1(changeNameRequest.ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), changeNameRequest)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
@@ -453,35 +459,36 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     @SuppressLint("CheckResult")
     public LiveData<String> toDeviceFactoryReset(Device device){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        Observable<Response<FactoryResetResponse>> toDeviceReset =
+        Observable<Response<String>> toDeviceReset =
                 Observable.just(device)
-                .flatMap(new Function<Device, Observable<Response<FactoryResetResponse>>>() {
+                .flatMap(new Function<Device, Observable<Response<String>>>() {
                     @Override
-                    public Observable<Response<FactoryResetResponse>> apply(Device device) throws Exception {
+                    public Observable<Response<String>> apply(Device device) throws Exception {
                         return toDeviceFactoryResetObservable(device);
                     }
                 })
                         .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                         .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
-                        .takeWhile(toggleDeviceResponse ->{
-                            Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
-                            Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
-                            Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                        .takeWhile(response ->{
+                            Log.e("rerererererere", "Toggle Device Response: " + response);
+                            Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                            Log.e("rerererererere", "Body Expected To Be: " + response.body());
                             Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
-                            Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
-                    if (toggleDeviceResponse.headers().get("auth") != null){
+                            Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(response.body(), device.getSecret()));
+                    if (response.headers().get("auth") != null){
                             Log.e("rererererere", "Auth Is Not NUll");
-                        if (AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                        if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                             Log.e("rererererere", "HMACs Are Equal");
-                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                            device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
-                            if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                            FactoryResetResponse factoryResetResponse = RayanUtils.convertToObject(FactoryResetResponse.class, response.body());
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[1])+1));
+                            device.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[0]);
+                            Log.e("TAGTAGTAG", "Should I go: " + factoryResetResponse.getCmd());
+                            if (factoryResetResponse.getCmd().equals("wrong_stword"))
                                 return true;
                             else{
                                 Device deviceToUpdate = new Device(device);
-                                device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                                device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                                device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[1])+1));
+                                device.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[0]);
                                 deviceDatabase.updateDevice(deviceToUpdate);
                                 return false;
                             }
@@ -503,14 +510,23 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
                     @Override
                     public void onNext(Object o) {
-                        if (o instanceof DeviceResponse){
-                            DeviceResponse deviceResponse = (DeviceResponse) o;
-                            if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+                        Log.e(TAG, "Response is: " + o.getClass().getCanonicalName());
+                        if (o instanceof BaseResponse){
+                            BaseResponse baseResponse = (BaseResponse) o;
+                            if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
                                 results.postValue(AppConstants.FACTORY_RESET_DONE);
-                            else if (deviceResponse.getData().getMessage() != null)
-                                results.postValue(deviceResponse.getData().getMessage());
+                            else if (baseResponse.getData().getMessage() != null)
+                                results.postValue(baseResponse.getData().getMessage());
                             else results.postValue(AppConstants.ERROR);
                         }
+//                        if (o instanceof DeviceResponse){
+//                            DeviceResponse deviceResponse = (DeviceResponse) o;
+//                            if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+//                                results.postValue(AppConstants.FACTORY_RESET_DONE);
+//                            else if (deviceResponse.getData().getMessage() != null)
+//                                results.postValue(deviceResponse.getData().getMessage());
+//                            else results.postValue(AppConstants.ERROR);
+//                        }
                     }
 
                     @Override
@@ -592,17 +608,15 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
 
     private Observable<BaseResponse> deleteUserObservable(DeleteUserRequest deleteUserRequest){
-        ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .deleteUser(RayanApplication.getPref().getToken(), deleteUserRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<Response<FactoryResetResponse>> toDeviceFactoryResetObservable(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    private Observable<Response<String>> toDeviceFactoryResetObservable(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         Log.e(TAG, "Sending StWord Is: " + device.getStatusWord());
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
+        return apiServiceScalar
                 .factoryReset(AppConstants.sha1(new FactoryResetRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new FactoryResetRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -635,33 +649,34 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     @SuppressLint("CheckResult")
     public LiveData<String> toDeviceChangeAccessPoint(Device device, String ssid, String password){
         final MutableLiveData<String> results = new MutableLiveData<>();
-        Observable<Response<ChangeAccessPointResponse>> toDeviceChangeAccessPoint = Observable.just(device)
-                .flatMap(new Function<Device, Observable<Response<ChangeAccessPointResponse>>>() {
+        Observable<Response<String>> toDeviceChangeAccessPoint = Observable.just(device)
+                .flatMap(new Function<Device, Observable<Response<String>>>() {
                     @Override
-                    public Observable<Response<ChangeAccessPointResponse>> apply(Device device) throws Exception {
+                    public Observable<Response<String>> apply(Device device) throws Exception {
                         return toDeviceChangeAccessPointObservable(device, new ChangeAccessPointRequest(device.getName1(), password, ssid, device.getStyle(), Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())));
                     }
                 })
                 .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
-                .takeWhile(toggleDeviceResponse ->{
-                    Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
-                    Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
-                    Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                .takeWhile(response ->{
+                    Log.e("rerererererere", "Toggle Device Response: " + response);
+                    Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + response.body());
                     Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
-                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
-                    if (toggleDeviceResponse.headers().get("auth") != null){
+                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(response.body(), device.getSecret()));
+                    if (response.headers().get("auth") != null){
                     Log.e("rererererere", "Auth Is Not NUll");
-                        if (AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                    ChangeAccessPointResponse changeAccessPointResponse = RayanUtils.convertToObject(ChangeAccessPointResponse.class, response.body());
+                    if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                     Log.e("rererererere", "HMACs Are Equal");
-                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                    device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                    Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
-                    if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getStword(),device.getSecret()).split("#")[1])+1));
+                    device.setHeader(Encryptor.decrypt(changeAccessPointResponse.getStword(),device.getSecret()).split("#")[0]);
+                    Log.e("TAGTAGTAG", "Should I go: " + changeAccessPointResponse.getCmd());
+                    if (changeAccessPointResponse.getCmd().equals("wrong_stword"))
                         return true;
                     else{
                         Device deviceToUpdate = new Device(device);
-                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                        device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
+                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getStword(),device.getSecret()).split("#")[1])+1));
+                        device.setHeader(Encryptor.decrypt(changeAccessPointResponse.getStword(),device.getSecret()).split("#")[0]);
                         deviceDatabase.updateDevice(deviceToUpdate);
                         return false;
                     }
@@ -816,9 +831,8 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
         return results;
     }
-    private Observable<Response<ChangeAccessPointResponse>> toDeviceChangeAccessPointObservable(Device device, ChangeAccessPointRequest changeAccessPointRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
+    private Observable<Response<String>> toDeviceChangeAccessPointObservable(Device device, ChangeAccessPointRequest changeAccessPointRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        return apiServiceScalar
                 .changeAccessPoint(AppConstants.sha1(changeAccessPointRequest.ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), changeAccessPointRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -855,7 +869,6 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return results;
     }
     public Observable<DeviceBaseResponse> toDeviceMqttObservable(MqttTopicRequest mqttTopicRequest, String ip){
-        ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .sendMqtt(AppConstants.getDeviceAddress(ip), mqttTopicRequest)
                 .subscribeOn(Schedulers.io())
@@ -954,7 +967,6 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     private Observable<Response<EndSettingsResponse>> toDeviceEndSettingsObservable(Device device, EndSettingsRequest endSettingsRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-        ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .endSettings(AppConstants.sha1(endSettingsRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()), endSettingsRequest)
                 .subscribeOn(Schedulers.io())
@@ -1040,27 +1052,28 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     public LiveData<String> toDeviceReady4Update(Device device){
         final MutableLiveData<String> result = new MutableLiveData<>();
         Observable.just(device).
-                flatMap(new Function<Device, Observable<Response<UpdateResponse>>>() {
+                flatMap(new Function<Device, Observable<Response<String>>>() {
                     @Override
-                    public Observable<Response<UpdateResponse>> apply(Device device) throws Exception {
+                    public Observable<Response<String>> apply(Device device) throws Exception {
                         return toDeviceReady4UpdateObservable(new UpdateRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())),device);
                     }
                 }).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
-                .takeWhile(toggleDeviceResponse ->{
-                    Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
-                    Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
-                    Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                .takeWhile(response ->{
+                    Log.e("rerererererere", "Toggle Device Response: " + response);
+                    Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + response.body());
                     Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
-                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
-                    if (toggleDeviceResponse.headers().get("auth") != null){
+                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(response.body(), device.getSecret()));
+                    if (response.headers().get("auth") != null){
                     Log.e("rererererere", "Auth Is Not NUll");
-                        if (AppConstants.sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                    UpdateResponse updateResponse = RayanUtils.convertToObject(UpdateResponse.class, response.body());
+                        if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                     Log.e("rererererere", "HMACs Are Equal");
-                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                    device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                    Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
-                    if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(updateResponse.getStword(),device.getSecret()).split("#")[1])+1));
+                    device.setHeader(Encryptor.decrypt(updateResponse.getStword(),device.getSecret()).split("#")[0]);
+                    Log.e("TAGTAGTAG", "Should I go: " + updateResponse.getCmd());
+                    if (updateResponse.getCmd().equals("wrong_stword"))
                         return true;
                     else{
                         Device deviceToUpdate = new Device(device);
@@ -1072,14 +1085,14 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     }else Log.e("rererererere", "Auth IS NULL");
                     return false;
                 }).timeout(4, TimeUnit.SECONDS)
-                .subscribe(new Observer<Response<UpdateResponse>>() {
+                .subscribe(new Observer<Response<String>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
                     }
 
                     @Override
-                    public void onNext(Response<UpdateResponse> updateResponseResponse) {
+                    public void onNext(Response<String> updateResponseResponse) {
 
                     }
 
@@ -1096,10 +1109,9 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return result;
     }
 
-    private Observable<Response<UpdateResponse>> toDeviceReady4UpdateObservable(UpdateRequest baseRequest, Device device){
-        ApiService apiService = ApiUtils.getApiService();
+    private Observable<Response<String>> toDeviceReady4UpdateObservable(UpdateRequest baseRequest, Device device){
         try {
-            return apiService
+            return apiServiceScalar
                     .deviceUpdate(AppConstants.sha1(baseRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()), baseRequest)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
@@ -1141,7 +1153,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     public MutableLiveData<VersionResponse> getDeviceVersion(Device device){
         MutableLiveData<VersionResponse> results = new MutableLiveData<>();
-        ApiUtils.getApiService().getVersion(AppConstants.getDeviceAddress(device.getIp()), new BaseRequest(AppConstants.GET_VERSION))
+        apiService.getVersion(AppConstants.getDeviceAddress(device.getIp()), new BaseRequest(AppConstants.GET_VERSION))
                 .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
                 .subscribe(new Observer<VersionResponse>() {
                     @Override
@@ -1188,7 +1200,6 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     private Observable<DeviceBaseResponse> toDeviceDoUpdateObservable(UpdateDeviceRequest updateDeviceRequest, String ip){
-        ApiService apiService = ApiUtils.getApiService();
         return apiService.deviceDoUpdate(AppConstants.getDeviceAddress(ip), updateDeviceRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -1226,7 +1237,6 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return results;
     }
     private Observable<AllFilesListResponse> toDeviceAllFilesListObservable(BaseRequest baseRequest, String ip){
-        ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .deviceFileList("http://10.0.3.2/DeviceGetFileList.php", baseRequest)
                 .subscribeOn(Schedulers.io())
@@ -1266,7 +1276,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return results;
     }
     private Observable<SendFilesToDevicePermitResponse> SendFilesToDevicePermitObservable(SendFilesToDevicePermitRequest sendFilesToDevicePermitRequest){
-        ApiService apiService = ApiUtils.getApiService();
+
         return apiService
                 .deviceSendFilePermit("http://10.0.3.2/YesNoApi.php", sendFilesToDevicePermitRequest)
                 .subscribeOn(Schedulers.io())

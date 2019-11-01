@@ -24,6 +24,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnTouch;
+//import co.ronash.pushe.Pushe;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.R;
@@ -59,11 +60,11 @@ public class LoginActivity extends AppCompatActivity {
         }
         ButterKnife.bind(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//            }
+//        }
 
 
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
@@ -151,6 +152,9 @@ void onPhoneEditTextFocusChange(){
 
     @OnClick(R.id.signInButton)
     public void checkForm() {
+//        Log.e(TAG, "PUSHE ID: " + Pushe.isPusheInitialized(this));
+//        Log.e(TAG, "PUSHE ID: " + Pushe.getPusheId(this));
+
         if (loginViewModel.isConnected(this)) {
             String phoneNumber = phoneEditText.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();

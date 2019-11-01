@@ -17,6 +17,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -27,6 +28,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.util.DiffUtil;
+import android.support.v7.util.ListUpdateCallback;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -49,20 +52,13 @@ import com.airbnb.lottie.LottieDrawable;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
-import org.apache.commons.net.util.Base64;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import butterknife.BindView;
@@ -71,13 +67,10 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
@@ -88,20 +81,23 @@ import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Fragments.FavoritesFragment;
 import rayan.rayanapp.Helper.ControlRequests;
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
+import rayan.rayanapp.Helper.RayanUtils;
 import rayan.rayanapp.Helper.RetryConnectMqtt;
 import rayan.rayanapp.Listeners.DevicesAndFavoritesListener;
 import rayan.rayanapp.Listeners.MqttStatus;
 import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnGroupClicked;
+import rayan.rayanapp.Mqtt.MqttClient;
+import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Services.AlwaysOnService;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.CustomViewPager;
 import rayan.rayanapp.Util.NetworkUtil;
+import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -172,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG, "OnCreate MainActivity");
         if (!RayanApplication.getPref().isLoggedIn()) {
             Intent intent = new Intent(this, StartUpSplashActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -181,6 +178,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             setContentView(R.layout.activity_main);
             ButterKnife.bind(this);
             mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+            observeDevicesForPlaySoundEffect();
+            MqttClientService.removeClient();
+            mqttClient = MqttClientService.getMqttClientInstance(getApplication());
             Log.d(TAG, "onCreate: ViewModel is: " + mainActivityViewModel);
             String currentShowingGroup = RayanApplication.getPref().getCurrentShowingGroup();
             if (currentShowingGroup == null){
@@ -227,9 +227,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                    }
                     if (connectionStatusModel.getType() == AppConstants.WIFI_NETWORK) {
                         String extraInfo = connectionStatusModel.getSsid();
-                        if (extraInfo != null && connectionStatusModel.getSsid().charAt(connectionStatusModel.getSsid().length()-1) == connectionStatusModel.getSsid().charAt(0) && String.valueOf(connectionStatusModel.getSsid().charAt(0)).equals("\""))
-                            extraInfo = connectionStatusModel.getSsid().substring(1,extraInfo.length()-1);
-                        this.wifiNetwork(connectionStatusModel.getState().equals(NetworkInfo.State.CONNECTED), extraInfo);
+                        if (extraInfo != null && connectionStatusModel.getSsid().charAt(connectionStatusModel.getSsid().length()-1) == connectionStatusModel.getSsid().charAt(0) && String.valueOf(connectionStatusModel.getSsid().charAt(0)).equals("\"")) {
+                            extraInfo = connectionStatusModel.getSsid().substring(1, extraInfo.length() - 1);
+                            this.wifiNetwork(connectionStatusModel.getState().equals(NetworkInfo.State.CONNECTED), extraInfo);
+                        }else if (extraInfo != null && !String.valueOf(connectionStatusModel.getSsid().charAt(connectionStatusModel.getSsid().length()-1)).equals("\"") && !String.valueOf(connectionStatusModel.getSsid().charAt(0)).equals("\"")){
+                            this.wifiNetwork(connectionStatusModel.getState().equals(NetworkInfo.State.CONNECTED), extraInfo);
+                        }
                     } else if (connectionStatusModel.getType() == AppConstants.MOBILE_DATA) {
                         this.mobileNetwork(connectionStatusModel.getState().equals(NetworkInfo.State.CONNECTED));
                     }
@@ -254,28 +257,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawerLayout.addDrawerListener(actionBarDrawerToggle);
             actionBarDrawerToggle.setDrawerIndicatorEnabled(false);
             actionBarDrawerToggle.syncState();
-            MainActivityViewModel.connection.observe(this, connection -> {
-                Log.e("thsithisklfj", "thisdlajt: " + connection + connection.getStatus());
-                switch (connection.getStatus()) {
+//            MainActivityViewModel.connection.observe(this, connection -> {
+//                Log.e("thsithisklfj", "thisdlajt: " + connection + connection.getStatus());
+//                switch (connection.getStatus()) {
+//                    case NONE:
+//                        break;
+//                    case CONNECTING:
+//                        this.mqttConnecting();
+//                        break;
+//                    case CONNECTED:
+//                        this.mqttConnected();
+//                        break;
+//                    case DISCONNECTING:
+//                        break;
+//                    case DISCONNECTED:
+//                        this.mqttDisconnected();
+//                        break;
+//                    case ERROR:
+//                        this.mqttError();
+//                        break;
+//                }
+//            });
+            mqttClient.listenToConnectionChanges().subscribe(new Consumer<Connection>() {
+                @Override
+                public void accept(Connection connection) throws Exception {
+                    switch (connection.getStatus()) {
                     case NONE:
                         break;
                     case CONNECTING:
-                        this.mqttConnecting();
+                        MainActivity.this.mqttConnecting();
                         break;
                     case CONNECTED:
-                        this.mqttConnected();
+                        MainActivity.this.mqttConnected();
                         break;
                     case DISCONNECTING:
                         break;
                     case DISCONNECTED:
-                        this.mqttDisconnected();
+                        MainActivity.this.mqttDisconnected();
                         break;
                     case ERROR:
-                        this.mqttError();
+                        MainActivity.this.mqttError();
                         break;
                 }
+                }
             });
-
             // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             viewPagerAdapter = new MainActivityViewPagerAdapter(getSupportFragmentManager());
             viewPager.setAdapter(viewPagerAdapter);
@@ -387,10 +412,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        }
     }
 
+
     @SuppressLint("CheckResult")
     @Override
     protected void onResume() {
         super.onResume();
+        Log.e(TAG, "OnResume");
 //        ReactiveNetwork
 //                .observeNetworkConnectivity(this)
 //                .subscribeOn(Schedulers.io())
@@ -459,6 +486,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttConnecting() {
+        mqttConnectionStatus = Connection.ConnectionStatus.CONNECTING;
         Log.d(TAG, "mqttConnecting() called");
         if (!NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
             actionBarStatus.setVisibility(View.INVISIBLE);
@@ -467,7 +495,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             connectionAnimation.setMaxProgress(0.6f);
             connectionAnimation.setRepeatCount(LottieDrawable.INFINITE);
             connectionAnimation.playAnimation();
-            mqttConnectionStatus = Connection.ConnectionStatus.CONNECTING;
 //            connectionAnimation.startAnimation(fadeIn);
             connectionAnimation.setVisibility(View.VISIBLE);
 //            tempText.startAnimation(fadeOut);
@@ -484,26 +511,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static boolean mqttConnected;
     @Override
         public void mqttConnected() {
-        connectionAnimation.startAnimation(fadeOut);
-        actionBarStatus.startAnimation(fadeIn);
+        Log.d(TAG, "mqttConnected() called");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                connectionAnimation.startAnimation(fadeOut);
+                actionBarStatus.startAnimation(fadeIn);
 //        connectionAnimation.setRepeatCount(0);
 //        connectionAnimation.setMaxProgress(1f);
+                String currentShowingGroup = RayanApplication.getPref().getCurrentShowingGroup();
+                if (currentShowingGroup == null)
+                    actionBarStatus.setText("رایان");
+                else {
+                    Group currentGroup = mainActivityViewModel.getGroup(currentShowingGroup);
+                    if (currentGroup != null)
+                        actionBarStatus.setText(currentGroup.getName());
+                }
+                retryIcon.setVisibility(View.INVISIBLE);
+//        progressBar.setVisibility(View.INVISIBLE);
+            }
+        });
+        Log.e(TAG, "Mqtt ConnectionStatus: Connected Connection Retries: " + retryConnectMqtt.count);
         retryConnectMqtt.stop();
         ((RayanApplication)getApplication()).getMsc().setMqttConnected(true);
-        Log.e(TAG, "Mqtt ConnectionStatus: Connected Connection Retries: " + retryConnectMqtt.count);
         mqttConnectionStatus = Connection.ConnectionStatus.CONNECTED;
         mqttConnected = true;
         connectionRetries = 0;
-        String currentShowingGroup = RayanApplication.getPref().getCurrentShowingGroup();
-        if (currentShowingGroup == null)
-            actionBarStatus.setText("رایان");
-        else {
-            Group currentGroup = mainActivityViewModel.getGroup(currentShowingGroup);
-            if (currentGroup != null)
-                actionBarStatus.setText(currentGroup.getName());
-        }
-        retryIcon.setVisibility(View.INVISIBLE);
-//        progressBar.setVisibility(View.INVISIBLE);
         RayanApplication.getPref().saveProtocol(AppConstants.MQTT);
         ((RayanApplication)getApplication()).getMtd().updateMqttStatus(true);
     }
@@ -511,20 +544,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void mqttDisconnected() {
         Log.d(TAG, "mqttDisconnected() called");
-        ((RayanApplication)getApplication()).getMsc().setMqttConnected(false);
         mqttConnected = false;
         Log.e(TAG, "Mqtt ConnectionStatus: DISCONNECTED Connection Retries: " + retryConnectMqtt.count);
+        ((RayanApplication)getApplication()).getMsc().setMqttConnected(false);
         mqttConnectionStatus = Connection.ConnectionStatus.DISCONNECTED;
-        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
-            connectionRetries = 0;
-            actionBarStatus.setText("عدم اتصال به اینترنت");
-            retryIcon.setVisibility(View.INVISIBLE);
-            connectionAnimation.setVisibility(View.INVISIBLE);
-        }
         if (!retryConnectMqtt.isRunning())
             retryConnectMqtt.start();
-            RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-            ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
+        RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+        ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!NetworkUtil.getConnectivityStatusString(MainActivity.this).equals(AppConstants.NOT_CONNECTED)) {
+                    actionBarStatus.setVisibility(View.INVISIBLE);
+                    connectionAnimation.setMaxProgress(0.6f);
+                    connectionAnimation.setRepeatCount(LottieDrawable.INFINITE);
+                    connectionAnimation.playAnimation();
+                    connectionAnimation.setVisibility(View.VISIBLE);
+                    retryIcon.setVisibility(View.INVISIBLE);
+                }
+                if (NetworkUtil.getConnectivityStatusString(MainActivity.this).equals(AppConstants.NOT_CONNECTED)) {
+                    connectionRetries = 0;
+                    actionBarStatus.setText("عدم اتصال به اینترنت");
+                    retryIcon.setVisibility(View.INVISIBLE);
+                    connectionAnimation.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
     }
 
     public void mqttReallyDisconnected(){
@@ -540,20 +586,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void mqttError() {
+        Log.e(TAG, "Mqtt ConnectionStatus: ERROR Connection Retries: " + retryConnectMqtt.count);
         ((RayanApplication)getApplication()).getMsc().setMqttConnected(false);
         mqttConnected = false;
         mqttConnectionStatus = Connection.ConnectionStatus.ERROR;
-        Log.e(TAG, "Mqtt ConnectionStatus: ERROR Connection Retries: " + retryConnectMqtt.count);
-        if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)) {
-            connectionRetries = 0;
-            actionBarStatus.setText("عدم اتصال به اینترنت");
-            retryIcon.setVisibility(View.INVISIBLE);
-            connectionAnimation.setVisibility(View.INVISIBLE);
-        }
         if (!retryConnectMqtt.isRunning())
             retryConnectMqtt.start();
-            RayanApplication.getPref().saveProtocol(AppConstants.UDP);
-            ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
+        RayanApplication.getPref().saveProtocol(AppConstants.UDP);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((RayanApplication) getApplication()).getMtd().updateMqttStatus(false);
+                if (!NetworkUtil.getConnectivityStatusString(MainActivity.this).equals(AppConstants.NOT_CONNECTED)) {
+                    actionBarStatus.setVisibility(View.INVISIBLE);
+                    connectionAnimation.setMaxProgress(0.6f);
+                    connectionAnimation.setRepeatCount(LottieDrawable.INFINITE);
+                    connectionAnimation.playAnimation();
+                    connectionAnimation.setVisibility(View.VISIBLE);
+                    retryIcon.setVisibility(View.INVISIBLE);
+                }
+                if (NetworkUtil.getConnectivityStatusString(MainActivity.this).equals(AppConstants.NOT_CONNECTED)) {
+                    connectionRetries = 0;
+                    actionBarStatus.setText("عدم اتصال به اینترنت");
+                    retryIcon.setVisibility(View.INVISIBLE);
+                    connectionAnimation.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
     }
 
     public boolean isExternalStorageWritable() {
@@ -607,7 +666,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.e(TAG, "OnDestroy...");
         if (RayanApplication.getPref().isLoggedIn()) {
             stopService(new Intent(this, UDPServerService.class));
-            mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection);
+//            mainActivityViewModel.disconnectMQTT(MainActivityViewModel.connection);
             RayanApplication.getPref().saveProtocol(AppConstants.UDP);
         }
             super.onDestroy();
@@ -622,6 +681,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+
 //        Observable<Integer> o1 =
 //                Observable.just(1,10,20,30,40, 140, 150, 170)
 //                        .flatMap(new Function<Integer, Observable<Integer>>() {
@@ -886,7 +946,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void initializeBottomNavigation(){
         viewPager.disableScroll(true);
         setupBottomNavigationViewPager(viewPager);
-
         bottomNavigationView.getMenu().getItem(RayanApplication.getPref().getBottomNavigationIndexKey()).setChecked(true);
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -948,7 +1007,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
+    DevicesDiffCallBack devicesDiffCallBack;
+    List<Device> devices = new ArrayList<>();
+    public void observeDevicesForPlaySoundEffect(){
+        mainActivityViewModel.getAllDevicesLive().observe(this, new android.arch.lifecycle.Observer<List<Device>>() {
+            @Override
+            public void onChanged(@Nullable List<Device> newDevices) {
+                devicesDiffCallBack = new DevicesDiffCallBack(newDevices, devices);
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack);
+                diffResult.dispatchUpdatesTo(new ListUpdateCallback() {
+                    @Override
+                    public void onInserted(int i, int i1) {
 
+                    }
+
+                    @Override
+                    public void onRemoved(int i, int i1) {
+
+                    }
+
+                    @Override
+                    public void onMoved(int i, int i1) {
+
+                    }
+
+                    @Override
+                    public void onChanged(int position, int count, @Nullable Object o) {
+                        if (RayanApplication.getPref().getIsNodeSoundOn() && o != null)
+                            try {
+                                for (String key : ((Bundle) o).keySet()) {
+                                    if (key.equals("pin1")) {
+                                        mainActivityViewModel.playSoundEffect(((Bundle) o).getString("pin1"));
+                                    } else if (key.equals("pin2")) {
+                                        mainActivityViewModel.playSoundEffect(((Bundle) o).getString("pin2"));
+                                    }
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                    }
+                });
+                devices = newDevices;
+            }
+        });
+    }
 //        nsdHelper = new NsdHelper(this);
 //        nsdHelper.registerService(AppConstants.HTTP_TO_DEVICE_PORT);
   //  NsdHelper nsdHelper;
@@ -1108,11 +1210,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
     }
 
-    @OnClick(R.id.statusIcon)
+//    @OnClick(R.id.statusIcon)
+
+    private MqttClient mqttClient;
     public void connectToMqtt(){
-        Log.d(TAG, "connectToMqtt() called");
+        Log.d(TAG, "connectToMqtt() called mqttConnectionStatus Is: " + mqttConnectionStatus);
+        MqttClientService.initializeAndConnectToBroker(getApplication());
 //        actionBarStatus.setText("کانکتینگ");
-        mainActivityViewModel.connectToMqtt(MainActivity.this);
+//        if (!(mqttConnectionStatus.equals(Connection.ConnectionStatus.CONNECTING) || mqttConnectionStatus.equals(Connection.ConnectionStatus.CONNECTED)))
+//        mainActivityViewModel.connectToMqtt(MainActivity.this);
 //                .observe(this, connection -> {
 //            MainActivityViewModel.connection.postValue(connection);
 //            switch (connection.getStatus()) {
@@ -1144,8 +1250,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (connected && !mqttConnectionStatus.equals(Connection.ConnectionStatus.CONNECTED)) {
             Log.e("///////////////", "////connecting to mqtt" + mqttConnectionStatus);
             connectToMqtt();
-            if (!retryConnectMqtt.isRunning())
-                retryConnectMqtt.start();
+//            if (!retryConnectMqtt.isRunning())
+//                retryConnectMqtt.start();
         }
         if (connected){
             ((RayanApplication)getApplication()).getMtd().setCurrentSSID(ssid);
@@ -1165,8 +1271,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             connectToMqtt();
         }
         if (connected){
-            if (!retryConnectMqtt.isRunning())
-                retryConnectMqtt.start();
+//            if (!retryConnectMqtt.isRunning())
+//                retryConnectMqtt.start();
             mainActivityViewModel.getGroups();
         }
     }
@@ -1258,5 +1364,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //{"text":"abcdefgh#25#", "cmd":"en", "src":"5958528", "k":"2kd6xdeesfc8kh2i"}
 //
 /*
-{"text":"AYtQrq0+qTAY8Pk5JgUYRQ==", "cmd":"de", "src":"", "k":"zmk4rid5h3e1mk66"}
+{"text":"P27upkIy3kIvJnhRL/p59A==", "cmd":"de", "src":"", "k":"zmk4rid5h3e1mk66"}
  */

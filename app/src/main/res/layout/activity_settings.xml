@@ -51,7 +51,7 @@
             android:textColor="@color/baseColor"
             android:textSize="16sp"
             android:layout_alignParentRight="true"
-            android:text="تنظیمات نوتیفیکیشن"/>
+            android:text="صدای دستگاه ها"/>
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/soundtitle"
@@ -61,7 +61,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginTop="11dp"
             android:layout_marginRight="10dp"
-            android:text="تنظیمات نوتیفیکیشن"
+            android:text="صدای روشن و خاموش"
             android:textColor="@color/ms_black"
             android:textSize="14sp" />
         <android.support.v7.widget.AppCompatTextView
@@ -71,7 +71,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
             android:paddingBottom="10dp"
-            android:text="فعال و غیر فعال کردن دریافت نوتیفیکیشن"
+            android:text="صدای بعد از روشن و خاموش شدن دستگاه ها"
             android:textColor="@color/grey_dark_1"
             android:textSize="12sp" />
         <View

@@ -54,9 +54,11 @@ public class SendMessageToDevice {
     private final String TAG = getClass().getSimpleName();
     private SendUDPMessage sendUDPMessage = new SendUDPMessage();
     private ApiService apiService;
+    private ApiService apiServiceScalar;
     private DeviceDatabase deviceDatabase;
     public SendMessageToDevice(Context context) {
         apiService = ApiUtils.getApiService();
+        apiServiceScalar = ApiUtils.getApiServiceScalar();
         deviceDatabase = new DeviceDatabase(context);
     }
 
@@ -449,9 +451,9 @@ public class SendMessageToDevice {
                  });
     }
     @SuppressLint("CheckResult")
-    private Observable<Response<ToggleDeviceResponse>> toDeviceHttpPin1(Device device) {
+    private Observable<Response<String>> toDeviceHttpPin1(Device device) {
         try {
-            return apiService.togglePin1(sha1(new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
+            return apiServiceScalar.togglePin1(sha1(new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin1().equals(AppConstants.ON_STATUS)? AppConstants.OFF_1 : AppConstants.ON_1,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
                    .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -464,9 +466,9 @@ public class SendMessageToDevice {
     }
 //                long sendTime;
     @SuppressLint("CheckResult")
-    private Observable<Response<ToggleDeviceResponse>> toDeviceHttpPin2(Device device)  {
+    private Observable<Response<String>> toDeviceHttpPin2(Device device)  {
         try {
-            return apiService.togglePin1(sha1(new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
+            return apiServiceScalar.togglePin1(sha1(new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), new ToggleDevice(device.getPin2().equals(AppConstants.ON_STATUS)? AppConstants.OFF_2 : AppConstants.ON_2,Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
                    .observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -516,35 +518,36 @@ public class SendMessageToDevice {
             }
         });
         Observable.just(device)
-                .flatMap(new Function<Device, Observable<Response<ToggleDeviceResponse>>>() {
+                .flatMap(new Function<Device, Observable<Response<String>>>() {
                     @Override
-                    public Observable<Response<ToggleDeviceResponse>> apply(Device device) throws Exception {
+                    public Observable<Response<String>> apply(Device device) throws Exception {
                         return toDeviceHttpPin1(device);
                     }
                 })
                 .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
-                .takeWhile(toggleDeviceResponse ->{
-                    Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
-                    Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
-                    Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                .takeWhile(response ->{
+                    Log.e("rerererererere", "Toggle Device Response: " + response);
+                    Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + response.body());
                     Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
-                    Log.e("rerererererere", "HMAC of Body: " + sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
-                    if (toggleDeviceResponse.headers().get("auth") != null){
+                    Log.e("rerererererere", "HMAC of Body: " + sha1(response.body(), device.getSecret()));
+                    if (response.headers().get("auth") != null){
                         Log.e("rererererere", "Auth Is Not NUll");
-                        if (sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))){
+                        if (sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                             Log.e("rererererere", "HMACs Are Equal");
+                            ToggleDeviceResponse toggleDeviceResponse = RayanUtils.convertToObject(ToggleDeviceResponse.class, response.body());
                             if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
                                 mqttBackup.get(device.getChipId()+"_1").dispose();
-                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                            device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.body().getCmd());
-                            if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[1])+1));
+                            device.setHeader(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0]);
+                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse.getCmd());
+                            if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
                                 return true;
-                            else if (toggleDeviceResponse.body().getCmd().equals(AppConstants.DEVICE_TOGGLE)){
+                            else if (toggleDeviceResponse.getCmd().equals(AppConstants.DEVICE_TOGGLE)){
                                 Device deviceToUpdate = new Device(device);
-                                deviceToUpdate.setPin1(toggleDeviceResponse.body().getPin1());
-                                deviceToUpdate.setPin2(toggleDeviceResponse.body().getPin2());
+                                deviceToUpdate.setPin1(toggleDeviceResponse.getPin1());
+                                deviceToUpdate.setPin2(toggleDeviceResponse.getPin2());
                                 deviceDatabase.updateDevice(deviceToUpdate);
                                 rayanApplication.getDevicesAccessibilityBus().removeWaitingPin1(device.getChipId());
                                 return false;
@@ -554,7 +557,7 @@ public class SendMessageToDevice {
                     return false;
                 }).timeout(4, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
-                .subscribe(new Observer<Response<ToggleDeviceResponse>>() {
+                .subscribe(new Observer<Response<String>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
@@ -566,7 +569,7 @@ public class SendMessageToDevice {
                     }
 
                     @Override
-                    public void onNext(Response<ToggleDeviceResponse> toggleDeviceResponseResponse) {
+                    public void onNext(Response<String> toggleDeviceResponseResponse) {
                         Log.d(TAG, "onNext() called with: toggleDeviceResponseResponse = [" + toggleDeviceResponseResponse + "]");
                     }
 
@@ -628,35 +631,36 @@ public class SendMessageToDevice {
                 }
             });
         Observable.just(device)
-                .flatMap(new Function<Device, Observable<Response<ToggleDeviceResponse>>>() {
+                .flatMap(new Function<Device, Observable<Response<String>>>() {
                     @Override
-                    public Observable<Response<ToggleDeviceResponse>> apply(Device device) throws Exception {
+                    public Observable<Response<String>> apply(Device device) throws Exception {
                         return toDeviceHttpPin2(device);
                     }
                 })
                 .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
-                .takeWhile(toggleDeviceResponse -> {
-                    Log.e("rerererererere", "Toggle Device Response: " + toggleDeviceResponse);
-                    Log.e("rerererererere", "Auth: " + toggleDeviceResponse.headers().get("auth"));
-                    Log.e("rerererererere", "Body Expected To Be: " + toggleDeviceResponse.body().ToString());
+                .takeWhile(response -> {
+                    Log.e("rerererererere", "Toggle Device Response: " + response);
+                    Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                    Log.e("rerererererere", "Body Expected To Be: " + response.body());
                     Log.e("rerererererere", "Sending Stword is: " + device.getStatusWord());
-                    Log.e("rerererererere", "HMAC of Body: " + sha1(toggleDeviceResponse.body().ToString(), device.getSecret()));
-                    if (toggleDeviceResponse.headers().get("auth") != null) {
+                    Log.e("rerererererere", "HMAC of Body: " + sha1(response.body(), device.getSecret()));
+                    if (response.headers().get("auth") != null) {
                         Log.e("rererererere", "Auth Is Not NUll");
-                        if (sha1(toggleDeviceResponse.body().ToString(), device.getSecret()).equals(toggleDeviceResponse.headers().get("auth"))) {
+                        if (sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))) {
                             Log.e("rererererere", "HMACs Are Equal");
                             if (mqttBackup.get(device.getChipId() + "_2") != null && !mqttBackup.get(device.getChipId() + "_2").isDisposed())
                                 mqttBackup.get(device.getChipId() + "_2").dispose();
-                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getStword(), device.getSecret()).split("#")[1]) + 1));
-                            device.setHeader(Encryptor.decrypt(toggleDeviceResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
-                            if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+                            ToggleDeviceResponse toggleDeviceResponse = RayanUtils.convertToObject(ToggleDeviceResponse.class, response.body());
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getStword(), device.getSecret()).split("#")[1]) + 1));
+                            device.setHeader(Encryptor.decrypt(toggleDeviceResponse.getStword(),device.getSecret()).split("#")[0]);
+                            Log.e("TAGTAGTAG", "Should I go: " + response);
+                            if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
                                 return true;
-                            else if (toggleDeviceResponse.body().getCmd().equals(AppConstants.DEVICE_TOGGLE)){
+                            else if (toggleDeviceResponse.getCmd().equals(AppConstants.DEVICE_TOGGLE)){
                                 Device deviceToUpdate = new Device(device);
-                                deviceToUpdate.setPin1(toggleDeviceResponse.body().getPin1());
-                                deviceToUpdate.setPin2(toggleDeviceResponse.body().getPin2());
+                                deviceToUpdate.setPin1(toggleDeviceResponse.getPin1());
+                                deviceToUpdate.setPin2(toggleDeviceResponse.getPin2());
                                 Log.e("DeviceAnimator", "Congradulations: " + deviceToUpdate);
                                 deviceDatabase.updateDevice(deviceToUpdate);
 //                        fragment.stopToggleAnimationPin2(device.getChipId());
@@ -669,7 +673,7 @@ public class SendMessageToDevice {
                 })
                 .timeout(4, TimeUnit.SECONDS)
                 .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
-                .subscribe(new Observer<Response<ToggleDeviceResponse>>() {
+                .subscribe(new Observer<Response<String>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
@@ -681,7 +685,7 @@ public class SendMessageToDevice {
                     }
 
                     @Override
-                    public void onNext(Response<ToggleDeviceResponse> toggleDeviceResponseResponse) {
+                    public void onNext(Response<String> toggleDeviceResponseResponse) {
                         Log.d(TAG, "onNext() called with: toggleDeviceResponseResponse = [" + toggleDeviceResponseResponse + "]");
                     }
 
@@ -711,8 +715,8 @@ public class SendMessageToDevice {
 
     public void toggleDevicePin1(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication){
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
-        Log.e(TAG,"Be Chi Befrestam? : " + cr);
-        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+        Log.e(TAG,"pin 1 Be Chi Befrestam? : " + cr);
+        //Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
             case AppConstants.MESSAGE_ROUTE_UDP:
                 sendUdpPin1(device, rayanApplication,fragment, position);
@@ -736,8 +740,8 @@ public class SendMessageToDevice {
     }
     public void toggleDevicePin2(DialogPresenter dp, ToggleDeviceAnimationProgress fragment, Device device, int position, RayanApplication rayanApplication)  {
         String cr = rayanApplication.getMtd().requestForSendMessage(device);
-        Log.e(TAG,"Be Chi Befrestam2? : " + cr);
-        Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
+        Log.e(TAG,"Pin 2 Be Chi Befrestam? : " + cr);
+        //Toast.makeText(rayanApplication, cr, Toast.LENGTH_SHORT).show();
         switch (cr){
             case "UDP":
                 sendUdpPin2(device, rayanApplication,fragment, position);
@@ -773,12 +777,13 @@ public class SendMessageToDevice {
         return new String( Base64.encodeBase64(bytes) );
     }
 
-    public Observable<Response<ToggleDeviceResponse>> synchStatusWord(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    public Observable<Response<String>> synchStatusWord(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         return toDeviceHttpPin1(device).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .repeatWhen(throwableObservable -> throwableObservable.delay(100, TimeUnit.MILLISECONDS))
-                .takeWhile(toggleDeviceResponseResponse -> {
-                    Log.e("?>?>?>?>?>?>", "cmd: " + toggleDeviceResponseResponse.body().getCmd() + (toggleDeviceResponseResponse.body().getCmd().equals("wrong_stword")));
-                    if (toggleDeviceResponseResponse.body().getCmd().equals("wrong_stword"))
+                .takeWhile(response -> {
+                    ToggleDeviceResponse toggleDeviceResponse = RayanUtils.convertToObject(ToggleDeviceResponse.class, response.body());
+                    Log.e("?>?>?>?>?>?>", "cmd: " + toggleDeviceResponse.getCmd() + (toggleDeviceResponse.getCmd().equals("wrong_stword")));
+                    if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
                         return true;
                     else return false;
                 });
@@ -786,21 +791,21 @@ public class SendMessageToDevice {
 
     public void concatMan(Device device, RayanApplication activity){
         try {
-            Observable.concat(synchStatusWord(device), new ObservableSource<Response<ToggleDeviceResponse>>() {
+            Observable.concat(synchStatusWord(device), new ObservableSource<Response<String>>() {
                 @Override
-                public void subscribe(Observer<? super Response<ToggleDeviceResponse>> observer) {
+                public void subscribe(Observer<? super Response<String>> observer) {
                     observer.onComplete();
                 }
             })
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<Response<ToggleDeviceResponse>>() {
+                    .subscribe(new Observer<Response<String>>() {
                 @Override
                 public void onSubscribe(Disposable d) {
                     Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
                 }
 
                 @Override
-                public void onNext(Response<ToggleDeviceResponse> toggleDeviceResponseResponse) {
+                public void onNext(Response<String> toggleDeviceResponseResponse) {
                     Log.e(TAG, "onNext() called with: toggleDeviceResponseResponse = [" + toggleDeviceResponseResponse + "]");
                 }
 

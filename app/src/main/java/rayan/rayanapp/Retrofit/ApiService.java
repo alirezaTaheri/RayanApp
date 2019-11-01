@@ -4,7 +4,11 @@ import com.google.gson.JsonObject;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 import io.reactivex.Observable;
+import okhttp3.ResponseBody;
+import rayan.rayanapp.Data.CustomResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
@@ -55,6 +59,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
 import retrofit2.Call;
 import retrofit2.Response;
+import retrofit2.adapter.rxjava2.Result;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -120,7 +125,7 @@ public interface ApiService {
     Observable<BaseResponse> addDeviceToGroup(@Header("Authorization") String token, @Body AddDeviceToGroupRequest addDeviceToGroupRequest);
 
     @POST
-    Observable<Response<ChangeNameResponse>> changeName(@Header("auth") String auth, @Url String url, @Body ChangeNameRequest changeNameRequest);
+    Observable<Response<String>> changeName(@Header("auth") String auth, @Url String url, @Body ChangeNameRequest changeNameRequest);
     @POST
     Observable<DeviceBaseResponse> ITET(@Url String url, @Body BaseRequest baseRequest);
     @POST
@@ -131,7 +136,7 @@ public interface ApiService {
     Observable<ToggleDeviceResponse> toggle(@Url String url, @Body BaseRequest baseRequest);
     @POST
     @Headers("Cache-Control: no-cache")
-    Observable<Response<ToggleDeviceResponse>> togglePin1(@Header("auth") String auth, @Url String url, @Body ToggleDevice toggleDevice);
+    Observable<Response<String>> togglePin1(@Header("auth") String auth, @Url String url, @Body ToggleDevice toggleDevice);
     @POST
     @Headers("Cache-Control: no-cache")
     Observable<Response<ToggleDeviceResponse>> togglePin123(@Header("auth") String auth, @Url String url, @Body ToggleDevice toggleDevice);
@@ -144,20 +149,20 @@ public interface ApiService {
 //    @Headers("Cache-Control: no-cache")
     @Headers("Cache-Control: no-cache")
     @POST
-    Observable<Response<ToggleDeviceResponse>> togglePin1Pin2(@Header("auth") String auth, @Url String url, @Body ToggleDeviceWithLastCommand toggleDevice);
+    Observable<Response<String>> togglePin1Pin2(@Header("auth") String auth, @Url String url, @Body ToggleDeviceWithLastCommand toggleDevice);
     @POST
     Observable<TlmsDoneResponse> tlms(@Url String url, @Body BaseRequest baseRequest);
     @POST
     Observable<YesResponse> NODE(@Url String url, @Body BaseRequest baseRequest);
     @POST
-    Observable<Response<Ready4SettingsResponse>> settings(@Header("auth") String auth, @Url String url, @Body Ready4SettingsRequest ready4SettingsRequest);
+    Observable<Response<String>> settings(@Header("auth") String auth, @Url String url, @Body Ready4SettingsRequest ready4SettingsRequest);
     @POST
     Observable<SetPrimaryConfigResponse> sendFirstConfig(@Url String url, @Body SetPrimaryConfigRequest setPrimaryConfigRequest);
     @POST
-    Observable<Response<FactoryResetResponse>> factoryReset(@Header("auth") String auth, @Url String url, @Body FactoryResetRequest baseRequest);
+    Observable<Response<String>> factoryReset(@Header("auth") String auth, @Url String url, @Body FactoryResetRequest baseRequest);
     //
     @POST
-    Observable<Response<UpdateResponse>> deviceUpdate(@Header("auth") String auth, @Url String url, @Body UpdateRequest baseRequest);
+    Observable<Response<String>> deviceUpdate(@Header("auth") String auth, @Url String url, @Body UpdateRequest baseRequest);
     @POST
     Observable<DeviceBaseResponse> deviceDoUpdate(@Url String url, @Body UpdateDeviceRequest updateDeviceRequest);
     @POST
@@ -165,7 +170,7 @@ public interface ApiService {
     @POST
     Observable<SendFilesToDevicePermitResponse> deviceSendFilePermit(@Url String url, @Body SendFilesToDevicePermitRequest sendFilesToDevicePermitRequest);
     @POST
-    Observable<Response<ChangeAccessPointResponse>> changeAccessPoint(@Header("auth") String auth, @Url String url, @Body ChangeAccessPointRequest changeAccessPointRequest);
+    Observable<Response<String>> changeAccessPoint(@Header("auth") String auth, @Url String url, @Body ChangeAccessPointRequest changeAccessPointRequest);
     @POST
     Observable<DeviceBaseResponse> sendMqtt(@Url String url, @Body MqttTopicRequest mqttTopicRequest);
     @POST

@@ -31,6 +31,7 @@ import rayan.rayanapp.R;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * Created by alireza321 on 20/12/2018.
@@ -38,6 +39,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
     private static Retrofit retrofit;
+    private static Retrofit retrofit2;
 
     public static Retrofit getRetrofitInstance(String BASE_URL){
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -65,11 +67,28 @@ public class RetrofitClient {
                     .baseUrl(BASE_URL)
                     .callbackExecutor(Executors.newSingleThreadExecutor())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+//                    .addConverterFactory(ScalarsConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
 //                    .client(httpClient.build())
                     .build();
         }
         return retrofit;
+    }
+    public static Retrofit getRetrofitInstanceScalar(String BASE_URL){
+        if (retrofit2 == null){
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient.Builder okhttpClient = new OkHttpClient.Builder();
+            okhttpClient.addInterceptor(httpLoggingInterceptor);
+            retrofit2 = new Retrofit.Builder()
+                    .client(okhttpClient.build())
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .baseUrl(BASE_URL)
+                    .build();
+        }
+        return retrofit2;
     }
     public static <T> void request(Single<retrofit2.Response<T>> single, ApiListener<T> listener) {
         Disposable disposable = single.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe((retrofit2.Response<T> tResponse) -> {

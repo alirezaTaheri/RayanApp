@@ -24,7 +24,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.crypto.Mac;
@@ -89,24 +91,50 @@ public class UDPServerService extends Service {
                         Device device = deviceDatabase.getDevice(src);
                         if (device != null) {
                             Log.e(TAG, "Computed HMAC is: " + sha1(jsonMessage.toString(), device.getSecret()));
-                            if (sha1(jsonMessage.toString(), device.getSecret()).equals(auth)) {
+                            if (sha1(msg[1], device.getSecret()).equals(auth)) {
+                                Log.e(TAG, "Hmacs Are Equal");
                                 byte[] decodedName;
                                 String cmd = jsonMessage.getString("cmd");
                                 String pin1, pin2, name, ssid, style, type, statusWord;
                                 ((RayanApplication) getApplication()).getBus().send(jsonMessage);
                                 switch (cmd) {
                                     case "tgl":
+                                        statusWord = jsonMessage.getString("stword");
                                         pin1 = jsonMessage.getString("pin1");
                                         pin2 = jsonMessage.getString("pin2");
                                         device = deviceDatabase.getDevice(src);
                                         if (device == null)
                                             Log.e(TAG, "Couldn't find Device with this ChipId: " + src);
-                                        else {
+                                        else if (statusWord != null && device.getStatusWord() != null && Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) > Integer.parseInt(device.getStatusWord())) {
+                                            Log.e(TAG, "message Stword: " + Encryptor.decrypt(statusWord, device.getSecret()));
+                                            Log.e(TAG, "Device Status word: " + device.getStatusWord());
                                             ((RayanApplication) getApplication()).getDevicesAccessibilityBus().send(src);
                                             device.setPin1(pin1);
                                             device.setPin2(pin2);
                                             device.setIp(senderIP);
+                                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
+                                            device.setHeader(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]);
                                             deviceDatabase.updateDevice(device);
+                                        }
+                                        else if (statusWord != null && device.getStatusWord() == null) {
+                                            Log.e(TAG, "Device status word was null but now it's not");
+                                            Log.e(TAG, "message Stword: " + Encryptor.decrypt(statusWord, device.getSecret()));
+                                            Log.e(TAG, "Device Status word: " + device.getStatusWord());
+                                            ((RayanApplication) getApplication()).getDevicesAccessibilityBus().send(src);
+                                            device.setPin1(pin1);
+                                            device.setPin2(pin2);
+                                            device.setIp(senderIP);
+                                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
+                                            device.setHeader(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]);
+                                            deviceDatabase.updateDevice(device);
+                                        }
+                                        else if (device.getStatusWord() != null && statusWord != null || device.getStatusWord() != null && statusWord != null && Integer.parseInt(Encryptor.decrypt(String.valueOf(Encryptor.decrypt(statusWord, device.getSecret().split("#")[0])), device.getSecret())) < Integer.parseInt(device.getStatusWord())) {
+                                            Log.e(TAG, "Status word verification failed because of something");
+                                            Log.e(TAG, "Going to Verify Device...");
+                                            verifyDevice(device, senderIP);
+
+                                        }else if (statusWord == null){
+                                            Log.e(TAG, "Sent Status word is empty and we can not execute anything...");
                                         }
                                         break;
                                     case "TLMSDONE":
@@ -133,8 +161,9 @@ public class UDPServerService extends Service {
                                                 if (statusWord != null) {
                                                     Log.e(getClass().getSimpleName(), "Received Stword: " + statusWord + " Decoding with Key: " + device.getSecret());
                                                     Log.e("Decrypting", "Plain text Decrypted is: " + Encryptor.decrypt(statusWord, device.getSecret()));
-                                                    Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
-                                                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]) + 1));
+                                                    Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
+                                                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
+                                                    device.setHeader(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]);
                                                     Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
                                                 }
                                             } catch (Exception e) {
@@ -318,12 +347,20 @@ public class UDPServerService extends Service {
         return new String( org.apache.commons.net.util.Base64.encodeBase64(bytes) );
     }
 
-    private Map<String, String> tempVerification = new HashMap<>();
+    private Map<String, List<String>> tempVerification = new HashMap<>();
     public void verifyDevice(Device device, String ip){
         Log.d(TAG, "Verifying This Device: " + device);
         try {
         VerifyDeviceRequest verifyDeviceRequest = new VerifyDeviceRequest();
-        tempVerification.put(device.getChipId(), verifyDeviceRequest.getAuth());
+        List<String> currentList = tempVerification.get(device.getChipId());
+        if (currentList == null){
+            List<String> verificationList = new ArrayList<>();
+            verificationList.add(verifyDeviceRequest.getAuth());
+            tempVerification.put(device.getChipId(), verificationList);
+        }else{
+            currentList.add(verifyDeviceRequest.getAuth());
+            tempVerification.put(device.getChipId(), currentList);
+        }
         Log.e(TAG, "Putting Auth To Header: " + verifyDeviceRequest.ToString());
         Log.e(TAG, "Putting Auth To Header: " + sha1(verifyDeviceRequest.ToString(), device.getSecret()));
         apiService.verifyDevice(sha1(verifyDeviceRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(ip), verifyDeviceRequest).subscribeOn(Schedulers.io())
@@ -340,9 +377,9 @@ public class UDPServerService extends Service {
                     Log.e(TAG, "Auth Detected: "+ verifyDeviceResponse.body().getAuth());
                     try {
                         Log.e(TAG, "String Auth Was: " + tempVerification.get(device.getChipId()));
-                        String originalAuth = AppConstants.sha1(tempVerification.get(device.getChipId()), device.getSecret());
-                        Log.e(TAG, "Orginal Auth: " + originalAuth);
-                        if (originalAuth.equals(verifyDeviceResponse.body().getAuth())){
+//                        String originalAuth = AppConstants.sha1(tempVerification.get(device.getChipId()), device.getSecret());
+//                        Log.e(TAG, "Orginal Auth: " + originalAuth);
+                        if (checkVerificationString(device.getChipId(), device.getSecret(), verifyDeviceResponse.body().getAuth())){
                             Log.e(TAG, "Auth is OK");
                             if (verifyDeviceResponse.body().getCmd().equals(AppConstants.FROM_DEVICE_VERIFY_DONE)) {
                                 Log.e(TAG, "Verify_done received from device");
@@ -412,5 +449,13 @@ public class UDPServerService extends Service {
         }
     }
 
+    public boolean checkVerificationString(String chipId, String secret, String auth) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        List<String> deviceAuthList = tempVerification.get(chipId);
+        if (deviceAuthList != null)
+        for (String expectedAuth: deviceAuthList)
+            if (auth.equals(AppConstants.sha1(expectedAuth, secret)))
+                return true;
+        return false;
+    }
 }
 

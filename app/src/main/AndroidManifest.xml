@@ -35,6 +35,7 @@
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning,InnerclassSeparator"
         tools:replace="android:allowBackup">
+        <meta-data android:name="co.ronash.pushe.token" android:value="PUSHE_550858149178"/>
         <activity android:name=".Activities.SettingssActivity" />
         <activity android:name=".Activities.StartUpSplashActivity" />
         <activity
@@ -74,19 +75,15 @@
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <!-- this metadata is for crashlytics -->
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="ad3a16c7f3170306882d8f85a367d63fdf8e0ab5" />
         <!--
  To receive notifications in apps. This is absolutely necessary for android
          push notifications to work while the app is not active.
         -->
-        <service android:name=".Services.firebase.FbMessagingService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
+        <!--<service android:name=".Services.firebase.FbMessagingService">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.google.firebase.MESSAGING_EVENT" />-->
+            <!--</intent-filter>-->
+        <!--</service>-->
         <service
             android:name=".Services.mqtt.MqttJobService"
             android:exported="true"
@@ -99,6 +96,12 @@
             android:name=".Services.AlwaysOnService"
             android:enabled="true"
             android:exported="false"></service>
+        <!--<meta-data-->
+            <!--android:name="io.fabric.ApiKey"-->
+            <!--android:value="cf40ca48fc7776853e91e19dddcb87e03a40ef78" />-->
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="cf40ca48fc7776853e91e19dddcb87e03a40ef78" />
     </application>
 
 </manifest>

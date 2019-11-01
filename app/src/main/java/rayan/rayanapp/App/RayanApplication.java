@@ -14,8 +14,11 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.JsonObject;
 
+//import co.ronash.pushe.Pushe;
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -28,6 +31,8 @@ import rayan.rayanapp.Helper.MqttSubscriptionController;
 import rayan.rayanapp.Helper.RequestManager;
 import rayan.rayanapp.Helper.ScenariosMqttMessagesController;
 import rayan.rayanapp.Helper.SendMessageToDevice;
+import rayan.rayanapp.Mqtt.MqttClient;
+import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.R;
 import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
@@ -57,6 +62,9 @@ public class RayanApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
+//        Pushe.initialize(this,true);
+//        Fabric.with(this, new Crashlytics());
         Configuration config = getBaseContext().getResources().getConfiguration();
         String lang = "en";
         if (! config.locale.getLanguage().equals(lang)) {
@@ -246,4 +254,5 @@ public class RayanApplication extends Application {
             mRequestQueue.cancelAll(tag);
         }
     }
+
 }

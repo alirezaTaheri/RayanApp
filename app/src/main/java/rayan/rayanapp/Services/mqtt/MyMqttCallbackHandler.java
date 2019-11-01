@@ -21,6 +21,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Mqtt.MqttClient;
+import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 
@@ -45,11 +47,12 @@ public class MyMqttCallbackHandler implements MqttCallback {
 
   @Override
   public void connectionLost(Throwable cause) {
+      Log.e(TAG, this+"MqttCallBackHandlerConnectionLost: " + cause);
       Connection connection = MainActivityViewModel.connection.getValue();
       connection.changeConnectionStatus(Connection.ConnectionStatus.DISCONNECTED);
       MainActivityViewModel.connection.postValue(connection);
+      MqttClientService.getMqttClientInstanceOnly(rayanApplication).updateConnectionStatus(connection);
 //      Toast.makeText(context, "MQTT Connection Lost", Toast.LENGTH_SHORT).show();
-        Log.e(TAG, "MqttCallBackHandlerConnectionLost: " + cause);
     if (cause != null) {
         cause.printStackTrace();
         Log.e(TAG , "Connection Lost: " + cause);
@@ -79,6 +82,7 @@ public class MyMqttCallbackHandler implements MqttCallback {
         }
         return null;
     }
+
     public Maybe<Device> getDeviceAsync(String chipId){
       return deviceDatabase.getDeviceFlowable(chipId).observeOn(Schedulers.io());
     }

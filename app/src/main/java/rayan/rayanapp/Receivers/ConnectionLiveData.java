@@ -41,10 +41,14 @@ public class ConnectionLiveData extends LiveData<ConnectionStatusModel> {
         public void onReceive(Context context, Intent intent) {
             if(intent.getExtras()!=null) {
                 ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                WifiManager manager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                WifiInfo connectionInfo = manager.getConnectionInfo();
                 NetworkInfo activeNetwork = (NetworkInfo) intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
                 NetworkInfo activeNetwork2 = connectivityManager.getActiveNetworkInfo();
                 Log.e("0101010101","first: " + activeNetwork);
                 Log.e("0101010101","second:" + activeNetwork2);
+                Log.e("0101010101","second:" + connectionInfo);
+                Log.e("0101010101","second:" + connectionInfo.getSSID());
                 if (activeNetwork2 != null)
                     activeNetwork = activeNetwork2;
                 boolean isConnected = activeNetwork != null &&
@@ -52,8 +56,12 @@ public class ConnectionLiveData extends LiveData<ConnectionStatusModel> {
                 if(isConnected) {
                     switch (activeNetwork.getType()){
                         case ConnectivityManager.TYPE_WIFI:
-                            postValue(new ConnectionStatusModel(activeNetwork.getExtraInfo(),ConnectivityManager.TYPE_WIFI,
-                                    AppConstants.WIFI,activeNetwork.getState()));
+                            if (activeNetwork != null && activeNetwork.getExtraInfo() != null)
+                                postValue(new ConnectionStatusModel(activeNetwork.getExtraInfo(),ConnectivityManager.TYPE_WIFI,
+                                        AppConstants.WIFI,activeNetwork.getState()));
+                            else
+                                postValue(new ConnectionStatusModel(connectionInfo.getSSID(),ConnectivityManager.TYPE_WIFI,
+                                        AppConstants.WIFI,activeNetwork.getState()));
                             break;
                         case ConnectivityManager.TYPE_MOBILE:
                             postValue(new ConnectionStatusModel(activeNetwork.getExtraInfo(),ConnectivityManager.TYPE_MOBILE,

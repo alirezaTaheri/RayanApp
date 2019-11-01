@@ -14,6 +14,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import java.util.ArrayList;
 
 import rayan.rayanapp.Fragments.DevicesFragment;
+import rayan.rayanapp.Mqtt.MqttClient;
+import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
@@ -38,7 +40,8 @@ public class ActionListener implements IMqttActionListener {
     private final String clientHandle;
     private final Context context;
     private MutableLiveData<Connection> updateConnection;
-    public ActionListener(Context context, Action action,
+    private MqttClient mqttClient;
+    public ActionListener(MqttClient mqttClient, Context context, Action action,
                           Connection connection, MutableLiveData<Connection> updateConnection, String... additionalArgs) {
         this.context = context;
         this.action = action;
@@ -46,6 +49,7 @@ public class ActionListener implements IMqttActionListener {
         this.clientHandle = connection.handle();
         this.additionalArgs = additionalArgs;
         this.updateConnection = updateConnection;
+        this.mqttClient = mqttClient;
     }
     public ActionListener(Context context, Action action,
                           Connection connection, String... additionalArgs) {
@@ -126,6 +130,8 @@ public class ActionListener implements IMqttActionListener {
 //        connection.setSubscriptions(subscriptionss);
         connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTED);
         connection.addAction("Client Connected");
+        mqttClient.updateConnectionStatus(connection);
+        updateConnection.postValue(connection);
 //        Toast.makeText(context, "Successfully Connected", Toast.LENGTH_SHORT).show();
         Log.i(TAG, connection.handle() + " connected.");
         Log.e(TAG, "subscriptions: " + connection.getSubscriptions());
@@ -167,7 +173,6 @@ public class ActionListener implements IMqttActionListener {
         } catch (MqttException | IllegalArgumentException ex){
             Log.e(TAG, "Failed to Auto-Subscribe: " + ex.getMessage());
         }
-        updateConnection.postValue(connection);
 //        MainActivityViewModel.connection.setValue(connection);
 
     }
@@ -224,9 +229,14 @@ public class ActionListener implements IMqttActionListener {
     }
 
     private void connect(Throwable exception) {
-//        Toast.makeText(context, "Can't Connect", Toast.LENGTH_SHORT).show();
         Log.e(TAG, "In Connect Method 2" + exception);
+        Log.e(TAG, "In Connect Method 2" + exception.getMessage());
+//        Toast.makeText(context, "Can't Connect", Toast.LENGTH_SHORT).show();
         exception.printStackTrace();
+        if (exception.getMessage().equals("Client is connected") || exception.getMessage().equals("Connect already in progress")) {
+            Log.e(TAG, "Client is already connected");//32110
+            connection.changeConnectionStatus(Connection.ConnectionStatus.CONNECTED);
+        }else{
 //        Connection c = MainActivityViewModel.connection.getValue();
 //        if (c == null)
 //            c = connection;
@@ -235,8 +245,10 @@ public class ActionListener implements IMqttActionListener {
 //        MainActivityViewModel.connection.setValue(c);
         connection.changeConnectionStatus(Connection.ConnectionStatus.ERROR);
         connection.addAction("Client failed to connect");
-        updateConnection.postValue(connection);
         System.out.println("Client failed to connect");
+    }
+    mqttClient.updateConnectionStatus(connection);
+    updateConnection.postValue(connection);
     }
 
 }

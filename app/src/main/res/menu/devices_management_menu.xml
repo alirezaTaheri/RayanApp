@@ -3,7 +3,7 @@
 
     <item android:id="@+id/favorite"
         android:title="مورد‌علاقه کردن"
-        android:icon="@drawable/ic_favorite"/>
+        android:icon="@drawable/ic_favorite_star"/>
     <item android:id="@+id/hide"
         android:title="مخفی کردن"
         android:icon="@drawable/ic_wifi"/>
