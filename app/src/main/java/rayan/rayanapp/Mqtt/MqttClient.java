@@ -3,12 +3,18 @@ package rayan.rayanapp.Mqtt;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.security.KeyStore;
+import java.util.Random;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
@@ -66,10 +72,10 @@ public class MqttClient {
             Log.e(getClass().getCanonicalName(), "Making the connection Object...");
             connection = Connection.createConnection(
                     //"ClientHandle" + System.currentTimeMillis(),
-//                    System.currentTimeMillis()+RayanApplication.getPref().getId()+new Random().nextInt(),
-//                    System.currentTimeMillis()+RayanApplication.getPref().getId()+new Random().nextInt(),
-                    RayanApplication.getPref().getId(),
-                    RayanApplication.getPref().getId(),
+                    System.currentTimeMillis()+RayanApplication.getPref().getId()+new Random().nextInt(),
+                    System.currentTimeMillis()+RayanApplication.getPref().getId()+new Random().nextInt(),
+//                    RayanApplication.getPref().getId(),
+//                    RayanApplication.getPref().getId(),
                     AppConstants.MQTT_HOST,
                     AppConstants.MQTT_PORT_SSL,
                     rayanApplication,
