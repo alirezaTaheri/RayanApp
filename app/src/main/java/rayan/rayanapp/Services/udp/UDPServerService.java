@@ -349,7 +349,7 @@ public class UDPServerService extends Service {
 
     private Map<String, List<String>> tempVerification = new HashMap<>();
     public void verifyDevice(Device device, String ip){
-        Log.d(TAG, "Verifying This Device: " + device);
+        Log.d(TAG, "Verifying This Device: " + device + " IP is: " + ip);
         try {
         VerifyDeviceRequest verifyDeviceRequest = new VerifyDeviceRequest();
         List<String> currentList = tempVerification.get(device.getChipId());

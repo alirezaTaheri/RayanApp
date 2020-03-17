@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -43,6 +44,8 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
+
+import static rayan.rayanapp.App.RayanApplication.getContext;
 
 public class EditGroupFragment extends Fragment {
    // OnToolbarNameChange onToolbarNameChange;
@@ -161,27 +164,24 @@ public class EditGroupFragment extends Fragment {
         switch (requestCode) {
             case (PICK_CONTACT):
                 if (resultCode == Activity.RESULT_OK) {
-                    Uri contactData = data.getData();
-                    Cursor c =  activity.managedQuery(contactData, null, null, null, null);
-                    if (c.moveToFirst()) {
-                        String id =c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-                        String hasPhone =c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-                        if (hasPhone.equalsIgnoreCase("1")) {
-                            Cursor phones = activity.getContentResolver().query(
-                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
-                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,
-                                    null, null);
-                            phones.moveToFirst();
-                            cNumber = phones.getString(phones.getColumnIndex("data1"));
-                            cNumber = cNumber.trim();
-                            while (cNumber.contains(" "))
-                                cNumber = cNumber.replace(" ", "");
-                            cNumber = cNumber.replace("+98","0");
-                            String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                            Contact contact = new Contact();
-                            contact.setName(name);
-                            contact.setNumbers(cNumber);
-                            editGroupFragmentViewModel.addUserByMobile(cNumber, group.getId()).observe(this, baseResponse -> {
+
+
+                    Uri contactUri = data.getData();
+                    String[] projection = new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER};
+                    Cursor cursor = getContext().getContentResolver().query(contactUri, projection,
+                            null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                        String number = cursor.getString(numberIndex);
+                        Uri uri2 = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number.trim()));
+                        Cursor cursor2 = getContext().getContentResolver().query(uri2, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+                        String contactName = null;
+                        if(cursor2.moveToFirst()) {
+                            contactName = cursor2.getString(cursor2.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                            while (number.contains(" "))
+                                number = number.replace(" ", "");
+                            number = number.replace("+98","0");
+                            editGroupFragmentViewModel.addUserByMobile(number, group.getId()).observe(this, baseResponse -> {
                                 if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
                                     Toast.makeText(activity, "کاربری با این شماره وجود ندارد", Toast.LENGTH_SHORT).show();
                                 }
@@ -196,7 +196,48 @@ public class EditGroupFragment extends Fragment {
                                     Toast.makeText(activity, "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
                             });
                         }
+                        Log.e("lklklklklklklk", "name" + contactName);
+                        cursor2.close();
                     }
+                    cursor.close();
+
+
+//                    Uri contactData = data.getData();
+//                    Cursor c =  activity.managedQuery(contactData, null, null, null, null);
+//                    if (c.moveToFirst()) {
+//                        String id =c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+//                        String hasPhone =c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+//                        if (hasPhone.equalsIgnoreCase("1")) {
+//                            Cursor phones = activity.getContentResolver().query(
+//                                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
+//                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ id,
+//                                    null, null);
+//                            phones.moveToFirst();
+//                            cNumber = phones.getString(phones.getColumnIndex("data1"));
+//                            cNumber = cNumber.trim();
+//                            while (cNumber.contains(" "))
+//                                cNumber = cNumber.replace(" ", "");
+//                            cNumber = cNumber.replace("+98","0");
+//                            String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+//                            Contact contact = new Contact();
+//                            contact.setName(name);
+//                            contact.setNumbers(cNumber);
+//                            editGroupFragmentViewModel.addUserByMobile(cNumber, group.getId()).observe(this, baseResponse -> {
+//                                if (baseResponse.getStatus().getCode().equals("404") && baseResponse.getData().getMessage().equals("User not found")){
+//                                    Toast.makeText(activity, "کاربری با این شماره وجود ندارد", Toast.LENGTH_SHORT).show();
+//                                }
+//                                else if (baseResponse.getStatus().getCode().equals("400") && baseResponse.getData().getMessage().equals("Repeated")){
+//                                    Toast.makeText(activity, "این کاربر هم‌اکنون عضو گروه است", Toast.LENGTH_SHORT).show();
+//                                }
+//                                else if (baseResponse.getStatus().getCode().equals("200")){
+//                                    Toast.makeText(activity, "کاربر با موفقیت اضافه شد", Toast.LENGTH_SHORT).show();
+//                                    editGroupFragmentViewModel.getGroups();
+//                                }
+//                                else
+//                                    Toast.makeText(activity, "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+//                            });
+//                        }
+//                    }
                 }
                 break;
 
@@ -219,8 +260,15 @@ public class EditGroupFragment extends Fragment {
     @OnClick(R.id.addUserToGroup)
     void addUser() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
-            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-            startActivityForResult(intent, PICK_CONTACT);
+//            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+//            startActivityForResult(intent, PICK_CONTACT);
+
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    12);
+            Intent i=new Intent(Intent.ACTION_PICK);
+            i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+            startActivityForResult(i, PICK_CONTACT);
         }
         else getContactPermission();
     }

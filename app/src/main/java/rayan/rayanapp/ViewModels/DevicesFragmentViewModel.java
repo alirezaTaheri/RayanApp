@@ -237,6 +237,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                     }
                     else {
                         existing.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
+                        Log.e("wwwwwwwwwwwwwwwwww", u.getName1()+"u.ssid"+u.getSsid()+existing.getSsid());
+
                         existing.setSecret(g.getSecret());
                         existing.setName1(u.getName1());
                         existing.setType(u.getType());
@@ -304,6 +306,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
                 }
                 if (!exists)
                     deviceDatabase.addDevice(newDevice);
+                else deviceDatabase.updateDevice(newDevice);
             }
             if (oldUsers != null){
                 for (int a = 0;a<oldUsers.size();a++){

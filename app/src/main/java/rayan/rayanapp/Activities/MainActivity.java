@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.net.wifi.ScanResult;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -100,6 +102,8 @@ import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+import static rayan.rayanapp.App.RayanApplication.getContext;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus, View.OnClickListener, OnGroupClicked<Group>, NetworkConnectivityListener, DevicesAndFavoritesListener {
     private static final int REQUEST_PHONE_CALL = 1;
@@ -657,6 +661,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
             }
+//            default:
+//                Uri contactUri = data.getData();
+//                String[] projection = new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER};
+//                Cursor cursor = getContext().getContentResolver().query(contactUri, projection,
+//                        null, null, null);
+//                if (cursor != null && cursor.moveToFirst()) {
+//                    int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+//                    String number = cursor.getString(numberIndex);
+//                    Uri uri2 = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number.trim()));
+//                    Cursor cursor2 = getContext().getContentResolver().query(uri2, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+//                    String contactName = null;
+//                    if(cursor2.moveToFirst()) {
+//                        contactName = cursor2.getString(cursor2.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+//                    }
+//                    Log.e("lklklklklklklk", "name" + contactName);
+//                    cursor2.close();
+//                }
+//                cursor.close();
 
         }
     }
@@ -681,6 +703,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+
 
 //        Observable<Integer> o1 =
 //                Observable.just(1,10,20,30,40, 140, 150, 170)
@@ -1365,4 +1388,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //
 /*
 {"text":"P27upkIy3kIvJnhRL/p59A==", "cmd":"de", "src":"", "k":"zmk4rid5h3e1mk66"}
+ */
+
+// 24 Bahman
+//entrance 10:30
+//1:20
+//2:45
+//1:30
+//2:55
+//Exit: 19:30
+
+/*
+
+7 Esfand
+25 min
+
+8 Esfand
+1 Hour = 60 min
+
+9 Esfand
+50 min
+20 min
+
+10 Esfand
+50 min
+60 min == 1 
+15 min 
+15 min 
+15 min
+10 min
+//////////////2:45
+
+
+19:
+1:10
+
+22 esfand:
+55 min
+36 min
+
+25 esfand
+50 min
+
+26 esfand
+50 min
+33 min
+24 min
+
  */

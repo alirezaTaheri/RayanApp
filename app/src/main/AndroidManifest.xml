@@ -45,11 +45,6 @@
             android:name=".Activities.SignUpUserActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".Activities.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".Activities.LoginActivity"
@@ -90,7 +85,15 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity android:name=".Activities.ScenarioActivity" />
-        <activity android:name=".Activities.TestActivity" />
+        <activity android:name=".Activities.TestActivity" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
 
         <service
             android:name=".Services.AlwaysOnService"

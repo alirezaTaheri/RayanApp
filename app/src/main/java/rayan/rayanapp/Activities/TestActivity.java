@@ -3,6 +3,7 @@ package rayan.rayanapp.Activities;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -33,23 +34,16 @@ import rayan.rayanapp.Util.AppConstants;
 
 public class TestActivity extends AppCompatActivity {
 
-    Device device;
-    @BindView(R.id.stword)
-    EditText stword;
-    @BindView(R.id.chipId)
-    EditText chipId;
-    @BindView(R.id.cmd)
-    EditText cmd;
-    @BindView(R.id.lc)
-    EditText lc;
-    private String TAG = this.getClass().getCanonicalName();
-    DeviceDatabase database;
+    @BindView(R.id.webView)
+    WebView webView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
         ButterKnife.bind(this);
-        database = new DeviceDatabase(this);
+
+        webView.loadUrl("http://www.dantia.ir/");
     }
 
 //    @OnClick(R.id.send)
