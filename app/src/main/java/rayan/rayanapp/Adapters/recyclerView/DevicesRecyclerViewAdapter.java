@@ -58,8 +58,10 @@ public class DevicesRecyclerViewAdapter extends GenericRecyclerViewAdapter<Devic
             return new DeviceViewHolder1Bridge(inflate(R.layout.item_device_1_bridge, parent));
         else if (viewType == 2)
             return new DeviceViewHolder2Bridges(inflate(R.layout.item_device_2_bridge, parent));
-        else
+        else if (viewType == 3)
             return new DeviceViewHolderPlug(inflate(R.layout.item_device_plug, parent));
+        else
+            return new DeviceViewHolderPlug(inflate(R.layout.item_device_remote_hub, parent));
     }
 
 
