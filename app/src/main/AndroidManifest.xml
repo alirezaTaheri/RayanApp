@@ -2,28 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="rayan.rayanapp">
-
     <!-- <uses-permission android:name="android.permission.READ_CONTACTS or android.permission.WRITE_CONTACTS" /> -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <!-- <uses-permission android:name="android.permission.READ_SMS" /> -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <!-- <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" /> <!-- <uses-permission android:name="android.permission.READ_SMS" /> -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" /> -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
     <!-- <uses-permission android:name="android.permission.RECORD_AUDIO" /> -->
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
-    <!-- <uses-permission android:name="android.permission.CALL_PHONE" /> -->
     <application
         android:name=".App.RayanApplication"
         android:allowBackup="false"
@@ -35,7 +30,15 @@
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning,InnerclassSeparator"
         tools:replace="android:allowBackup">
-        <meta-data android:name="co.ronash.pushe.token" android:value="PUSHE_550858149178"/>
+        <activity android:name=".Activities.AddNewRemoteActivity"
+            android:theme="@style/AppBaseThemeDarkStatusBar"/>
+
+        <activity android:name=".Activities.RemoteActivity"/>
+
+        <meta-data
+            android:name="co.ronash.pushe.token"
+            android:value="PUSHE_550858149178" />
+
         <activity android:name=".Activities.SettingssActivity" />
         <activity android:name=".Activities.StartUpSplashActivity" />
         <activity
@@ -45,6 +48,11 @@
             android:name=".Activities.SignUpUserActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".Activities.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".Activities.LoginActivity"
@@ -69,39 +77,29 @@
             android:name=".Activities.AddNewDeviceActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <!--
  To receive notifications in apps. This is absolutely necessary for android
          push notifications to work while the app is not active.
         -->
-        <!--<service android:name=".Services.firebase.FbMessagingService">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.google.firebase.MESSAGING_EVENT" />-->
-            <!--</intent-filter>-->
-        <!--</service>-->
+        <!-- <service android:name=".Services.firebase.FbMessagingService"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="com.google.firebase.MESSAGING_EVENT" /> -->
+        <!-- </intent-filter> -->
+        <!-- </service> -->
         <service
             android:name=".Services.mqtt.MqttJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity android:name=".Activities.ScenarioActivity" />
-        <activity android:name=".Activities.TestActivity" >
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
+        <activity android:name=".Activities.TestActivity" />
 
         <service
             android:name=".Services.AlwaysOnService"
             android:enabled="true"
-            android:exported="false"></service>
-        <!--<meta-data-->
-            <!--android:name="io.fabric.ApiKey"-->
-            <!--android:value="cf40ca48fc7776853e91e19dddcb87e03a40ef78" />-->
+            android:exported="false" /> <!-- <meta-data -->
+        <!-- android:name="io.fabric.ApiKey" -->
+        <!-- android:value="cf40ca48fc7776853e91e19dddcb87e03a40ef78" /> -->
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="cf40ca48fc7776853e91e19dddcb87e03a40ef78" />

@@ -66,7 +66,6 @@ public class LoginActivity extends AppCompatActivity {
 //            }
 //        }
 
-
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         loginViewModel.getLoginResponse().observe(this, baseResponse -> {
             if (NetworkUtil.getConnectivityStatusString(this).equals(AppConstants.NOT_CONNECTED)){

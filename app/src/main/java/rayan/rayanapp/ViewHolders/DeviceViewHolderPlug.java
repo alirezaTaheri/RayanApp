@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -16,8 +15,9 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Listeners.OnToggleDeviceListener;
+import rayan.rayanapp.Listeners.OnDeviceClickListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
@@ -38,7 +38,8 @@ public class DeviceViewHolderPlug extends DeviceViewHolder1Bridge {
     }
 
     @Override
-    public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
+    public void onBind(BaseDevice baseDevice, @Nullable OnDeviceClickListener<BaseDevice> listener) {
+        Device item = (Device) baseDevice;
         AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
         Log.e("UNIQUETAG", "OnBindViewHolder: Type3" +" "+ item.getName1() +"\n"+ itemView.getId());
         Log.e(TAG, "Processing this Device: " + item);
@@ -81,7 +82,8 @@ public class DeviceViewHolderPlug extends DeviceViewHolder1Bridge {
         v.start();
     }
 
-    public void stopToggleAnimationPin1(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
+    @Override
+    public void stopToggleAnimationPin1(ValueAnimator v, OnDeviceClickListener<BaseDevice> listener, Device item) {
         Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge1" + item);
         AppConstants.disableEnableControls(true, (ViewGroup) itemView);
         if (v != null) {
@@ -111,8 +113,8 @@ public class DeviceViewHolderPlug extends DeviceViewHolder1Bridge {
                 }
             });
         }
-            v.setDuration(300);
-            v.start();
+        v.setDuration(300);
+        v.start();
         pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_plug_on_1):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_plug_off_1));
 //            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
         if (listener != null){
@@ -128,13 +130,15 @@ public class DeviceViewHolderPlug extends DeviceViewHolder1Bridge {
         return itemView.getWidth();
     }
 
-    public void changePosition(Device item, OnToggleDeviceListener<Device> listener){
+    @Override
+    public void changePosition(BaseDevice item, OnDeviceClickListener<BaseDevice> listener) {
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
         }
     }
-    public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
+
+    @Override
+    public void accessPointChanged(Device device, OnDeviceClickListener<BaseDevice> l) {
         l.onAccessPointChanged(device);
     }
-
 }

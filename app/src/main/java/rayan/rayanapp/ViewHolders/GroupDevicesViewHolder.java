@@ -5,9 +5,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.varunest.sparkbutton.SparkButton;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,7 +13,7 @@ import rayan.rayanapp.Listeners.OnDeviceClickListenerManagement;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class GroupDevicesViewHolder extends BaseViewHolder<Device, OnDeviceClickListenerManagement<Device>> {
+public class GroupDevicesViewHolder extends BasicViewHolder<Device, OnDeviceClickListenerManagement<Device>> {
     private final String TAG = GroupDevicesViewHolder.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;

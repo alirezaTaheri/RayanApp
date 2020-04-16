@@ -15,7 +15,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Util.AppConstants;
 
 @Entity
-public class Device implements Parcelable {
+public class Device extends BaseDevice implements Parcelable {
     @PrimaryKey
     @NonNull
     @SerializedName("chip_id")
@@ -56,13 +56,13 @@ public class Device implements Parcelable {
     private String statusWord;
     private String secret;
     private boolean hidden;
-    private int position;
-    private int inGroupPosition;
-    private int favoritePosition = -1;
     private String header = AppConstants.UNKNOWN_HEADER;
 
+    public Device() {
+    }
 
     public Device(Device device) {
+        super(device);
         this.pin1 = device.getPin1();
         this.chipId = device.getChipId();
         this.name1 = device.getName1();
@@ -81,11 +81,8 @@ public class Device implements Parcelable {
         this.devicePassword = device.getDevicePassword();
         this.statusWord = device.getStatusWord();
         this.hidden = device.isHidden();
-        this.position = device.getPosition();
-        this.inGroupPosition = device.getInGroupPosition();
         this.locallyAccessibility = device.isLocallyAccessibility();
         this.onlineAccessibility = device.isOnlineAccessibility();
-        this.favoritePosition = device.getFavoritePosition();
         this.header = device.getHeader();
     }
 
@@ -93,21 +90,6 @@ public class Device implements Parcelable {
         return header;
     }
 
-    public int getFavoritePosition() {
-        return favoritePosition;
-    }
-
-    public void setFavoritePosition(int favoritePosition) {
-        this.favoritePosition = favoritePosition;
-    }
-
-    public int getInGroupPosition() {
-        return inGroupPosition;
-    }
-
-    public void setInGroupPosition(int inGroupPosition) {
-        this.inGroupPosition = inGroupPosition;
-    }
 
     public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId, String secret) {
         this.chipId = chipId;
@@ -147,9 +129,6 @@ public class Device implements Parcelable {
         statusWord = in.readString();
         secret = in.readString();
         hidden = in.readByte() != 0;
-        position = in.readInt();
-        inGroupPosition = in.readInt();
-        favoritePosition = in.readInt();
         header = in.readString();
     }
 
@@ -176,9 +155,6 @@ public class Device implements Parcelable {
         dest.writeString(statusWord);
         dest.writeString(secret);
         dest.writeByte((byte) (hidden ? 1 : 0));
-        dest.writeInt(position);
-        dest.writeInt(inGroupPosition);
-        dest.writeInt(favoritePosition);
         dest.writeString(header);
     }
 
@@ -374,70 +350,37 @@ public class Device implements Parcelable {
     public String toString() {
         return "{" +
                 "chipId='" + chipId + '\'' +
-                ", name1='" + name1 + '\'' +
+                "baseType='" + getDeviceType() + '\'' +
+                "position='" + getPosition() + '\'' +
+                "grouppos='" + getInGroupPosition() + '\'' +
+                ", name1='" + name1 + '\'' ;
 ////                ", name2='" + name2 + '\'' +
-                ", pin1='" + pin1 + '\'' +
-                ", pin2='" + pin2 + '\'' +
-                ", id='" + id + '\'' +
-                ", type='" + type + '\'' +
+//                ", pin1='" + pin1 + '\'' +
+//                ", pin2='" + pin2 + '\'' +
+//                ", id='" + id + '\'' +
+//                ", type='" + type + '\'' +
 //                ", username='" + username + '\'' +
-                ", topic=" + topic +
-                ", groupId='" + groupId + '\'' +
+//                ", topic=" + topic +
+//                ", groupId='" + groupId + '\'' +
 //                ", style='" + style + '\'' +
-                ", ssid='" + ssid + '\'' +
+//                ", ssid='" + ssid + '\'' +
 //                ", devicePassword='" + devicePassword + '\'' +
-                ", ip='" + ip + '\'' +
+//                ", ip='" + ip + '\'' +
 //                ", password='" + password + '\'' +
-                ", favorite=" + favorite +
+//                ", favorite=" + favorite +
 //                ", locallyAccessibility=" + locallyAccessibility +
 //                ", onlineAccessibility=" + onlineAccessibility +
-                ", statusWord='" + statusWord + '\'' +
-                ", secret='" + secret + '\'' +
-                ", hidden=" + hidden +
-                ", position=" + position +
-                ", inGroupPosition=" + inGroupPosition +
-                ", favoritePosition=" + favoritePosition +
-                ", Header=" + header +
-                '}';
+//                ", statusWord='" + statusWord + '\'' +
+//                ", secret='" + secret + '\'' +
+//                ", hidden=" + hidden +
+//                ", Header=" + header +
+//                '}';
     }
 
     public void setHeader(String header) {
         this.header = header;
     }
 
-    //    @Override
-//    public String toString() {
-//        return "Device{" +
-//                "chipId='" + chipId + '\'' +
-//                ", name1='" + name1 + '\'' +
-//                ", position=" + position +
-////                ", name2='" + name2 + '\'' +
-//                ", pin1='" + pin1 + '\'' +
-//                ", pin2='" + pin2 + '\'' +
-////                ", id='" + id + '\'' +
-////                ", type='" + type + '\'' +
-////                ", username='" + username + '\'' +
-//                ", topic=" + topic +
-//                ", groupId='" + groupId + '\'' +
-////                ", style='" + style + '\'' +
-//                ", ssid='" + ssid + '\'' +
-//                ", ip='" + ip + '\'' +
-////                ", password='" + password + '\'' +
-////                ", favorite=" + favorite +
-////                ", locallyAccessibility=" + locallyAccessibility +
-////                ", onlineAccessibility=" + onlineAccessibility +
-//                ", statusWord='" + statusWord + '\'' +
-//                ", secret='" + secret + '\'' +
-//                '}';
-//    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
 
     public boolean isReady4Mqtt(){
         return topic.getTopic() != null;

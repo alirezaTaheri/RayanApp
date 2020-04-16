@@ -10,7 +10,7 @@ import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 
-public class UserViewHolder extends BaseViewHolder<User, OnUserClicked<User>> {
+public class UserViewHolder extends BasicViewHolder<User, OnUserClicked<User>> {
     private final String TAG = UserViewHolder.class.getSimpleName();
     @BindView(R.id.contactName)
     TextView contactName;

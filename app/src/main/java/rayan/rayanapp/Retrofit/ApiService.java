@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
@@ -39,6 +40,8 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeAccessPointResponse;
@@ -62,11 +65,13 @@ import retrofit2.Response;
 import retrofit2.adapter.rxjava2.Result;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
 
 /**
@@ -83,6 +88,12 @@ public interface ApiService {
 
     @GET("api/v2/groups/")
     Observable<GroupsResponse> getGroups(@Header("Authorization") String token);
+
+    @GET("api/v2/remotehubs/")
+    Observable<RemoteHubsResponse> getRemoteHubs(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+    @GET("api/v2/remotes/")
+    Observable<RemotesResponse> getRemotes(@Header("Authorization") String token, @QueryMap Map<String, String> params);
 
     @POST("api/v2/groups/addusermobile")
     Observable<BaseResponse> addUserByMobile(@Header("Authorization") String token, @Body AddUserByMobileRequest addUserByMobileRequest);

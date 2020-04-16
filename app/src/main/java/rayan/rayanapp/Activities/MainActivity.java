@@ -56,10 +56,14 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -69,16 +73,22 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
+
 import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Fragments.FavoritesFragment;
 import rayan.rayanapp.Helper.ControlRequests;
@@ -91,16 +101,31 @@ import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.Mqtt.MqttClient;
 import rayan.rayanapp.Mqtt.MqttClientService;
+import rayan.rayanapp.Persistance.PrefManager;
+import rayan.rayanapp.Persistance.database.DeviceDatabase;
+import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.Persistance.database.RemoteDatabase;
+import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
+import rayan.rayanapp.Persistance.database.UserDatabase;
+import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
+import rayan.rayanapp.Retrofit.ApiService;
+import rayan.rayanapp.Retrofit.ApiUtils;
+import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceData;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.CustomViewPager;
 import rayan.rayanapp.Util.NetworkUtil;
+import rayan.rayanapp.Util.api.StartupApiRequests;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static rayan.rayanapp.App.RayanApplication.getContext;
@@ -459,7 +484,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startService(new Intent(this, UDPServerService.class));
             RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
             mainActivityViewModel.sendNodeToAll();
-            mainActivityViewModel.getGroups();
+            mainActivityViewModel.getGroups1().observe(this, new android.arch.lifecycle.Observer<StartupApiRequests.requestStatus>() {
+                @Override
+                public void onChanged(@Nullable StartupApiRequests.requestStatus requestStatus) {
+                    Log.e("3$$$$$", "^^^^^^^^^^^^^^^^^^^" + requestStatus);
+                }
+            });
         }
         ((RayanApplication)getApplication()).getMsc().init();
     }
@@ -694,16 +724,212 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onDestroy();
     }
 
-    int counter = 1;
+    int counter = 0;
+    int limit = 2;
+    int skip = 0;
+    ApiService apiService;
+    @SuppressLint("CheckResult")
     @Override
     public void onBackPressed() {
 //        startService(new Intent(this, AlwaysOnService.class));
-        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            this.drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
 
+//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//            this.drawerLayout.closeDrawer(GravityCompat.START);
+//        } else {
+//            super.onBackPressed();
+//        }
+//        apiService = ApiUtils.getApiService();
+        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
+        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
+        Log.e(TAG, "RemoteHub: " + remoteHubDatabase.getAllRemoteHubs());
+        Log.e(TAG, "Remote: " + remoteDatabase.getAllRemotes());
+        Log.e(TAG, "RemoteHub: " + remoteHubDatabase.getAllRemoteHubs().size());
+        Log.e(TAG, "Remote: " + remoteDatabase.getAllRemotes().size());
+//        DeviceDatabase deviceDatabase = null;
+//        GroupDatabase groupDatabase = null;
+//        UserDatabase userDatabase = null;
+//        UserMembershipDatabase userMembershipDatabase = null;
+//        String tt = "@@@@@@@@@@";
+//        StartupApiRequests startupApiRequests = new StartupApiRequests(apiService,deviceDatabase, groupDatabase, groupDatabase, userDatabase, userMembershipDatabase);
+//        startupApiRequests.getGroups();
+//        Observable.concat(Observable.just(1,2,4,5), Observable.just("a","b","c"))
+//                .subscribe(new Observer<Serializable>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
+//                    }
+//
+//                    @Override
+//                    public void onNext(Serializable serializable) {
+//                        Log.d(TAG, "onNext() called with: serializable = [" + serializable + "]");
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e(TAG, "onError: ", e);
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.d(TAG, "onComplete() called");
+//                    }
+//                });
+//        apiService = ApiUtils.getApiService();
+//        Observable<RemoteHubsResponse> a = Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+//                .flatMap(new Function<Long, Observable<RemoteHubsResponse>>() {
+//                    @Override
+//                    public Observable<RemoteHubsResponse> apply(Long aLong) throws Exception {
+//                        Log.e("//////////","Sending: Limit" + limit + " Skip: " + skip);
+//                        Map<String , String> params = new HashMap<>();
+//                        params.put("limit", String.valueOf(limit));
+//                        params.put("skip", String.valueOf(skip));
+//                        return apiService.getRemoteHubs(RayanApplication.getPref().getToken(), params);
+//                    }
+//                })
+//                .takeWhile(new Predicate<RemoteHubsResponse>() {
+//                    @Override
+//                    public boolean test(RemoteHubsResponse remoteHubsResponse) throws Exception {
+//                        if (limit < remoteHubsResponse.getData().getCount()) {
+//                            limit += 2;
+//                            skip += 2;
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                });
+//        Observer b =
+//                new Observer<RemoteHubsResponse>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        Log.e(tt, "Shoroo shod");
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(RemoteHubsResponse remoteHubsResponse) {
+//                        Log.e(tt, "badi ro dad"+remoteHubsResponse);
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e(tt, "error dad dada"+e);
+//
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.e(tt, "tamoom shod");
+//
+//                    }
+//                };
+//        apiService.getGroups(RayanApplication.getPref().getToken()).subscribeOn(Schedulers.io())
+//                .flatMap(new Function<GroupsResponse, Observable<RemoteHubsResponse>>() {
+//                    @Override
+//                    public Observable<RemoteHubsResponse> apply(GroupsResponse groupsResponse) throws Exception {
+//                        return a;
+//                    }
+//                })
+//                .subscribe(new Observer<RemoteHubsResponse>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        Log.e(TAG, "onSubscribe: ");
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(RemoteHubsResponse remoteHubsResponse) {
+//                        Log.e(TAG, "onNext:  group ha ro gereft");
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e(TAG, "onError: ", e);
+//
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.e(TAG, "onComplete: tammom shod group ha");
+//
+//                    }
+//                });
+
+//        apiService.getGroups(RayanApplication.getPref().getToken()).subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+//                .doOnNext(new Consumer<GroupsResponse>() {
+//                    @Override
+//                    public void accept(GroupsResponse groupsResponse) throws Exception {
+//                        Log.e("@@@@@@@@@@@", "Accept" + groupsResponse);
+//                    }
+//                })
+//                .doOnError(new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Exception {
+//                        Log.e("@@@@@@@@@@@", "Accept Nashod" + throwable);
+//                    }
+//                })
+//                .flatMap(new Function<GroupsResponse, Observable<RemoteHubsResponse>>() {
+//                    @Override
+//                    public Observable<RemoteHubsResponse> apply(GroupsResponse groupsResponse) throws Exception {
+//                        Log.e("@#@#","Accept:"+groupsResponse);
+//                        Map<String , String> params = new HashMap<>();
+//                        params.put("limit",limit);
+//                        params.put("skip",skip);
+//                        return apiService.getRemoteHubs(RayanApplication.getPref().getToken(), params);
+//                    }
+//                })
+//                .doOnError(new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Exception {
+//                        Log.e("@@@@@@@@@@@", "Accept Nashod" + throwable);
+//                    }
+//                })
+//                .doOnNext(new Consumer<RemoteHubsResponse>() {
+//                    @Override
+//                    public void accept(RemoteHubsResponse remoteHubsResponse) throws Exception {
+//                        Log.e("@@@@@@@@@@@", "Response oomad" + remoteHubsResponse);
+//                    }
+//                })
+//                .flatMap(new Function<RemoteHubsResponse, Observable<Integer>>() {
+//                    @Override
+//                    public Observable<Integer> apply(RemoteHubsResponse remoteHubsResponse) throws Exception {
+//                        return Observable.just(9999999);
+//                    }
+//                })
+//                .doOnError(new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Exception {
+//                        Log.e("EEEE", "E inam error dada ke" + throwable);
+//                    }
+//                })
+//                .doOnNext(new Consumer<Integer>() {
+//                    @Override
+//                    public void accept(Integer integer) throws Exception {
+//                        Log.e("EEEE", "Na ok shod " + integer);
+//                    }
+//                })
+//                .subscribe(new Observer<Integer>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
+//                    }
+//
+//                    @Override
+//                    public void onNext(Integer integer) {
+//                        Log.d(TAG, "onNext() called with: integer = [" + integer + "]");
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e(TAG, "onError: ", e);
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Log.d(TAG, "onComplete: complete shod");
+//                    }
+//                });
 
 //        Observable<Integer> o1 =
 //                Observable.just(1,10,20,30,40, 140, 150, 170)
@@ -1422,32 +1648,86 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 19:
 1:10
+////////////////////////////////////////////
 
 22 esfand:
 55 min
-36 min
+35 min
 
 25 esfand
 50 min
 
 26 esfand
 50 min
-33 min
-24 min
+30 min
 
 28 Esfand:
-11 min in progress
+40 min
 
 
 
 5,6,7 Farvardin
-2:16 hours
+2:15 hours
 
 8 Farvardin
 50 min
 
 9 Farvardin
 2:20 min
-14 min
+15 min
 
+
+11 Farvardin
+50 min
+
+
+12 Farvardin
+2:40 min
+
+14 Farvardin
+1:05 min
+
+15 Farvardin
+4:35 hours
+
+16 farvardin:
+50 min
+
+17 Farvardin
+3:40 min
+
+18 Farvardin
+1:45 min
+
+19 Farvardin
+1:10 min
+
+20 Farvardin
+2:55 min
+
+21 Farvardin
+2:25 min
+
+22 Farvardin
+5:35 min
+
+23 Farvardin
+2:0 min
+
+24 Farvardin
+3:20 min
+
+25 Farvardin
+2:40 min
+
+26 Farvardin
+2:51 min
+
+27 Farvardin
+problem with -44 -54
+2:52 min
+
+
+28 Farvardin
+2:08 min
  */

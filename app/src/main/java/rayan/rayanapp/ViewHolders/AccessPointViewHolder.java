@@ -1,23 +1,19 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Fragments.ChangeDeviceAccessPointFragment;
-import rayan.rayanapp.Fragments.EditDeviceFragment;
 import rayan.rayanapp.Listeners.OnNewDeviceClicked;
 import rayan.rayanapp.R;
 
-public class AccessPointViewHolder extends BaseViewHolder<AccessPoint, OnNewDeviceClicked<AccessPoint>> {
+public class AccessPointViewHolder extends BasicViewHolder<AccessPoint, OnNewDeviceClicked<AccessPoint>> {
     private final String TAG = AccessPointViewHolder.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;

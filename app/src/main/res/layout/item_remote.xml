@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/grey_light_4"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_height="60dp">
+    <RelativeLayout
+        android:background="?attr/selectableItemBackground"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/group_item_layout"
+        >
+    <ImageView
+        android:clickable="false"
+        android:focusable="false"
+        android:id="@+id/icon"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginRight="15dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        app:srcCompat="@drawable/ic_tv"
+        />
+
+    <TextView
+        android:clickable="false"
+        android:focusable="false"
+        android:text="Name"
+        android:id="@+id/name"
+        android:layout_toLeftOf="@id/icon"
+        android:layout_marginRight="15dp"
+        android:layout_centerVertical="true"
+        android:textSize="14sp"
+        android:textColor="@color/ms_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <View
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_width="match_parent"
+        android:background="@color/grey"
+        android:layout_height="0.3dp"
+        android:layout_marginRight="54dp"
+        android:padding="1dp"
+        android:id="@+id/grouplistLinee"
+        android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
+</RelativeLayout>

@@ -48,6 +48,7 @@ public class DeviceDatabase {
         return deviceDAO.getAllSingle();
     }
 
+
     public void addDevice(Device device){
         deviceDAO.add(device);
     }

@@ -9,6 +9,17 @@
         <!--<item name="android:statusBarColor">@color/white</item>-->
     </style>
 
+    <style name="AppBaseThemeDarkStatusBar" parent="AppTheme">
+        <!-- Customize your theme here. -->
+        <item name="android:statusBarColor">@color/grey_light_4</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="colorPrimary">@color/grey</item>
+        <item name="colorPrimaryDark">@color/grey</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="CustomTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/baseColor</item>

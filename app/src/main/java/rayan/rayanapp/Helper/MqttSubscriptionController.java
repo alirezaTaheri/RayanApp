@@ -14,6 +14,8 @@ import java.util.List;
 
 import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
+import rayan.rayanapp.Persistance.database.RemoteDatabase;
+import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 
 public class MqttSubscriptionController {
     public List<String> dbTopics = new ArrayList<>();
@@ -22,16 +24,23 @@ public class MqttSubscriptionController {
     public List<String> subscribedTopics = new ArrayList<>();
     private final String TAG = "MqttSubConLevellll";
     DeviceDatabase deviceDatabase;
+    RemoteHubDatabase remoteHubDatabase;
+    RemoteDatabase remoteDatabase;
     Application application;
     public MqttSubscriptionController(Context context) {
         deviceDatabase = new DeviceDatabase(context);
+        remoteHubDatabase = new RemoteHubDatabase(context);
+        remoteDatabase = new RemoteDatabase(context);
         Log.e(TAG, "created...");
         application = (Application) context.getApplicationContext();
     }
 
     public void init(){
         Log.e(TAG, "initializing...");
-        setDbTopics(deviceDatabase.getAllTopics());
+        List<String> allTopics = deviceDatabase.getAllTopics();
+        allTopics.addAll(remoteHubDatabase.getAllTopics());
+        allTopics.addAll(remoteDatabase.getAllTopics());
+        setDbTopics(allTopics);
     }
 
     public void setDbTopics(List<String> dbTopics){
@@ -43,6 +52,14 @@ public class MqttSubscriptionController {
     public void setNewArrivedTopics(List<String> newArrivedTopics) {
         Log.e(TAG, "setNewArrivedTopics...");
         this.newArrivedTopics = newArrivedTopics;
+//        for (int a = 0; a<subscribedTopics.size();a++) {
+//            boolean exists = false;
+//            for (int b = 0; b < newArrivedTopics.size(); b++){
+//                if (newArrivedTopics.get(b).equals(subscribedTopics.get(a))) exists = true;
+//            }
+//            if (!exists) subscribedTopics.remove(a);
+//        }
+
         check();
     }
 
@@ -51,11 +68,9 @@ public class MqttSubscriptionController {
         subscribedTopics.clear();
         this.mqttConnected = mqttConnected;
         if (mqttConnected){
-            Log.d("pakidam", "chitooshe? : " + subscribedTopics);
             check();
         }
         else {
-            Log.d("pakidam", "pakidam");
             check();
         }
     }

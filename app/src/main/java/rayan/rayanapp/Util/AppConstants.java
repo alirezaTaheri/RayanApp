@@ -122,6 +122,16 @@ public class AppConstants {
     public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";
     public final static String DEVICE_TYPE_TOUCH_2 = "touch_2";
     public final static String DEVICE_TYPE_PLUG = "plug";
+    public final static String DEVICE_TYPE_RemoteHub = "remote_hub";
+    public final static String DEVICE_TYPE_Remote = "remote";
+    public final static String REMOTE_TYPE_AC = "AC";
+    public final static String REMOTE_TYPE_TV = "TV";
+    public final static String BaseDeviceType_SWITCH_1 = "switch_1";
+    public final static String BaseDeviceType_SWITCH_2 = "switch_2";
+    public final static String BaseDeviceType_TOUCH_2 = "touch_2";
+    public final static String BaseDeviceType_PLUG = "plug";
+    public final static String BaseDeviceType_REMOTE_HUB = "remoteHub";
+    public final static String BaseDeviceType_REMOTE = "remote";
 
     /**
      * API
@@ -150,6 +160,12 @@ public class AppConstants {
      */
     public final static String DIALOG_PROVIDE_INTERNET = "dialog_provide_internet";
     public final static String DIALOG_ALERT = "dialog_alert";
+
+    /**
+     * URL Params
+     */
+
+
 
 
     public final static String ERROR_OCCURRED = "error_occurred";

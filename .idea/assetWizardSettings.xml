@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/D:/AndroidStudio3.2/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_dehaze_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/D:/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_arrow_back_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,8 +28,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_hamburger_menu" />
-                            <entry key="sourceFile" value="C:\Users\Alireza\Downloads\light-bulb.svg" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="ic_radio" />
+                            <entry key="sourceFile" value="C:\Users\Alireza\Downloads\radio.svg" />
                           </map>
                         </option>
                       </PersistentState>

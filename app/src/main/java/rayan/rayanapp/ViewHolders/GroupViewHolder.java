@@ -1,9 +1,7 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -13,7 +11,7 @@ import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
-public class GroupViewHolder  extends BaseViewHolder<Group, OnGroupClicked<Group>> {
+public class GroupViewHolder  extends BasicViewHolder<Group, OnGroupClicked<Group>> {
 
     @BindView(R.id.name)
     TextView name;

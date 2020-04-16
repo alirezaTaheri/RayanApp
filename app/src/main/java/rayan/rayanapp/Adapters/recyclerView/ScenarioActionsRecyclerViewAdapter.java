@@ -1,30 +1,20 @@
 package rayan.rayanapp.Adapters.recyclerView;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
-import android.util.Log;
 import android.view.ViewGroup;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Listeners.ScenarioOnActionClickedListener;
-import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewHolders.ActionViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.ActionViewHolder2Bridges;
 import rayan.rayanapp.ViewHolders.ActionViewHolderPlug;
-import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
-import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
-import rayan.rayanapp.ViewHolders.DeviceViewHolderPlug;
 
 public class ScenarioActionsRecyclerViewAdapter extends GenericRecyclerViewAdapter<Device,ScenarioOnActionClickedListener<Device>, ActionViewHolder1Bridge> {
 

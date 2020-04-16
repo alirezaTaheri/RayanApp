@@ -17,6 +17,11 @@ public class Topic implements Parcelable {
     @SerializedName("_id")
     private String id;
     public Topic(){}
+
+    public Topic(String topic) {
+        this.topic = topic;
+    }
+
     protected Topic(Parcel in) {
         topic = in.readString();
         type = in.readString();

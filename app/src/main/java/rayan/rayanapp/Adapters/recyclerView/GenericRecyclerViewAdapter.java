@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rayan.rayanapp.Listeners.BaseRecyclerListener;
-import rayan.rayanapp.ViewHolders.BaseViewHolder;
+import rayan.rayanapp.ViewHolders.BasicViewHolder;
 
-public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListener, VH extends BaseViewHolder<T,L>>
+public abstract class GenericRecyclerViewAdapter<T, L extends BaseRecyclerListener, VH extends BasicViewHolder<T,L>>
         extends RecyclerView.Adapter<VH> {
 
     protected List<T> items;

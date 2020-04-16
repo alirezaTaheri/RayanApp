@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 
@@ -28,12 +29,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.DeviceAnimator;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.DevicesAndFavoritesListener;
-import rayan.rayanapp.Listeners.OnToggleDeviceListener;
-import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
+import rayan.rayanapp.Listeners.OnDeviceClickListener;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
@@ -41,7 +42,7 @@ import rayan.rayanapp.ViewModels.FavoritesFragmentViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class FavoritesFragment extends Fragment implements OnToggleDeviceListener<Device>, ToggleDeviceAnimationProgress {
+public class FavoritesFragment extends Fragment implements OnDeviceClickListener<Device>, ToggleDeviceAnimationProgress {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
 
@@ -52,7 +53,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     List<Device> devices = new ArrayList<>();
     List<Device> finalDevices = new ArrayList<>();
     FavoritesFragmentViewModel favoritesFragmentViewModel;
-    DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
+//    DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
     Activity activity;
     LiveData<List<Device>> favoritesObservable;
     Observer<List<Device>> favoritesObserver;
@@ -119,12 +120,12 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                     }
                 });
 //                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"ShowingFavoriteDevices: " + finalDevices);
-                devicesRecyclerViewAdapter.updateItems(finalDevices);
+//                devicesRecyclerViewAdapter.updateItems(finalDevices);
                 FavoritesFragment.this.devices = finalDevices;
             }
         };
-        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
-        devicesRecyclerViewAdapter.setListener(this);
+//        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
+//        devicesRecyclerViewAdapter.setListener(this);
     }
 
     @Override
@@ -132,7 +133,7 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
         ButterKnife.bind(this, view);
-        recyclerView.setAdapter(devicesRecyclerViewAdapter);
+//        recyclerView.setAdapter(devicesRecyclerViewAdapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
@@ -243,8 +244,8 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                 dragFrom =  fromPosition;
             }
             dragTo = toPosition;
-            if (fromPosition != -1 && toPosition != -1)
-                devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
+//            if (fromPosition != -1 && toPosition != -1)
+//                devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
             return true;
         }
 
@@ -252,12 +253,12 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
             Log.e("///////////" , "reallyMoved From: " + from);
             Log.e("///////////" , "reallyMoved To: " + to);
             Log.e("oooooooooooo" , "reallyMoved: oldList:: " + devices);
-            List<Device> devicesToUpdate = new ArrayList<>();
+            List<BaseDevice> devicesToUpdate = new ArrayList<>();
             if (from < to) {
                 for (int i = from; i < to; i++) {
-                    Device d = new Device(devices.get(i));
+                    BaseDevice d = new BaseDevice(devices.get(i));
                     d.setFavoritePosition(i+1);
-                    Device d1 = new Device(devices.get(i+1));
+                    BaseDevice d1 = new BaseDevice(devices.get(i+1));
                     d1.setFavoritePosition(i);
                     Collections.swap(devices, i, i + 1);
                     if (!updateIfExists(d, devicesToUpdate))
@@ -267,9 +268,9 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
                 }
             } else {
                 for (int i = from; i > to; i--) {
-                    Device d = new Device(devices.get(i));
+                    BaseDevice d = new BaseDevice(devices.get(i));
                     d.setFavoritePosition(i-1);
-                    Device d2 = new Device(devices.get(i-1));
+                    BaseDevice d2 = new BaseDevice(devices.get(i-1));
                     d2.setFavoritePosition(i);
                     Collections.swap(devices, i, i - 1);
 
@@ -315,6 +316,16 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
     @Override
     public void onAccessPointChanged(Device item) {
 //        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
+    }
+
+    @Override
+    public void onClick_RemoteHub(Device Item, int position) {
+        Toast.makeText(activity, "Hi Favorite", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onClick_Remote(Device item, int position) {
+
     }
 
     @Override
@@ -416,9 +427,9 @@ public class FavoritesFragment extends Fragment implements OnToggleDeviceListene
             devicesAndFavoritesListener = (DevicesAndFavoritesListener) context;
     }
 
-    public boolean updateIfExists(Device d, List<Device> devices){
-        for (Device device: devices)
-            if (d.getChipId().equals(device.getChipId())){
+    public boolean updateIfExists(BaseDevice d, List<BaseDevice> devices){
+        for (BaseDevice device: devices)
+            if (d.getBaseId().equals(device.getBaseId())){
                 device.setFavoritePosition(d.getFavoritePosition());
                 return true;
             }

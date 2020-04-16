@@ -1,37 +1,20 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Listeners.ScenarioOnActionClickedListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class ActionViewHolder1Bridge extends BaseViewHolder<Device, ScenarioOnActionClickedListener<Device>> {
+public class ActionViewHolder1Bridge extends BasicViewHolder<Device, ScenarioOnActionClickedListener<Device>> {
     private final String TAG = ActionViewHolder1Bridge.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;

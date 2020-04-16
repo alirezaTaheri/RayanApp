@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:clickable="true"
+    android:focusable="true"
     android:layout_height="100dp"
     android:theme="@style/AppTheme.NoActionBarListItems"
     app:cardCornerRadius="7dp">
@@ -32,13 +33,14 @@
                 <ImageView
                     android:clickable="false"
                     android:focusable="false"
-                    android:padding="3dp"
+                    android:padding="1dp"
                     android:layout_height="50dp"
                     android:id="@+id/pin1"
                     android:layout_width="match_parent"
+                    android:tint="#757575"
                     android:foregroundGravity="top"
                     android:layout_marginTop="5dp"
-                    app:srcCompat="@drawable/ic_lamp_off"
+                    app:srcCompat="@drawable/ic_hub"
                     />
 
             </RelativeLayout>
@@ -66,7 +68,7 @@
             android:id="@+id/name"
             android:gravity="center"
             android:textColor="@color/ms_black"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginTop="1.5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

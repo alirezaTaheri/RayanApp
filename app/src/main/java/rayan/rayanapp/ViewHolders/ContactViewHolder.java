@@ -12,7 +12,7 @@ import rayan.rayanapp.Listeners.OnContactClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 
-public class ContactViewHolder  extends BaseViewHolder<User, OnContactClicked<User>> {
+public class ContactViewHolder  extends BasicViewHolder<User, OnContactClicked<User>> {
 
     @BindView(R.id.contactName)
     TextView name;

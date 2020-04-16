@@ -10,12 +10,10 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Scenario;
-import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.Listeners.OnScenarioClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
-public class ScenarioViewHolder extends BaseViewHolder<Scenario, OnScenarioClicked<Scenario>> {
+public class ScenarioViewHolder extends BasicViewHolder<Scenario, OnScenarioClicked<Scenario>> {
 
     @BindView(R.id.name)
     TextView name;

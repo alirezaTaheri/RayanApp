@@ -2,27 +2,20 @@ package rayan.rayanapp.ViewHolders;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.varunest.sparkbutton.SparkButton;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -32,12 +25,13 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Listeners.OnToggleDeviceListener;
+import rayan.rayanapp.Listeners.OnDeviceClickListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDeviceListener<Device>> {
+public class DeviceViewHolder1Bridge extends BaseViewHolder {
     private final String TAG = DeviceViewHolder1Bridge.class.getSimpleName();
     private Map<String, ValueAnimator> animators = new HashMap<>();
     @BindView(R.id.name)
@@ -56,7 +50,8 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
     }
 
     @Override
-    public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
+    public void onBind(BaseDevice baseDevice, @Nullable OnDeviceClickListener<BaseDevice> listener) {
+        Device item = (Device) baseDevice;
         AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
         Log.e("UNIQUETAG", "OnBindViewHolder: Type1" +" "+ item.getName1() +"\n"+ itemView.getId());
         Log.e(TAG, "Processing this Device: " + item);
@@ -82,10 +77,11 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         }
     }
 
+
     public void onViewRecycled(ValueAnimator v, boolean enabled){
         AppConstants.disableEnableControls(enabled, (ViewGroup) clickableLayout);
-
     }
+    @Override
         public void updateBottomStripPin1(int b){
         itemView.post(() -> {
             bottomStrip.getLayoutParams().width = b;
@@ -93,10 +89,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         });
     }
 
-    public int getItemWidth(){
-        return itemView.getWidth();
-    }
-
+    @Override
     public void startToggleAnimationPin1(ValueAnimator v){
         Log.e("<<<<<<<<<<<<<<<<","<Starting bridge1");
         AppConstants.disableEnableControls(false, (ViewGroup) clickableLayout);
@@ -111,7 +104,8 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         v.start();
     }
 
-    public void stopToggleAnimationPin1(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
+    @Override
+    public void stopToggleAnimationPin1(ValueAnimator v, OnDeviceClickListener<BaseDevice> listener, Device item){
         try {
             Log.e("<<<<<<<<<<<<<<<<", "<Stopping bridge1" + item);
             AppConstants.disableEnableControls(true, clickableLayout);
@@ -162,21 +156,20 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder<Device, OnToggleDevi
         this.name.setText(name);
     }
 
-    public int getDeviceItemWidth(){
-        return itemView.getWidth();
-    }
-
-    public void changePosition(Device item, OnToggleDeviceListener<Device> listener){
+    @Override
+    public void changePosition(BaseDevice item, OnDeviceClickListener<BaseDevice> listener) {
         Log.d(TAG, "changePosition() called with: item = [" + item + "], listener = [" + listener + "]");
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, item.getPosition()));
         }
     }
-    public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
+
+    public void accessPointChanged(Device device, OnDeviceClickListener<BaseDevice> l){
         l.onAccessPointChanged(device);
     }
 
-    public void ipChanged(OnToggleDeviceListener<Device> listener, Device item){
+    @Override
+    public void ipChanged(OnDeviceClickListener<BaseDevice> listener, Device item){
         Log.e(TAG, "ipchangedchanged oneBridge: " + item);
         clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
     }

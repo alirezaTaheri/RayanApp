@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_remotes_bottom_sheet"
+    android:id="@+id/confirm_create_group"
+    app:behavior_hideable="true"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+    <android.support.constraint.ConstraintLayout
+        android:paddingTop="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        android:id="@+id/topPanel"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <ImageView
+        android:clickable="false"
+        android:focusable="false"
+        android:id="@+id/icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/name"
+        app:layout_constraintRight_toRightOf="@id/name"
+        app:srcCompat="@drawable/ic_hub"
+        android:tint="@color/grey_dark_2"
+        android:layout_width="45dp"
+        android:layout_height="45dp" />
+    <TextView
+        android:clickable="false"
+        android:focusable="false"
+        app:layout_constraintTop_toBottomOf="@id/icon"
+        app:layout_constraintLeft_toRightOf="@id/sepLine"
+        app:layout_constraintRight_toRightOf="@id/topPanelSep"
+        app:layout_constraintBottom_toTopOf="@+id/topPanelSep"
+        android:text="Test remote Hub"
+        android:gravity="center"
+        android:textColor="@color/grey_dark_3"
+        android:textSize="13sp"
+        android:id="@+id/name"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:id="@+id/sepLine"
+        app:layout_constraintLeft_toRightOf="@id/addWrapper"
+        app:layout_constraintRight_toRightOf="@+id/name"
+        app:layout_constraintTop_toTopOf="@id/icon"
+        app:layout_constraintBottom_toBottomOf="@id/name"
+        android:background="@color/baseColor"
+        android:layout_width="1dp"
+        android:layout_height="0dp"/>
+    <LinearLayout
+        android:background="?attr/selectableItemBackground"
+        android:padding="10dp"
+        android:id="@+id/addWrapper"
+        app:layout_constraintRight_toLeftOf="@id/sepLine"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/icon"
+        app:layout_constraintBottom_toBottomOf="@id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="horizontal">
+        <android.support.v7.widget.AppCompatTextView
+            android:textSize="15sp"
+            android:id="@+id/bottomSheetText"
+            android:layout_width="wrap_content"
+            android:text="افزودن ریموت جدید"
+            android:layout_gravity="center"
+            android:layout_marginRight="4dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/grey_dark_2" />
+        <ImageView
+            app:srcCompat="@drawable/ic_add"
+            android:tint="@color/ms_black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+        <View
+            android:layout_marginTop="8dp"
+            android:id="@+id/topPanelSep"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@color/baseColor"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topPanel" />
+</android.support.constraint.ConstraintLayout>

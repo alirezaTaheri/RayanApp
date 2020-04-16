@@ -3,6 +3,7 @@ package rayan.rayanapp.Fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -11,15 +12,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
-//<<<<<<< HEAD
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
-//=======
 import android.util.DisplayMetrics;
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,21 +32,29 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.MainActivity;
+import rayan.rayanapp.Adapters.recyclerView.DevicesFragmentRecyclerViewAdapter;
+
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Helper.DeviceAnimator;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.LayoutManagers.CustomGridLayoutManager;
+import rayan.rayanapp.Listeners.OnDeviceClickListener;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
-import rayan.rayanapp.Listeners.OnToggleDeviceListener;
-import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
+import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.ViewHolders.BaseViewHolder;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
-import rayan.rayanapp.R;
-import rayan.rayanapp.Util.AppConstants;
 
-public class DevicesFragment extends Fragment implements OnToggleDeviceListener<Device>,ToggleDeviceAnimationProgress {
+//<<<<<<< HEAD
+//=======
+//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
+
+public class DevicesFragment extends Fragment implements OnDeviceClickListener<BaseDevice>,ToggleDeviceAnimationProgress {
     public DevicesFragmentViewModel devicesFragmentViewModel;
     Activity activity;
     DialogPresenter dp;
@@ -60,15 +65,21 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     RelativeLayout emptyView;
     @BindView(R.id.animation_view)
     LottieAnimationView lottieAnimationView;
-    public DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
+    public DevicesFragmentRecyclerViewAdapter devicesRecyclerViewAdapter;
     public List<Device> devices = new ArrayList<>();
+    public List<BaseDevice> baseDevices = new ArrayList<>();
+    public List<RemoteHub> remoteHubs = new ArrayList<>();
     List<Device> finalDevices = new ArrayList<>();
+    List<RemoteHub> finalRemoteHubs = new ArrayList<>();
     LiveData<List<Device>> devicesObservable;
+    LiveData<List<RemoteHub>> remoteHubsObservable;
     MainActivity mainActivity;
     Observer<List<Device>> devicesObserver;
+    Observer<List<RemoteHub>> remoteHubsObserver;
     private final String TAG = this.getClass().getSimpleName();
     public static List<String> subscribedDevices = new ArrayList<>();
     private DeviceAnimator deviceAnimator;
+    MediatorLiveData mediatorLiveData = new MediatorLiveData();
     public static DevicesFragment newInstance() {
         return new DevicesFragment();
     }
@@ -78,37 +89,42 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         deviceAnimator = new DeviceAnimator();
-        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
-        devicesRecyclerViewAdapter.setListener(this);
+        devicesRecyclerViewAdapter = new DevicesFragmentRecyclerViewAdapter(getContext(), this, this);
         dp = new DialogPresenter(getActivity().getSupportFragmentManager());
         devicesFragmentViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(DevicesFragmentViewModel.class);
 //        sortDevicesByGroup(RayanApplication.getPref().getCurrentShowingGroup());
+        activity = getActivity();
         devicesObservable = devicesFragmentViewModel.getAllDevicesLive();
-        devicesObserver = new Observer<List<Device>>() {
+        remoteHubsObservable = devicesFragmentViewModel.getAllRemoteHubsLive();
+        remoteHubsObserver = new Observer<List<RemoteHub>>() {
             @Override
-            public void onChanged(@Nullable List<Device> devices) {
-                if (DevicesFragment.this.finalDevices.size() == 0 && devices.size() > 0)
+            public void onChanged(@Nullable List<RemoteHub> remoteHubs) {
+                DevicesFragment.this.remoteHubs = remoteHubs;
+                if (DevicesFragment.this.finalRemoteHubs.size() == 0 && remoteHubs.size() > 0)
                     deviceAnimator.setItemWidth(DevicesFragment.this);
-                DevicesFragment.this.devices = devices;
-                finalDevices = new ArrayList<>();
+                finalRemoteHubs = new ArrayList<>();
                 String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
-                Log.e(TAG ,"All Devices: " + devices.subList(0, devices.size()/3));
-                Log.e(TAG ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
-                Log.e(TAG ,"All Devices: " + devices.subList(devices.size()/3*2, devices.size()));
-                Log.e(TAG ,"currentGroup: " + currentGroup);
                 if (currentGroup != null)
-                    for (int a = 0; a<devices.size();a++){
-                        if (devices.get(a).getGroupId().equals(currentGroup) && !devices.get(a).isHidden()){
-                            finalDevices.add(devices.get(a));
-                            }
-                        }
-                        else
-                    for (int a = 0; a<devices.size();a++){
-                        if (!devices.get(a).isHidden()){
-                            finalDevices.add(devices.get(a));
+                    for (int a = 0; a<remoteHubs.size();a++){
+                        if (remoteHubs.get(a).getGroupId().equals(currentGroup) && remoteHubs.get(a).isVisibility()){
+                            finalRemoteHubs.add(remoteHubs.get(a));
                         }
                     }
-                    if (finalDevices.size() == 0){
+                else
+                    for (int a = 0; a<remoteHubs.size();a++){
+                        if (remoteHubs.get(a).isVisibility()){
+                            finalRemoteHubs.add(remoteHubs.get(a));
+                        }
+                    }
+                DevicesFragment.this.remoteHubs = finalRemoteHubs;
+                synchronized (baseDevices) {
+                    baseDevices.clear();
+                    baseDevices.addAll(finalDevices);
+                    baseDevices.addAll(finalRemoteHubs);
+                    if (RayanApplication.getPref().getCurrentShowingGroup() == null)
+                        Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                    else Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getInGroupPosition(), obj2.getInGroupPosition()));
+                    if (baseDevices.size() == 0){
                         lottieAnimationView.setMaxProgress(0.5f);
                         emptyView.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.INVISIBLE);
@@ -117,27 +133,57 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
                         emptyView.setVisibility(View.INVISIBLE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
-                if (RayanApplication.getPref().getCurrentShowingGroup() == null)
-                    Collections.sort(finalDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
-                else Collections.sort(finalDevices, (obj1, obj2) -> Integer.compare(obj1.getInGroupPosition(), obj2.getInGroupPosition()));
-                Log.e(TAG ,"FinalDevices: " + finalDevices.subList(0, finalDevices.size()/3));
-                Log.e(TAG ,"FinalDevices: " + finalDevices.subList(finalDevices.size()/3,finalDevices.size()/3*2));
-                Log.e(TAG ,"FinalDevices: " + finalDevices.subList(finalDevices.size()/3*2, finalDevices.size()));
-//                for (Device d:finalDevices)
-//                    if (d.getChipId().equals("5958528"))
-//                        d.setType(AppConstants.DEVICE_TYPE_SWITCH_2);
-                devicesRecyclerViewAdapter.updateItems(finalDevices);
+                }
+                devicesRecyclerViewAdapter.updateItems(baseDevices);
+            }
+        };
+        devicesObserver = new Observer<List<Device>>() {
+            @Override
+            public void onChanged(@Nullable List<Device> devices) {
+                Log.e("BAHBAHBAHD", "Devices: " +devices.size());
+                Log.e("BAHBAHBAHD", "Devicesfffffff: " +devices);
+                if (DevicesFragment.this.finalDevices.size() == 0 && devices.size() > 0)
+                    deviceAnimator.setItemWidth(DevicesFragment.this);
+                DevicesFragment.this.devices = devices;
+                finalDevices = new ArrayList<>();
+                String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
+                Log.e(TAG ,"currentGroup: " + currentGroup);
+                if (currentGroup != null)
+                    for (int a = 0; a<devices.size();a++){
+                        if (devices.get(a).getGroupId().equals(currentGroup) && !devices.get(a).isHidden()){
+                            finalDevices.add(devices.get(a));
+                        }
+                    }
+                else
+                    for (int a = 0; a<devices.size();a++){
+                        if (!devices.get(a).isHidden()){
+                            finalDevices.add(devices.get(a));
+                        }
+                    }
                 DevicesFragment.this.devices = finalDevices;
+                synchronized (baseDevices) {
+                    baseDevices.clear();
+                    baseDevices.addAll(finalDevices);
+                    baseDevices.addAll(finalRemoteHubs);
+                    if (RayanApplication.getPref().getCurrentShowingGroup() == null)
+                        Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                    else Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getInGroupPosition(), obj2.getInGroupPosition()));
+
+                    if (baseDevices.size() == 0){
+                        lottieAnimationView.setMaxProgress(0.5f);
+                        emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.INVISIBLE);
+                    }
+                    else{
+                        emptyView.setVisibility(View.INVISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                }
+                devicesRecyclerViewAdapter.updateItems(baseDevices);
             }
         };
         devicesObservable.observe(this, devicesObserver);
-        activity = getActivity();
-
-        Device d = devicesFragmentViewModel.getDevice("222222");
-        if (d != null) {
-            d.setIp("192.168.1.105");
-            devicesFragmentViewModel.updateDevice(d);
-        }
+        remoteHubsObservable.observe(this, remoteHubsObserver);
     }
 
     @Override
@@ -172,25 +218,8 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         RayanApplication.getPref().saveCurrentShowingGroup(groupId);
         devicesObservable.removeObservers(this);
         devicesObservable.observe(this,devicesObserver);
-    }
-
-    @Override
-    public void onPin1Clicked(Device device, int position) {
-        Log.e("Pin1 Is Touching: " , "Device: " +device + position);
-        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
-        devicesFragmentViewModel.togglePin1(dp,this, position, ((RayanApplication) getActivity().getApplication()), device);
-    }
-
-    @Override
-    public void onPin2Clicked(Device device, int position) {
-        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
-        Log.e("Pin2 Is Touching: " , "Device: " +device);
-        devicesFragmentViewModel.togglePin2(dp,this,position, (RayanApplication) getActivity().getApplication(),device);
-        }
-
-    @Override
-    public void onAccessPointChanged(Device item) {
-//        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
+        remoteHubsObservable.removeObservers(this);
+        remoteHubsObservable.observe(this,remoteHubsObserver);
     }
 
     @Override
@@ -198,7 +227,7 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
 //        if (!(finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
 //            width /= 2;
         if (recyclerView.findViewHolderForAdapterPosition(position) != null)
-            return ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
+            return ((BaseViewHolder)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
         else return -1;
     }
 
@@ -383,8 +412,6 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
             int fromPosition = viewHolder.getAdapterPosition();
             int toPosition = target.getAdapterPosition();
-            Log.e("///////////" , "onMove:new List:: " + devices);
-            Log.e("///////////" , "onMove From: " + fromPosition + " to: " + toPosition);
             if(dragFrom == -1) {
                 dragFrom =  fromPosition;
             }
@@ -396,79 +423,75 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         }
 
         private void reallyMoved(int from, int to) {
-//            Log.e("///////////" , "reallyMoved From: " + from + " to: " + to);
-//            Log.e("oooooooooooo" , "reallyMoved: oldList:: " + devices);
-//            Bundle b = new Bundle();
-//            b.putString("position", "position");
-            List<Device> changed = new ArrayList<>();
+            List<BaseDevice> changed = new ArrayList<>();
             if (from < to) {
                 for (int i = from; i < to; i++) {
-                    Device d = new Device(finalDevices.get(i));
+                    BaseDevice d=null;
+                    BaseDevice d1=null;
+                    if (baseDevices.get(i) instanceof Device)
+                        d = new Device((Device)baseDevices.get(i));
+                    else if(baseDevices.get(i) instanceof RemoteHub)
+                        d = new RemoteHub((RemoteHub)baseDevices.get(i));
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         d.setPosition(i+1);
                     else d.setInGroupPosition(i+1);
-                    Device d1 = new Device(finalDevices.get(i+1));
+                    if (baseDevices.get(i+1) instanceof Device)
+                        d1 = new Device((Device)baseDevices.get(i+1));
+                    else if(baseDevices.get(i+1) instanceof RemoteHub)
+                        d1 = new RemoteHub((RemoteHub)baseDevices.get(i+1));
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         d1.setPosition(i);
                     else d1.setInGroupPosition(i);
-                    Collections.swap(finalDevices, i, i + 1);
+                    Collections.swap(baseDevices, i, i + 1);
                     if (!updateIfExists(d, changed, RayanApplication.getPref().getCurrentShowingGroup()))
                         changed.add(d);
                     if (!updateIfExists(d1, changed, RayanApplication.getPref().getCurrentShowingGroup()))
                         changed.add(d1);
-//                    Log.e("DeviceAnimator", "changePosition(): " + changed);
-//                    devicesFragmentViewModel.updateDevices(changed);
-//                    devicesRecyclerViewAdapter.notifyItemChanged(i,b);
-//                    devicesRecyclerViewAdapter.notifyItemChanged(i+1,b);
                 }
             } else {
                 for (int i = from; i > to; i--) {
-                    Device d = new Device(finalDevices.get(i));
+                    BaseDevice d=null;
+                    BaseDevice d2=null;
+                    if (baseDevices.get(i) instanceof Device)
+                        d = new Device((Device)baseDevices.get(i));
+                    else if(baseDevices.get(i) instanceof RemoteHub)
+                        d = new RemoteHub((RemoteHub)baseDevices.get(i));
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         d.setPosition(i-1);
                     else d.setInGroupPosition(i-1);
-                    Device d2 = new Device(finalDevices.get(i-1));
+                    if (baseDevices.get(i-1) instanceof Device)
+                        d2 = new Device((Device)baseDevices.get(i-1));
+                    else if(baseDevices.get(i-1) instanceof RemoteHub)
+                        d2 = new RemoteHub((RemoteHub)baseDevices.get(i-1));
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         d2.setPosition(i);
                     else d2.setInGroupPosition(i);
-                    Collections.swap(finalDevices, i, i - 1);
+                    Collections.swap(baseDevices, i, i - 1);
 
                     if (!updateIfExists(d, changed, RayanApplication.getPref().getCurrentShowingGroup()))
                         changed.add(d);
                     if (!updateIfExists(d2, changed, RayanApplication.getPref().getCurrentShowingGroup()))
                         changed.add(d2);
-//                    List<Device> changed = new ArrayList<>();
-//                    changed.add(d);
-//                    changed.add(d2);
-//                    Log.e("DeviceAnimator", "changePosition(): " + changed);
-//                    devicesFragmentViewModel.updateDevices(changed);
-//                    devicesRecyclerViewAdapter.notifyItemChanged(i,b);
-//                    devicesRecyclerViewAdapter.notifyItemChanged(i-1,b);
-//                    devicesFragmentViewModel.updateDevices(changed);
                 }
             }
             devicesFragmentViewModel.updateDevices(changed);
-//            Log.e("nnnnnnnnnnnnn" , "reallyMoved: NewList:: " + devices);
         }
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-//            Log.e("///////////" , "////////onSwiped: " + direction);
         }
 
         @Override
         public boolean isLongPressDragEnabled() {
-//            Log.e("///////////" , "isLongPressDragEnabled"+devices);
             return true;
         }
 
         @Override
         public boolean isItemViewSwipeEnabled() {
-//            Log.e("///////////" , "isItemViewSwipeEnabled");
             return false;
         }
 
-        
+
         @Override
         public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             Log.e("///////////" , "////////clearView: ");
@@ -485,14 +508,48 @@ public class DevicesFragment extends Fragment implements OnToggleDeviceListener<
         return finalDevices;
     }
 
-    public boolean updateIfExists(Device d, List<Device> devices, String selectedGroup){
-        for (Device device: devices)
-            if (d.getChipId().equals(device.getChipId())){
+    public boolean updateIfExists(BaseDevice d, List<BaseDevice> devices, String selectedGroup){
+        for (BaseDevice device: devices)
+            if (d.getBaseId().equals(device.getBaseId())){
             if (selectedGroup == null)
                 device.setPosition(d.getPosition());
             else device.setInGroupPosition(d.getInGroupPosition());
                 return true;
             }
         return false;
+    }
+
+    @Override
+    public void onPin1Clicked(BaseDevice Item, int position) {
+        Device device = (Device) Item;
+        Log.e("Pin1 Is Touching: " , "Device: " +device + position);
+        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
+        devicesFragmentViewModel.togglePin1(dp,this, position, ((RayanApplication) getActivity().getApplication()), device);
+    }
+
+    @Override
+    public void onPin2Clicked(BaseDevice Item, int position) {
+        Device device = (Device) Item;
+        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
+        Log.e("Pin2 Is Touching: " , "Device: " +device);
+        devicesFragmentViewModel.togglePin2(dp,this,position, (RayanApplication) getActivity().getApplication(),device);
+    }
+
+    @Override
+    public void onAccessPointChanged(BaseDevice item) {
+
+    }
+
+    @Override
+    public void onClick_RemoteHub(BaseDevice Item, int position) {
+        Log.e("CLICLCLICL", "ldkfjlkjfsd");
+        RemoteHub remoteHub = (RemoteHub) Item;
+        SelectRemoteBottomSheetFragment selectRemoteBottomSheetFragment = SelectRemoteBottomSheetFragment.instance(remoteHub.getName());
+        selectRemoteBottomSheetFragment.show(getActivity().getSupportFragmentManager(), "TAG");
+    }
+
+    @Override
+    public void onClick_Remote(BaseDevice item, int position) {
+
     }
 }

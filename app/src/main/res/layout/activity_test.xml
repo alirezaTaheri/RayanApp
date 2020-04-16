@@ -5,12 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.TestActivity">
-<WebView
-    android:id="@+id/webView"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintTop_toBottomOf="parent"
-    app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintLeft_toLeftOf="parent"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"></WebView>
+
+    <rayan.rayanapp.TestCustomView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </android.support.constraint.ConstraintLayout>

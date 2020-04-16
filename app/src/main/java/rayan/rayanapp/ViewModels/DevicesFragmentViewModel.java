@@ -1,8 +1,10 @@
 package rayan.rayanapp.ViewModels;
 
+import android.app.Activity;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -24,7 +26,9 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,16 +36,20 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
+import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
+import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Helper.DialogPresenter;
@@ -50,6 +58,8 @@ import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.Persistance.database.RemoteDatabase;
+import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 import rayan.rayanapp.Persistance.database.UserDatabase;
 import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
@@ -57,10 +67,12 @@ import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.api.StartupApiRequests;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
 
@@ -70,13 +82,21 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     private ExecutorService executorService;
     private UserDatabase userDatabase;
     private UserMembershipDatabase membershipDatabase;
+    private RemoteHubDatabase remoteHubDatabase;
+    private ApiService apiService;
+    private StartupApiRequests startupApiRequests;
     public DevicesFragmentViewModel(@NonNull Application application) {
         super(application);
         deviceDatabase = new DeviceDatabase(application);
         groupDatabase = new GroupDatabase(application);
         userDatabase = new UserDatabase(application);
+        remoteHubDatabase = new RemoteHubDatabase(application);
         membershipDatabase = new UserMembershipDatabase(application);
         executorService= Executors.newSingleThreadExecutor();
+        apiService = ApiUtils.getApiService();
+        if (startupApiRequests == null)
+            startupApiRequests = new StartupApiRequests(apiService, deviceDatabase, groupDatabase,groupDatabase, userDatabase, membershipDatabase,
+                    new RemoteHubDatabase(application), new RemoteDatabase(application),(RayanApplication) getApplication());
 //        initSounds();
     }
 
@@ -98,6 +118,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         }
         return null;
     }
+    public LiveData<List<RemoteHub>> getAllRemoteHubsLive(){
+        return remoteHubDatabase.getAllRemoteHubsLive();
+    }
 
     public List<Device> getAllDevicesInGroup(String groupId){
             return deviceDatabase.getAllInGroup(groupId);
@@ -112,8 +135,21 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     public void updateDevice(Device device){
         deviceDatabase.updateDevice(device);
     }
-    public void updateDevices(List<Device> devices){
+    public void updateDevices(List<BaseDevice> baseDevices){
+        List<Device> devices = new ArrayList<>();
+        List<RemoteHub> remoteHubs = new ArrayList<>();
+        List<Remote> remotes = new ArrayList<>();
+        for (BaseDevice baseDevice:baseDevices) {
+            if (baseDevice.getDeviceType().equals(AppConstants.BaseDeviceType_SWITCH_1) || baseDevice.getDeviceType().equals(AppConstants.BaseDeviceType_SWITCH_2)||
+                    baseDevice.getDeviceType().equals(AppConstants.BaseDeviceType_TOUCH_2)||baseDevice.getDeviceType().equals(AppConstants.BaseDeviceType_PLUG))
+                devices.add((Device) baseDevice);
+            else if (baseDevice.getDeviceType().equals(AppConstants.BaseDeviceType_REMOTE_HUB))
+                remoteHubs.add((RemoteHub) baseDevice);
+            else if (baseDevice.getDeviceType().equals(AppConstants.BaseDeviceType_REMOTE))
+                remotes.add((Remote) baseDevice);
+        }
         deviceDatabase.updateDevices(devices);
+        remoteHubDatabase.updateRemoteHubs(remoteHubs);
     }
 
     private class GetAllDevices extends AsyncTask<Void, Void,LiveData<List<Device>>> {
@@ -125,8 +161,47 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
     private final String TAG = DevicesFragmentViewModel.class.getSimpleName();
 
-    public void getGroups() {
-        getGroupObservable().subscribe(getGroupObserver());
+    public LiveData<StartupApiRequests.requestStatus> getGroups() {
+        return startupApiRequests.getGroups();
+    }
+    public LiveData<StartupApiRequests.requestStatus> getGroups1() {
+        return startupApiRequests.getGroups1();
+//        getGroupObservable().flatMap(new Function<GroupsResponse, Observable<RemoteHubsResponse>>() {
+//            @Override
+//            public Observable<RemoteHubsResponse> apply(GroupsResponse groupsResponse) throws Exception {
+//                Log.e("<<<<<<<<<","<<<<<<<<<<<<<<<<<<<<<<STARTSTART");
+//                if(groupsResponse.getData().getGroups() != null){
+//                    syncGroups(groupsResponse.getData().getGroups());
+//                }
+//                Log.e("<<<<<<<<<","<<<<<<<<<<<<<<<<<<<<<< ENDENDEND");
+//                ApiService apiService = ApiUtils.getApiService();
+//                Log.e("@#@#","Accept:"+groupsResponse);
+//                Map<String , String> params = new HashMap<>();
+//                params.put("limit","20");
+//                params.put("skip","0");
+//                return apiService.getRemoteHubs(RayanApplication.getPref().getToken(), params);
+//            }
+//        }).subscribe(new Observer<RemoteHubsResponse>() {
+//            @Override
+//            public void onSubscribe(Disposable d) {
+//                Log.e(TAG, "STARTING MAN");
+//            }
+//
+//            @Override
+//            public void onNext(RemoteHubsResponse remoteHubsResponse) {
+//                Log.e(TAG, "On Next " + remoteHubsResponse);
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                Log.e(TAG, "Error darim dada" + e);
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//                Log.e(TAG, "Hale tamoom shod");
+//            }
+//        });
     }
 
     public void login(){
@@ -138,7 +213,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         return apiService
                 .getGroups(RayanApplication.getPref().getToken())
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(Schedulers.io());
     }
 
     private DisposableObserver<GroupsResponse> getGroupObserver(){
@@ -148,9 +223,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
             public void onNext(@NonNull GroupsResponse baseResponse) {
                 Log.d(TAG,"OnNext "+baseResponse);
 
-		if(baseResponse.getData().getGroups() != null){
-                new SyncGroups(baseResponse.getData().getGroups()).execute();
-		}
+//		if(baseResponse.getData().getGroups() != null){
+//                new SyncGroups(baseResponse.getData().getGroups()).execute();
+//		}
             }
 
             @Override
@@ -200,14 +275,10 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
 
     private int nOd = 0;
-    private class SyncGroups extends AsyncTask<Void, Void, Void>{
-        private List<Group> serverGroups = new ArrayList<>();
-        private List<String> tempTopics = new ArrayList<>();
-        SyncGroups(List<Group> groups){
-            this.serverGroups.addAll(groups);
-        }
-        @Override
-        protected Void doInBackground(Void... voids) {
+    public void syncGroups(List<Group> groups){
+        List<Group> serverGroups = new ArrayList<>();
+        List<String> tempTopics = new ArrayList<>();
+            serverGroups.addAll(groups);
             List<Device> newDevices = new ArrayList<>();
             List<User> newUsers = new ArrayList<>();
             List<UserMembership> memberships = new ArrayList<>();
@@ -218,37 +289,37 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 //                if (g.getDevices() != null)
 //                devices.addAll(g.getDevices());
                 if (g.getHumanUsers() != null)
-                for (int b = 0;b<g.getDevices().size();b++){
-                    Device u = g.getDevices().get(b);
-                    Device existing = deviceDatabase.getDevice(u.getChipId());
-                    if (existing == null){
-                        Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
-                        deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
-                        deviceUser.setIp(AppConstants.UNKNOWN_IP);
-                        deviceUser.setPosition(nOd);
+                    for (int b = 0;b<g.getDevices().size();b++){
+                        Device u = g.getDevices().get(b);
+                        Device existing = deviceDatabase.getDevice(u.getChipId());
+                        if (existing == null){
+                            Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
+                            deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
+                            deviceUser.setIp(AppConstants.UNKNOWN_IP);
+                            deviceUser.setPosition(nOd);
 //                        deviceUser.setFavoritePosition(nOd);
-                        deviceUser.setInGroupPosition(b);
-                        tempTopics.add(deviceUser.getTopic().getTopic());
-                        if (deviceUser.getType()!= null && deviceUser.getName1() != null){
-                            devices.add(deviceUser);
+                            deviceUser.setInGroupPosition(b);
+                            tempTopics.add(deviceUser.getTopic().getTopic());
+                            if (deviceUser.getType()!= null && deviceUser.getName1() != null){
+                                devices.add(deviceUser);
+                                nOd++;
+                            }
+                            Log.e("isDeviceHasEmptyPar" , "really?? " + (deviceUser.getType()!= null) + (deviceUser.getName1() != null));
+                        }
+                        else {
+                            existing.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
+                            Log.e("wwwwwwwwwwwwwwwwww", u.getName1()+"u.ssid"+u.getSsid()+existing.getSsid());
+
+                            existing.setSecret(g.getSecret());
+                            existing.setName1(u.getName1());
+                            existing.setType(u.getType());
+                            existing.setTopic(u.getTopic());
+                            tempTopics.add(u.getTopic().getTopic());
+                            existing.setGroupId(g.getId());
+                            devices.add(existing);
                             nOd++;
                         }
-                            Log.e("isDeviceHasEmptyPar" , "really?? " + (deviceUser.getType()!= null) + (deviceUser.getName1() != null));
-                    }
-                    else {
-                        existing.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
-                        Log.e("wwwwwwwwwwwwwwwwww", u.getName1()+"u.ssid"+u.getSsid()+existing.getSsid());
-
-                        existing.setSecret(g.getSecret());
-                        existing.setName1(u.getName1());
-                        existing.setType(u.getType());
-                        existing.setTopic(u.getTopic());
-                        tempTopics.add(u.getTopic().getTopic());
-                        existing.setGroupId(g.getId());
-                        devices.add(existing);
-                        nOd++;
-                    }
-                } for (int c = 0;c<g.getHumanUsers().size();c++){
+                    } for (int c = 0;c<g.getHumanUsers().size();c++){
                     User user = g.getHumanUsers().get(c);
                     UserMembership userMembership = new UserMembership(g.getId(), user.getId());
                     User existingUser = userDatabase.getUser(user.getId());
@@ -352,8 +423,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 //            }catch (Exception e){
 //                Log.e(TAG, AppConstants.ERROR_OCCURRED + e);
 //            }
-            return null;
-        }
+
     }
 
     public void subscribeToTopic(String topic){

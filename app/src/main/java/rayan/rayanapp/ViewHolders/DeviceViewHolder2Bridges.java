@@ -2,7 +2,6 @@ package rayan.rayanapp.ViewHolders;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -12,8 +11,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.varunest.sparkbutton.SparkButton;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
@@ -21,8 +18,9 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Listeners.OnToggleDeviceListener;
+import rayan.rayanapp.Listeners.OnDeviceClickListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
@@ -44,7 +42,8 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     }
 
     @Override
-    public void onBind(Device item, @Nullable OnToggleDeviceListener<Device> listener) {
+    public void onBind(BaseDevice baseDevice, @Nullable OnDeviceClickListener<BaseDevice> listener) {
+        Device item = (Device) baseDevice;
         AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout);
         AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout2);
         Log.e("UNIQUETAG", "OnBindViewHolder: Type2" +" "+ item.getName1() +"\n"+ itemView.getId());
@@ -53,14 +52,13 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
 //        if (!item.isLocallyAccessibility() || item.getIp() == null)
 //            bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.red_acc_4));
 //        else
-            bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
+        bottomStrip.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.baseColor2));
         if (item.getPin1().equals(AppConstants.ON_STATUS)){
             pin1.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on));
 //            pin1.setChecked(true);
             itemView.post(new Runnable() {
                 @Override
                 public void run(){
-                    Log.e("///////////////", "cellWidth: " + itemView.getWidth());
                     bottomStrip.getLayoutParams().width = itemView.getWidth()/2;
                     bottomStrip.requestLayout();
                 }
@@ -77,7 +75,6 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
             itemView.post(new Runnable() {
                 @Override
                 public void run(){
-                    Log.e("///////////////", "cellWidth: " + itemView.getWidth());
                     bottomStrip2.getLayoutParams().width = itemView.getWidth()/2;
                     bottomStrip2.requestLayout();
                 }
@@ -88,11 +85,11 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
             bottomStrip2.requestLayout();
             pin2.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
         }
-        if (listener != null){
+//        if (listener != null){
             clickableLayout.setOnClickListener(v -> listener.onPin1Clicked(item, getAdapterPosition()));
             clickableLayout2.setOnClickListener(v -> listener.onPin2Clicked(item, getAdapterPosition()));
             name.setOnClickListener(null);
-        }
+//        }
     }
 
 
@@ -102,6 +99,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
             bottomStrip2.requestLayout();
         });
     }
+    @Override
     public void startToggleAnimationPin2(ValueAnimator v){
         AppConstants.disableEnableControls(false, (ViewGroup) clickableLayout2);
         Log.e("<<<<<<<<<<<<<<<<","<Starting bridge2 ");
@@ -116,8 +114,8 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
         v.setDuration(AppConstants.TOGGLE_ANIMATION_TIMEOUT);
         v.start();
     }
-
-    public void stopToggleAnimationPin2(ValueAnimator v, OnToggleDeviceListener<Device> listener, Device item){
+    @Override
+    public void stopToggleAnimationPin2(ValueAnimator v, OnDeviceClickListener<BaseDevice> listener, Device item){
         AppConstants.disableEnableControls(true, (ViewGroup) clickableLayout2);
         Log.e("<<<<<<<<<<<<<<<<","<Stopping bridge2" + item);
 //        pin2.setEnabled(true);
@@ -161,11 +159,13 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
         }
     }
 
-    public void accessPointChanged(Device device, OnToggleDeviceListener<Device> l){
+    @Override
+    public void accessPointChanged(Device device, OnDeviceClickListener<BaseDevice> l) {
         l.onAccessPointChanged(device);
     }
 
-    public void changePosition(Device item, OnToggleDeviceListener<Device> listener){
+
+    public void changePosition(Device item, OnDeviceClickListener<Device> listener){
         Log.d(TAG, "changePosition() called with: item = [" + item + "], listener = [" + listener + "]");
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
@@ -173,8 +173,8 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
         }
     }
 
-    @Override
-    public void ipChanged(OnToggleDeviceListener<Device> listener, Device item){
+
+    public void ipChanged(OnDeviceClickListener<BaseDevice> listener, Device item){
         Log.e(TAG, "ipchangedchanged twoBridges: " + item);
         clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
         clickableLayout2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));

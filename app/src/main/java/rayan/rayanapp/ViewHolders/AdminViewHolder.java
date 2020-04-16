@@ -1,8 +1,6 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
-import android.support.v7.content.res.AppCompatResources;
 import android.view.View;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -15,9 +13,7 @@ import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Util.AppConstants;
 
-import static rayan.rayanapp.App.RayanApplication.getContext;
-
-public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> {
+public class AdminViewHolder extends BasicViewHolder<User, OnAdminClicked<User>> {
     private final String TAG = AdminViewHolder.class.getSimpleName();
 
     @BindView(R.id.contactImage)

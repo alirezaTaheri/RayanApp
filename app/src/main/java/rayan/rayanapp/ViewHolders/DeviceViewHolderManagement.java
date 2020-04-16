@@ -9,9 +9,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.varunest.sparkbutton.SparkButton;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -20,7 +17,7 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.OnDeviceClickListenerManagement;
 import rayan.rayanapp.R;
 
-public class DeviceViewHolderManagement extends BaseViewHolder<Device, OnDeviceClickListenerManagement<Device>> {
+public class DeviceViewHolderManagement extends BasicViewHolder<Device, OnDeviceClickListenerManagement<Device>> {
     private final String TAG = DeviceViewHolderManagement.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;

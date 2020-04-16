@@ -34,16 +34,12 @@ import rayan.rayanapp.Util.AppConstants;
 
 public class TestActivity extends AppCompatActivity {
 
-    @BindView(R.id.webView)
-    WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        ButterKnife.bind(this);
 
-        webView.loadUrl("http://www.dantia.ir/");
     }
 
 //    @OnClick(R.id.send)
@@ -103,5 +99,4 @@ public class TestActivity extends AppCompatActivity {
 //// Adding request to request queue
 //        RayanApplication.addToRequestQueue(jsonObjReq, String.valueOf(System.currentTimeMillis()));
 //    }
-    long sendTime;
 }
