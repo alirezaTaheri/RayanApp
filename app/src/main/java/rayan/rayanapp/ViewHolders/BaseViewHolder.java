@@ -29,7 +29,7 @@ public abstract class BaseViewHolder extends RecyclerView.ViewHolder {
         ((TextView)itemView.findViewById(R.id.name)).setText(name);
     }
 
-    public void ipChanged(OnDeviceClickListener<BaseDevice> listener, Device item){}
+    public void ipChanged(OnDeviceClickListener<BaseDevice> listener, BaseDevice item){}
 
     public int getDeviceItemWidth(){
         return itemView.getWidth();

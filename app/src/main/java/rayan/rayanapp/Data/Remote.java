@@ -27,7 +27,35 @@ public class Remote  extends BaseDevice{
     @SerializedName("remote_hub_id")
     private String remoteHubId;
     private String type;
+    private String groupId;
     private boolean accessible,learned,visibility,favorite;
+
+    public Remote() {
+    }
+
+    public Remote(Remote remote) {
+        super(remote);
+        this.id = remote.getId();
+        this.name = remote.getName();
+        this.topic = remote.getTopic();
+        this.creatorId = remote.getCreatorId();
+        this.remoteDataId = remote.getRemoteDataId();
+        this.remoteHubId = remote.getRemoteHubId();
+        this.type = remote.getType();
+        this.groupId = remote.getGroupId();
+        this.accessible = remote.isAccessible();
+        this.learned = remote.isLearned();
+        this.visibility = remote.isVisibility();
+        this.favorite = remote.isFavorite();
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
 
     public String getId() {
         return id;
@@ -120,16 +148,20 @@ public class Remote  extends BaseDevice{
     @Override
     public String toString() {
         return "Remote{" +
-                "id='" + id + '\'' +
+//                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", topic='" + topic + '\'' +
-                ", creatorId='" + creatorId + '\'' +
-                ", remoteDataId='" + remoteDataId + '\'' +
-                ", remoteHubId='" + remoteHubId + '\'' +
-                ", accessible=" + accessible +
-                ", learned=" + learned +
-                ", visibility=" + visibility +
-                ", favorite=" + favorite +
-                '}';
+                ", pos'" + getPosition() + '\'' +
+                ", grPos='" + getInGroupPosition() + '\'' ;
+//                ", topic='" + topic + '\'' +
+//                ", creatorId='" + creatorId + '\'' +
+//                ", remoteDataId='" + remoteDataId + '\'' +
+//                ", remoteHubId='" + remoteHubId + '\'' +
+//                ", type='" + type + '\'' +
+//                ", groupId='" + groupId + '\'' +
+//                ", accessible=" + accessible +
+//                ", learned=" + learned +
+//                ", visibility=" + visibility +
+//                ", favorite=" + favorite +
+//                '}';
     }
 }

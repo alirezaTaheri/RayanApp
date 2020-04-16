@@ -28,7 +28,7 @@ public class DrawerSortByGroupViewHolder extends BasicViewHolder<Group, OnGroupC
     @Override
     public void onBind(Group item, @Nullable OnGroupClicked<Group> listener) {
         name.setText(item.getName());
-        number.setText(String.valueOf(item.getDevices().size()));
+        number.setText(String.valueOf(item.getBaseDevices().size()));
         if (RayanApplication.getPref().getCurrentShowingGroup() == null && item.getId() == null)
             itemView.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.background_selected_item_base_color));
         else if (RayanApplication.getPref().getCurrentShowingGroup()!= null && RayanApplication.getPref().getCurrentShowingGroup().equals(item.getId()))

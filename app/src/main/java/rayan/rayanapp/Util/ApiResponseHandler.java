@@ -75,17 +75,19 @@ public class ApiResponseHandler {
                     }
                 }
             g.setDevices(devices);
-            for (int z = 0;z<remoteHubs.size();z++){
-                if (remoteHubs.get(z).getGroupId().equals(g.getId())){
+            for (int z = 0;z<remoteHubs.size();z++) {
+                if (remoteHubs.get(z).getGroupId().equals(g.getId())) {
                     remoteHubs.get(z).setPosition(nOd);
-                    remoteHubs.get(z).setInGroupPosition(devices.size()+z);
+                    remoteHubs.get(z).setInGroupPosition(devices.size() + z);
                     nOd++;
-                }
-                for (int i = 0;i<remotes.size();i++){
-                    if (remotes.get(i).getRemoteHubId().equals(remoteHubs.get(z).getId())){
-                        remotes.get(i).setPosition(nOd);
-                        remotes.get(i).setInGroupPosition(devices.size()+z+i);
-                        nOd++;
+                    for (int i = 0; i < remotes.size(); i++) {
+                        if (remotes.get(i).getRemoteHubId().equals(remoteHubs.get(z).getId())) {
+                            remotes.get(i).setPosition(nOd);
+                            remotes.get(i).setType(nOd % 2 == 0 ? "AC" : "TV");
+                            remotes.get(i).setInGroupPosition(devices.size() + z + i);
+                            remotes.get(i).setGroupId(g.getId());
+                            nOd++;
+                        }
                     }
                 }
             }
@@ -192,13 +194,18 @@ public class ApiResponseHandler {
             }
         }
         for (RemoteHub remoteHub: remoteHubs){
+            Log.e("POSPOSREMOTEHUB", ""+remoteHub.getName()+" | "+remoteHub.getPosition() + " | "+remoteHub.getInGroupPosition());
             remoteHub.setChipId(remoteHub.getId());
             remoteHub.setDeviceType(AppConstants.BaseDeviceType_REMOTE_HUB);
             remoteHub.setBaseId(remoteHub.getId());
         }
         for (Remote remote: remotes){
+            Log.e("POSPOSREMOTE", ""+remote.getName()+" | "+remote.getPosition()+ " | "+remote.getInGroupPosition());
             remote.setBaseId(remote.getId());
             remote.setDeviceType(AppConstants.BaseDeviceType_REMOTE);
+        }
+        for (Device device: newDevices){
+            Log.e("POSPOSREMOTE", ""+device.getName1()+" | "+device.getPosition()+ " | "+device.getInGroupPosition());
         }
         if (remotes != null && oldRemotes != null){
             for (int a = 0;a<oldRemotes.size();a++){

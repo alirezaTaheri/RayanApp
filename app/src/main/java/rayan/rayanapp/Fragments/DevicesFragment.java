@@ -7,6 +7,7 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,11 +33,13 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.MainActivity;
+import rayan.rayanapp.Activities.RemoteActivity;
 import rayan.rayanapp.Adapters.recyclerView.DevicesFragmentRecyclerViewAdapter;
 
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Remote;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Helper.DeviceAnimator;
 import rayan.rayanapp.Helper.DialogPresenter;
@@ -69,13 +72,17 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
     public List<Device> devices = new ArrayList<>();
     public List<BaseDevice> baseDevices = new ArrayList<>();
     public List<RemoteHub> remoteHubs = new ArrayList<>();
+    public List<Remote> remotes = new ArrayList<>();
     List<Device> finalDevices = new ArrayList<>();
     List<RemoteHub> finalRemoteHubs = new ArrayList<>();
+    List<Remote> finalRemotes = new ArrayList<>();
     LiveData<List<Device>> devicesObservable;
     LiveData<List<RemoteHub>> remoteHubsObservable;
+    LiveData<List<Remote>> remotesObservable;
     MainActivity mainActivity;
     Observer<List<Device>> devicesObserver;
     Observer<List<RemoteHub>> remoteHubsObserver;
+    Observer<List<Remote>> remotesObserver;
     private final String TAG = this.getClass().getSimpleName();
     public static List<String> subscribedDevices = new ArrayList<>();
     private DeviceAnimator deviceAnimator;
@@ -96,6 +103,49 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
         activity = getActivity();
         devicesObservable = devicesFragmentViewModel.getAllDevicesLive();
         remoteHubsObservable = devicesFragmentViewModel.getAllRemoteHubsLive();
+        remotesObservable = devicesFragmentViewModel.getAllRemotesLive();
+        remotesObserver = new Observer<List<Remote>>() {
+            @Override
+            public void onChanged(@Nullable List<Remote> remotes) {
+                DevicesFragment.this.remotes = remotes;
+                if (DevicesFragment.this.finalRemotes.size() == 0 && remotes.size() > 0)
+                    deviceAnimator.setItemWidth(DevicesFragment.this);
+                finalRemotes = new ArrayList<>();
+                String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
+                if (currentGroup != null)
+                    for (int a = 0; a<remotes.size();a++){
+                        if (remotes.get(a).getGroupId().equals(currentGroup) && remotes.get(a).isVisibility()){
+                            finalRemotes.add(remotes.get(a));
+                        }
+                    }
+                else
+                    for (int a = 0; a<remotes.size();a++){
+                        if (remotes.get(a).isVisibility()){
+                            finalRemotes.add(remotes.get(a));
+                        }
+                    }
+                DevicesFragment.this.remotes = finalRemotes;
+                synchronized (baseDevices) {
+                    baseDevices.clear();
+                    baseDevices.addAll(finalDevices);
+                    baseDevices.addAll(finalRemoteHubs);
+                    baseDevices.addAll(finalRemotes);
+                    if (RayanApplication.getPref().getCurrentShowingGroup() == null)
+                        Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                    else Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getInGroupPosition(), obj2.getInGroupPosition()));
+                    if (baseDevices.size() == 0){
+                        lottieAnimationView.setMaxProgress(0.5f);
+                        emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.INVISIBLE);
+                    }
+                    else{
+                        emptyView.setVisibility(View.INVISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                }
+                devicesRecyclerViewAdapter.updateItems(baseDevices);
+            }
+        };
         remoteHubsObserver = new Observer<List<RemoteHub>>() {
             @Override
             public void onChanged(@Nullable List<RemoteHub> remoteHubs) {
@@ -121,6 +171,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                     baseDevices.clear();
                     baseDevices.addAll(finalDevices);
                     baseDevices.addAll(finalRemoteHubs);
+                    baseDevices.addAll(finalRemotes);
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
                     else Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getInGroupPosition(), obj2.getInGroupPosition()));
@@ -165,6 +216,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                     baseDevices.clear();
                     baseDevices.addAll(finalDevices);
                     baseDevices.addAll(finalRemoteHubs);
+                    baseDevices.addAll(finalRemotes);
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
                     else Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getInGroupPosition(), obj2.getInGroupPosition()));
@@ -184,6 +236,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
         };
         devicesObservable.observe(this, devicesObserver);
         remoteHubsObservable.observe(this, remoteHubsObserver);
+        remotesObservable.observe(this, remotesObserver);
     }
 
     @Override
@@ -220,6 +273,8 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
         devicesObservable.observe(this,devicesObserver);
         remoteHubsObservable.removeObservers(this);
         remoteHubsObservable.observe(this,remoteHubsObserver);
+        remotesObservable.removeObservers(this);
+        remotesObservable.observe(this, remotesObserver);
     }
 
     @Override
@@ -432,6 +487,8 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                         d = new Device((Device)baseDevices.get(i));
                     else if(baseDevices.get(i) instanceof RemoteHub)
                         d = new RemoteHub((RemoteHub)baseDevices.get(i));
+                    else if (baseDevices.get(i) instanceof Remote)
+                        d = new Remote((Remote) baseDevices.get(i));
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         d.setPosition(i+1);
                     else d.setInGroupPosition(i+1);
@@ -439,6 +496,8 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                         d1 = new Device((Device)baseDevices.get(i+1));
                     else if(baseDevices.get(i+1) instanceof RemoteHub)
                         d1 = new RemoteHub((RemoteHub)baseDevices.get(i+1));
+                    else if (baseDevices.get(i+1) instanceof Remote)
+                        d1 = new Remote((Remote) baseDevices.get(i+1));
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         d1.setPosition(i);
                     else d1.setInGroupPosition(i);
@@ -456,6 +515,8 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                         d = new Device((Device)baseDevices.get(i));
                     else if(baseDevices.get(i) instanceof RemoteHub)
                         d = new RemoteHub((RemoteHub)baseDevices.get(i));
+                    else if (baseDevices.get(i) instanceof Remote)
+                        d = new Remote((Remote) baseDevices.get(i));
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         d.setPosition(i-1);
                     else d.setInGroupPosition(i-1);
@@ -463,6 +524,8 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                         d2 = new Device((Device)baseDevices.get(i-1));
                     else if(baseDevices.get(i-1) instanceof RemoteHub)
                         d2 = new RemoteHub((RemoteHub)baseDevices.get(i-1));
+                    else if (baseDevices.get(i-1) instanceof Remote)
+                        d2 = new Remote((Remote) baseDevices.get(i-1));
                     if (RayanApplication.getPref().getCurrentShowingGroup() == null)
                         d2.setPosition(i);
                     else d2.setInGroupPosition(i);
@@ -550,6 +613,9 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
 
     @Override
     public void onClick_Remote(BaseDevice item, int position) {
-
+        Remote remote = (Remote) item;
+        Intent intent = new Intent(activity, RemoteActivity.class);
+        intent.putExtra("type", remote.getType());
+        startActivity(intent);
     }
 }

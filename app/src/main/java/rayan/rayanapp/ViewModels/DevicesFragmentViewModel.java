@@ -83,6 +83,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     private UserDatabase userDatabase;
     private UserMembershipDatabase membershipDatabase;
     private RemoteHubDatabase remoteHubDatabase;
+    private RemoteDatabase remoteDatabase;
     private ApiService apiService;
     private StartupApiRequests startupApiRequests;
     public DevicesFragmentViewModel(@NonNull Application application) {
@@ -91,6 +92,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         groupDatabase = new GroupDatabase(application);
         userDatabase = new UserDatabase(application);
         remoteHubDatabase = new RemoteHubDatabase(application);
+        remoteDatabase = new RemoteDatabase(application);
         membershipDatabase = new UserMembershipDatabase(application);
         executorService= Executors.newSingleThreadExecutor();
         apiService = ApiUtils.getApiService();
@@ -121,6 +123,12 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     public LiveData<List<RemoteHub>> getAllRemoteHubsLive(){
         return remoteHubDatabase.getAllRemoteHubsLive();
     }
+    public LiveData<List<Remote>> getAllRemotesLive(){
+        return remoteDatabase.getAllRemotesLive();
+    }
+    public Flowable<List<RemoteHub>> getAllRemoteHubsFlowable(){
+        return remoteHubDatabase.getAllRemoteHubsFlowable();
+    }
 
     public List<Device> getAllDevicesInGroup(String groupId){
             return deviceDatabase.getAllInGroup(groupId);
@@ -150,6 +158,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         }
         deviceDatabase.updateDevices(devices);
         remoteHubDatabase.updateRemoteHubs(remoteHubs);
+        remoteDatabase.updateRemotes(remotes);
     }
 
     private class GetAllDevices extends AsyncTask<Void, Void,LiveData<List<Device>>> {

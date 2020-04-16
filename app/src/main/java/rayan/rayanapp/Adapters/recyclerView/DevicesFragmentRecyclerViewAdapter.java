@@ -20,6 +20,7 @@ import java.util.Map;
 
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Remote;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Listeners.OnDeviceClickListener;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
@@ -31,9 +32,10 @@ import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.ViewHolders.DeviceViewHolderPlug;
 import rayan.rayanapp.ViewHolders.RemoteHubViewHolder;
+import rayan.rayanapp.ViewHolders.RemoteViewHolder;
 
 public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<BaseViewHolder> {
-    private final String TAG = "DevicesFragmentRecyclerViewAdapter";
+    private final String TAG = "DevicesRecyclerViewAdapter";
     private Map<String, ValueAnimator> animatorMap = new HashMap<>();
     private static Map<String, Boolean> pin1Enabled = new HashMap<>();
     private ToggleDeviceAnimationProgress fragment;
@@ -60,7 +62,6 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
         this.items.addAll(items);
     }
 
-
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == 1)
@@ -73,11 +74,11 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
             return new DeviceViewHolderPlug(inflate(R.layout.item_device_plug, parent));
         else if (viewType == 5)
             return new RemoteHubViewHolder(inflate(R.layout.item_device_remote_hub, parent));
+        else if (viewType == 6)
+            return new RemoteViewHolder(inflate(R.layout.item_device_remote, parent));
         else
-            return new RemoteHubViewHolder(inflate(R.layout.item_device_remote_hub, parent));
+            return null;
     }
-
-
 
     @Override
     public int getItemViewType(int position) {
@@ -89,7 +90,6 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
             return 5; if (items.get(position).getDeviceType().equals(AppConstants.BaseDeviceType_REMOTE))
             return 6; else return -1;
     }
-
 
     public void onItemMove(int fromPosition, int toPosition){
         if (fromPosition != -1 && toPosition != -1) {
@@ -103,41 +103,55 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
         BaseDevice item = items.get(i);
-        switch (item.getDeviceType()){
-            case AppConstants.BaseDeviceType_SWITCH_1:
-                viewHolder.onBind(item, listener);
-                break;
-            case AppConstants.BaseDeviceType_SWITCH_2:
-                viewHolder.onBind(item, listener);
-                break;
-            case AppConstants.BaseDeviceType_TOUCH_2:
-                viewHolder.onBind(item, listener);
-                break;
-            case AppConstants.BaseDeviceType_PLUG:
-                viewHolder.onBind(item, listener);
-                break;
-            case AppConstants.BaseDeviceType_REMOTE_HUB:
-                viewHolder.onBind(item, listener);
-                break;
-            case AppConstants.BaseDeviceType_REMOTE:
-                viewHolder.onBind(item, listener);
-                break;
-                default:break;
-        }
+        viewHolder.onBind(item, listener);
+//        switch (item.getDeviceType()){
+//            case AppConstants.BaseDeviceType_SWITCH_1:
+//                viewHolder.onBind(item, listener);
+//                break;
+//            case AppConstants.BaseDeviceType_SWITCH_2:
+//                viewHolder.onBind(item, listener);
+//                break;
+//            case AppConstants.BaseDeviceType_TOUCH_2:
+//                viewHolder.onBind(item, listener);
+//                break;
+//            case AppConstants.BaseDeviceType_PLUG:
+//                viewHolder.onBind(item, listener);
+//                break;
+//            case AppConstants.BaseDeviceType_REMOTE_HUB:
+//                viewHolder.onBind(item, listener);
+//                break;
+//            case AppConstants.BaseDeviceType_REMOTE:
+//                viewHolder.onBind(item, listener);
+//                break;
+//                default:break;
+//        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (payloads.isEmpty())
+            Log.e("Khallili" , "Khalli");
+        else Log.e("OOOOOOOOMANDA" , "OOOMANADLKL"+payloads.get(0));
         if (!payloads.isEmpty()) {
-            BaseDevice item = items.get(position);
-                    Device device = (Device)item;
+            BaseDevice baseDevice = items.get(position);
                     Bundle b = (Bundle) payloads.get(0);
                     for (String key : b.keySet()) {
                         switch (key){
-                            case "position":
-                                holder.changePosition(device, listener);
+                            case "position": {
+                                if (baseDevice instanceof Device) {
+                                    Device device = (Device) baseDevice;
+                                    holder.changePosition(device, listener);
+                                }else if(baseDevice instanceof RemoteHub) {
+                                    RemoteHub remoteHub = (RemoteHub) baseDevice;
+                                    holder.changePosition(remoteHub, listener);
+                                }
+//                                }else if (baseDevice instanceof Remote){
+//                                    Remote remote
+//                                }
+                            }
                                 break;
                             case "pin1": {
+                                Device device = (Device) baseDevice;
                                 if (device.getPin1().equals(AppConstants.ON_STATUS))
                                     fragment.turnOnDevicePin1(device.getChipId(), position, device.getType());
                                 else
@@ -145,7 +159,8 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
                                 holder.stopToggleAnimationPin1(animatorMap.get(device.getChipId() + "1"), listener, device);
                             }
                                 break;
-                            case "pin2":
+                            case "pin2": {
+                                Device device = (Device) baseDevice;
                                 if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || device.getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)) {
                                     if (device.getPin2().equals(AppConstants.ON_STATUS))
                                         fragment.turnOnDevicePin2(device.getChipId(), position, device.getType());
@@ -153,15 +168,26 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
                                         fragment.turnOffDevicePin2(device.getChipId(), position, device.getType());
                                     holder.stopToggleAnimationPin2(animatorMap.get(device.getChipId() + "2"), listener, device);
                                 }
+                            }
                                 break;
                             case "name":
                                 holder.changeName(b.getString("name"));
-                                holder.stopToggleAnimationPin1(animatorMap.get(device.getChipId()+"1"),listener, device);
+                                if (baseDevice instanceof Device) {
+                                    Device device = (Device) baseDevice;
+                                    holder.stopToggleAnimationPin1(animatorMap.get(device.getChipId() + "1"), listener, device);
+                                }
                                 break;
                             case "ip":
-                                holder.ipChanged(listener, device);
+                                if (baseDevice instanceof Device) {
+                                    Device device = (Device) baseDevice;
+                                    holder.ipChanged(listener, device);
+                                }else if (baseDevice instanceof RemoteHub) {
+                                    RemoteHub remoteHub = (RemoteHub) baseDevice;
+                                    holder.ipChanged(listener, remoteHub);
+                                }
                                 break;
                             case "startTogglingPin1": {
+                                Device device = (Device) baseDevice;
                                 setPin1Enabled(device.getChipId(), false);
                                 ValueAnimator v;
                                 if (b.getString("status").equals(AppConstants.ON_STATUS))
@@ -173,23 +199,28 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
                             }
                                 break;
                             case "startTogglingPin2": {
+                                Device device = (Device) baseDevice;
                                 setPin2Enabled(device.getChipId(), false);
                                 ValueAnimator v;
                                 if (b.getString("status").equals(AppConstants.ON_STATUS))
-                                    v = ValueAnimator.ofInt(item.getDeviceType().equals(AppConstants.BaseDeviceType_SWITCH_2) || item.getDeviceType().equals(AppConstants.BaseDeviceType_TOUCH_2) ? holder.getDeviceItemWidth() / 2 : holder.getDeviceItemWidth(), 0);
+                                    v = ValueAnimator.ofInt(device.getDeviceType().equals(AppConstants.BaseDeviceType_SWITCH_2) || device.getDeviceType().equals(AppConstants.BaseDeviceType_TOUCH_2) ? holder.getDeviceItemWidth() / 2 : holder.getDeviceItemWidth(), 0);
                                 else
-                                    v = ValueAnimator.ofInt(0, item.getDeviceType().equals(AppConstants.BaseDeviceType_SWITCH_2) || item.getDeviceType().equals(AppConstants.BaseDeviceType_TOUCH_2) ? holder.getDeviceItemWidth() / 2 : holder.getDeviceItemWidth());
+                                    v = ValueAnimator.ofInt(0, device.getDeviceType().equals(AppConstants.BaseDeviceType_SWITCH_2) || device.getDeviceType().equals(AppConstants.BaseDeviceType_TOUCH_2) ? holder.getDeviceItemWidth() / 2 : holder.getDeviceItemWidth());
                                 animatorMap.put(b.getString("chipId") + "2", v);
                                 holder.startToggleAnimationPin2(v);
                             }
                                 break;
-                            case "stopToggleAnimationPin1":
+                            case "stopToggleAnimationPin1": {
+                                Device device = (Device) baseDevice;
                                 setPin1Enabled(device.getChipId(), true);
-                                holder.stopToggleAnimationPin1(animatorMap.get(b.getString("chipId")+"1"),listener, device);
+                                holder.stopToggleAnimationPin1(animatorMap.get(b.getString("chipId") + "1"), listener, device);
+                            }
                                 break;
-                            case "stopToggleAnimationPin2":
+                            case "stopToggleAnimationPin2": {
+                                Device device = (Device) baseDevice;
                                 setPin2Enabled(device.getChipId(), true);
-                                holder.stopToggleAnimationPin2(animatorMap.get(b.getString("chipId")+"2"),listener, device);
+                                holder.stopToggleAnimationPin2(animatorMap.get(b.getString("chipId") + "2"), listener, device);
+                            }
                                 break;
 
                         }

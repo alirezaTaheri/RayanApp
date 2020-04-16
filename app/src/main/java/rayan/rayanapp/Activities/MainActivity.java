@@ -70,6 +70,7 @@ import javax.crypto.spec.SecretKeySpec;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -87,7 +88,10 @@ import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.viewPager.BottomNavigationViewPagerAdapter;
 import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Fragments.FavoritesFragment;
@@ -741,6 +745,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        apiService = ApiUtils.getApiService();
         RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
         RemoteDatabase remoteDatabase = new RemoteDatabase(this);
+        RemoteHub poor = remoteHubDatabase.getAllRemoteHubs().get(0);
+        poor.setName("Blah Blah man");
+        remoteHubDatabase.updateRemoteHub(poor);
+        Remote pp = remoteDatabase.getAllRemotes().get(0);
+        pp.setName("man manam");
+        remoteDatabase.updateRemote(pp);
         Log.e(TAG, "RemoteHub: " + remoteHubDatabase.getAllRemoteHubs());
         Log.e(TAG, "Remote: " + remoteDatabase.getAllRemotes());
         Log.e(TAG, "RemoteHub: " + remoteHubDatabase.getAllRemoteHubs().size());
@@ -1317,6 +1327,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        return secretKeySpec;
 //    }
         public static SecretKeySpec secretKeySpec;
+        @SuppressLint("CheckResult")
         @Override
         public void onClick (View v){
             switch (v.getId()) {
@@ -1369,30 +1380,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         drawer_groupsRecyclerView.setAdapter(drawer_groupsRecyclerViewAdapter);
                         drawer_groupsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
                         drawer_groupsRecyclerViewAdapter.setListener(this);
-                        mainActivityViewModel.getAllGroupsFlowable().zipWith(mainActivityViewModel.getAllDevicesFlowable(), new BiFunction<List<Group>, List<Device>, Object>() {
-                            @Override
-                            public Object apply(List<Group> groups, List<Device> devices) throws Exception {
-                                Log.e("IjustCome", "IjustCome: " + groups);
-                                List<Group> items = new ArrayList<>();
-                                Group g = new Group();
-                                g.setDevices(devices);
-                                g.setName("همه");
-                                items.add(g);
-                                items.addAll(groups);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        drawer_groupsRecyclerViewAdapter.setItems(items);
-                                    }
-                                });
-                                return new Object();
+                        Flowable.zip(mainActivityViewModel.getAllGroupsFlowable(), mainActivityViewModel.getAllDevicesFlowable(),mainActivityViewModel.getAllRemoteHubsFlowable(), (groups, devices1, remoteHubs) -> {
+                            List<Group> items = new ArrayList<>();
+                            for (Group group:groups) {
+                                List<BaseDevice> baseDevices = new ArrayList<>();
+                                for (Device device : devices1) {
+                                    if (device.getGroupId().equals(group.getId()))
+                                        baseDevices.add(device);
+                                }for (RemoteHub remoteHub : remoteHubs) {
+                                    if (remoteHub.getGroupId().equals(group.getId()))
+                                        baseDevices.add(remoteHub);
+                                }
+                                group.setBaseDevices(baseDevices);
                             }
-                        }).subscribe(new Consumer<Object>() {
-                            @Override
-                            public void accept(Object o) throws Exception {
-
-                            }
-                        });
+                            Group g = new Group();
+                            List<BaseDevice> baseDevices = new ArrayList<>();
+                            baseDevices.addAll(devices1);
+                            baseDevices.addAll(remoteHubs);
+                            g.setBaseDevices(baseDevices);
+                            g.setDevices(devices);
+                            g.setName("همه");
+                            items.add(g);
+                            items.addAll(groups);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    drawer_groupsRecyclerViewAdapter.setItems(items);
+                                }
+                            });
+                            return new Object();
+                        }).subscribe();
                     }
 
 
@@ -1730,4 +1747,6 @@ problem with -44 -54
 
 28 Farvardin
 2:08 min
+1:41 min...
+
  */

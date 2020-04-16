@@ -174,7 +174,8 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     }
 
 
-    public void ipChanged(OnDeviceClickListener<BaseDevice> listener, Device item){
+    @Override
+    public void ipChanged(OnDeviceClickListener<BaseDevice> listener, BaseDevice item){
         Log.e(TAG, "ipchangedchanged twoBridges: " + item);
         clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
         clickableLayout2.setOnClickListener(vv -> listener.onPin2Clicked(item, this.getAdapterPosition()));

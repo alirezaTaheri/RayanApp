@@ -19,7 +19,7 @@ import rayan.rayanapp.Listeners.OnRemoteClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
 
-public class RemoteHubViewHolder extends BaseViewHolder {
+public class RemoteHubViewHolder extends DeviceViewHolder1Bridge {
 
     @BindView(R.id.name)
     TextView name;
@@ -27,7 +27,7 @@ public class RemoteHubViewHolder extends BaseViewHolder {
     ImageView icon;
     @BindView(R.id.clickableLayout)
     LinearLayout clickableLayout;
-    private final String TAG = "RemoteViewHolder";
+    private final String TAG = "RemoteViewHolderAddNewRemote";
     public RemoteHubViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);

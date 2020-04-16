@@ -43,6 +43,8 @@ public class BaseDeviceDiffCallBack extends DiffUtil.Callback {
                 return ((Device) oldThing).getChipId().equals(((Device) newThing).getChipId());
             }else if(oldThing.getClass().getName().equals(RemoteHub.class.getName())){
                 return ((RemoteHub) oldThing).getChipId().equals(((RemoteHub) newThing).getChipId());
+            }else if(oldThing instanceof Remote){
+                return ((Remote) oldThing).getId().equals(((Remote) newThing).getId());
             }
             else return false;
         }
@@ -73,6 +75,12 @@ public class BaseDeviceDiffCallBack extends DiffUtil.Callback {
                 return oldRemoteHub.getName().equals(newRemoteHub.getName())
                         && oldRemoteHub.isFavorite() == newRemoteHub.isFavorite()
                         && oldRemoteHub.getSsid().equals(newRemoteHub.getSsid());
+            }else if(oldThing instanceof Remote){
+                Remote oldRemote = (Remote)oldThing;
+                Remote newRemote = (Remote)newThing;
+                return oldRemote.getName().equals(newRemote.getName())
+                        && oldRemote.isFavorite() == newRemote.isFavorite()
+                        && oldRemote.isVisibility() == newRemote.isVisibility();
             }
             else return false;
         }
@@ -116,6 +124,11 @@ public class BaseDeviceDiffCallBack extends DiffUtil.Callback {
             RemoteHub newRemoteHub = (RemoteHub) newThing;
             if (!newRemoteHub.getName().equals(oldRemoteHub.getName()))
                 b.putString("name", newRemoteHub.getName());
+        }else if(oldThing instanceof Remote){
+            Remote oldRemote = (Remote) oldThing;
+            Remote newRemote = (Remote) newThing;
+            if (!newRemote.getName().equals(oldRemote.getName()))
+                b.putString("name", newRemote.getName());
         }
 
         if (b.size() == 0) return null;

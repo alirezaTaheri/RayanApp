@@ -144,10 +144,11 @@ public class RemoteHub extends BaseDevice{
     @Override
     public String toString() {
         return "RemoteHub{" +
-                "name='" + name + '\'' +
-                ", visibility=" + visibility +
-                ", pos=" + getPosition() +
-                ", groupPos=" + getInGroupPosition() +
-                '}';
+//                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", pos='" + getPosition() + '\'' +
+                ", grPos='" + getInGroupPosition()+ '\'' ;
+//                ", groupId='" + groupId + '\'' +
+//                '}';
     }
 }

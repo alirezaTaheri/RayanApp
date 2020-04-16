@@ -1,6 +1,7 @@
 package rayan.rayanapp.Retrofit.Models.Responses.api;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.os.Parcel;
@@ -13,12 +14,15 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 import androidx.annotation.Nullable;
+
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Util.dataConverter.DeviceDataConverter;
 import rayan.rayanapp.Util.dataConverter.UserDataConverter;
 
 @Entity
 public class Group implements Parcelable {
+
     @PrimaryKey
     @NonNull
     @SerializedName("_id")
@@ -31,6 +35,8 @@ public class Group implements Parcelable {
     @Expose
     private String secret;
 
+    @Ignore
+    private List<BaseDevice> baseDevices;
 //    @SerializedName("admins")
 //    @Expose
 //    @Ignore
@@ -71,6 +77,14 @@ public class Group implements Parcelable {
             return new Group[size];
         }
     };
+
+    public List<BaseDevice> getBaseDevices() {
+        return baseDevices;
+    }
+
+    public void setBaseDevices(List<BaseDevice> baseDevices) {
+        this.baseDevices = baseDevices;
+    }
 
     @NonNull
     public String getId() {
