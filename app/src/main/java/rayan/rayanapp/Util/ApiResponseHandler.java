@@ -50,8 +50,7 @@ public class ApiResponseHandler {
                         deviceUser.setIp(AppConstants.UNKNOWN_IP);
                         deviceUser.setPosition(nOd);
                         deviceUser.setDeviceType(u.getType());
-                        deviceUser.setBaseId(u.getChipId());
-//                        deviceUser.setFavoritePosition(nOd);
+                        deviceUser.setBaseId(u.getId());
                         deviceUser.setInGroupPosition(b);
                         tempTopics.add(deviceUser.getTopic().getTopic());
                         if (deviceUser.getType()!= null && deviceUser.getName1() != null){
@@ -66,7 +65,7 @@ public class ApiResponseHandler {
                         existing.setName1(u.getName1());
                         existing.setType(u.getType());
                         existing.setDeviceType(u.getType());
-                        existing.setBaseId(u.getChipId());
+                        existing.setBaseId(u.getId());
                         existing.setTopic(u.getTopic());
                         tempTopics.add(u.getTopic().getTopic());
                         existing.setGroupId(g.getId());
@@ -187,39 +186,46 @@ public class ApiResponseHandler {
                 String cId = oldRemoteHubs.get(a).getId();
                 boolean exist = false;
                 for (int b = 0;b<remoteHubs.size();b++){
-                    tempTopics.add(remoteHubs.get(b).getTopic());
-                    if (cId.equals(remoteHubs.get(b).getId())) exist = true;
+                    if (cId.equals(remoteHubs.get(b).getId())) {
+                        exist = true;
+                        remoteHubs.get(b).setFavorite(oldRemoteHubs.get(a).isFavorite());
+                        remoteHubs.get(b).setPosition(oldRemoteHubs.get(a).getPosition());
+                        remoteHubs.get(b).setInGroupPosition(oldRemoteHubs.get(a).getInGroupPosition());
+                        remoteHubs.get(b).setFavoritePosition(oldRemoteHubs.get(a).getFavoritePosition());
+                    }
                 }
                 if (!exist) remoteHubDatabase.deleteRemoteHub(oldRemoteHubs.get(a));
             }
         }
-        for (RemoteHub remoteHub: remoteHubs){
-            Log.e("POSPOSREMOTEHUB", ""+remoteHub.getName()+" | "+remoteHub.getPosition() + " | "+remoteHub.getInGroupPosition());
-            remoteHub.setChipId(remoteHub.getId());
-            remoteHub.setDeviceType(AppConstants.BaseDeviceType_REMOTE_HUB);
-            remoteHub.setBaseId(remoteHub.getId());
-        }
-        for (Remote remote: remotes){
-            Log.e("POSPOSREMOTE", ""+remote.getName()+" | "+remote.getPosition()+ " | "+remote.getInGroupPosition());
-            remote.setBaseId(remote.getId());
-            remote.setDeviceType(AppConstants.BaseDeviceType_REMOTE);
-        }
-        for (Device device: newDevices){
-            Log.e("POSPOSREMOTE", ""+device.getName1()+" | "+device.getPosition()+ " | "+device.getInGroupPosition());
-        }
+        if (remoteHubs != null)
+            for (RemoteHub remoteHub: remoteHubs){
+                remoteHub.setChipId(remoteHub.getId());
+                remoteHub.setDeviceType(AppConstants.BaseDeviceType_REMOTE_HUB);
+                remoteHub.setBaseId(remoteHub.getId());
+                tempTopics.add(remoteHub.getTopic());
+            }
         if (remotes != null && oldRemotes != null){
             for (int a = 0;a<oldRemotes.size();a++){
                 String cId = oldRemotes.get(a).getId();
                 boolean exist = false;
                 for (int b = 0;b<remotes.size();b++){
-                    tempTopics.add(remotes.get(b).getTopic());
-                    if (cId.equals(remotes.get(b).getId())) exist = true;
+                    if (cId.equals(remotes.get(b).getId())){
+                        exist = true;
+                        remotes.get(b).setFavorite(oldRemotes.get(a).isFavorite());
+                        remotes.get(b).setPosition(oldRemotes.get(a).getPosition());
+                        remotes.get(b).setInGroupPosition(oldRemotes.get(a).getInGroupPosition());
+                        remotes.get(b).setFavoritePosition(oldRemotes.get(a).getFavoritePosition());
+                    }
                 }
-                if (!exist) {
-                    remoteDatabase.deleteRemote(oldRemotes.get(a));
-                }
+                if (!exist) remoteDatabase.deleteRemote(oldRemotes.get(a));
             }
         }
+        if (remotes != null)
+            for (Remote remote : remotes){
+                tempTopics.add(remote.getTopic());
+                remote.setBaseId(remote.getId());
+                remote.setDeviceType(AppConstants.BaseDeviceType_REMOTE);
+            }
         rayanApplication.getMsc().setNewArrivedTopics(tempTopics);
         groupDatabase.addGroups(serverGroups);
         userDatabase.addUsers(newUsers);

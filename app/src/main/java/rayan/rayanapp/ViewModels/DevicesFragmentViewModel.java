@@ -82,8 +82,8 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     private ExecutorService executorService;
     private UserDatabase userDatabase;
     private UserMembershipDatabase membershipDatabase;
-    private RemoteHubDatabase remoteHubDatabase;
-    private RemoteDatabase remoteDatabase;
+    protected RemoteHubDatabase remoteHubDatabase;
+    protected RemoteDatabase remoteDatabase;
     private ApiService apiService;
     private StartupApiRequests startupApiRequests;
     public DevicesFragmentViewModel(@NonNull Application application) {

@@ -122,6 +122,7 @@ public class AppConstants {
     public final static String DEVICE_TYPE_SWITCH_2 = "switch_2";
     public final static String DEVICE_TYPE_TOUCH_2 = "touch_2";
     public final static String DEVICE_TYPE_PLUG = "plug";
+    public final static String DEVICE_TYPE_DEVICE = "device";
     public final static String DEVICE_TYPE_RemoteHub = "remote_hub";
     public final static String DEVICE_TYPE_Remote = "remote";
     public final static String REMOTE_TYPE_AC = "AC";

@@ -28,6 +28,8 @@ import okhttp3.ResponseBody;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.CustomResponse;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Helper.RayanUtils;
 import rayan.rayanapp.Retrofit.ApiUtils;
@@ -177,6 +179,12 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
 
     public void updateDevice(Device device){
         deviceDatabase.updateDevice(device);
+    }
+    public void updateRemoteHub(RemoteHub remoteHub){
+        remoteHubDatabase.updateRemoteHub(remoteHub);
+    }
+    public void updateRemote(Remote remote){
+        remoteDatabase.updateRemote(remote);
     }
 
 }

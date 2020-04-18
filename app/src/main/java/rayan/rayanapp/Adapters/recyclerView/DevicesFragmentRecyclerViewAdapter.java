@@ -52,12 +52,12 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
         if (items == null) {
             throw new IllegalArgumentException("Cannot set `null` item to the Recycler adapter");
         }
-        BaseDeviceDiffCallBack devicesDiffCallBack = new BaseDeviceDiffCallBack(items, this.items);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack,false);
-        diffResult.dispatchUpdatesTo(this);
         Log.e(TAG ,"ShowingDevices: " + items.subList(0, items.size()/3));
         Log.e(TAG ,"ShowingDevices: " + items.subList(items.size()/3,items.size()/3*2));
         Log.e(TAG ,"ShowingDevices: " + items.subList(items.size()/3*2, items.size()));
+        BaseDeviceDiffCallBack devicesDiffCallBack = new BaseDeviceDiffCallBack(items, this.items);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(devicesDiffCallBack,false);
+        diffResult.dispatchUpdatesTo(this);
         this.items.clear();
         this.items.addAll(items);
     }
@@ -93,10 +93,8 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
 
     public void onItemMove(int fromPosition, int toPosition){
         if (fromPosition != -1 && toPosition != -1) {
-            Log.e("!@#", "old: " + items);
             items.add(toPosition, items.remove(fromPosition));
             notifyItemMoved(fromPosition, toPosition);
-            Log.e("!@#", "new: " + items);
         }else Log.e("GenericRecyclerAdapter", "Index Problem => from: " + fromPosition + " to: " +toPosition);
     }
 
@@ -104,34 +102,10 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int i) {
         BaseDevice item = items.get(i);
         viewHolder.onBind(item, listener);
-//        switch (item.getDeviceType()){
-//            case AppConstants.BaseDeviceType_SWITCH_1:
-//                viewHolder.onBind(item, listener);
-//                break;
-//            case AppConstants.BaseDeviceType_SWITCH_2:
-//                viewHolder.onBind(item, listener);
-//                break;
-//            case AppConstants.BaseDeviceType_TOUCH_2:
-//                viewHolder.onBind(item, listener);
-//                break;
-//            case AppConstants.BaseDeviceType_PLUG:
-//                viewHolder.onBind(item, listener);
-//                break;
-//            case AppConstants.BaseDeviceType_REMOTE_HUB:
-//                viewHolder.onBind(item, listener);
-//                break;
-//            case AppConstants.BaseDeviceType_REMOTE:
-//                viewHolder.onBind(item, listener);
-//                break;
-//                default:break;
-//        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position, @NonNull List<Object> payloads) {
-        if (payloads.isEmpty())
-            Log.e("Khallili" , "Khalli");
-        else Log.e("OOOOOOOOMANDA" , "OOOMANADLKL"+payloads.get(0));
         if (!payloads.isEmpty()) {
             BaseDevice baseDevice = items.get(position);
                     Bundle b = (Bundle) payloads.get(0);
@@ -144,10 +118,10 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
                                 }else if(baseDevice instanceof RemoteHub) {
                                     RemoteHub remoteHub = (RemoteHub) baseDevice;
                                     holder.changePosition(remoteHub, listener);
+                                }else if (baseDevice instanceof Remote){
+                                    Remote remote = (Remote) baseDevice;
+                                    holder.changePosition(remote, listener);
                                 }
-//                                }else if (baseDevice instanceof Remote){
-//                                    Remote remote
-//                                }
                             }
                                 break;
                             case "pin1": {
@@ -222,7 +196,6 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
                                 holder.stopToggleAnimationPin2(animatorMap.get(b.getString("chipId") + "2"), listener, device);
                             }
                                 break;
-
                         }
                     }
 

@@ -2,12 +2,14 @@ package rayan.rayanapp.Data;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
 @Entity
-public class RemoteHub extends BaseDevice{
+public class RemoteHub extends BaseDevice implements Parcelable {
     @SerializedName("chip_id")
     private String chipId;
     @PrimaryKey
@@ -23,7 +25,7 @@ public class RemoteHub extends BaseDevice{
     private String creatorId;
     @SerializedName("group_id")
     private String groupId;
-    private boolean accessible,visibility,favorite;
+    private boolean accessible,visibility;
 
     public RemoteHub() {
     }
@@ -41,8 +43,33 @@ public class RemoteHub extends BaseDevice{
         this.groupId = remoteHub.getGroupId();
         this.accessible = remoteHub.isAccessible();
         this.visibility = remoteHub.isVisibility();
-        this.favorite = remoteHub.isFavorite();
     }
+
+    protected RemoteHub(Parcel in) {
+        chipId = in.readString();
+        id = in.readString();
+        name = in.readString();
+        version = in.readString();
+        topic = in.readString();
+        ssid = in.readString();
+        mac = in.readString();
+        creatorId = in.readString();
+        groupId = in.readString();
+        accessible = in.readByte() != 0;
+        visibility = in.readByte() != 0;
+    }
+
+    public static final Creator<RemoteHub> CREATOR = new Creator<RemoteHub>() {
+        @Override
+        public RemoteHub createFromParcel(Parcel in) {
+            return new RemoteHub(in);
+        }
+
+        @Override
+        public RemoteHub[] newArray(int size) {
+            return new RemoteHub[size];
+        }
+    };
 
     @NonNull
     public String getChipId() {
@@ -133,13 +160,6 @@ public class RemoteHub extends BaseDevice{
         this.visibility = visibility;
     }
 
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
-    }
 
     @Override
     public String toString() {
@@ -147,8 +167,28 @@ public class RemoteHub extends BaseDevice{
 //                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", pos='" + getPosition() + '\'' +
-                ", grPos='" + getInGroupPosition()+ '\'' ;
+                ",BaseId='" + getBaseId()+ '\'' ;
 //                ", groupId='" + groupId + '\'' +
 //                '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(chipId);
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(version);
+        dest.writeString(topic);
+        dest.writeString(ssid);
+        dest.writeString(mac);
+        dest.writeString(creatorId);
+        dest.writeString(groupId);
+        dest.writeByte((byte) (accessible ? 1 : 0));
+        dest.writeByte((byte) (visibility ? 1 : 0));
     }
 }

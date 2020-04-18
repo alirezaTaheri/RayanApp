@@ -38,12 +38,13 @@ public class BaseDeviceDiffCallBack extends DiffUtil.Callback {
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
         BaseDevice oldThing = oldBaseDevices.get(oldItemPosition);
         BaseDevice newThing = newBaseDevices.get(newItemPosition);
+//        return oldThing.getBaseId().equals(newThing.getBaseId());
         if (oldThing.getClass().getName().equals(newThing.getClass().getName())) {
             if (oldThing.getClass().getName().equals(Device.class.getName())) {
                 return ((Device) oldThing).getChipId().equals(((Device) newThing).getChipId());
-            }else if(oldThing.getClass().getName().equals(RemoteHub.class.getName())){
+            }else if (oldThing.getClass().getName().equals(RemoteHub.class.getName())){
                 return ((RemoteHub) oldThing).getChipId().equals(((RemoteHub) newThing).getChipId());
-            }else if(oldThing instanceof Remote){
+            }else if (oldThing instanceof Remote){
                 return ((Remote) oldThing).getId().equals(((Remote) newThing).getId());
             }
             else return false;
@@ -74,12 +75,16 @@ public class BaseDeviceDiffCallBack extends DiffUtil.Callback {
                 RemoteHub newRemoteHub = (RemoteHub)newThing;
                 return oldRemoteHub.getName().equals(newRemoteHub.getName())
                         && oldRemoteHub.isFavorite() == newRemoteHub.isFavorite()
+                        && oldRemoteHub.getPosition() == newRemoteHub.getPosition()
+                        && oldRemoteHub.getInGroupPosition() == newRemoteHub.getInGroupPosition()
                         && oldRemoteHub.getSsid().equals(newRemoteHub.getSsid());
             }else if(oldThing instanceof Remote){
                 Remote oldRemote = (Remote)oldThing;
                 Remote newRemote = (Remote)newThing;
                 return oldRemote.getName().equals(newRemote.getName())
                         && oldRemote.isFavorite() == newRemote.isFavorite()
+                        && oldRemote.getPosition() == newRemote.getPosition()
+                        && oldRemote.getInGroupPosition() == newRemote.getInGroupPosition()
                         && oldRemote.isVisibility() == newRemote.isVisibility();
             }
             else return false;
@@ -114,7 +119,7 @@ public class BaseDeviceDiffCallBack extends DiffUtil.Callback {
                 b.putString("pin2", newDevice.getPin2());
             }
             if (newDevice.getPosition()!=(oldDevice.getPosition())){
-                b.putString("position", newDevice.getPin1());
+                b.putString("position", String.valueOf(newDevice.getPosition()));
             }
             if (!newDevice.isLocallyAccessibility() == (oldDevice.isLocallyAccessibility()))
                 b.putBoolean("la", newDevice.isLocallyAccessibility());
@@ -122,15 +127,22 @@ public class BaseDeviceDiffCallBack extends DiffUtil.Callback {
         }else if(oldThing.getClass().equals(RemoteHub.class)){
             RemoteHub oldRemoteHub = (RemoteHub) oldThing;
             RemoteHub newRemoteHub = (RemoteHub) newThing;
-            if (!newRemoteHub.getName().equals(oldRemoteHub.getName()))
+            if (!newRemoteHub.getName().equals(oldRemoteHub.getName())) {
                 b.putString("name", newRemoteHub.getName());
+            }
+            if (newRemoteHub.getPosition()!=(oldRemoteHub.getPosition())){
+                b.putString("position", String.valueOf(newRemoteHub.getPosition()));
+            }
         }else if(oldThing instanceof Remote){
             Remote oldRemote = (Remote) oldThing;
             Remote newRemote = (Remote) newThing;
-            if (!newRemote.getName().equals(oldRemote.getName()))
+            if (!newRemote.getName().equals(oldRemote.getName())) {
                 b.putString("name", newRemote.getName());
+            }
+            if (newRemote.getPosition()!=(oldRemote.getPosition())){
+                b.putString("position", String.valueOf(newRemote.getPosition()));
+            }
         }
-
         if (b.size() == 0) return null;
         return b;
     }

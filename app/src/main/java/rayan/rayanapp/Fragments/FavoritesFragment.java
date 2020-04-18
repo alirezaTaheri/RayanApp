@@ -5,6 +5,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,51 +14,68 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rayan.rayanapp.Activities.RemoteActivity;
+import rayan.rayanapp.Adapters.recyclerView.DevicesFragmentRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Helper.DeviceAnimator;
 import rayan.rayanapp.Helper.DialogPresenter;
+import rayan.rayanapp.LayoutManagers.CustomGridLayoutManager;
 import rayan.rayanapp.Listeners.DevicesAndFavoritesListener;
 import rayan.rayanapp.Listeners.OnDeviceClickListener;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
+import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.ViewHolders.BaseViewHolder;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.ViewModels.FavoritesFragmentViewModel;
-import rayan.rayanapp.R;
-import rayan.rayanapp.Util.AppConstants;
 
-public class FavoritesFragment extends Fragment implements OnDeviceClickListener<Device>, ToggleDeviceAnimationProgress {
+import static rayan.rayanapp.Fragments.DevicesFragment.calculateNoOfColumns;
+import static rayan.rayanapp.Fragments.DevicesFragment.isTablet;
+
+public class FavoritesFragment extends Fragment implements OnDeviceClickListener<BaseDevice>, ToggleDeviceAnimationProgress {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-
+    private final String TAG = "FavoritesFragment";
     @BindView(R.id.empty_view)
     RelativeLayout emptyView;
     @BindView(R.id.animation_view)
     LottieAnimationView lottieAnimationView;
-    List<Device> devices = new ArrayList<>();
-    List<Device> finalDevices = new ArrayList<>();
     FavoritesFragmentViewModel favoritesFragmentViewModel;
-//    DevicesRecyclerViewAdapter devicesRecyclerViewAdapter;
+    DevicesFragmentRecyclerViewAdapter devicesRecyclerViewAdapter;
     Activity activity;
-    LiveData<List<Device>> favoritesObservable;
-    Observer<List<Device>> favoritesObserver;
+    public List<Device> devices = new ArrayList<>();
+    public List<BaseDevice> baseDevices = new ArrayList<>();
+    public List<RemoteHub> remoteHubs = new ArrayList<>();
+    public List<Remote> remotes = new ArrayList<>();
+    List<Device> finalDevices = new ArrayList<>();
+    List<RemoteHub> finalRemoteHubs = new ArrayList<>();
+    List<Remote> finalRemotes = new ArrayList<>();
+    LiveData<List<Device>> devicesObservable;
+    LiveData<List<RemoteHub>> remoteHubsObservable;
+    LiveData<List<Remote>> remotesObservable;
+    Observer<List<Device>> devicesObserver;
+    Observer<List<RemoteHub>> remoteHubsObserver;
+    Observer<List<Remote>> remotesObserver;
     private DeviceAnimator deviceAnimator;
     DialogPresenter dp;
     public FavoritesFragment() {
@@ -76,56 +95,11 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
         deviceAnimator = new DeviceAnimator();
         dp = new DialogPresenter(getActivity().getSupportFragmentManager());
         favoritesFragmentViewModel = ViewModelProviders.of(getActivity()).get(FavoritesFragmentViewModel.class);
-        favoritesObservable = favoritesFragmentViewModel.getAllDevicesLive();
-        favoritesObserver = new Observer<List<Device>>() {
-            @Override
-            public void onChanged(@Nullable List<Device> devices) {
-                if (FavoritesFragment.this.finalDevices.size() == 0 && devices.size() > 0)
-                    deviceAnimator.setItemWidth(FavoritesFragment.this);
-                finalDevices = new ArrayList<>();
-                String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
-//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(0, devices.size()/3));
-//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3,devices.size()/3*2));
-//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"All Devices: " + devices.subList(devices.size()/3*2, devices.size()));
-//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"currentGroup: " + currentGroup);
-//                if (currentGroup != null)
-//                    for (int a = 0; a<devices.size();a++){
-//                        if (devices.get(a).getGroupId().equals(currentGroup)){
-//                            finalDevices.add(devices.get(a));
-//                        }
-//                    }
-//                else
-                    finalDevices = devices;
-                Log.e("lsdkfjkldsfjsdfkjl: " , "sdlfk: " + finalDevices);
-                Log.e("lsdkfjkldsfjsdfkjl: " , "sdlfk: " + finalDevices.size());
-                if (finalDevices.size() == 0){
-                Log.e("lsdkfjkldsfjsdfkjl: " , "sdlfk: " + finalDevices);
-                    lottieAnimationView.setMaxProgress(0.5f);
-                    emptyView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.INVISIBLE);
-                }
-                else{
-                    emptyView.setVisibility(View.INVISIBLE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                }
-//                ((RayanApplication)getActivity().getApplication()).getMtd().updateDevices(finalDevices);
-                Collections.sort(finalDevices, new Comparator<Device>(){
-                    public int compare(Device obj1, Device obj2) {
-                        // ## Ascending order
-//                    return obj1.firstName.compareToIgnoreCase(obj2.firstName); // To compare string values
-                        return Integer.compare(obj1.getFavoritePosition(), obj2.getFavoritePosition()); // To compare integer values
-                        // ## Descending order
-                        // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
-                        // return Integer.valueOf(obj2.empId).compareTo(Integer.valueOf(obj1.empId)); // To compare integer values
-                    }
-                });
-//                Log.e(FavoritesFragment.this.getClass().getSimpleName() ,"ShowingFavoriteDevices: " + finalDevices);
-//                devicesRecyclerViewAdapter.updateItems(finalDevices);
-                FavoritesFragment.this.devices = finalDevices;
-            }
-        };
-//        devicesRecyclerViewAdapter = new DevicesRecyclerViewAdapter(getContext(), devices, this);
-//        devicesRecyclerViewAdapter.setListener(this);
+        devicesRecyclerViewAdapter = new DevicesFragmentRecyclerViewAdapter(getContext(), this, this);
+        initObservablesObservers();
+        devicesObservable.observe(this, devicesObserver);
+        remoteHubsObservable.observe(this, remoteHubsObserver);
+        remotesObservable.observe(this, remotesObserver);
     }
 
     @Override
@@ -133,8 +107,12 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
         ButterKnife.bind(this, view);
-//        recyclerView.setAdapter(devicesRecyclerViewAdapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setAdapter(devicesRecyclerViewAdapter);
+        if (isTablet(getActivity())) {
+            recyclerView.setLayoutManager(new CustomGridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180), CustomGridLayoutManager.VERTICAL, false));
+        } else {
+            recyclerView.setLayoutManager(new CustomGridLayoutManager(getContext(), calculateNoOfColumns(getActivity(),180), CustomGridLayoutManager.VERTICAL, false));
+        }
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
         return view;
@@ -143,86 +121,37 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
     @Override
     public void onResume() {
         super.onResume();
-        favoritesObservable.observe(this,favoritesObserver);
+        if (devicesObservable ==null && remoteHubsObservable == null && remotesObservable == null)
+            initObservablesObservers();
+        devicesObservable.removeObservers(this);
+        devicesObservable.observe(this,devicesObserver);
+        remoteHubsObservable.removeObservers(this);
+        remoteHubsObservable.observe(this,remoteHubsObserver);
+        remotesObservable.removeObservers(this);
+        remotesObservable.observe(this, remotesObserver);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser) {
-            if (favoritesObservable != null)
-                favoritesObservable.observe(this,favoritesObserver);
+            if (devicesObservable != null) {
+                devicesObservable.removeObservers(this);
+                devicesObservable.observe(this, devicesObserver);
+                remoteHubsObservable.removeObservers(this);
+                remoteHubsObservable.observe(this, remoteHubsObserver);
+                remotesObservable.removeObservers(this);
+                remotesObservable.observe(this, remotesObserver);
+            }
         }
     }
-
-    @Override
-    public void onPin1Clicked(Device device, int position) {
-        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
-        Log.e(this.getClass().getSimpleName()," Pin1 Is Touching: " + "Device: " +device);
-        favoritesFragmentViewModel.togglePin1(dp,this, position, ((RayanApplication) getActivity().getApplication()), device);
-    }
-
-    @Override
-    public void onPin2Clicked(Device device, int position) {
-        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
-        Log.e(this.getClass().getSimpleName()," Pin1 Is Touching: " + "Device: " +device);
-        favoritesFragmentViewModel.togglePin2(dp,this,position, (RayanApplication) getActivity().getApplication(),device);
-    }
-
-
-//    @Override
-//    public void startToggleAnimationPin1(String chipId, int position) {
-//        Bundle b = new Bundle();
-//        b.putString("startTogglingPin1", "startTogglingPin1");
-//        b.putString("chipId", chipId);
-//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
-//        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-//    }
-//
-//    @Override
-//    public void startToggleAnimationPin2(String chipId, int position) {
-//        Bundle b = new Bundle();
-//        b.putString("startTogglingPin2", "startTogglingPin2");
-//        b.putString("chipId", chipId);
-//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin2().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
-//        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-//    }
-//
-//    @Override
-//    public void stopToggleAnimationPin1(String chipId) {
-//        Bundle b = new Bundle();
-//        int position = findDevicePosition(chipId);
-//        b.putString("stopToggleAnimationPin1", "stopToggleAnimationPin1");
-//        b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-//        activity.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-//                Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 111");
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public void stopToggleAnimationPin2(String chipId) {
-//        Bundle b = new Bundle();
-//        int position = findDevicePosition(chipId);
-//        b.putString("stopToggleAnimationPin2", "stopToggleAnimationPin2");
-//        b.putString("chipId", devicesRecyclerViewAdapter.getItem(position).getChipId());
-//        activity.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                devicesRecyclerViewAdapter.notifyItemChanged(position,b);
-//                Log.e(this.getClass().getSimpleName(), "InFragment stopping animation pin 222");
-//            }
-//        });
-//    }
 
     public int findDevicePosition(String chipId){
         for (int a = 0;a<devices.size();a++)
             if (chipId.equals(devices.get(a).getChipId())) return a;
         return -1;
     }
+
     private ItemTouchHelper.Callback dragCallback = new ItemTouchHelper.Callback() {
 
         int dragFrom = -1;
@@ -238,68 +167,104 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
             int fromPosition = viewHolder.getAdapterPosition();
             int toPosition = target.getAdapterPosition();
-            Log.e("///////////" , "onMove:new List:: " + devices);
-            Log.e("///////////" , "onMove From: " + fromPosition+" To: " + toPosition);
             if(dragFrom == -1) {
                 dragFrom =  fromPosition;
             }
             dragTo = toPosition;
-//            if (fromPosition != -1 && toPosition != -1)
-//                devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
+
+            devicesRecyclerViewAdapter.onItemMove(fromPosition, toPosition);
+
             return true;
         }
 
         private void reallyMoved(int from, int to) {
-            Log.e("///////////" , "reallyMoved From: " + from);
-            Log.e("///////////" , "reallyMoved To: " + to);
-            Log.e("oooooooooooo" , "reallyMoved: oldList:: " + devices);
-            List<BaseDevice> devicesToUpdate = new ArrayList<>();
+            List<BaseDevice> changed = new ArrayList<>();
             if (from < to) {
                 for (int i = from; i < to; i++) {
-                    BaseDevice d = new BaseDevice(devices.get(i));
+                    BaseDevice d=null;
+                    BaseDevice d1=null;
+                    if (baseDevices.get(i) instanceof Device)
+                        d = new Device((Device)baseDevices.get(i));
+                    else if(baseDevices.get(i) instanceof RemoteHub)
+                        d = new RemoteHub((RemoteHub)baseDevices.get(i));
+                    else if (baseDevices.get(i) instanceof Remote)
+                        d = new Remote((Remote) baseDevices.get(i));
+
                     d.setFavoritePosition(i+1);
-                    BaseDevice d1 = new BaseDevice(devices.get(i+1));
+
+                    if (baseDevices.get(i+1) instanceof Device)
+                        d1 = new Device((Device)baseDevices.get(i+1));
+                    else if(baseDevices.get(i+1) instanceof RemoteHub)
+                        d1 = new RemoteHub((RemoteHub)baseDevices.get(i+1));
+                    else if (baseDevices.get(i+1) instanceof Remote)
+                        d1 = new Remote((Remote) baseDevices.get(i+1));
                     d1.setFavoritePosition(i);
-                    Collections.swap(devices, i, i + 1);
-                    if (!updateIfExists(d, devicesToUpdate))
-                        devicesToUpdate.add(d);
-                    if (!updateIfExists(d1, devicesToUpdate))
-                        devicesToUpdate.add(d1);
+                    Collections.swap(baseDevices, i, i + 1);
+                    changed.add(d);
+                    changed.add(d1);
                 }
             } else {
                 for (int i = from; i > to; i--) {
-                    BaseDevice d = new BaseDevice(devices.get(i));
+                    BaseDevice d=null;
+                    BaseDevice d2=null;
+                    if (baseDevices.get(i) instanceof Device)
+                        d = new Device((Device)baseDevices.get(i));
+                    else if(baseDevices.get(i) instanceof RemoteHub)
+                        d = new RemoteHub((RemoteHub)baseDevices.get(i));
+                    else if (baseDevices.get(i) instanceof Remote)
+                        d = new Remote((Remote) baseDevices.get(i));
                     d.setFavoritePosition(i-1);
-                    BaseDevice d2 = new BaseDevice(devices.get(i-1));
+                    if (baseDevices.get(i-1) instanceof Device)
+                        d2 = new Device((Device)baseDevices.get(i-1));
+                    else if(baseDevices.get(i-1) instanceof RemoteHub)
+                        d2 = new RemoteHub((RemoteHub)baseDevices.get(i-1));
+                    else if (baseDevices.get(i-1) instanceof Remote)
+                        d2 = new Remote((Remote) baseDevices.get(i-1));
                     d2.setFavoritePosition(i);
-                    Collections.swap(devices, i, i - 1);
-
-                    if (!updateIfExists(d, devicesToUpdate))
-                        devicesToUpdate.add(d);
-                    if (!updateIfExists(d2, devicesToUpdate))
-                        devicesToUpdate.add(d2);
+                    Collections.swap(baseDevices, i, i - 1);
+                    changed.add(d);
+                    changed.add(d2);
                 }
             }
-            favoritesFragmentViewModel.updateDevices(devicesToUpdate);
-            Log.e("nnnnnnnnnnnnn" , "reallyMoved: NewList:: " + devices);
+            for (int a=0;a<changed.size();a++){
+                BaseDevice changedBaseDevices = changed.get(a);
+                if (changedBaseDevices instanceof Device)
+                    for (int b = 0;b<devices.size();b++){
+                        Device currentDevice = devices.get(b);
+                        if (currentDevice.getBaseId().equals(changedBaseDevices.getBaseId()))
+                            devices.set(b,(Device)changedBaseDevices);
+                    }
+                else if (changedBaseDevices instanceof RemoteHub)
+                    for (int b = 0;b<remoteHubs.size();b++){
+                        RemoteHub currentRemoteHub= remoteHubs.get(b);
+                        if (currentRemoteHub.getBaseId().equals(changedBaseDevices.getBaseId()))
+                            remoteHubs.set(b,(RemoteHub) changedBaseDevices);
+                    }
+                else if (changedBaseDevices instanceof Remote)
+                    for (int b = 0;b<remotes.size();b++){
+                        Remote currentRemote= remotes.get(b);
+                        if (currentRemote.getBaseId().equals(changedBaseDevices.getBaseId()))
+                            remotes.set(b,(Remote) changedBaseDevices);
+                    }
+            }
+
+            favoritesFragmentViewModel.updateDevices(changed);
         }
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            Log.e("///////////" , "////////onSwiped: " + direction);
         }
 
         @Override
         public boolean isLongPressDragEnabled() {
-            Log.e("///////////" , "isLongPressDragEnabled"+devices);
             return true;
         }
 
         @Override
         public boolean isItemViewSwipeEnabled() {
-            Log.e("///////////" , "isItemViewSwipeEnabled");
             return false;
         }
+
 
         @Override
         public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
@@ -313,27 +278,14 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
 
     };
 
-    @Override
-    public void onAccessPointChanged(Device item) {
-//        ((RayanApplication)getActivity().getApplication()).getMtd().updateDevice(item);
-    }
-
-    @Override
-    public void onClick_RemoteHub(Device Item, int position) {
-        Toast.makeText(activity, "Hi Favorite", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onClick_Remote(Device item, int position) {
-
-    }
 
     @Override
     public int getDeviceItemWidth(int position){
-//        if (!(finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_SWITCH_1) || finalDevices.get(position).getType().equals(AppConstants.DEVICE_TYPE_PLUG)))
-//            width /= 2;
-        return ((DeviceViewHolder1Bridge)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
+        if (recyclerView.findViewHolderForAdapterPosition(position) != null)
+            return ((BaseViewHolder)recyclerView.findViewHolderForAdapterPosition(position)).getItemWidth();
+        else return -1;
     }
+
 
     @Override
     public RecyclerView getRecyclerView() {
@@ -403,7 +355,7 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
     @Override
     public void sendingMessageTimeoutPin1(String chipId, int position, String type){
         if (!deviceAnimator.isResponseReceivedPin1(chipId)){
-            if (devices.get(position).getPin1().equals(AppConstants.ON_STATUS))
+            if (((Device)baseDevices.get(position)).getPin1().equals(AppConstants.ON_STATUS))
                 turnOnDeviceAnimationPin1(chipId, position, type);
             else
                 turnOffDeviceAnimationPin1(chipId, position, type);
@@ -411,8 +363,9 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
     }
     @Override
     public void sendingMessageTimeoutPin2(String chipId, int position, String type){
+        Log.e("wewewewe", "HAH? " + baseDevices.size()+baseDevices);
         if (!deviceAnimator.isResponseReceivedPin2(chipId)){
-            if (devices.get(position).getPin2().equals(AppConstants.ON_STATUS))
+            if (((Device)baseDevices.get(position)).getPin2().equals(AppConstants.ON_STATUS))
                 turnOnDeviceAnimationPin2(chipId, position, type);
             else
                 turnOffDeviceAnimationPin2(chipId, position, type);
@@ -434,5 +387,150 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
                 return true;
             }
         return false;
+    }
+
+    @Override
+    public void onPin1Clicked(BaseDevice Item, int position) {
+        Device device = (Device) Item;
+        Log.e("Pin1 Is Touching: " , "Device: " +device + position);
+        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
+        favoritesFragmentViewModel.togglePin1(dp,this, position, ((RayanApplication) getActivity().getApplication()), device);
+    }
+
+    @Override
+    public void onPin2Clicked(BaseDevice Item, int position) {
+        Device device = (Device) Item;
+        Log.e(this.getClass().getSimpleName(), "Mqtt backup is On? " + RayanApplication.getPref().getIsNodeSoundOn());
+        Log.e("Pin2 Is Touching: " , "Device: " +device);
+        favoritesFragmentViewModel.togglePin2(dp,this,position, (RayanApplication) getActivity().getApplication(),device);
+    }
+
+    @Override
+    public void onAccessPointChanged(BaseDevice item) {
+
+    }
+
+    @Override
+    public void onClick_RemoteHub(BaseDevice Item, int position) {
+        RemoteHub remoteHub = (RemoteHub) Item;
+        Log.e("onClick_RemoteHub", "Item:"+remoteHub + position);
+        SelectRemoteBottomSheetFragment selectRemoteBottomSheetFragment = SelectRemoteBottomSheetFragment.instance(remoteHub.getName());
+        selectRemoteBottomSheetFragment.show(getActivity().getSupportFragmentManager(), "TAG");
+    }
+
+    @Override
+    public void onClick_Remote(BaseDevice item, int position) {
+        Remote remote = (Remote) item;
+        Log.e("onClick_Remote", "Item:"+remote+ position);
+        Intent intent = new Intent(activity, RemoteActivity.class);
+        intent.putExtra("type", remote.getType());
+        startActivity(intent);
+    }
+
+    public void initObservablesObservers(){
+        devicesObservable = favoritesFragmentViewModel.getAllDevicesLive();
+        remoteHubsObservable = favoritesFragmentViewModel.getAllRemoteHubsLive();
+        remotesObservable = favoritesFragmentViewModel.getAllRemotesLive();
+        remotesObserver = new Observer<List<Remote>>() {
+            @Override
+            public void onChanged(@Nullable List<Remote> remotes) {
+                Log.e(TAG, "Remotes Updated " + remotes.size());
+                FavoritesFragment.this.remotes = remotes;
+                if (FavoritesFragment.this.remotes.size() == 0 && remotes.size() > 0)
+                    deviceAnimator.setItemWidth(FavoritesFragment.this);
+                finalRemotes = new ArrayList<>();
+                for (int a = 0; a<remotes.size();a++){
+                    if (remotes.get(a).isVisibility()){
+                        finalRemotes.add(remotes.get(a));
+                    }
+                }
+                FavoritesFragment.this.remotes = finalRemotes;
+                synchronized (baseDevices) {
+                    baseDevices.clear();
+                    baseDevices.addAll(finalDevices);
+                    baseDevices.addAll(finalRemoteHubs);
+                    baseDevices.addAll(finalRemotes);
+                    Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getFavoritePosition(), obj2.getFavoritePosition()));
+                    Log.e("bbbbbbbbbbb", "bascoint: " + baseDevices.size());
+                    if (baseDevices.size() == 0){
+                        lottieAnimationView.setMaxProgress(0.5f);
+                        emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.INVISIBLE);
+                    }
+                    else{
+                        emptyView.setVisibility(View.INVISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                }
+                devicesRecyclerViewAdapter.updateItems(baseDevices);
+            }
+        };
+        remoteHubsObserver = new Observer<List<RemoteHub>>() {
+            @Override
+            public void onChanged(@Nullable List<RemoteHub> remoteHubs) {
+                Log.e(TAG, "RemoteHubs Updated " + remoteHubs.size());
+                FavoritesFragment.this.remoteHubs = remoteHubs;
+                if (FavoritesFragment.this.finalRemoteHubs.size() == 0 && remoteHubs.size() > 0)
+                    deviceAnimator.setItemWidth(FavoritesFragment.this);
+                finalRemoteHubs = new ArrayList<>();
+                for (int a = 0; a<remoteHubs.size();a++){
+                    if (remoteHubs.get(a).isVisibility()){
+                        finalRemoteHubs.add(remoteHubs.get(a));
+                    }
+                }
+                FavoritesFragment.this.remoteHubs = finalRemoteHubs;
+                synchronized (baseDevices) {
+                    baseDevices.clear();
+                    baseDevices.addAll(finalDevices);
+                    baseDevices.addAll(finalRemoteHubs);
+                    baseDevices.addAll(finalRemotes);
+                    Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getFavoritePosition(), obj2.getFavoritePosition()));
+                    if (baseDevices.size() == 0){
+                        lottieAnimationView.setMaxProgress(0.5f);
+                        emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.INVISIBLE);
+                    }
+                    else{
+                        emptyView.setVisibility(View.INVISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                }
+                devicesRecyclerViewAdapter.updateItems(baseDevices);
+            }
+        };
+        devicesObserver = new Observer<List<Device>>() {
+            @Override
+            public void onChanged(@Nullable List<Device> devices) {
+                Log.e(TAG, "Devices Updated " + devices.size());
+                if (FavoritesFragment.this.finalDevices.size() == 0 && devices.size() > 0)
+                    deviceAnimator.setItemWidth(FavoritesFragment.this);
+                FavoritesFragment.this.devices = devices;
+                finalDevices = new ArrayList<>();
+                String currentGroup = RayanApplication.getPref().getCurrentShowingGroup();
+                for (int a = 0; a<devices.size();a++){
+                    if (!devices.get(a).isHidden()){
+                        finalDevices.add(devices.get(a));
+                    }
+                }
+                FavoritesFragment.this.devices = finalDevices;
+                synchronized (baseDevices) {
+                    baseDevices.clear();
+                    baseDevices.addAll(finalDevices);
+                    baseDevices.addAll(finalRemoteHubs);
+                    baseDevices.addAll(finalRemotes);
+                    Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getFavoritePosition(), obj2.getFavoritePosition()));
+                    if (baseDevices.size() == 0){
+                        lottieAnimationView.setMaxProgress(0.5f);
+                        emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.INVISIBLE);
+                    }
+                    else{
+                        emptyView.setVisibility(View.INVISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                }
+                devicesRecyclerViewAdapter.updateItems(baseDevices);
+            }
+        };
     }
 }

@@ -6,6 +6,7 @@ public class BaseDevice {
     private int position, inGroupPosition, favoritePosition;
     private String deviceType;
     private String baseId;
+    private boolean favorite;
 
     public BaseDevice() {
     }
@@ -23,7 +24,16 @@ public class BaseDevice {
         this.inGroupPosition = baseDevice.getInGroupPosition();
         this.deviceType = baseDevice.getDeviceType();
         this.baseId = baseDevice.getBaseId();
+        this.favorite = baseDevice.isFavorite();
         this.favoritePosition = baseDevice.getFavoritePosition();
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 
     public int getFavoritePosition() {

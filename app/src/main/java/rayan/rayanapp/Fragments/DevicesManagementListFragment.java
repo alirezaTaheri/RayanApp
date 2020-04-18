@@ -21,7 +21,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -29,8 +32,11 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Adapters.recyclerView.DevicesManagementRecyclerViewAdapter;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.ConnectionStatusModel;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Dialogs.DeviceManagementPopupDialog;
 import rayan.rayanapp.Listeners.DeviceManagementOptionsClickListener;
 import rayan.rayanapp.Listeners.OnDeviceClickListenerManagement;
@@ -40,7 +46,7 @@ import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.DevicesManagementListFragmentViewModel;
 
-public class DevicesManagementListFragment extends BackHandledFragment implements OnDeviceClickListenerManagement<Device>,
+public class DevicesManagementListFragment extends BackHandledFragment implements OnDeviceClickListenerManagement<BaseDevice>,
         DeviceManagementOptionsClickListener<Device> {
     private final String TAG = "DevicesManagementListFragment";
     @BindView(R.id.recyclerView)
@@ -49,6 +55,10 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     CoordinatorLayout coordinatorLayout;
     DevicesManagementRecyclerViewAdapter devicesRecyclerViewAdapterManagement;
     List<Device> devices = new ArrayList<>();
+    List<RemoteHub> remoteHubs = new ArrayList<>();
+    List<Remote> remotes = new ArrayList<>();
+    List<BaseDevice> baseDevices = new ArrayList<>();
+    Map<String, List<String>> favoriteBaseDevices = new HashMap<>();
     List<Device> favoriteDevices = new ArrayList<>();
     DevicesManagementListFragmentViewModel devicesManagementListFragmentViewModel;
     ClickOnDevice sendDevice;
@@ -74,18 +84,64 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        devicesRecyclerViewAdapterManagement = new DevicesManagementRecyclerViewAdapter(getActivity(), devices, waiting);
-        devicesRecyclerViewAdapterManagement.setListener(this);
+        devicesRecyclerViewAdapterManagement = new DevicesManagementRecyclerViewAdapter(getActivity(),waiting, this);
         devicesManagementListFragmentViewModel = ViewModelProviders.of(this).get(DevicesManagementListFragmentViewModel.class);
+        devicesManagementListFragmentViewModel.getAllRemoteHubsLive().observe(this, new Observer<List<RemoteHub>>() {
+            @Override
+            public void onChanged(@Nullable List<RemoteHub> remoteHubs) {
+                Log.e(TAG, "REMOTES HUBS: " + remoteHubs);
+                synchronized (baseDevices){
+                    DevicesManagementListFragment.this.remoteHubs = remoteHubs;
+                    baseDevices.clear();
+                    baseDevices.addAll(devices);
+                    baseDevices.addAll(remoteHubs);
+                    baseDevices.addAll(remotes);
+                    Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                }
+                List<String> favorites = new ArrayList<>();
+                for (RemoteHub d: remoteHubs)
+                    if (d.isFavorite())
+                        favorites.add(d.getBaseId());
+                favoriteBaseDevices.put(AppConstants.DEVICE_TYPE_RemoteHub, favorites);
+                devicesRecyclerViewAdapterManagement.updateItems(baseDevices);
+            }
+        });
+        devicesManagementListFragmentViewModel.getAllRemotesLive().observe(this, new Observer<List<Remote>>() {
+            @Override
+            public void onChanged(@Nullable List<Remote> remotes) {
+                Log.e(TAG, "Remotes: " + remotes);
+                synchronized (baseDevices){
+                    DevicesManagementListFragment.this.remotes = remotes;
+                    baseDevices.clear();
+                    baseDevices.addAll(devices);
+                    baseDevices.addAll(remoteHubs);
+                    baseDevices.addAll(remotes);
+                    Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                }
+                List<String> favorites = new ArrayList<>();
+                for (Remote d: remotes)
+                    if (d.isFavorite())
+                        favorites.add(d.getBaseId());
+                favoriteBaseDevices.put(AppConstants.DEVICE_TYPE_Remote, favorites);
+                devicesRecyclerViewAdapterManagement.updateItems(baseDevices);
+            }
+        });
         devicesManagementListFragmentViewModel.getAllDevicesLive().observe(this, devices -> {
-            Log.e("devdevdevdev: ", ": " + devices);
-//            for (Device d: devices)
-//                if (d.getChipId().equals("222222"))
-//                    d.setIp("192.168.137.1");
-            devicesRecyclerViewAdapterManagement.updateItems(devices);
+            Log.e(TAG, "Devices: " + devices);
+            synchronized (baseDevices){
+                DevicesManagementListFragment.this.devices = devices;
+                baseDevices.clear();
+                baseDevices.addAll(devices);
+                baseDevices.addAll(remoteHubs);
+                baseDevices.addAll(remotes);
+                Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+            }
+            devicesRecyclerViewAdapterManagement.updateItems(baseDevices);
+            List<String> favorites = new ArrayList<>();
             for (Device d: devices)
                 if (d.isFavorite())
-                    favoriteDevices.add(d);
+                    favorites.add(d.getBaseId());
+                favoriteBaseDevices.put(AppConstants.DEVICE_TYPE_DEVICE, favorites);
         });
         fragmentManager = getActivity().getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
@@ -131,102 +187,6 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     }
 
     @Override
-    public void onItemClick(Device item) {
-        Log.e(TAG, connectionStatus.toString());
-        if (connectionStatus == null){
-            ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext());
-            connectionLiveData.observe(this, getConnectionStatusObserver());
-        }else {
-            if (connectionStatus.getTypeName().equals(AppConstants.WIFI) && item.getSsid().equals(connectionStatus.getSsid())) {
-//        if (item.getIp() != null) {
-                waiting.add(item.getChipId());
-                devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
-                devicesManagementListFragmentViewModel.setReadyForSettingsHttp(item).observe(this, new Observer<String>() {
-                    @Override
-                    public void onChanged(@Nullable String s) {
-                        Log.e("...........", "............" + s);
-                        if (s.equals(AppConstants.SETTINGS)) {
-                            transaction = fragmentManager.beginTransaction();
-                            transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
-                            EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
-                            ((DeviceManagementActivity) getActivity()).editDeviceFragment = editGroupFragment;
-                            ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
-                            transaction.replace(R.id.frameLayout, editGroupFragment);
-                            transaction.addToBackStack(null);
-                            transaction.commit();
-                        } else if (s.equals(AppConstants.SOCKET_TIME_OUT)) {
-                            Log.e("ttttttttttt", "tttttttttttttt" + s);
-                            Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
-                        } else
-                            Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
-                        waiting.remove(item.getChipId());
-                        devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
-                    }
-                });
-//        }else SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
-
-
-//        if (disposable != null)
-//            disposable.dispose();
-//        disposable = ((RayanApplication)getActivity().getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
-//            if (o.getString("cmd").equals(AppConstants.SETTINGS)){
-//                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"Message: " + o);
-//                waiting.remove(device.getChipId());
-//                transaction = fragmentManager.beginTransaction();
-//                transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-//                EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
-//                ((DeviceManagementActivity)Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
-//                transaction.replace(R.id.frameLayout, editGroupFragment);
-//                transaction.addToBackStack(null);
-//                transaction.commit();
-//                disposable.dispose();
-//            }
-//        });
-//        this.device = item;
-//        if (device.getIp() == null)
-//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
-//        else {
-//            waiting.add(item.getChipId());
-//            devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
-//            devicesManagementListFragmentViewModel.setReadyForSettings(device).observe(this, s -> {
-//                if (waiting.contains(s)){
-//                    waiting.remove(s);
-//                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
-//                }
-//                devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
-//            });
-//        }
-            } else {
-                Toast.makeText(getContext(), "لطفا به شبکه " + "\"" + item.getSsid() + "\"" + " متصل شوید", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    @Override
-    public void onFavoriteIconClicked(Device item) {
-        Device deviceToUpdate = new Device(item);
-        deviceToUpdate.setFavorite(!item.isFavorite());
-        if (deviceToUpdate.isFavorite())
-            deviceToUpdate.setFavoritePosition(favoriteDevices.size());
-        else if (!deviceToUpdate.isFavorite())
-            deviceToUpdate.setFavoritePosition(-1);
-        devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
-        if (deviceToUpdate.isFavorite()){
-            Toast.makeText(getActivity(),item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
-        }
-        else Toast.makeText(getActivity(),item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
-    }
-    @Override
-    public void onVisibilityIconClicked(Device item) {
-        Device deviceToUpdate = new Device(item);
-        deviceToUpdate.setHidden(!item.isHidden());
-        devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
-        if (deviceToUpdate.isHidden())
-            Toast.makeText(getActivity(),item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
-        else Toast.makeText(getActivity(),item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void onFavoriteClicked(Device item) {
 //        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
 
@@ -237,6 +197,114 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
 //        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
 //        d.setHidden(!d.isHidden());
 
+    }
+
+    @Override
+    public void onDeviceClicked(BaseDevice baseDevice) {
+        Log.e(TAG, connectionStatus.toString());
+        if (connectionStatus == null){
+            ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext());
+            connectionLiveData.observe(this, getConnectionStatusObserver());
+        }else {
+                Device item = (Device) baseDevice;
+                if (connectionStatus.getTypeName().equals(AppConstants.WIFI) && item.getSsid().equals(connectionStatus.getSsid())) {
+//        if (item.getIp() != null) {
+                    waiting.add(item.getChipId());
+                    devicesRecyclerViewAdapterManagement.setItems(baseDevices);
+                    devicesManagementListFragmentViewModel.setReadyForSettingsHttp(item).observe(this, new Observer<String>() {
+                        @Override
+                        public void onChanged(@Nullable String s) {
+                            Log.e("...........", "............" + s);
+                            if (s.equals(AppConstants.SETTINGS)) {
+                                transaction = fragmentManager.beginTransaction();
+                                transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
+                                EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
+                                ((DeviceManagementActivity) getActivity()).editDeviceFragment = editGroupFragment;
+                                ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
+                                transaction.replace(R.id.frameLayout, editGroupFragment);
+                                transaction.addToBackStack(null);
+                                transaction.commit();
+                            } else if (s.equals(AppConstants.SOCKET_TIME_OUT)) {
+                                Log.e("ttttttttttt", "tttttttttttttt" + s);
+                                Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
+                            } else
+                                Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                            waiting.remove(item.getChipId());
+                            devicesRecyclerViewAdapterManagement.setItems(baseDevices);
+                        }
+                    });
+                } else {
+                    Toast.makeText(getContext(), "لطفا به شبکه " + "\"" + item.getSsid() + "\"" + " متصل شوید", Toast.LENGTH_LONG).show();
+                }
+        }
+    }
+
+    @Override
+    public void onRemoteHubClicked(BaseDevice item) {
+        //TODO: REMOTEHUB
+    }
+
+    @Override
+    public void onRemoteCLicked(BaseDevice item) {
+        //TODO: REMOTE
+    }
+
+    @Override
+    public void onFavoriteIconClicked(BaseDevice baseDevice) {
+        if (baseDevice instanceof Device) {
+            Device item = (Device) baseDevice;
+            Device deviceToUpdate = new Device(item);
+            deviceToUpdate.setFavorite(!item.isFavorite());
+            if (deviceToUpdate.isFavorite())
+                deviceToUpdate.setFavoritePosition(favoriteDevices.size());
+            else if (!deviceToUpdate.isFavorite())
+                deviceToUpdate.setFavoritePosition(-1);
+            devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
+            if (deviceToUpdate.isFavorite()) {
+                Toast.makeText(getActivity(), item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getActivity(), item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
+        }else if (baseDevice instanceof RemoteHub){
+            RemoteHub item = (RemoteHub) baseDevice;
+            RemoteHub deviceToUpdate = new RemoteHub(item);
+            deviceToUpdate.setFavorite(!item.isFavorite());
+            if (deviceToUpdate.isFavorite())
+                deviceToUpdate.setFavoritePosition(favoriteDevices.size());
+            else if (!deviceToUpdate.isFavorite())
+                deviceToUpdate.setFavoritePosition(-1);
+            devicesManagementListFragmentViewModel.updateRemoteHub(deviceToUpdate);
+            if (deviceToUpdate.isFavorite()) {
+                Toast.makeText(getActivity(), item.getName().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getActivity(), item.getName().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
+        } else if (baseDevice instanceof Remote){
+            Remote item = (Remote) baseDevice;
+            Remote deviceToUpdate = new Remote(item);
+            deviceToUpdate.setFavorite(!item.isFavorite());
+            if (deviceToUpdate.isFavorite())
+                deviceToUpdate.setFavoritePosition(favoriteDevices.size());
+            else if (!deviceToUpdate.isFavorite())
+                deviceToUpdate.setFavoritePosition(-1);
+            devicesManagementListFragmentViewModel.updateRemote(deviceToUpdate);
+            if (deviceToUpdate.isFavorite()) {
+                Toast.makeText(getActivity(), item.getName().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getActivity(), item.getName().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onVisibilityIconClicked(BaseDevice baseDevice) {
+        if (baseDevice instanceof Device) {
+            Device item = (Device) baseDevice;
+            Device deviceToUpdate = new Device((Device) baseDevice);
+            deviceToUpdate.setHidden(!item.isHidden());
+            devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
+            if (deviceToUpdate.isHidden())
+                Toast.makeText(getActivity(), item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getActivity(), item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public interface ClickOnDevice {

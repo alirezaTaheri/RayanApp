@@ -53,10 +53,6 @@ import rayan.rayanapp.ViewHolders.DeviceViewHolder1Bridge;
 import rayan.rayanapp.ViewHolders.DeviceViewHolder2Bridges;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 
-//<<<<<<< HEAD
-//=======
-//>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
-
 public class DevicesFragment extends Fragment implements OnDeviceClickListener<BaseDevice>,ToggleDeviceAnimationProgress {
     public DevicesFragmentViewModel devicesFragmentViewModel;
     Activity activity;
@@ -69,6 +65,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
     @BindView(R.id.animation_view)
     LottieAnimationView lottieAnimationView;
     public DevicesFragmentRecyclerViewAdapter devicesRecyclerViewAdapter;
+    MainActivity mainActivity;
     public List<Device> devices = new ArrayList<>();
     public List<BaseDevice> baseDevices = new ArrayList<>();
     public List<RemoteHub> remoteHubs = new ArrayList<>();
@@ -79,7 +76,6 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
     LiveData<List<Device>> devicesObservable;
     LiveData<List<RemoteHub>> remoteHubsObservable;
     LiveData<List<Remote>> remotesObservable;
-    MainActivity mainActivity;
     Observer<List<Device>> devicesObserver;
     Observer<List<RemoteHub>> remoteHubsObserver;
     Observer<List<Remote>> remotesObserver;
@@ -107,6 +103,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
         remotesObserver = new Observer<List<Remote>>() {
             @Override
             public void onChanged(@Nullable List<Remote> remotes) {
+                Log.e(TAG, "Remotes Updated " + remotes.size());
                 DevicesFragment.this.remotes = remotes;
                 if (DevicesFragment.this.finalRemotes.size() == 0 && remotes.size() > 0)
                     deviceAnimator.setItemWidth(DevicesFragment.this);
@@ -149,6 +146,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
         remoteHubsObserver = new Observer<List<RemoteHub>>() {
             @Override
             public void onChanged(@Nullable List<RemoteHub> remoteHubs) {
+                Log.e(TAG, "RemoteHubs Updated " + remoteHubs.size());
                 DevicesFragment.this.remoteHubs = remoteHubs;
                 if (DevicesFragment.this.finalRemoteHubs.size() == 0 && remoteHubs.size() > 0)
                     deviceAnimator.setItemWidth(DevicesFragment.this);
@@ -191,8 +189,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
         devicesObserver = new Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> devices) {
-                Log.e("BAHBAHBAHD", "Devices: " +devices.size());
-                Log.e("BAHBAHBAHD", "Devicesfffffff: " +devices);
+                Log.e(TAG, "Devices Updated " + devices.size());
                 if (DevicesFragment.this.finalDevices.size() == 0 && devices.size() > 0)
                     deviceAnimator.setItemWidth(DevicesFragment.this);
                 DevicesFragment.this.devices = devices;
@@ -502,9 +499,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                         d1.setPosition(i);
                     else d1.setInGroupPosition(i);
                     Collections.swap(baseDevices, i, i + 1);
-                    if (!updateIfExists(d, changed, RayanApplication.getPref().getCurrentShowingGroup()))
                         changed.add(d);
-                    if (!updateIfExists(d1, changed, RayanApplication.getPref().getCurrentShowingGroup()))
                         changed.add(d1);
                 }
             } else {
@@ -530,13 +525,32 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                         d2.setPosition(i);
                     else d2.setInGroupPosition(i);
                     Collections.swap(baseDevices, i, i - 1);
-
-                    if (!updateIfExists(d, changed, RayanApplication.getPref().getCurrentShowingGroup()))
                         changed.add(d);
-                    if (!updateIfExists(d2, changed, RayanApplication.getPref().getCurrentShowingGroup()))
                         changed.add(d2);
                 }
             }
+            for (int a=0;a<changed.size();a++){
+                BaseDevice changedBaseDevices = changed.get(a);
+                if (changedBaseDevices instanceof Device)
+                    for (int b = 0;b<devices.size();b++){
+                        Device currentDevice = devices.get(b);
+                        if (currentDevice.getBaseId().equals(changedBaseDevices.getBaseId()))
+                            devices.set(b,(Device)changedBaseDevices);
+                    }
+                else if (changedBaseDevices instanceof RemoteHub)
+                    for (int b = 0;b<remoteHubs.size();b++){
+                        RemoteHub currentRemoteHub= remoteHubs.get(b);
+                        if (currentRemoteHub.getBaseId().equals(changedBaseDevices.getBaseId()))
+                            remoteHubs.set(b,(RemoteHub) changedBaseDevices);
+                    }
+                else if (changedBaseDevices instanceof Remote)
+                    for (int b = 0;b<remotes.size();b++){
+                        Remote currentRemote= remotes.get(b);
+                        if (currentRemote.getBaseId().equals(changedBaseDevices.getBaseId()))
+                            remotes.set(b,(Remote) changedBaseDevices);
+                    }
+            }
+
             devicesFragmentViewModel.updateDevices(changed);
         }
 
@@ -605,8 +619,8 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
 
     @Override
     public void onClick_RemoteHub(BaseDevice Item, int position) {
-        Log.e("CLICLCLICL", "ldkfjlkjfsd");
         RemoteHub remoteHub = (RemoteHub) Item;
+        Log.e("onClick_RemoteHub", "Item:"+remoteHub + position);
         SelectRemoteBottomSheetFragment selectRemoteBottomSheetFragment = SelectRemoteBottomSheetFragment.instance(remoteHub.getName());
         selectRemoteBottomSheetFragment.show(getActivity().getSupportFragmentManager(), "TAG");
     }
@@ -614,6 +628,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
     @Override
     public void onClick_Remote(BaseDevice item, int position) {
         Remote remote = (Remote) item;
+        Log.e("onClick_Remote", "Item:"+remote+ position);
         Intent intent = new Intent(activity, RemoteActivity.class);
         intent.putExtra("type", remote.getType());
         startActivity(intent);

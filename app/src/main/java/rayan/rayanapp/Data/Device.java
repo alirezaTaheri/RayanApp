@@ -50,7 +50,6 @@ public class Device extends BaseDevice implements Parcelable {
     private String devicePassword;
     private String ip;
     private String password;
-    private boolean favorite;
     private boolean locallyAccessibility;
     private boolean onlineAccessibility;
     private String statusWord;
@@ -73,7 +72,6 @@ public class Device extends BaseDevice implements Parcelable {
         this.username = device.getUsername();
         this.topic = device.getTopic();
         this.groupId = device.getGroupId();
-        this.favorite = device.isFavorite();
         this.pin1 = device.getPin1();
         this.pin2 = device.getPin2();
         this.secret = device.getSecret();
@@ -99,7 +97,6 @@ public class Device extends BaseDevice implements Parcelable {
         this.username = username;
         this.topic = topic;
         this.groupId = groupId;
-        this.favorite = false;
         this.setPin1("off");
         this.setPin2("off");
         this.secret = secret;
@@ -123,7 +120,6 @@ public class Device extends BaseDevice implements Parcelable {
         devicePassword = in.readString();
         ip = in.readString();
         password = in.readString();
-        favorite = in.readByte() != 0;
         locallyAccessibility = in.readByte() != 0;
         onlineAccessibility = in.readByte() != 0;
         statusWord = in.readString();
@@ -149,7 +145,6 @@ public class Device extends BaseDevice implements Parcelable {
         dest.writeString(devicePassword);
         dest.writeString(ip);
         dest.writeString(password);
-        dest.writeByte((byte) (favorite ? 1 : 0));
         dest.writeByte((byte) (locallyAccessibility ? 1 : 0));
         dest.writeByte((byte) (onlineAccessibility ? 1 : 0));
         dest.writeString(statusWord);
@@ -297,14 +292,6 @@ public class Device extends BaseDevice implements Parcelable {
         this.password = password;
     }
 
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
-    }
-
     public boolean isLocallyAccessibility() {
         return locallyAccessibility && getIp()!=null;
     }
@@ -349,9 +336,9 @@ public class Device extends BaseDevice implements Parcelable {
     @Override
     public String toString() {
         return "{" +
-                "chipId='" + chipId + '\'' +
+//                "chipId='" + chipId + '\'' +
                 "baseType='" + getDeviceType() + '\'' +
-                "position='" + getPosition() + '\'' +
+                "posin='" + getPosition() + '\'' +
                 "grouppos='" + getInGroupPosition() + '\'' +
                 ", name1='" + name1 + '\'' ;
 ////                ", name2='" + name2 + '\'' +

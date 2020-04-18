@@ -28,7 +28,7 @@ public class Remote  extends BaseDevice{
     private String remoteHubId;
     private String type;
     private String groupId;
-    private boolean accessible,learned,visibility,favorite;
+    private boolean accessible,learned,visibility;
 
     public Remote() {
     }
@@ -46,7 +46,6 @@ public class Remote  extends BaseDevice{
         this.accessible = remote.isAccessible();
         this.learned = remote.isLearned();
         this.visibility = remote.isVisibility();
-        this.favorite = remote.isFavorite();
     }
 
     public String getGroupId() {
@@ -137,13 +136,6 @@ public class Remote  extends BaseDevice{
         this.visibility = visibility;
     }
 
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
-    }
 
     @Override
     public String toString() {
@@ -151,7 +143,6 @@ public class Remote  extends BaseDevice{
 //                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", pos'" + getPosition() + '\'' +
-                ", grPos='" + getInGroupPosition() + '\'' ;
 //                ", topic='" + topic + '\'' +
 //                ", creatorId='" + creatorId + '\'' +
 //                ", remoteDataId='" + remoteDataId + '\'' +
@@ -161,7 +152,7 @@ public class Remote  extends BaseDevice{
 //                ", accessible=" + accessible +
 //                ", learned=" + learned +
 //                ", visibility=" + visibility +
-//                ", favorite=" + favorite +
+                ", favorite=" + isFavorite() ;
 //                '}';
     }
 }
