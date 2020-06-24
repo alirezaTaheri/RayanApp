@@ -86,7 +86,13 @@
             android:layout_width="0dp"
             app:layout_constraintRight_toLeftOf="@+id/nextRemote"
             android:layout_height="wrap_content" />
-
+        <View
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/nextRemote"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="@color/baseColor"/>
         <TextView
             android:padding="5dp"
             android:clickable="true"

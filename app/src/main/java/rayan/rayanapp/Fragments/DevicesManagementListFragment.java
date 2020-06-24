@@ -3,7 +3,6 @@ package rayan.rayanapp.Fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -37,13 +35,11 @@ import rayan.rayanapp.Data.ConnectionStatusModel;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Remote;
 import rayan.rayanapp.Data.RemoteHub;
-import rayan.rayanapp.Dialogs.DeviceManagementPopupDialog;
 import rayan.rayanapp.Listeners.DeviceManagementOptionsClickListener;
 import rayan.rayanapp.Listeners.OnDeviceClickListenerManagement;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.ViewModels.DevicesManagementListFragmentViewModel;
 
 public class DevicesManagementListFragment extends BackHandledFragment implements OnDeviceClickListenerManagement<BaseDevice>,
@@ -61,10 +57,10 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     Map<String, List<String>> favoriteBaseDevices = new HashMap<>();
     List<Device> favoriteDevices = new ArrayList<>();
     DevicesManagementListFragmentViewModel devicesManagementListFragmentViewModel;
-    ClickOnDevice sendDevice;
     List<String> waiting = new ArrayList<>();
     Device device;
     ConnectionStatusModel connectionStatus;
+    DeviceManagementActivity activity;
 
     public DevicesManagementListFragment() {
     }
@@ -84,7 +80,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        devicesRecyclerViewAdapterManagement = new DevicesManagementRecyclerViewAdapter(getActivity(),waiting, this);
+        devicesRecyclerViewAdapterManagement = new DevicesManagementRecyclerViewAdapter(activity,waiting, this);
         devicesManagementListFragmentViewModel = ViewModelProviders.of(this).get(DevicesManagementListFragmentViewModel.class);
         devicesManagementListFragmentViewModel.getAllRemoteHubsLive().observe(this, new Observer<List<RemoteHub>>() {
             @Override
@@ -143,7 +139,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                     favorites.add(d.getBaseId());
                 favoriteBaseDevices.put(AppConstants.DEVICE_TYPE_DEVICE, favorites);
         });
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = activity.getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
     }
 
@@ -156,7 +152,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         ButterKnife.bind(this, view);
         recyclerView.setAdapter(devicesRecyclerViewAdapterManagement);
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(false);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         return view;
     }
 
@@ -201,7 +197,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
 
     @Override
     public void onDeviceClicked(BaseDevice baseDevice) {
-        Log.e(TAG, connectionStatus.toString());
+        Log.e(TAG, "Settings On Device Clicked"+connectionStatus.toString());
         if (connectionStatus == null){
             ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext());
             connectionLiveData.observe(this, getConnectionStatusObserver());
@@ -214,21 +210,21 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                     devicesManagementListFragmentViewModel.setReadyForSettingsHttp(item).observe(this, new Observer<String>() {
                         @Override
                         public void onChanged(@Nullable String s) {
-                            Log.e("...........", "............" + s);
+                            Log.e("...........", "Ready For Settings Response" + s);
                             if (s.equals(AppConstants.SETTINGS)) {
                                 transaction = fragmentManager.beginTransaction();
                                 transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
                                 EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
-                                ((DeviceManagementActivity) getActivity()).editDeviceFragment = editGroupFragment;
-                                ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
+                                activity.editDeviceFragment = editGroupFragment;
+                                activity.setActionBarTitle(item.getName1());
                                 transaction.replace(R.id.frameLayout, editGroupFragment);
                                 transaction.addToBackStack(null);
                                 transaction.commit();
                             } else if (s.equals(AppConstants.SOCKET_TIME_OUT)) {
                                 Log.e("ttttttttttt", "tttttttttttttt" + s);
-                                Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
                             } else
-                                Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
                             waiting.remove(item.getChipId());
                             devicesRecyclerViewAdapterManagement.setItems(baseDevices);
                         }
@@ -240,8 +236,16 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     }
 
     @Override
-    public void onRemoteHubClicked(BaseDevice item) {
-        //TODO: REMOTEHUB
+    public void onRemoteHubClicked(BaseDevice baseDevice) {
+        RemoteHub item = remoteHubs.get(0);
+        transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
+        EditRemoteHubFragment editRemoteHubFragment = EditRemoteHubFragment.newInstance(item);
+        activity.editRemoteHubFragment = editRemoteHubFragment;
+        activity.setActionBarTitle(item.getName());
+        transaction.replace(R.id.frameLayout, editRemoteHubFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -261,9 +265,9 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                 deviceToUpdate.setFavoritePosition(-1);
             devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
             if (deviceToUpdate.isFavorite()) {
-                Toast.makeText(getActivity(), item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, item.getName1().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
             } else
-                Toast.makeText(getActivity(), item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, item.getName1().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
         }else if (baseDevice instanceof RemoteHub){
             RemoteHub item = (RemoteHub) baseDevice;
             RemoteHub deviceToUpdate = new RemoteHub(item);
@@ -274,9 +278,9 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                 deviceToUpdate.setFavoritePosition(-1);
             devicesManagementListFragmentViewModel.updateRemoteHub(deviceToUpdate);
             if (deviceToUpdate.isFavorite()) {
-                Toast.makeText(getActivity(), item.getName().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, item.getName().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
             } else
-                Toast.makeText(getActivity(), item.getName().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, item.getName().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
         } else if (baseDevice instanceof Remote){
             Remote item = (Remote) baseDevice;
             Remote deviceToUpdate = new Remote(item);
@@ -287,9 +291,9 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                 deviceToUpdate.setFavoritePosition(-1);
             devicesManagementListFragmentViewModel.updateRemote(deviceToUpdate);
             if (deviceToUpdate.isFavorite()) {
-                Toast.makeText(getActivity(), item.getName().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, item.getName().concat(" به موردعلاقه ها اضافه شد"), Toast.LENGTH_SHORT).show();
             } else
-                Toast.makeText(getActivity(), item.getName().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, item.getName().concat(" از موردعلاقه ها حذف شد"), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -301,9 +305,9 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
             deviceToUpdate.setHidden(!item.isHidden());
             devicesManagementListFragmentViewModel.updateDevice(deviceToUpdate);
             if (deviceToUpdate.isHidden())
-                Toast.makeText(getActivity(), item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
             else
-                Toast.makeText(getActivity(), item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -314,7 +318,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        sendDevice = (ClickOnDevice) getActivity();
+        activity = (DeviceManagementActivity) context;
     }
 
 }

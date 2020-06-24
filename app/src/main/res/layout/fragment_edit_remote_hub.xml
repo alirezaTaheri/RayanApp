@@ -28,26 +28,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </android.support.design.widget.TextInputLayout>
-        <TextView
-            android:visibility="invisible"
-            android:id="@+id/editDevice"
-            android:textColor="@color/grey_dark_4"
-            android:padding="5dp"
-            android:background="@drawable/background_save_group_name"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="8dp"
-            android:layout_alignParentLeft="true"
-            android:textSize="12sp"
-            android:text="ذخیره"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <ProgressBar
-            android:visibility="invisible"
-            android:id="@+id/progressBar"
-            android:layout_centerInParent="true"
-            android:layout_alignParentLeft="true"
-            android:layout_width="33dp"
-            android:layout_height="33dp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -57,7 +37,8 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp">
         <TextView
-            android:textSize="17sp"
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:text="نوع دستگاه:"
             android:id="@+id/typeTitle"
@@ -65,77 +46,88 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true" />
         <TextView
-            android:textSize="17sp"
+            android:textSize="15sp"
             android:layout_marginRight="8dp"
             android:id="@+id/type"
             android:layout_toLeftOf="@id/typeTitle"
-            android:text="کلید یک پل"
+            android:text="نوع دستگاه"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_toStartOf="@id/typeTitle" />
     </RelativeLayout>
     <RelativeLayout
-        android:background="@drawable/background_base_color_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp">
+        <TextView
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:text="متصل به: "
+            android:id="@+id/ssidTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true" />
+        <TextView
+            android:layout_centerVertical="true"
+            android:textSize="15sp"
+            android:layout_marginRight="8dp"
+            android:id="@+id/ssid"
+            android:layout_toLeftOf="@id/ssidTitle"
+            android:text="نام مودم"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/ssidTitle" />
         <ImageView
-            android:layout_alignParentRight="true"
-            android:layout_height="27dp"
-            android:layout_width="27dp"
-            android:tint="@color/white"
-            android:layout_centerInParent="true"
-            android:layout_marginRight="20dp"
-            app:srcCompat="@drawable/ic_cloud"
-            android:id="@+id/changeAccessPointIcon"
-            />
-        <ProgressBar
-            android:visibility="invisible"
-            android:id="@+id/changeAccessPointProgressBar"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:layout_marginRight="20dp"
-            android:layout_width="27dp"
-            android:layout_height="27dp" />
-    <TextView
-        android:id="@+id/changeAccessPoint"
-        android:text="تغییر نقطه اتصال"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:clickable="true"
-        android:gravity="center"
-        android:paddingBottom="10dp"
-        android:paddingLeft="23dp"
-        android:paddingRight="23dp"
-        android:paddingTop="10dp"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+            android:layout_centerVertical="true"
+            android:padding="8dp"
+            android:id="@+id/changeAccessPoint"
+            app:srcCompat="@drawable/ic_edit_group_basic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/deviceUpdate"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
-        android:background="@drawable/background_base_color_button"
-        android:clickable="true"
-        android:drawableRight="@drawable/ic_cloud"
-        android:gravity="center"
-        android:paddingLeft="23dp"
-        android:paddingTop="10dp"
-        android:paddingRight="23dp"
-        android:paddingBottom="10dp"
-        android:text="آپدیت دستگاه"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
-
+        android:layout_marginTop="20dp">
+        <TextView
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:text="متعلق به گروه: "
+            android:id="@+id/groupTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true" />
+        <TextView
+            android:layout_centerVertical="true"
+            android:textSize="15sp"
+            android:layout_marginRight="8dp"
+            android:id="@+id/group"
+            android:layout_toLeftOf="@id/groupTitle"
+            android:text="نام گروه"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/groupTitle" />
+        <ImageView
+            android:layout_centerVertical="true"
+            android:padding="8dp"
+            android:id="@+id/goToGroup"
+            app:srcCompat="@drawable/ic_groups"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+<android.support.v7.widget.RecyclerView
+    android:id="@+id/recyclerView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"/>
     <TextView
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"

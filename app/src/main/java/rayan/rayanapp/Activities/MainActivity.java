@@ -1738,7 +1738,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 2:40 min
 
 26 Farvardin
-2:51 min
+2:50 min
 
 27 Farvardin
 problem with -44 -54
@@ -1751,9 +1751,38 @@ problem with -44 -54
 
 29 Farvardin
 4:35 min
-50 min
+
 
 30 Farvardin
+30 min
+50 min
+
+01 Ordibehesht
+50 min
+
+7 ordibehesht
+48 min
+
+8 Ordibehesht
+28min
+
+14 Ordibehesht
+1:13 min
+
+15 Ordibehesht
+1:53 min
+
+////////////////
+
+30 Ordibehesht
+3:19 min
+
+//////////////
+
+22 Khordad
+55 min
+
+
 
 
 

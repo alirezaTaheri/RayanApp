@@ -147,7 +147,7 @@ public class Remote  extends BaseDevice{
 //                ", creatorId='" + creatorId + '\'' +
 //                ", remoteDataId='" + remoteDataId + '\'' +
 //                ", remoteHubId='" + remoteHubId + '\'' +
-//                ", type='" + type + '\'' +
+                ", type='" + type + '\'' +
 //                ", groupId='" + groupId + '\'' +
 //                ", accessible=" + accessible +
 //                ", learned=" + learned +

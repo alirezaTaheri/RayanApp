@@ -31,6 +31,7 @@ public class RemoteViewHolder extends DeviceViewHolder1Bridge {
     @Override
     public void onBind(BaseDevice baseDevice, @Nullable OnDeviceClickListener<BaseDevice> listener) {
         Remote item = (Remote) baseDevice;
+        Log.d("RemoteViewHolder", "onBind() with: Remote" + item);
         name.setText(item.getName());
         clickableLayout.setOnClickListener(v -> listener.onClick_Remote(item, getAdapterPosition()));
         icon.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(),item.getType().equals(AppConstants.REMOTE_TYPE_TV)?R.drawable.ic_tv:R.drawable.ic_air_conditioner));

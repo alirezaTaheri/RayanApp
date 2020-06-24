@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -24,6 +26,7 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
+import rayan.rayanapp.Fragments.EditRemoteHubFragment;
 import rayan.rayanapp.Fragments.ProvideInternetFragment;
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 import rayan.rayanapp.Helper.DialogPresenter;
@@ -40,6 +43,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     public EditDeviceFragment editDeviceFragment;
+    public EditRemoteHubFragment editRemoteHubFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
@@ -110,14 +114,15 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
 
     @Override
     public void accessPointSelected(String ssid, String pass) {
-        ((EditDeviceFragment)getSupportFragmentManager().getFragments().get(0)).accessPointSelected(ssid, pass);
+        ((DoneWithSelectAccessPointFragment)getSupportFragmentManager().getFragments().get(0)).accessPointSelected(ssid, pass);
     }
 
     public void submitClicked(String tag) {
         Log.e("tag of fragment",tag);
         switch (tag){
             case "EditDeviceFragment":
-                editDeviceFragment.clickOnDeviceUpdateSubmit();
+                Toast.makeText(this, ".......", Toast.LENGTH_SHORT).show();
+//                editDeviceFragment.clickOnDeviceUpdateSubmit();
                 break;
             case "resetDevice":
                 viewModel.internetProvided().subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Boolean>() {

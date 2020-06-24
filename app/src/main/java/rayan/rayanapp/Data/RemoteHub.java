@@ -1,5 +1,6 @@
 package rayan.rayanapp.Data;
 
+import android.annotation.SuppressLint;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+@SuppressLint("ParcelCreator")
 @Entity
 public class RemoteHub extends BaseDevice implements Parcelable {
     @SerializedName("chip_id")
@@ -26,6 +28,7 @@ public class RemoteHub extends BaseDevice implements Parcelable {
     @SerializedName("group_id")
     private String groupId;
     private boolean accessible,visibility;
+    private String secret,ip,statusWord,header,style;
 
     public RemoteHub() {
     }
@@ -43,6 +46,11 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         this.groupId = remoteHub.getGroupId();
         this.accessible = remoteHub.isAccessible();
         this.visibility = remoteHub.isVisibility();
+        this.secret = remoteHub.getSecret();
+        this.ip = remoteHub.getIp();
+        this.statusWord = remoteHub.getStatusWord();
+        this.header = remoteHub.getHeader();
+        this.style = remoteHub.getStyle();
     }
 
     protected RemoteHub(Parcel in) {
@@ -57,6 +65,36 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         groupId = in.readString();
         accessible = in.readByte() != 0;
         visibility = in.readByte() != 0;
+        secret = in.readString();
+        ip = in.readString();
+        statusWord = in.readString();
+        header = in.readString();
+        style = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(chipId);
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(version);
+        dest.writeString(topic);
+        dest.writeString(ssid);
+        dest.writeString(mac);
+        dest.writeString(creatorId);
+        dest.writeString(groupId);
+        dest.writeByte((byte) (accessible ? 1 : 0));
+        dest.writeByte((byte) (visibility ? 1 : 0));
+        dest.writeString(secret);
+        dest.writeString(ip);
+        dest.writeString(statusWord);
+        dest.writeString(header);
+        dest.writeString(style);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<RemoteHub> CREATOR = new Creator<RemoteHub>() {
@@ -70,6 +108,46 @@ public class RemoteHub extends BaseDevice implements Parcelable {
             return new RemoteHub[size];
         }
     };
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getStatusWord() {
+        return statusWord;
+    }
+
+    public void setStatusWord(String statusWord) {
+        this.statusWord = statusWord;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
 
     @NonNull
     public String getChipId() {
@@ -172,23 +250,4 @@ public class RemoteHub extends BaseDevice implements Parcelable {
 //                '}';
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(chipId);
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(version);
-        dest.writeString(topic);
-        dest.writeString(ssid);
-        dest.writeString(mac);
-        dest.writeString(creatorId);
-        dest.writeString(groupId);
-        dest.writeByte((byte) (accessible ? 1 : 0));
-        dest.writeByte((byte) (visibility ? 1 : 0));
-    }
 }

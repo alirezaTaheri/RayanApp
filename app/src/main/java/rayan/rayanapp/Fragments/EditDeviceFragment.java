@@ -164,23 +164,6 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 //        onlineAccess.setVisibility(device.isReady4Mqtt()? View.VISIBLE : View.INVISIBLE);
     }
 
-//    @OnClick(R.id.setTopic)
-    void createTopic(){
-        setDeviceTopicStatus(TopicStatus.CHANGING);
-        editDeviceFragmentViewModel.flatMqtt(device).observe(this, s -> {
-            assert s != null;
-            switch (s){
-                case AppConstants.SET_TOPIC_MQTT_Response:
-                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دسترسی اینترنتی با موفقیت ایجاد شد");
-                    setDeviceTopicStatus(TopicStatus.CHANGED);
-                    break;
-                case AppConstants.SOCKET_TIME_OUT:
-                    setDeviceTopicStatus(TopicStatus.CHANGED);
-                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"خطای اتصال");
-                    break;
-            }
-        });
-    }
 
     @OnClick(R.id.editDevice)
     void toDeviceChangeName(){
@@ -310,20 +293,6 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 //        yesNoDialog.show();
     }
 
-
-    public void clickOnDeviceUpdateSubmit(){
-         readFromFileResult=  editDeviceFragmentViewModel.readFromFile();
-        getDeviceFileList(AppConstants.DEVICE_ALL_FILES_LIST,device.getIp());
-        if (permitToSendFiles()) {
-            Toast.makeText(getActivity(), "trueeeee", Toast.LENGTH_SHORT).show();
-            for (int i=0;i<=deviceFileList.size()-1;i++){
-                Log.e("codelist items",deviceFileList.get(i));
-                Toast.makeText(getActivity(), "codelist items"+deviceFileList.get(i), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
     @OnClick(R.id.changeAccessPoint)
     void toDeviceChangeAccessPoint(){
         int PERMISSION_ALL = 1;
@@ -333,7 +302,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
                 android.Manifest.permission.ACCESS_FINE_LOCATION,
         };
 
-        if(!hasPermissions(getActivity(), PERMISSIONS)){
+        if(!editDeviceFragmentViewModel.hasPermissions(getActivity(), PERMISSIONS)){
             ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ALL);
         }
         else
@@ -449,16 +418,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
             changeAccessPointIcon.setVisibility(View.VISIBLE);
         }
     }
-    public static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+
     public void statusCheck() {
         final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -480,8 +440,6 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
         final AlertDialog alert = builder.create();
         alert.show();
     }
-
-
 
     public ArrayList<String> convertCodeStringToList(String result){
         codeList.clear();

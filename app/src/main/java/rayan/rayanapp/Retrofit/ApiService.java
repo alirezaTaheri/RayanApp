@@ -17,6 +17,7 @@ import rayan.rayanapp.Retrofit.Models.Requests.api.ChangePasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteHubRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
@@ -119,6 +120,9 @@ public interface ApiService {
 
     @POST("api/v2/groups/edittopic")
     Observable<DeviceResponse> editDevice(@Header("Authorization") String token, @Body EditDeviceRequest editDeviceRequest);
+
+    @POST("api/v2/groups/edittopic")
+    Observable<DeviceResponse> editRemoteHub(@Header("Authorization") String token, @Body EditRemoteHubRequest editRemoteHubRequest);
 
     @POST("api/v2/groups/addtopic")
     Observable<DeviceResponse> createTopic(@Header("Authorization") String token, @Body CreateTopicRequest createTopicRequest);

@@ -354,6 +354,7 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
 
     @Override
     public void sendingMessageTimeoutPin1(String chipId, int position, String type){
+        Log.e("wewewewe", "HAH? " + baseDevices.size()+baseDevices);
         if (!deviceAnimator.isResponseReceivedPin1(chipId)){
             if (((Device)baseDevices.get(position)).getPin1().equals(AppConstants.ON_STATUS))
                 turnOnDeviceAnimationPin1(chipId, position, type);

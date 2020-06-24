@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/confirm"
+        android:title="تایید"
+        android:tooltipText="تایید"
+        android:icon="@drawable/ic_tick"
+        app:showAsAction="always|withText"
+        android:visible="false"
+        />
+</menu>
