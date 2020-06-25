@@ -737,24 +737,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onBackPressed() {
 //        startService(new Intent(this, AlwaysOnService.class));
 
-//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-//            this.drawerLayout.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-//        apiService = ApiUtils.getApiService();
-        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
-        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
-        RemoteHub poor = remoteHubDatabase.getAllRemoteHubs().get(0);
-        poor.setName("Blah Blah man");
-        remoteHubDatabase.updateRemoteHub(poor);
-        Remote pp = remoteDatabase.getAllRemotes().get(0);
-        pp.setName("man manam");
-        remoteDatabase.updateRemote(pp);
-        Log.e(TAG, "RemoteHub: " + remoteHubDatabase.getAllRemoteHubs());
-        Log.e(TAG, "Remote: " + remoteDatabase.getAllRemotes());
-        Log.e(TAG, "RemoteHub: " + remoteHubDatabase.getAllRemoteHubs().size());
-        Log.e(TAG, "Remote: " + remoteDatabase.getAllRemotes().size());
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+        apiService = ApiUtils.getApiService();
+//        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
+//        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
+//        RemoteHub poor = remoteHubDatabase.getAllRemoteHubs().get(0);
+//        poor.setName("Blah Blah man");
+//        remoteHubDatabase.updateRemoteHub(poor);
+//        Remote pp = remoteDatabase.getAllRemotes().get(0);
+//        pp.setName("man manam");
+//        remoteDatabase.updateRemote(pp);
+//        Log.e(TAG, "RemoteHub: " + remoteHubDatabase.getAllRemoteHubs());
+//        Log.e(TAG, "Remote: " + remoteDatabase.getAllRemotes());
+//        Log.e(TAG, "RemoteHub: " + remoteHubDatabase.getAllRemoteHubs().size());
+//        Log.e(TAG, "Remote: " + remoteDatabase.getAllRemotes().size());
 //        DeviceDatabase deviceDatabase = null;
 //        GroupDatabase groupDatabase = null;
 //        UserDatabase userDatabase = null;
@@ -1782,6 +1782,9 @@ problem with -44 -54
 22 Khordad
 55 min
 
+/////////////
+4 Tir
+2:10 min...
 
 
 

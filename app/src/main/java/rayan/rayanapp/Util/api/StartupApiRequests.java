@@ -49,6 +49,7 @@ public class StartupApiRequests {
 
     public final static String URL_REMOTE_HUB = "REMOTE_HUB";
     public final static String URL_REMOTE = "REMOTE";
+    public final static String URL_GROUP = "REMOTE";
     public final static String URL_MAIN_DATA = "MAIN_DATA";
     public final static String URL_SKIP = "skip";
     public final static String URL_LIMIT = "limit";
@@ -99,6 +100,21 @@ public class StartupApiRequests {
     List<Group> newGroups;
     List<RemoteHub> newRemoteHubs;
     List<Remote> newRemotes;
+//    @SuppressLint("CheckResult")
+//    public MutableLiveData<requestStatus> getGroupsV3() {
+//        urlParams.put(URL_REMOTE_HUB+URL_LIMIT,"20");
+//        urlParams.put(URL_REMOTE_HUB+URL_SKIP,"0");
+//        urlParams.put(URL_REMOTE+URL_LIMIT,"20");
+//        urlParams.put(URL_REMOTE+URL_SKIP,"0");
+//        urlParams.put(URL_GROUP+URL_LIMIT,"20");
+//        urlParams.put(URL_GROUP+URL_SKIP,"0");
+//        newGroups = new ArrayList<>();
+//        newRemoteHubs = new ArrayList<>();
+//        newRemotes = new ArrayList<>();
+//        MutableLiveData<requestStatus> requestStatusLiveData = new MutableLiveData<>();
+//        apiService.getGroups()
+//    }
+
     @SuppressLint("CheckResult")
     public MutableLiveData<requestStatus> getGroups1() {
         urlParams.put(URL_REMOTE_HUB+URL_LIMIT,"20");

@@ -340,19 +340,19 @@ public class Device extends BaseDevice implements Parcelable {
                 "baseType='" + getDeviceType() + '\'' +
                 "posin='" + getPosition() + '\'' +
                 "grouppos='" + getInGroupPosition() + '\'' +
-                ", name1='" + name1 + '\'' ;
+                ", name1='" + name1 + '\'' +
 ////                ", name2='" + name2 + '\'' +
 //                ", pin1='" + pin1 + '\'' +
 //                ", pin2='" + pin2 + '\'' +
 //                ", id='" + id + '\'' +
-//                ", type='" + type + '\'' +
+                ", type='" + type + '\'' +
 //                ", username='" + username + '\'' +
 //                ", topic=" + topic +
 //                ", groupId='" + groupId + '\'' +
 //                ", style='" + style + '\'' +
 //                ", ssid='" + ssid + '\'' +
 //                ", devicePassword='" + devicePassword + '\'' +
-//                ", ip='" + ip + '\'' +
+                ", ip='" + ip + '\'' +
 //                ", password='" + password + '\'' +
 //                ", favorite=" + favorite +
 //                ", locallyAccessibility=" + locallyAccessibility +
@@ -361,7 +361,7 @@ public class Device extends BaseDevice implements Parcelable {
 //                ", secret='" + secret + '\'' +
 //                ", hidden=" + hidden +
 //                ", Header=" + header +
-//                '}';
+                '}';
     }
 
     public void setHeader(String header) {
