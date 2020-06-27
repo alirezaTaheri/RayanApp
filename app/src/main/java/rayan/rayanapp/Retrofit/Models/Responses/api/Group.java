@@ -149,8 +149,8 @@ public class Group implements Parcelable {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
 //                ", admins=" + admins +
-//                ", users=" + users +
-//                ", devices=" + devices +
+                ", users=" + humanUsers +
+                ", devices=" + devices +
                 '}';
     }
 

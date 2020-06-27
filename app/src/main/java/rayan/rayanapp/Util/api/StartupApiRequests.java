@@ -6,6 +6,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,8 @@ import rayan.rayanapp.Persistance.database.UserDatabase;
 import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
+import rayan.rayanapp.Retrofit.Models.Responses.api.ApiBaseResponseV3;
+import rayan.rayanapp.Retrofit.Models.Responses.api.ApiGroupsResponseDataV3;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
@@ -49,7 +52,7 @@ public class StartupApiRequests {
 
     public final static String URL_REMOTE_HUB = "REMOTE_HUB";
     public final static String URL_REMOTE = "REMOTE";
-    public final static String URL_GROUP = "REMOTE";
+    public final static String URL_GROUP = "GROUP";
     public final static String URL_MAIN_DATA = "MAIN_DATA";
     public final static String URL_SKIP = "skip";
     public final static String URL_LIMIT = "limit";
@@ -97,28 +100,121 @@ public class StartupApiRequests {
                 .observeOn(Schedulers.io());
     }
 
+
+    @SuppressLint("CheckResult")
+    public MutableLiveData<requestStatus> getGroupsv3() {
+        urlParams.put(URL_REMOTE_HUB + URL_LIMIT, "1");
+        urlParams.put(URL_REMOTE_HUB + URL_SKIP, "0");
+        urlParams.put(URL_GROUP+URL_LIMIT,"1");
+        urlParams.put(URL_GROUP+URL_SKIP,"0");
+        newGroups = new ArrayList<>();
+        newRemoteHubs = new ArrayList<>();
+        MutableLiveData<requestStatus> requestStatusLiveData = new MutableLiveData<>();
+        Observable.concat(getGroupsObservable(),getRemoteHubObservable())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.e(TAG, "Getting v3v3v3 / "+RayanApplication.getPref().getToken());
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        Log.e(TAG, "oooooooooooonNext() called with: o = [" + o + "]");
+//                        Toast.makeText(rayanApplication, "hey you", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "Error occurred"+e);
+                        if (e instanceof HttpException && ((HttpException) e).message().contains("Unauthorized"))
+                            loginObservable().subscribe(loginObserver(requestStatusLiveData, doAfterLogin.GET_GROUPS));
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "Completed"+newGroups.size()+" / "+newRemoteHubs.size());
+                        new ApiResponseHandler().syncGroups(deviceDatabase, groupDatabase, userDatabase, membershipDatabase,
+                                remoteHubDatabase, remoteDatabase, rayanApplication, newGroups, newRemoteHubs,newRemotes);
+                    }
+                });
+        return requestStatusLiveData;
+    }
+
+    public Observable<ApiBaseResponseV3<ApiGroupsResponseDataV3>> getGroupsObservable(){
+        return Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+                .flatMap(new Function<Long, Observable<ApiBaseResponseV3<ApiGroupsResponseDataV3>>>() {
+                    @Override
+                    public Observable<ApiBaseResponseV3<ApiGroupsResponseDataV3>> apply(Long aLong) throws Exception {
+                        Log.e("//////////","Groups...Sending: Limit" + urlParams.get(URL_GROUP + URL_LIMIT) + " Skip: " + urlParams.get(URL_GROUP + URL_SKIP));
+                        Map<String,String> params = new HashMap<>();
+                        params.put(URL_LIMIT, Objects.requireNonNull(urlParams.get(URL_GROUP + URL_LIMIT)));
+                        params.put(URL_SKIP, Objects.requireNonNull(urlParams.get(URL_GROUP + URL_SKIP)));
+                        return apiService.getGroupsV3(RayanApplication.getPref().getToken(), params);
+                    }
+                })
+                .doOnNext(new Consumer<ApiBaseResponseV3<ApiGroupsResponseDataV3>>() {
+                    @Override
+                    public void accept(ApiBaseResponseV3<ApiGroupsResponseDataV3> responseV3) throws Exception {
+                        Log.e(TAG,"Adding new Groups...");
+                        newGroups.addAll(responseV3.getData().getGroups());
+                    }
+                })
+                .takeWhile(new Predicate<ApiBaseResponseV3<ApiGroupsResponseDataV3>>() {
+                    @Override
+                    public boolean test(ApiBaseResponseV3<ApiGroupsResponseDataV3> response) throws Exception {
+                        Log.e("pipipipi", urlParams.get(URL_GROUP + URL_LIMIT)+" / " + urlParams.get(URL_GROUP + URL_SKIP));
+                        if (Integer.parseInt(Objects.requireNonNull(urlParams.get(URL_GROUP + URL_SKIP)))+Integer.parseInt(Objects.requireNonNull(urlParams.get(URL_GROUP + URL_LIMIT))) < response.getData().getCount()) {
+                            urlParams.put(URL_GROUP+URL_SKIP,String.valueOf(Integer.parseInt(Objects.requireNonNull(
+                                    urlParams.get(URL_GROUP + URL_SKIP))) + 1));
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+    }
+    public Observable<RemoteHubsResponse> getRemoteHubObservable(){
+        return Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+                .flatMap(new Function<Long, Observable<RemoteHubsResponse>>() {
+                    @Override
+                    public Observable<RemoteHubsResponse> apply(Long aLong) throws Exception {
+                        Log.e("//////////","Sending: Limit" + urlParams.get(URL_REMOTE_HUB + URL_LIMIT) + " Skip: " + urlParams.get(URL_REMOTE_HUB + URL_SKIP));
+                        Map<String , String> params = new HashMap<>();
+                        params.put(URL_LIMIT, Objects.requireNonNull(urlParams.get(URL_REMOTE_HUB + URL_LIMIT)));
+                        params.put(URL_SKIP, Objects.requireNonNull(urlParams.get(URL_REMOTE_HUB + URL_SKIP)));
+                        return apiService.getRemoteHubs(RayanApplication.getPref().getToken(), params);
+                    }
+                })
+                .doOnNext(new Consumer<RemoteHubsResponse>() {
+                    @Override
+                    public void accept(RemoteHubsResponse remoteHubsResponse) throws Exception {
+                        Log.e(TAG,"Adding new RemoteHubs...");
+                        newRemoteHubs.addAll(remoteHubsResponse.getData().getRemotes());
+                    }
+                })
+                .takeWhile(new Predicate<RemoteHubsResponse>() {
+                    @Override
+                    public boolean test(RemoteHubsResponse remoteHubsResponse) throws Exception {
+                        Log.e("pipipipi", urlParams.get(URL_REMOTE_HUB + URL_LIMIT)+" / " + urlParams.get(URL_REMOTE_HUB + URL_SKIP));
+                        if (Integer.parseInt(Objects.requireNonNull(urlParams.get(URL_REMOTE_HUB + URL_SKIP)))+Integer.parseInt(Objects.requireNonNull(urlParams.get(URL_REMOTE_HUB + URL_LIMIT))) < remoteHubsResponse.getData().getCount()) {
+                            urlParams.put(URL_REMOTE_HUB+URL_SKIP,String.valueOf(Integer.parseInt(Objects.requireNonNull(
+                                    urlParams.get(URL_REMOTE_HUB + URL_SKIP))) + 1));
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+    }
     List<Group> newGroups;
     List<RemoteHub> newRemoteHubs;
     List<Remote> newRemotes;
-//    @SuppressLint("CheckResult")
-//    public MutableLiveData<requestStatus> getGroupsV3() {
-//        urlParams.put(URL_REMOTE_HUB+URL_LIMIT,"20");
-//        urlParams.put(URL_REMOTE_HUB+URL_SKIP,"0");
-//        urlParams.put(URL_REMOTE+URL_LIMIT,"20");
-//        urlParams.put(URL_REMOTE+URL_SKIP,"0");
-//        urlParams.put(URL_GROUP+URL_LIMIT,"20");
-//        urlParams.put(URL_GROUP+URL_SKIP,"0");
-//        newGroups = new ArrayList<>();
-//        newRemoteHubs = new ArrayList<>();
-//        newRemotes = new ArrayList<>();
-//        MutableLiveData<requestStatus> requestStatusLiveData = new MutableLiveData<>();
-//        apiService.getGroups()
-//    }
-
     @SuppressLint("CheckResult")
     public MutableLiveData<requestStatus> getGroups1() {
         urlParams.put(URL_REMOTE_HUB+URL_LIMIT,"20");
         urlParams.put(URL_REMOTE_HUB+URL_SKIP,"0");
+//        urlParams.put(URL_GROUP+URL_LIMIT,"20");
+//        urlParams.put(URL_GROUP+URL_SKIP,"0");
         urlParams.put(URL_REMOTE+URL_LIMIT,"20");
         urlParams.put(URL_REMOTE+URL_SKIP,"0");
         newGroups = new ArrayList<>();

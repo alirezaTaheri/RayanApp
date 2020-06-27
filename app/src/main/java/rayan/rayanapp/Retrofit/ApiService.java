@@ -1,15 +1,8 @@
 package rayan.rayanapp.Retrofit;
 
-import com.google.gson.JsonObject;
-
-import org.json.JSONObject;
-
-import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import okhttp3.ResponseBody;
-import rayan.rayanapp.Data.CustomResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
@@ -35,38 +28,33 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDeviceWithLastComman
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.VerifyDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Responses.api.ApiGroupsResponseDataV3;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.ApiBaseResponseV3;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeAccessPointResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ForgetPasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.RegisterUserRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.device.EndSettingsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.FactoryResetResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.UpdateResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.VerifyDeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.adapter.rxjava2.Result;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
-import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -90,11 +78,14 @@ public interface ApiService {
     @GET("api/v2/groups/")
     Observable<GroupsResponse> getGroups(@Header("Authorization") String token);
 
-    @GET("api/v2/remotehubs/")
+    @GET("api/v3/remotehubs/")
     Observable<RemoteHubsResponse> getRemoteHubs(@Header("Authorization") String token, @QueryMap Map<String, String> params);
 
-    @GET("api/v2/remotes/")
+    @GET("api/v3/remotes/")
     Observable<RemotesResponse> getRemotes(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+    @GET("api/v3/groups/")
+    Observable<ApiBaseResponseV3<ApiGroupsResponseDataV3>> getGroupsV3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
 
     @POST("api/v2/groups/addusermobile")
     Observable<BaseResponse> addUserByMobile(@Header("Authorization") String token, @Body AddUserByMobileRequest addUserByMobileRequest);

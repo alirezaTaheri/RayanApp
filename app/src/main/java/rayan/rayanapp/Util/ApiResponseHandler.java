@@ -26,7 +26,7 @@ public class ApiResponseHandler {
                            UserMembershipDatabase membershipDatabase, RemoteHubDatabase remoteHubDatabase,
                            RemoteDatabase remoteDatabase, RayanApplication rayanApplication, List<Group> groups,
                            List<RemoteHub> remoteHubs, List<Remote> remotes){
-
+        Log.d("BEGOOBEOO", "syncGroups() called with: deviceDatabase = [" + deviceDatabase + "], groupDatabase = [" + groupDatabase + "], userDatabase = [" + userDatabase + "], membershipDatabase = [" + membershipDatabase + "], remoteHubDatabase = [" + remoteHubDatabase + "], remoteDatabase = [" + remoteDatabase + "], rayanApplication = [" + rayanApplication + "], groups = [" + groups + "], remoteHubs = [" + remoteHubs + "], remotes = [" + remotes + "]");
         int nOd = 0;
         List<Group> serverGroups = new ArrayList<>();
         List<String> tempTopics = new ArrayList<>();
@@ -36,6 +36,7 @@ public class ApiResponseHandler {
         List<UserMembership> memberships = new ArrayList<>();
         for (int a = 0;a<serverGroups.size();a++){
             Group g = serverGroups.get(a);
+            Log.e("222222222222","servergroups"+g);
             List<User> admins = g.getAdmins();
             List<Device> devices = new ArrayList<>();
 //                if (g.getDevices() != null)
@@ -44,6 +45,7 @@ public class ApiResponseHandler {
                 for (int b = 0;b<g.getDevices().size();b++){
                     Device u = g.getDevices().get(b);
                     Device existing = deviceDatabase.getDevice(u.getChipId());
+                    Log.e("222222222222","01010101"+u+existing);
                     if (existing == null){
                         Device deviceUser = new Device(u.getChipId(), u.getName1(), u.getId(), u.getType(), u.getUsername(), u.getTopic(), g.getId(), g.getSecret());
                         deviceUser.setSsid(u.getSsid() != null? u.getSsid():AppConstants.UNKNOWN_SSID);
@@ -73,6 +75,7 @@ public class ApiResponseHandler {
                         nOd++;
                     }
                 }
+            Log.e("222222222222","1111111111111");
             g.setDevices(devices);
             for (int z = 0;z<remoteHubs.size();z++) {
                 if (remoteHubs.get(z).getGroupId().equals(g.getId())) {
@@ -90,6 +93,7 @@ public class ApiResponseHandler {
                     }
                 }
             }
+            Log.e("222222222222","22222222222222");
             for (int c = 0;c<g.getHumanUsers().size();c++){
                 User user = g.getHumanUsers().get(c);
                 UserMembership userMembership = new UserMembership(g.getId(), user.getId());
@@ -122,6 +126,7 @@ public class ApiResponseHandler {
             }
             newDevices.addAll(devices);
         }
+        Log.e("222222222222","33333333333333333");
         List<Device> oldDevices = deviceDatabase.getAllDevices();
         List<Group> oldGroups = groupDatabase.getAllGroups();
         List<RemoteHub> oldRemoteHubs = remoteHubDatabase.getAllRemoteHubs();
@@ -202,7 +207,7 @@ public class ApiResponseHandler {
                 remoteHub.setChipId(remoteHub.getId());
                 remoteHub.setDeviceType(AppConstants.BaseDeviceType_REMOTE_HUB);
                 remoteHub.setBaseId(remoteHub.getId());
-                tempTopics.add(remoteHub.getTopic());
+                tempTopics.add(remoteHub.getTopic().getTopic());
             }
         if (remotes != null && oldRemotes != null){
             for (int a = 0;a<oldRemotes.size();a++){
@@ -226,6 +231,7 @@ public class ApiResponseHandler {
                 remote.setBaseId(remote.getId());
                 remote.setDeviceType(AppConstants.BaseDeviceType_REMOTE);
             }
+        Log.e("><><><>?><M<>",""+newUsers+remoteHubs+serverGroups);
         rayanApplication.getMsc().setNewArrivedTopics(tempTopics);
         groupDatabase.addGroups(serverGroups);
         userDatabase.addUsers(newUsers);

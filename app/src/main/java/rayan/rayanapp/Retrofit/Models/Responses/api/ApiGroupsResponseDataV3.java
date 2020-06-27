@@ -5,28 +5,24 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import rayan.rayanapp.Data.RemoteHub;
-
 
 /**
  * Created by alireza321 on 21/12/2018.
  */
 
-public class RemoteHubsData {
+public class ApiGroupsResponseDataV3 {
     @SerializedName("message")
     @Expose
     private String message;
 
     @SerializedName("items")
     @Expose
-    private List<RemoteHub> remotes;
-    @SerializedName("token")
-    @Expose
-    private String token;
+    private List<Group> groups;
 
     @SerializedName("count")
     @Expose
     private int count;
+
     public String getMessage() {
         return message;
     }
@@ -35,20 +31,12 @@ public class RemoteHubsData {
         this.message = message;
     }
 
-    public List<RemoteHub> getRemotes() {
-        return remotes;
+    public List<Group> getGroups() {
+        return groups;
     }
 
-    public void setRemotes(List<RemoteHub> remotes) {
-        this.remotes = remotes;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 
     public int getCount() {
@@ -61,10 +49,9 @@ public class RemoteHubsData {
 
     @Override
     public String toString() {
-        return "RemoteHubsData{" +
-                ", message='" + message + '\'' +
-                ", remotes=" + remotes +
-                ", token='" + token + '\'' +
+        return "ApiGroupsResponseDataV3{" +
+                "message='" + message + '\'' +
+                ", groups=" + groups +
                 ", count=" + count +
                 '}';
     }

@@ -63,6 +63,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -116,10 +117,13 @@ import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
+import rayan.rayanapp.Retrofit.Models.Responses.api.ApiBaseResponseV3;
+import rayan.rayanapp.Retrofit.Models.Responses.api.ApiGroupsResponseDataV3;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceData;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
@@ -732,17 +736,121 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     int limit = 2;
     int skip = 0;
     ApiService apiService;
+    int groupLimit = 1;
+    int groupSkip = 0;
+    int remoteHubLimit = 1;
+    int remoteHubSkip = 0;
+    int remoteLimit = 1;
+    int remoteSkip = 0;
+    String token = "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWM2M2Q0NGNlYzQxNTMyNGQ3MDg0ZDMiLCJ1c2VybmFtZSI6IjA5Mzk1ODQ0ODI4Iiwicm9sZSI6InVzZXIiLCJpbmZvIjp7InN0YXR1cyI6ImNyZWF0ZWQiLCJfaWQiOiI1ZWM2M2Q0NGNlYzQxNTMyNGQ3MDg0ZDIiLCJjcmVhdGVfYXQiOjE1OTAwNTAxMTY3NTQsIm5hbWUiOiIgIn0sInJlZ2lzdGVyZWQiOnRydWUsImNyZWF0ZV9hdCI6MTU5MDA1MDExNjc1NSwidXBkYXRlX2F0IjoxNTkwMDUwMTE2NzU1LCJpYXQiOjE1OTMyNTIwODQsImV4cCI6MTU5MzI2MjE2NH0.2RHFDFBLuV1h5WMALGDcPYHDr66PpnixETMBLxZgklM";
     @SuppressLint("CheckResult")
     @Override
     public void onBackPressed() {
 //        startService(new Intent(this, AlwaysOnService.class));
 
-        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            this.drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//            this.drawerLayout.closeDrawer(GravityCompat.START);
+//        } else {
+//            super.onBackPressed();
+//        }
+
         apiService = ApiUtils.getApiService();
+
+       Observable<ApiBaseResponseV3<ApiGroupsResponseDataV3>> a = Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+                .flatMap(new Function<Long, Observable<ApiBaseResponseV3<ApiGroupsResponseDataV3>>>() {
+                    @Override
+                    public Observable<ApiBaseResponseV3<ApiGroupsResponseDataV3>> apply(Long aLong) throws Exception {
+                        Log.e("//////////","Sending: Limit" + groupLimit + " Skip: " + groupSkip);
+                        Map<String,String> data = new HashMap<>();
+                        data.put("skip",String.valueOf(groupSkip));
+                        data.put("limit",String.valueOf(groupLimit));
+                        return apiService.getGroupsV3(token, data);
+                    }
+                })
+                .takeWhile(new Predicate<ApiBaseResponseV3<ApiGroupsResponseDataV3>>() {
+                    @Override
+                    public boolean test(ApiBaseResponseV3<ApiGroupsResponseDataV3> response) throws Exception {
+                        Log.e("pipipipi", remoteHubLimit+" / " + remoteHubSkip);
+                        if (groupSkip+groupLimit < response.getData().getCount()) {
+                            groupSkip += 1;
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+       Observable<RemoteHubsResponse> b = Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+                .flatMap(new Function<Long, Observable<RemoteHubsResponse>>() {
+                    @Override
+                    public Observable<RemoteHubsResponse> apply(Long aLong) throws Exception {
+                        Log.e("//////////","Sending: Limit" + remoteHubLimit + " Skip: " + remoteHubSkip);
+                        Map<String , String> params = new HashMap<>();
+                        params.put("limit", String.valueOf(remoteHubLimit));
+                        params.put("skip", String.valueOf(remoteHubSkip));
+                        return apiService.getRemoteHubs(token, params);
+                    }
+                })
+                .takeWhile(new Predicate<RemoteHubsResponse>() {
+                    @Override
+                    public boolean test(RemoteHubsResponse remoteHubsResponse) throws Exception {
+                        Log.e("pipipipi", remoteHubLimit+" / " + remoteHubSkip);
+                        if (remoteHubSkip+remoteHubLimit < remoteHubsResponse.getData().getCount()) {
+                            remoteHubSkip += 1;
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+        Observable<RemotesResponse> c = Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+                .flatMap(new Function<Long, Observable<RemotesResponse>>() {
+                    @Override
+                    public Observable<RemotesResponse> apply(Long aLong) throws Exception {
+                        Log.e("//////////","Sending: Limit" + remoteLimit+ " Skip: " + remoteSkip);
+                        Map<String , String> params = new HashMap<>();
+                        params.put("limit",String.valueOf(remoteLimit));
+                        params.put("skip",String.valueOf(remoteSkip));
+                        return apiService.getRemotes(RayanApplication.getPref().getToken(), params);
+                    }
+                })
+                .takeWhile(new Predicate<RemotesResponse>() {
+                    @Override
+                    public boolean test(RemotesResponse remoteHubsResponse) throws Exception {
+                        Log.e("pipipipi", remoteLimit+" / " + remoteSkip);
+                        if (remoteSkip+remoteLimit < remoteHubsResponse.getData().getCount()) {
+                            remoteSkip += 1;
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+        Observable.concat(a,b)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.e(TAG, "Getting v3v3v3");
+                    }
+
+                    @Override
+                    public void onNext(Object response) {
+                        Log.e(TAG, "ONNEXT v3v3v3"+ response);
+//                        Log.e(TAG, "ONNEXT v3v3v3"+ response.getData());
+//                        Log.e(TAG, "ONNEXT v3v3v3"+ response.getStatus());
+//                        Log.e(TAG, "ONNEXT v3v3v3 "+ response.getData().getCount());
+//                        Log.e(TAG, "ONNEXT v3v3v3"+ response.getData().getGroups());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "Error occurred"+e);
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "Completed");
+                    }
+                });
 //        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
 //        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
 //        RemoteHub poor = remoteHubDatabase.getAllRemoteHubs().get(0);
@@ -1784,9 +1892,12 @@ problem with -44 -54
 
 /////////////
 4 Tir
-2:10 min...
+2:10 min
 
+5 Tir
+2:8 min
 
-
+7 Tir
+13 min
 
  */
