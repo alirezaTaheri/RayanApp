@@ -393,10 +393,10 @@ public class Device implements Parcelable {
 //                ", onlineAccessibility=" + onlineAccessibility +
                 ", statusWord='" + statusWord + '\'' +
                 ", secret='" + secret + '\'' +
-                ", hidden=" + hidden +
+//                ", hidden=" + hidden +
                 ", position=" + position +
-                ", inGroupPosition=" + inGroupPosition +
-                ", favoritePosition=" + favoritePosition +
+//                ", inGroupPosition=" + inGroupPosition +
+//                ", favoritePosition=" + favoritePosition +
                 ", Header=" + header +
                 '}';
     }
@@ -405,31 +405,6 @@ public class Device implements Parcelable {
         this.header = header;
     }
 
-    //    @Override
-//    public String toString() {
-//        return "Device{" +
-//                "chipId='" + chipId + '\'' +
-//                ", name1='" + name1 + '\'' +
-//                ", position=" + position +
-////                ", name2='" + name2 + '\'' +
-//                ", pin1='" + pin1 + '\'' +
-//                ", pin2='" + pin2 + '\'' +
-////                ", id='" + id + '\'' +
-////                ", type='" + type + '\'' +
-////                ", username='" + username + '\'' +
-//                ", topic=" + topic +
-//                ", groupId='" + groupId + '\'' +
-////                ", style='" + style + '\'' +
-//                ", ssid='" + ssid + '\'' +
-//                ", ip='" + ip + '\'' +
-////                ", password='" + password + '\'' +
-////                ", favorite=" + favorite +
-////                ", locallyAccessibility=" + locallyAccessibility +
-////                ", onlineAccessibility=" + onlineAccessibility +
-//                ", statusWord='" + statusWord + '\'' +
-//                ", secret='" + secret + '\'' +
-//                '}';
-//    }
 
     public int getPosition() {
         return position;

@@ -507,7 +507,7 @@ public class MqttAndroidClient extends BroadcastReceiver implements
                     messageArrivedAction(data);
                 }
                 else if (MqttServiceConstants.SUBSCRIBE_ACTION.equals(action)) {
-                    Log.e("MQTT_EVENT_LISTENER","SUBSCRIBE_ACTION");
+//                    Log.e("MQTT_EVENT_LISTENER","SUBSCRIBE_ACTION");
                     subscribeAction(data);
                 }
                 else if (MqttServiceConstants.UNSUBSCRIBE_ACTION.equals(action)) {

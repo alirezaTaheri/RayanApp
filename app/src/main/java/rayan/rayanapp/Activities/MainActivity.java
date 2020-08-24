@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             initializeAnimations();
             mqttConnectionStatus = Connection.ConnectionStatus.NONE;
             retryConnectMqtt = new RetryConnectMqtt(this);
-            ConnectionLiveData connectionLiveData = new ConnectionLiveData(getApplicationContext());
+            ConnectionLiveData connectionLiveData = new ConnectionLiveData(getApplicationContext(),((RayanApplication) (getApplication())).getNetworkBus());
             connectionLiveData.observe(this, connectionStatusModel -> {
                 Log.e("MainActivity", "connectionLiveData:" + connectionStatusModel);
                 if (connectionStatusModel == null){

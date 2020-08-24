@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -19,12 +20,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnTouch;
 //import co.ronash.pushe.Pushe;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.R;
@@ -135,8 +147,84 @@ public class LoginActivity extends AppCompatActivity {
 //                startActivity(intent);
 //            }
 //        });
+        writeLog().observeOn(Schedulers.io()).subscribeOn(Schedulers.io()).subscribe(new Observer<Object>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
     }
-@OnFocusChange(R.id.phoneNumberEditText)
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if ( Environment.MEDIA_MOUNTED.equals( state ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+    public Observable<Object> writeLog(){
+        return Observable.create(new ObservableOnSubscribe<Object>() {
+            @Override
+            public void subscribe(ObservableEmitter<Object> e) throws Exception {
+                if (isExternalStorageWritable()) {
+                    File appDirectory = new File(Environment.getExternalStorageDirectory() + "/RayanAppFolder");
+                    File logDirectory = new File(appDirectory + "/log");
+                    File logFile = new File(logDirectory, "logcat" + System.currentTimeMillis() + ".txt");
+                    Date currentTime = Calendar.getInstance().getTime();
+                    Log.e(">>>>>>>>>", ">>>>>>>>>Date<<<<<<<< " + currentTime);
+                    File logFile2 = new File(logDirectory, "logcat" + System.currentTimeMillis() + "_2.txt");
+                    // create app folder
+                    if (!appDirectory.exists()) {
+                        appDirectory.mkdir();
+                    }
+                    // create log folder
+                    if (!logDirectory.exists()) {
+                        logDirectory.mkdir();
+                    }
+                    // clear the previous logcat and then write the new one to the file
+                    try {
+                        Process process = Runtime.getRuntime().exec("logcat -c");
+                        process = Runtime.getRuntime().exec("logcat -f " + logFile);
+//                process = Runtime.getRuntime().exec("logcat -f " + logFile2 + " *:S EditDeviceFragment:E UDPServerService:E EditGroupFragmentViewModel:E");
+                    } catch (IOException error) {
+                        error.printStackTrace();
+                    }
+
+                } else if (isExternalStorageReadable()) {
+                    // only readable
+                } else {
+                    // not accessible
+                }
+            }
+        });
+    }
+
+    @OnFocusChange(R.id.phoneNumberEditText)
 void onPhoneEditTextFocusChange(){
     phoneEditText.setHint("09123456789");
 }

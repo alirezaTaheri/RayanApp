@@ -20,11 +20,13 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
 import rayan.rayanapp.Util.AppConstants;
 
 public class GroupsListFragmentViewModel extends DevicesFragmentViewModel {
@@ -35,6 +37,43 @@ public class GroupsListFragmentViewModel extends DevicesFragmentViewModel {
         super(application);
         groupDatabase = new GroupDatabase(application);
     }
+
+
+    public LiveData<ToggleDeviceResponse> toDeviceToggle(String command){
+        final MutableLiveData<ToggleDeviceResponse> results = new MutableLiveData<>();
+        toDeviceToggleObservable(new BaseRequest(command), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceToggleObserver(results));
+        return results;
+    }
+    public Observable<ToggleDeviceResponse> toDeviceToggleObservable(BaseRequest baseRequest, String ip){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .toggle(AppConstants.getDeviceAddress(ip), baseRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private DisposableObserver<ToggleDeviceResponse> toDeviceToggleObserver(MutableLiveData<ToggleDeviceResponse> results){
+        return new DisposableObserver<ToggleDeviceResponse>() {
+
+            @Override
+            public void onNext(@NonNull ToggleDeviceResponse baseResponse) {
+                Log.e(TAG,"OnNext "+baseResponse);
+                results.postValue(baseResponse);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                Log.d(TAG,"Error"+e);
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"Completed");
+            }
+        };
+    }
+
+
     public LiveData<List<Group>> getAllGroupsLive(){
         return groupDatabase.getAllGroupsLive();
     }

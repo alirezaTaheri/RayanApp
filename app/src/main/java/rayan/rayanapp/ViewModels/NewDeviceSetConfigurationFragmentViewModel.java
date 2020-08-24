@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.thanosfisherman.wifiutils.WifiUtils;
+import com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
 import org.reactivestreams.Subscription;
@@ -147,18 +148,23 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
         if (!wifiManager.isWifiEnabled())
             wifiManager.setWifiEnabled(true);
         if (getCurrentSSID(wifiManager).equals(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName()))
-            return Observable.create(subscriber -> subscriber.onNext(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName()) );
+            return Observable.create(subscriber -> subscriber.onNext(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName()));
 //        WifiHandler.connectToSSID(activity.getApplicationContext(),((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName(), password);
         WifiUtils.enableLog(true);
         WifiUtils.withContext(activity)
                 .connectWith(((AddNewDeviceActivity)activity).getNewDevice().getAccessPointName(), password)
                 .onConnectionResult(new ConnectionSuccessListener() {
                     @Override
-                    public void isSuccessful(boolean isSuccess) {
-                        Log.e("isSuccessful???? " , "isisisisi: " + isSuccess);
-                        if (!isSuccess)
-                            ((AddNewDeviceActivity) activity).getNewDevice().setFailed(true);
-                        Toast.makeText(activity, ""+isSuccess, Toast.LENGTH_SHORT).show();
+                    public void success() {
+                        Log.e("isSuccessful" , "isisisisi: ");
+                        Toast.makeText(activity, "به دستگاه متصل شد", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void failed(@androidx.annotation.NonNull ConnectionErrorCode errorCode) {
+                        Log.e("NOTsUCCESSFULL" , "Error isisisisi: " + errorCode);
+                        ((AddNewDeviceActivity) activity).getNewDevice().setFailed(true);
+                        Toast.makeText(activity, "خطا در اتصال به دستگاه", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .start();
@@ -269,14 +275,21 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                     String secret;
                     if (deviceDatabase.getDevice(activity.getNewDevice().getChip_id()) != null){
                         secret = deviceDatabase.getDevice(activity.getNewDevice().getChip_id()).getSecret();
-                        Log.e(TAG, "A device with this chip id is already saved on device and password will be: " + (activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret));
+                        Log.e(TAG, secret + "A device with this chip id is already saved on device and password will be: " + (activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret));
                         return connectToDeviceObservable(activity, wifiManager, activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret);
                     }
                     Log.e(TAG, "this device never registerd in this device before password will be:  " + AppConstants.DEVICE_PRIMARY_PASSWORD);
                     return connectToDeviceObservable(activity, wifiManager, AppConstants.DEVICE_PRIMARY_PASSWORD);
                 })
-                .flatMap(deviceResponse ->
-                    toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(),activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, String.valueOf(AppConstants.MQTT_PORT_SSL), activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip))
+                .flatMap(s -> {
+                    Log.e(TAG,"Ok Now we will wait for n seconds"+s);
+                    return Observable.timer(8,TimeUnit.SECONDS);})
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(deviceResponse -> {
+                    Toast.makeText(activity, "ارسال اطلاعات به دستگاه", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Ok Response of connection is here: "+deviceResponse);
+                    return toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(), activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, String.valueOf(AppConstants.MQTT_PORT_SSL), activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip);
+                })
                 .subscribe(new Observer<SetPrimaryConfigResponse>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -293,7 +306,61 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(TAG, "onError::::" + e);
+                        Log.e(TAG, "Flow of install onError::::" + e);
+                        SetPrimaryConfigResponse errorResponse = new SetPrimaryConfigResponse();
+                        if (e instanceof SocketTimeoutException){
+                            errorResponse.setCmd(AppConstants.SOCKET_TIME_OUT);
+                        }
+                        else if (e instanceof UnknownHostException){
+                            errorResponse.setCmd(AppConstants.UNKNOWN_HOST_EXCEPTION);
+                        }
+                        else if (e.toString().contains("Unauthorized"))
+                            login();
+                        else if (e instanceof ConnectException)
+                            errorResponse.setCmd(AppConstants.CONNECT_EXCEPTION);
+                        else{
+                            errorResponse.setCmd(AppConstants.UNKNOWN_EXCEPTION);
+                        }
+                        e.printStackTrace();
+                        result.postValue(errorResponse);
+                        disposable.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "onComplete::::" );
+                    }
+                });
+        return result;
+
+    }
+
+    public SingleLiveEvent<SetPrimaryConfigResponse> sendInfoToDevice(WifiManager wifiManager,AddNewDeviceActivity activity, RegisterDeviceRequest registerDeviceRequest, String ip){
+//        if (RayanApplication.getPref().getIsNodeSoundOn())
+//            WifiHandler.removeNetwork(activity, activity.getNewDevice().getAccessPointName());
+        SingleLiveEvent<SetPrimaryConfigResponse> result = new SingleLiveEvent<>();
+        Toast.makeText(activity, "ارسال اطلاعات به دستگاه", Toast.LENGTH_SHORT).show();
+        Log.e(TAG, "Click on Send info to device");
+        toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(), activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, String.valueOf(AppConstants.MQTT_PORT_SSL), activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip)
+        .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Observer<SetPrimaryConfigResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
+                        setConfigDeviceDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(SetPrimaryConfigResponse deviceBaseResponse) {
+                        Log.e(TAG, "OnNext::::" + deviceBaseResponse);
+                        result.postValue(deviceBaseResponse);
+                        disposable.dispose();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "Flow of install onError::::" + e);
                         SetPrimaryConfigResponse errorResponse = new SetPrimaryConfigResponse();
                         if (e instanceof SocketTimeoutException){
                             errorResponse.setCmd(AppConstants.SOCKET_TIME_OUT);
@@ -310,6 +377,7 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                         }
                         result.postValue(errorResponse);
                         disposable.dispose();
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -320,6 +388,8 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
         return result;
 
     }
+
+
 
     private String getCurrentSSID(WifiManager wifiManager){
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();

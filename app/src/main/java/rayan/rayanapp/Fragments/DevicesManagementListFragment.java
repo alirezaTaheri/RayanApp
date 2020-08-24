@@ -29,6 +29,7 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Adapters.recyclerView.DevicesManagementRecyclerViewAdapter;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.ConnectionStatusModel;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Dialogs.DeviceManagementPopupDialog;
@@ -91,11 +92,12 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         transaction = fragmentManager.beginTransaction();
     }
 
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_devices_management_list, container, false);
-        ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext());
+        ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext(),((RayanApplication) (activity.getApplication())).getNetworkBus());
         connectionLiveData.observe(this, getConnectionStatusObserver());
         ButterKnife.bind(this, view);
         recyclerView.setAdapter(devicesRecyclerViewAdapterManagement);
@@ -132,9 +134,9 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
 
     @Override
     public void onItemClick(Device item) {
-        Log.e(TAG, connectionStatus.toString());
+        Log.e(TAG, connectionStatus.toString() + item);
         if (connectionStatus == null){
-            ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext());
+            ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext(),((RayanApplication) (activity.getApplication())).getNetworkBus());
             connectionLiveData.observe(this, getConnectionStatusObserver());
         }else {
             if (connectionStatus.getTypeName().equals(AppConstants.WIFI) && item.getSsid().equals(connectionStatus.getSsid())) {
@@ -157,8 +159,11 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                         } else if (s.equals(AppConstants.SOCKET_TIME_OUT)) {
                             Log.e("ttttttttttt", "tttttttttttttt" + s);
                             Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
-                        } else
+                        } else {
+                            Log.e(TAG,"What is the unknown problem? "+s);
                             Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), ""+s, Toast.LENGTH_SHORT).show();
+                        }
                         waiting.remove(item.getChipId());
                         devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
                     }
@@ -247,6 +252,8 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     public void onAttach(Context context) {
         super.onAttach(context);
         sendDevice = (ClickOnDevice) getActivity();
+        activity = (DeviceManagementActivity) context;
     }
 
+    DeviceManagementActivity activity;
 }

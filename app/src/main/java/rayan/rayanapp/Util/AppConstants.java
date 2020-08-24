@@ -56,6 +56,7 @@ public class AppConstants {
     public final static String PRIMARY_CONFIG_FALSE = "primary_config_false";
     public final static String EXPIRED = "EXPIRED";
     public final static String NEW_DEVICE_IP = "192.168.4.1";
+//    public final static String NEW_DEVICE_IP = "192.168.137.1";
     public final static String GET_VERSION = "version";
     public final static String NAMING_PREFIX_PIN1 = "_1";
     public final static String NAMING_PREFIX_PIN2 = "_2";
