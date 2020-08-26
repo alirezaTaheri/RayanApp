@@ -31,6 +31,7 @@ import io.reactivex.disposables.Disposable;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Adapters.recyclerView.DevicesManagementRecyclerViewAdapter;
 import rayan.rayanapp.Data.BaseDevice;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.ConnectionStatusModel;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Remote;
@@ -143,11 +144,12 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         transaction = fragmentManager.beginTransaction();
     }
 
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_devices_management_list, container, false);
-        ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext());
+        ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext(),((RayanApplication) (activity.getApplication())).getNetworkBus());
         connectionLiveData.observe(this, getConnectionStatusObserver());
         ButterKnife.bind(this, view);
         recyclerView.setAdapter(devicesRecyclerViewAdapterManagement);
@@ -183,6 +185,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     }
 
     @Override
+//<<<<<<< HEAD
     public void onFavoriteClicked(Device item) {
 //        Device d = devicesManagementListFragmentViewModel.getDevice(item.getChipId());
 
@@ -198,13 +201,18 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     @Override
     public void onDeviceClicked(BaseDevice baseDevice) {
         Log.e(TAG, "Settings On Device Clicked"+connectionStatus.toString());
+//=======
+//    public void onItemClick(Device item) {
+//        Log.e(TAG, connectionStatus.toString() + item);
+//>>>>>>> remotes
         if (connectionStatus == null){
-            ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext());
+            ConnectionLiveData connectionLiveData = new ConnectionLiveData(getContext(),((RayanApplication) (activity.getApplication())).getNetworkBus());
             connectionLiveData.observe(this, getConnectionStatusObserver());
         }else {
                 Device item = (Device) baseDevice;
                 if (connectionStatus.getTypeName().equals(AppConstants.WIFI) && item.getSsid().equals(connectionStatus.getSsid())) {
 //        if (item.getIp() != null) {
+//<<<<<<< HEAD
                     waiting.add(item.getChipId());
                     devicesRecyclerViewAdapterManagement.setItems(baseDevices);
                     devicesManagementListFragmentViewModel.setReadyForSettingsHttp(item).observe(this, new Observer<String>() {
@@ -232,6 +240,71 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                 } else {
                     Toast.makeText(getContext(), "لطفا به شبکه " + "\"" + item.getSsid() + "\"" + " متصل شوید", Toast.LENGTH_LONG).show();
                 }
+//=======
+//                waiting.add(item.getChipId());
+//                devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+//                devicesManagementListFragmentViewModel.setReadyForSettingsHttp(item).observe(this, new Observer<String>() {
+//                    @Override
+//                    public void onChanged(@Nullable String s) {
+//                        Log.e("...........", "............" + s);
+//                        if (s.equals(AppConstants.SETTINGS)) {
+//                            transaction = fragmentManager.beginTransaction();
+//                            transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
+//                            EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
+//                            ((DeviceManagementActivity) getActivity()).editDeviceFragment = editGroupFragment;
+//                            ((DeviceManagementActivity) Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
+//                            transaction.replace(R.id.frameLayout, editGroupFragment);
+//                            transaction.addToBackStack(null);
+//                            transaction.commit();
+//                        } else if (s.equals(AppConstants.SOCKET_TIME_OUT)) {
+//                            Log.e("ttttttttttt", "tttttttttttttt" + s);
+//                            Toast.makeText(getActivity(), "اتصال به دستگاه ناموفق بود", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Log.e(TAG,"What is the unknown problem? "+s);
+//                            Toast.makeText(getActivity(), "مشکلی وجود دارد", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getActivity(), ""+s, Toast.LENGTH_SHORT).show();
+//                        }
+//                        waiting.remove(item.getChipId());
+//                        devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+//                    }
+//                });
+////        }else SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
+//
+//
+////        if (disposable != null)
+////            disposable.dispose();
+////        disposable = ((RayanApplication)getActivity().getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
+////            if (o.getString("cmd").equals(AppConstants.SETTINGS)){
+////                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"Message: " + o);
+////                waiting.remove(device.getChipId());
+////                transaction = fragmentManager.beginTransaction();
+////                transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
+////                EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(device);
+////                ((DeviceManagementActivity)Objects.requireNonNull(getActivity())).setActionBarTitle(item.getName1());
+////                transaction.replace(R.id.frameLayout, editGroupFragment);
+////                transaction.addToBackStack(null);
+////                transaction.commit();
+////                disposable.dispose();
+////            }
+////        });
+////        this.device = item;
+////        if (device.getIp() == null)
+////            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
+////        else {
+////            waiting.add(item.getChipId());
+////            devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+////            devicesManagementListFragmentViewModel.setReadyForSettings(device).observe(this, s -> {
+////                if (waiting.contains(s)){
+////                    waiting.remove(s);
+////                    SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"دستگاه در دسترس نیست");
+////                }
+////                devicesRecyclerViewAdapterManagement.setItems(devicesManagementListFragmentViewModel.getDevices());
+////            });
+////        }
+//            } else {
+//                Toast.makeText(getContext(), "لطفا به شبکه " + "\"" + item.getSsid() + "\"" + " متصل شوید", Toast.LENGTH_LONG).show();
+//            }
+//>>>>>>> remotes
         }
     }
 
@@ -321,4 +394,5 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
         activity = (DeviceManagementActivity) context;
     }
 
+//    DeviceManagementActivity activity;
 }

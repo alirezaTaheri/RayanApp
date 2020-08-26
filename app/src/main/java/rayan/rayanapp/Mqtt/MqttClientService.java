@@ -11,7 +11,7 @@ public class MqttClientService {
     private static final String TAG = "MqttClientService";
 
     public static synchronized MqttClient getMqttClientInstance(Application application){
-        Log.e(TAG, "Initializing MqttClient");
+//        Log.e(TAG, "Initializing MqttClient");
         if (mqttClient == null){
             Log.e(TAG, "Making The Client...");
             mqttClient = new MqttClient.Builder()
@@ -20,7 +20,7 @@ public class MqttClientService {
                     .build();
             return mqttClient;
         }
-        Log.e(TAG, "Client is already created");
+//        Log.e(TAG, "Client is already created");
         //mqttClient.connectToBroker();
         return mqttClient;
     }

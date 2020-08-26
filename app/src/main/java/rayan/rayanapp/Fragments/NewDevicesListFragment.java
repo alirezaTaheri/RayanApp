@@ -25,6 +25,7 @@ import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 import com.thanosfisherman.wifiutils.WifiUtils;
+import com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
 import java.util.ArrayList;
@@ -147,16 +148,26 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
         if (existingDevice != null)
             password = existingDevice.getSecret();
         else password = AppConstants.DEVICE_PRIMARY_PASSWORD;
+        Log.e(TAG, "Connecting... password will be: "+password);
+        if (targetSSID.toLowerCase().contains("_f"))
+            password = AppConstants.DEVICE_PRIMARY_PASSWORD;
+        Log.e(TAG, "Connecting... password will be: "+password);
         Log.e(TAG , "Connecting To: "+ target.getSSID() +" with password: " + password);
         WifiUtils.enableLog(true);
         WifiUtils.withContext(getActivity())
                 .connectWith(targetSSID, password)
                 .onConnectionResult(new ConnectionSuccessListener() {
                     @Override
-                    public void isSuccessful(boolean isSuccess) {
+                    public void success() {
                         progressDialog.dismiss();
-                        Log.e("SuccessfullyConnected?" , "isisisisi: " + isSuccess);
-//                        Toast.makeText(getActivity(), ""+isSuccess, Toast.LENGTH_SHORT).show();
+                        Log.e("SuccessfullyConnected" , "isisisisi: ");
+                    }
+
+                    @Override
+                    public void failed(@androidx.annotation.NonNull ConnectionErrorCode errorCode) {
+                        progressDialog.dismiss();
+                        targetSSID = null;
+                        Log.e("NotSuccessfully" , "NotSuccessfullyConnected NONONONOISISISIS: " + errorCode);
                     }
                 })
                 .start();
@@ -276,6 +287,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 
     @Override
     public void wifiNetwork(boolean connected, String ssid) {
+        Log.d(TAG, "wifiNetwork() called with: connected = [" + connected + "], ssid = [" + ssid + " TargetSSID: "+targetSSID+".]");
         if (connected) {
             ((RayanApplication) (activity.getApplication())).getNetworkBus().send(ssid);
             if (targetSSID != null) {
@@ -335,10 +347,21 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
 //            currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
 //        }
 //        Log.e("thisisCurrent SSID: ", "Current SSID: : " + currentSSID);
-        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
-        if (info != null && info.isConnected()) {
-            currentSSID = info.getExtraInfo();
+
+//        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo info = cm.getActiveNetworkInfo();
+//        if (info != null && info.isConnected()) {
+//            currentSSID = info.getExtraInfo();
+//            Log.d(TAG, "WiFi SSID: " + currentSSID);
+//            if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
+//            currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
+//        }
+//        }else {
+//            currentSSID = AppConstants.UNKNOWN_SSID;
+//            Log.d(TAG, "WiFi SSID: " + "null");
+//        }
+        if (activity.currentSsid != null) {
+            currentSSID = activity.currentSsid;
             Log.d(TAG, "WiFi SSID: " + currentSSID);
             if (currentSSID.startsWith("\"") && currentSSID.endsWith("\"")) {
             currentSSID = currentSSID.substring(1, currentSSID.length() - 1);
@@ -361,7 +384,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Activity)
-            this.activity = (Activity) context;
+            this.activity = (AddNewDeviceActivity) context;
     }
-    Activity activity;
+    AddNewDeviceActivity activity;
 }
