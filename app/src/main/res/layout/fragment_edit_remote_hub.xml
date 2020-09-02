@@ -116,35 +116,125 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_toStartOf="@id/groupTitle" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp">
+        <TextView
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:text="مورد علاقه:"
+            android:id="@+id/favoriteTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true" />
         <ImageView
             android:layout_centerVertical="true"
             android:padding="8dp"
-            android:id="@+id/goToGroup"
-            app:srcCompat="@drawable/ic_groups"
+            android:id="@+id/favorite"
+            app:srcCompat="@drawable/ic_star_empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </RelativeLayout>
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/recyclerView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp">
+        <TextView
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:text="قابل رویت:"
+            android:id="@+id/visibilityTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true" />
+        <ImageView
+            android:layout_centerVertical="true"
+            android:padding="8dp"
+            android:id="@+id/visibility"
+            app:srcCompat="@drawable/ic_visibility_on"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
     <TextView
+        android:text="ریموت‌های زیرمجموعه"
+        android:textSize="14sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <RelativeLayout
+        android:visibility="gone"
+        android:layout_marginLeft="20dp"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/emptyRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="@string/no_remote_found"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/addNewRemote"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:layout_alignParentRight="true"
+            app:srcCompat="@drawable/ic_add"
+            android:tint="@color/blue_acc_1"
+            android:layout_centerVertical="true"
+            android:clickable="false"
+            android:focusable="false"
+            android:id="@+id/addNewRemote"
+            android:layout_width="55dp"
+            android:layout_height="55dp" />
+    </RelativeLayout>
+    <LinearLayout
+        android:background="@drawable/background_reset_device_button"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:id="@+id/factoryReset"
-        android:drawableRight="@drawable/ic_reset"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:clickable="true"
-        android:background="@drawable/background_reset_device_button"
-        android:gravity="center"
-        android:paddingBottom="10dp"
-        android:paddingLeft="23dp"
-        android:paddingRight="23dp"
-        android:paddingTop="10dp"
-        android:text="ریست کردن دستگاه"
-        android:textColor="@color/grey_light_3"
-        android:textSize="14sp" />
+        android:focusable="true"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_marginLeft="8px"
+            android:tint="@color/white"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:paddingLeft="23dp"
+            android:paddingRight="23dp"
+            android:paddingTop="10dp"
+            android:text="ریست کردن دستگاه"
+            android:textColor="@color/grey_light_3"
+            android:textSize="14sp" />
+    </LinearLayout>
 </LinearLayout>

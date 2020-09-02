@@ -236,6 +236,7 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_settingss">Settings</string>
+    <string name="no_remote_found">ریموتی وجود ندارد\nایجاد ریموت جدید</string>
 
 
 </resources>

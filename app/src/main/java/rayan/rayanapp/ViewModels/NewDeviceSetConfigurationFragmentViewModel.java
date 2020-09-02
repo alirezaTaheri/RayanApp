@@ -15,31 +15,33 @@ import com.thanosfisherman.wifiutils.WifiUtils;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
-import org.reactivestreams.Subscription;
-
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.internal.operators.observable.ObservableAny;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
@@ -49,7 +51,6 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SingleLiveEvent;
-import rayan.rayanapp.Wifi.WifiHandler;
 
 public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListViewModel {
 
@@ -171,6 +172,14 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
         return ((RayanApplication)activity.getApplication()).getNetworkBus().toObservable();
     }
 
+    private Observable<DeviceResponse> editDeviceTopicObservable(EditDeviceTopicRequest editDeviceTopicRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .editDeviceTopic(RayanApplication.getPref().getToken(), editDeviceTopicRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
@@ -209,16 +218,15 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
         return results;
     }
 
-    private Observable<BaseResponse> deleteUserObservable(DeleteUserRequest deleteUserRequest){
+    private Observable<BaseResponse> deleteUserObservable(DeleteDeviceRequest deleteDeviceRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .deleteUser(RayanApplication.getPref().getToken(), deleteUserRequest)
+                .deleteDeviceFromGroup(RayanApplication.getPref().getToken(), deleteDeviceRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
     Disposable disposable;
     Disposable setConfigDeviceDisposable;
-
     public Disposable getConfigDeviceDisposable(){
         return setConfigDeviceDisposable;
     }
@@ -232,7 +240,7 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap(deviceResponse -> {
-                    Log.e(TAG, "Device Registration Passed\nRemoving Device from previous group...");
+                    Log.e(TAG, "Device Registration Passed\nRemoving Device from previous group..."+deviceResponse);
                     Device d = deviceResponse.getData().getDevice();
                     activity.getNewDevice().setId(d.getId());
                     activity.getNewDevice().setUsername(d.getUsername());
@@ -245,7 +253,7 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                         Log.e(TAG, "Deleting Device From previous Group: " + existingDevice);
                         activity.getNewDevice().setPreGroupId(existingDevice.getGroupId());
 
-                        return deleteUserObservable(new DeleteUserRequest(existingDevice.getId(), existingDevice.getGroupId()));
+                        return deleteUserObservable(new DeleteDeviceRequest(existingDevice.getId(), existingDevice.getGroupId()));
                     }
                     else {
                         Log.e(TAG, "There is no such device to delete from group ");
@@ -256,7 +264,7 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                     Log.e(TAG, "Device Registration Passed\nAdding Device To new Group...");
                     return addDeviceToGroupObservable(new AddDeviceToGroupRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId()));
                 })
-                .flatMap(baseResponse -> editDeviceObservable(new EditDeviceRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getName(), activity.getNewDevice().getType(), activity.getNewDevice().getSsid())))
+                .flatMap(baseResponse -> editDeviceTopicObservable(new EditDeviceTopicRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getName(), activity.getNewDevice().getType(), activity.getNewDevice().getSsid())))
                 .flatMap(deviceResponse -> {
                     if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR) && deviceResponse.getData().getMessage().equals(AppConstants.FORBIDDEN)){
                         Toast.makeText(activity, "شما قادر به نصب این دستگاه نیستید", Toast.LENGTH_SHORT).show();
@@ -266,6 +274,9 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                     Log.e(TAG, "Device Specification successfully Changed...");
                     return createTopicObservable(new CreateTopicRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getChip_id(), AppConstants.MQTT_HOST));
                 })
+                .flatMap(baseResponse -> editDeviceObservable(new EditDeviceRequest(activity.getNewDevice().getName(),
+                        activity.getNewDevice().getType(),activity.getNewDevice().getSsid(),null,
+                        activity.getNewDevice().getGroup().getId(),activity.getNewDevice().getId(),null, null)))
                 .flatMap(deviceBaseResponse ->{
                     Log.e(TAG, "Topic Creation Passed\nConnecting to device...");
                     activity.getNewDevice().setTopic(deviceBaseResponse.getData().getDevice().getTopic());

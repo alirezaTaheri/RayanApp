@@ -9,10 +9,7 @@ import android.util.Log;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
@@ -20,9 +17,8 @@ import rayan.rayanapp.Data.LocallyChange;
 import rayan.rayanapp.Persistance.database.LocallyChangesDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
 
 public class ControlRequests {
     LocallyChangesDatabase lcd;
@@ -52,13 +48,13 @@ public class ControlRequests {
 
     public LiveData<DeviceResponse> editDevice(String id, String name, String type, String groupId, String ssid){
         final MutableLiveData<DeviceResponse> results = new MutableLiveData<>();
-        editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)).subscribe(editDeviceObserver(results));
+        editDeviceObservable(new EditDeviceTopicRequest(id, groupId, name, type, ssid)).subscribe(editDeviceObserver(results));
         return results;
     }
-    private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
+    private Observable<DeviceResponse> editDeviceObservable(EditDeviceTopicRequest editDeviceTopicRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .editDevice(RayanApplication.getPref().getToken(), editDeviceRequest)
+                .editDeviceTopic(RayanApplication.getPref().getToken(), editDeviceTopicRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

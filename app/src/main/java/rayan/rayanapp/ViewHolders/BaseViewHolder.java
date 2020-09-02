@@ -20,7 +20,6 @@ public abstract class BaseViewHolder extends RecyclerView.ViewHolder {
 
     public abstract void onBind(BaseDevice item, @Nullable OnDeviceClickListener<BaseDevice> listener);
 
-
     public void changePosition(BaseDevice item, OnDeviceClickListener<BaseDevice> listener){
         Log.d("BaseViewHo", "changePosition() called with: item = [" + item + "], listener = [" + listener + "]");
     }

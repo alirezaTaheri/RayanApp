@@ -2,14 +2,12 @@ package rayan.rayanapp.Fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -19,20 +17,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.AddNewRemoteActivity;
 import rayan.rayanapp.Adapters.recyclerView.RemoteBrandsRecyclerViewAdapter;
-import rayan.rayanapp.Adapters.recyclerView.RemoteTypesRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.AddNewRemoteNavListener;
 import rayan.rayanapp.Listeners.OnRemoteBrandClicked;
 import rayan.rayanapp.R;
@@ -130,16 +122,17 @@ public class NewRemoteSelectBrandFragment extends Fragment implements OnRemoteBr
     }
 
     @Override
-    public void goToNextStep(Map<String, String> data) {
-        Map<String, String> map = new HashMap<>();
-        map.put("brand", selectedBrand.first);
-        activity.doOnNext(map);
+    public void goToNextStep(Bundle data) {
+        activity.doOnNext(data);
     }
 
     @Override
     public void verifyStatus() {
-        if (!selectedBrand.first.equals(""))
-            goToNextStep(null);
+        if (!selectedBrand.first.equals("")) {
+            Bundle data = new Bundle();
+            data.putString("brand", selectedBrand.first);
+            goToNextStep(data);
+        }
     }
 
 }

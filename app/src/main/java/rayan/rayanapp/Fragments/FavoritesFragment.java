@@ -6,15 +6,12 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -415,7 +412,7 @@ public class FavoritesFragment extends Fragment implements OnDeviceClickListener
     public void onClick_RemoteHub(BaseDevice Item, int position) {
         RemoteHub remoteHub = (RemoteHub) Item;
         Log.e("onClick_RemoteHub", "Item:"+remoteHub + position);
-        SelectRemoteBottomSheetFragment selectRemoteBottomSheetFragment = SelectRemoteBottomSheetFragment.instance(remoteHub.getName());
+        SelectRemoteBottomSheetFragment selectRemoteBottomSheetFragment = SelectRemoteBottomSheetFragment.instance(remoteHub);
         selectRemoteBottomSheetFragment.show(getActivity().getSupportFragmentManager(), "TAG");
     }
 

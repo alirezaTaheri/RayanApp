@@ -58,6 +58,7 @@ import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.Persistance.database.RemoteDataDatabase;
 import rayan.rayanapp.Persistance.database.RemoteDatabase;
 import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 import rayan.rayanapp.Persistance.database.UserDatabase;
@@ -78,7 +79,7 @@ import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
 
 public class DevicesFragmentViewModel extends AndroidViewModel {
     protected DeviceDatabase deviceDatabase;
-    private GroupDatabase groupDatabase;
+    protected GroupDatabase groupDatabase;
     private ExecutorService executorService;
     private UserDatabase userDatabase;
     private UserMembershipDatabase membershipDatabase;
@@ -98,7 +99,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         apiService = ApiUtils.getApiService();
         if (startupApiRequests == null)
             startupApiRequests = new StartupApiRequests(apiService, deviceDatabase, groupDatabase,groupDatabase, userDatabase, membershipDatabase,
-                    new RemoteHubDatabase(application), new RemoteDatabase(application),(RayanApplication) getApplication());
+                    new RemoteHubDatabase(application), new RemoteDatabase(application),new RemoteDataDatabase(application), (RayanApplication) getApplication());
 //        initSounds();
     }
 
@@ -130,6 +131,15 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         return remoteHubDatabase.getAllRemoteHubsFlowable();
     }
 
+    public LiveData<List<Remote>> getRemotesOfRemoteHub(String remoteHubId){
+            return remoteDatabase.getRemotesOfRemoteHub(remoteHubId);
+    }
+    public RemoteHub getRemoteHub(String remoteHubId){
+            return remoteHubDatabase.getRemoteHub(remoteHubId);
+    }
+    public Group getGroup(String groupId){
+            return groupDatabase.getGroup(groupId);
+    }
     public List<Device> getAllDevicesInGroup(String groupId){
             return deviceDatabase.getAllInGroup(groupId);
     }
@@ -171,7 +181,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     private final String TAG = DevicesFragmentViewModel.class.getSimpleName();
 
     public LiveData<StartupApiRequests.requestStatus> getGroups() {
-        return startupApiRequests.getGroups();
+        return startupApiRequests.getGroupsv3();
     }
     public LiveData<StartupApiRequests.requestStatus> getGroups1() {
         return startupApiRequests.getGroups1();
@@ -211,6 +221,10 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 //                Log.e(TAG, "Hale tamoom shod");
 //            }
 //        });
+    }
+
+    public LiveData<StartupApiRequests.requestStatus> getGroupsv3() {
+        return startupApiRequests.getGroupsv3();
     }
 
     public void login(){

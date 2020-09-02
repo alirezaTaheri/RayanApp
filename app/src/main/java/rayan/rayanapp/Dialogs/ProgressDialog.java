@@ -16,8 +16,8 @@ import rayan.rayanapp.R;
 
 public class ProgressDialog extends Dialog {
 
-    public ProgressDialog(@NonNull Context context, int themeResId) {
-        super(context, themeResId);
+    public ProgressDialog(@NonNull Context context) {
+        super(context);
     }
 
     @BindView(R.id.text)
@@ -31,8 +31,7 @@ public class ProgressDialog extends Dialog {
         super.onCreate(savedInstanceState);
         this.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        this.setCancelable(false);
-        this.setContentView(R.layout.dialog_progress);
+        this.setContentView(R.layout.dialog_progress_2);
         ButterKnife.bind(this);
         text.setText("لطفا کمی صبرکنید...");
     }

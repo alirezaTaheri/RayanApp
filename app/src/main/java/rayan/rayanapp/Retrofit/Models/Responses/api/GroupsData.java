@@ -26,6 +26,12 @@ public class GroupsData {
     @Expose
     private String token;
 
+    private int count;
+
+    public int getCount() {
+        return count;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -60,11 +66,12 @@ public class GroupsData {
 
     @Override
     public String toString() {
-        return "Data{" +
+        return "GroupsData{" +
                 "user=" + user +
                 ", message='" + message + '\'' +
                 ", groups=" + groups +
                 ", token='" + token + '\'' +
+                ", count=" + count +
                 '}';
     }
 }

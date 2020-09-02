@@ -26,6 +26,7 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
+import rayan.rayanapp.Fragments.EditRemoteFragment;
 import rayan.rayanapp.Fragments.EditRemoteHubFragment;
 import rayan.rayanapp.Fragments.ProvideInternetFragment;
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
@@ -44,6 +45,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
     Toolbar toolbar;
     public EditDeviceFragment editDeviceFragment;
     public EditRemoteHubFragment editRemoteHubFragment;
+    public EditRemoteFragment editRemoteFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
@@ -133,7 +135,16 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
                         else dp.showDialog(AppConstants.DIALOG_PROVIDE_INTERNET, null);
                     }
                 });
-
+                break;
+            case "resetRemoteHub":
+                viewModel.internetProvided().subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if (aBoolean)
+                            editRemoteHubFragment.resetRemoteHub();
+                        else dp.showDialog(AppConstants.DIALOG_PROVIDE_INTERNET, null);
+                    }
+                });
                 break;
             default:
                 break;

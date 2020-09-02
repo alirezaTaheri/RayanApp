@@ -6,6 +6,13 @@
         android:tooltipText="تایید"
         android:icon="@drawable/ic_tick"
         app:showAsAction="always|withText"
-        android:visible="false"
+        android:visible="true"
+        />
+    <item android:id="@+id/edit"
+        android:title="ویرایش"
+        android:tooltipText="ویرایش"
+        android:icon="@drawable/ic_edit_group_basic"
+        app:showAsAction="always|withText"
+        android:visible="true"
         />
 </menu>

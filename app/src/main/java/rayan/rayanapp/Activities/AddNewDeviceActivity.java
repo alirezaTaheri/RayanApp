@@ -1,6 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -31,13 +32,17 @@ import android.widget.Toast;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import com.stepstone.stepper.StepperLayout;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
@@ -47,7 +52,10 @@ import rayan.rayanapp.Adapters.viewPager.AddNewDeviceStepperAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.AccessPoint;
 import rayan.rayanapp.Data.ConnectionStatusModel;
+import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.NewDevice;
+import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.ChangeGroupFragment;

@@ -121,6 +121,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                             finalRemotes.add(remotes.get(a));
                         }
                     }
+
                 DevicesFragment.this.remotes = finalRemotes;
                 synchronized (baseDevices) {
                     baseDevices.clear();
@@ -621,7 +622,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
     public void onClick_RemoteHub(BaseDevice Item, int position) {
         RemoteHub remoteHub = (RemoteHub) Item;
         Log.e("onClick_RemoteHub", "Item:"+remoteHub + position);
-        SelectRemoteBottomSheetFragment selectRemoteBottomSheetFragment = SelectRemoteBottomSheetFragment.instance(remoteHub.getName());
+        SelectRemoteBottomSheetFragment selectRemoteBottomSheetFragment = SelectRemoteBottomSheetFragment.instance(remoteHub);
         selectRemoteBottomSheetFragment.show(getActivity().getSupportFragmentManager(), "TAG");
     }
 

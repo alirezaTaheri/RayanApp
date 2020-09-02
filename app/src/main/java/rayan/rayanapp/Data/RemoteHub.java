@@ -1,15 +1,21 @@
 package rayan.rayanapp.Data;
 
-import android.annotation.SuppressLint;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@SuppressLint("ParcelCreator")
+import java.util.List;
+
+import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
+
+//@SuppressLint("ParcelCreator")
 @Entity
 public class RemoteHub extends BaseDevice implements Parcelable {
     @SerializedName("chip_id")
@@ -18,7 +24,11 @@ public class RemoteHub extends BaseDevice implements Parcelable {
     @NonNull
     @SerializedName("_id")
     private String id;
-    private String name,version,topic;
+    private String name,version;
+    @SerializedName("topic")
+    @Expose
+    @Embedded(prefix = "topic_")
+    private Topic topic;
     @SerializedName("ap_ssid")
     private String ssid;
     @SerializedName("ap_mac")
@@ -29,6 +39,16 @@ public class RemoteHub extends BaseDevice implements Parcelable {
     private String groupId;
     private boolean accessible,visibility;
     private String secret,ip,statusWord,header,style;
+    @Ignore
+    private List<Remote> remotes;
+
+    public List<Remote> getRemotes() {
+        return remotes;
+    }
+
+    public void setRemotes(List<Remote> remotes) {
+        this.remotes = remotes;
+    }
 
     public RemoteHub() {
     }
@@ -58,7 +78,7 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         id = in.readString();
         name = in.readString();
         version = in.readString();
-        topic = in.readString();
+        topic = in.readParcelable(Topic.class.getClassLoader());
         ssid = in.readString();
         mac = in.readString();
         creatorId = in.readString();
@@ -70,31 +90,6 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         statusWord = in.readString();
         header = in.readString();
         style = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(chipId);
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(version);
-        dest.writeString(topic);
-        dest.writeString(ssid);
-        dest.writeString(mac);
-        dest.writeString(creatorId);
-        dest.writeString(groupId);
-        dest.writeByte((byte) (accessible ? 1 : 0));
-        dest.writeByte((byte) (visibility ? 1 : 0));
-        dest.writeString(secret);
-        dest.writeString(ip);
-        dest.writeString(statusWord);
-        dest.writeString(header);
-        dest.writeString(style);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     public static final Creator<RemoteHub> CREATOR = new Creator<RemoteHub>() {
@@ -109,60 +104,20 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         }
     };
 
-    public String getStyle() {
-        return style;
-    }
-
-    public void setStyle(String style) {
-        this.style = style;
-    }
-
-    public String getHeader() {
-        return header;
-    }
-
-    public void setHeader(String header) {
-        this.header = header;
-    }
-
-    public String getStatusWord() {
-        return statusWord;
-    }
-
-    public void setStatusWord(String statusWord) {
-        this.statusWord = statusWord;
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    @NonNull
     public String getChipId() {
         return chipId;
     }
 
-    public void setChipId(@NonNull String chipId) {
+    public void setChipId(String chipId) {
         this.chipId = chipId;
     }
 
+    @NonNull
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(@NonNull String id) {
         this.id = id;
     }
 
@@ -182,11 +137,11 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         this.version = version;
     }
 
-    public String getTopic() {
+    public Topic getTopic() {
         return topic;
     }
 
-    public void setTopic(String topic) {
+    public void setTopic(Topic topic) {
         this.topic = topic;
     }
 
@@ -238,16 +193,91 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         this.visibility = visibility;
     }
 
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getStatusWord() {
+        return statusWord;
+    }
+
+    public void setStatusWord(String statusWord) {
+        this.statusWord = statusWord;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
+    }
 
     @Override
     public String toString() {
         return "RemoteHub{" +
-//                "id='" + id + '\'' +
+                "chipId='" + chipId + '\'' +
+                ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", pos='" + getPosition() + '\'' +
-                ",BaseId='" + getBaseId()+ '\'' ;
-//                ", groupId='" + groupId + '\'' +
-//                '}';
+                ", version='" + version + '\'' +
+                ", topic=" + topic +
+                ", ssid='" + ssid + '\'' +
+                ", mac='" + mac + '\'' +
+                ", creatorId='" + creatorId + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", accessible=" + accessible +
+                ", visibility=" + visibility +
+                ", secret='" + secret + '\'' +
+                ", ip='" + ip + '\'' +
+                ", statusWord='" + statusWord + '\'' +
+                ", header='" + header + '\'' +
+                ", style='" + style + '\'' +
+                ", remotes=" + remotes +
+                '}';
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(chipId);
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(version);
+        dest.writeParcelable(topic, flags);
+        dest.writeString(ssid);
+        dest.writeString(mac);
+        dest.writeString(creatorId);
+        dest.writeString(groupId);
+        dest.writeByte((byte) (accessible ? 1 : 0));
+        dest.writeByte((byte) (visibility ? 1 : 0));
+        dest.writeString(secret);
+        dest.writeString(ip);
+        dest.writeString(statusWord);
+        dest.writeString(header);
+        dest.writeString(style);
+    }
 }

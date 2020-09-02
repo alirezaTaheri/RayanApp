@@ -91,6 +91,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteData;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
@@ -105,9 +106,11 @@ import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.Mqtt.MqttClient;
 import rayan.rayanapp.Mqtt.MqttClientService;
+import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.Persistance.database.RemoteDataDatabase;
 import rayan.rayanapp.Persistance.database.RemoteDatabase;
 import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 import rayan.rayanapp.Persistance.database.UserDatabase;
@@ -118,6 +121,7 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceData;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsData;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
@@ -737,12 +741,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onBackPressed() {
 //        startService(new Intent(this, AlwaysOnService.class));
 
-        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            this.drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-        apiService = ApiUtils.getApiService();
+//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//            this.drawerLayout.closeDrawer(GravityCompat.START);
+//        } else {
+//            super.onBackPressed();
+//        }
+        DeviceDatabase deviceDatabase = new DeviceDatabase(this);
+        RemoteDataDatabase remoteDataDatabase = new RemoteDataDatabase(this);
+        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
+        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
+        GroupDatabase groupDatabase = new GroupDatabase(this);
+        Log.e(TAG, "G"+groupDatabase.getAllGroups());
+        Log.e(TAG, "G"+deviceDatabase.getAllDevices());
+        Log.e(TAG, "G"+remoteHubDatabase.getAllRemoteHubs());
+        Log.e(TAG, "G"+remoteDatabase.getAllRemotes());
+        Log.e(TAG, "G"+remoteDataDatabase.getAllRemoteDatas());
+        groupDatabase.getAllCount("");
+
+        mainActivityViewModel.getGroupsv3();
+
+//        apiService = ApiUtils.getApiService();
 //        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
 //        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
 //        RemoteHub poor = remoteHubDatabase.getAllRemoteHubs().get(0);

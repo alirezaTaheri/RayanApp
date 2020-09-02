@@ -48,7 +48,10 @@ public interface RemotesDAO extends BaseDAO<Remote>{
     @Query("SELECT * FROM Remote WHERE id = :id")
     Maybe<Remote> getRemoteFlowable(String id);
 
-    @Query("SELECT topic FROM Remote")
+    @Query("SELECT * FROM Remote WHERE remoteHubId = :remoteHubId")
+    LiveData<List<Remote>> getRemotesOfRemoteHub(String remoteHubId);
+
+    @Query("SELECT topic_topic FROM Remote")
     List<String> getAllTopics();
 
     @Update

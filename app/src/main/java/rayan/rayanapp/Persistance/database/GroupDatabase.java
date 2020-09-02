@@ -2,7 +2,11 @@ package rayan.rayanapp.Persistance.database;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteCursor;
+import android.util.Log;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,4 +62,22 @@ public class GroupDatabase {
         groupsDAO.updateGroups(devices);
     }
 
+    public void getAllCount(String groupId){
+        Log.e("FFFFFFFFFFFFF","LLLLLLLLLLLLLLLL" + groupsDAO.getAllBaseDevices());
+        Log.e("FFFFFFFFFFFFF","LLLLLLLLLLLLLLLL" + groupsDAO.getAllGroupBaseDevices("5ee3aed04703f279137e6c0a"));
+//        Cursor c = groupsDAO.getAllGroupBaseDevices();
+//        Log.e("FFFFFFFF",""+c.getColumnCount());
+//        Log.e("FFFFFFFF",""+c.getCount());
+//        Log.e("FFFFFFFF",""+c.getPosition());
+//        Log.e("FFFFFFFF",""+ Arrays.toString(c.getColumnNames()));
+//        while(c.moveToNext()) {
+//            int nameFieldColumnIndex = c.getColumnIndex("c1");
+//            int a = c.getInt(nameFieldColumnIndex);
+//            int numberFieldColumnIndex = c.getColumnIndex("c2");
+//            int b = c.getInt(numberFieldColumnIndex);
+//            Log.e("FFFFFFFF",a+"  ||  "+b);
+//        }
+//        c.close();
+
+    }
 }

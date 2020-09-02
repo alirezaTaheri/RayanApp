@@ -21,7 +21,7 @@ public class Device extends BaseDevice implements Parcelable {
     @SerializedName("chip_id")
     @Expose
     private String chipId;
-    @SerializedName("device_name")
+    @SerializedName("name")
     @Expose
     private String name1;
     private String name2;
@@ -30,7 +30,7 @@ public class Device extends BaseDevice implements Parcelable {
     @SerializedName("_id")
     @Expose
     private String id;
-    @SerializedName("device_type")
+    @SerializedName("type")
     @Expose
     private String type;
     @SerializedName("username")
@@ -42,7 +42,7 @@ public class Device extends BaseDevice implements Parcelable {
     private Topic topic;
     private String groupId;
     private String style;
-    @SerializedName("ssid")
+    @SerializedName("ap_ssid")
     @Expose
     private String ssid;
     @SerializedName("device_pass")
@@ -56,7 +56,7 @@ public class Device extends BaseDevice implements Parcelable {
     private String secret;
     private boolean hidden;
     private String header = AppConstants.UNKNOWN_HEADER;
-
+    private String create_at;
     public Device() {
     }
 
@@ -371,5 +371,13 @@ public class Device extends BaseDevice implements Parcelable {
 
     public boolean isReady4Mqtt(){
         return topic.getTopic() != null;
+    }
+
+    public String getCreate_at() {
+        return create_at;
+    }
+
+    public void setCreate_at(String create_at) {
+        this.create_at = create_at;
     }
 }

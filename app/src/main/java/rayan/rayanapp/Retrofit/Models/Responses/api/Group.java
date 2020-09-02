@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Util.dataConverter.DeviceDataConverter;
 import rayan.rayanapp.Util.dataConverter.UserDataConverter;
 
@@ -34,7 +35,9 @@ public class Group implements Parcelable {
     @SerializedName("secret")
     @Expose
     private String secret;
-
+    @SerializedName("remote_hubs")
+    @Ignore
+    private List<RemoteHub> remoteHubs;
     @Ignore
     private List<BaseDevice> baseDevices;
 //    @SerializedName("admins")
@@ -59,11 +62,31 @@ public class Group implements Parcelable {
     @TypeConverters(DeviceDataConverter.class)
     private List<Device> devices;
     public Group(){}
+
     protected Group(Parcel in) {
         id = in.readString();
         name = in.readString();
+        secret = in.readString();
+        remoteHubs = in.createTypedArrayList(RemoteHub.CREATOR);
         humanUsers = in.createTypedArrayList(User.CREATOR);
+        admins = in.createTypedArrayList(User.CREATOR);
         devices = in.createTypedArrayList(Device.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(secret);
+        dest.writeTypedList(remoteHubs);
+        dest.writeTypedList(humanUsers);
+        dest.writeTypedList(admins);
+        dest.writeTypedList(devices);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Group> CREATOR = new Creator<Group>() {
@@ -103,13 +126,6 @@ public class Group implements Parcelable {
         this.name = name;
     }
 
-//    public List<ResponseUser> getAdmins() {
-//        return admins;
-//    }
-//
-//    public void setAdmins(List<ResponseUser> admins) {
-//        this.admins = admins;
-//    }
 
     public List<User> getHumanUsers() {
         return humanUsers;
@@ -143,27 +159,26 @@ public class Group implements Parcelable {
         this.secret = secret;
     }
 
+    public List<RemoteHub> getRemoteHubs() {
+        return remoteHubs;
+    }
+
+    public void setRemoteHubs(List<RemoteHub> remoteHubs) {
+        this.remoteHubs = remoteHubs;
+    }
+
     @Override
     public String toString() {
         return "Group{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-//                ", admins=" + admins +
-//                ", users=" + users +
-//                ", devices=" + devices +
+                ", secret='" + secret + '\'' +
+                ", remoteHubs=" + remoteHubs +
+                ", baseDevices=" + baseDevices +
+                ", humanUsers=" + humanUsers +
+                ", admins=" + admins +
+                ", devices=" + devices +
                 '}';
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeTypedList(humanUsers);
-        dest.writeTypedList(devices);
-    }
 }

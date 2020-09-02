@@ -69,9 +69,13 @@ public class AppConstants {
     public final static String TO_DEVICE_NOT_VERIFY = "not_verify";
     public final static String FROM_DEVICE_VERIFY_DONE = "verify_done";
     public final static String OPERATION_DONE = "Done";
+    public final static String MISSING_PARAMS = "Missing_Parameters";
+    public final static String NOT_FOUND = "Not_found";
     public final static String DEVICE_TOGGLE = "tgl";
     public final static String ERROR = "error";
+    public final static String SERVER_ERROR= "SERVER_ERROR";
     public final static String FORBIDDEN = "Forbidden";
+    public final static String AUTHENTICATION_ERROR= "Forbidden";
     public final static int MOBILE_DATA = 0;
     public final static int WIFI_NETWORK = 1;
     public final static int VPN_NETWORK = 17;
@@ -79,6 +83,7 @@ public class AppConstants {
     public final static String WIFI = "WIFI";
     public final static String NOT_CONNECTED = "NOT_CONNECTED";
     public final static int NOT_CONNECTED_NETWORK = -1;
+    public final static String NETWORK_ERROR = "NETWORK_ERROR";
     public final static String NO_HTTP = "no_http";
 
 
@@ -142,6 +147,8 @@ public class AppConstants {
     public final static String USER_TYPE = "user";
     public final static String DUPLICATE_USER = "duplicate user";
     public final static String UNKNOWN_SSID = "Unknown SSID";
+    public final static String UNKNOWN_NAME = "Unknown NAME";
+    public final static String UNKNOWN_REMOTE_TYPE = "Unknown Remote Type";
     public final static String NULL_SSID = "Null SSID";
     public final static String UNKNOWN_IP = "Unknown IP";
     public final static String SUCCESS_DESCRIPTION = "success";

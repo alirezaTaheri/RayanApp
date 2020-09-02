@@ -222,10 +222,10 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                             if (s.equals(AppConstants.SETTINGS)) {
                                 transaction = fragmentManager.beginTransaction();
                                 transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
-                                EditDeviceFragment editGroupFragment = EditDeviceFragment.newInstance(item);
-                                activity.editDeviceFragment = editGroupFragment;
+                                EditDeviceFragment editDeviceFragment = EditDeviceFragment.newInstance(item);
+                                activity.editDeviceFragment = editDeviceFragment;
                                 activity.setActionBarTitle(item.getName1());
-                                transaction.replace(R.id.frameLayout, editGroupFragment);
+                                transaction.replace(R.id.frameLayout, editDeviceFragment);
                                 transaction.addToBackStack(null);
                                 transaction.commit();
                             } else if (s.equals(AppConstants.SOCKET_TIME_OUT)) {
@@ -310,7 +310,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
 
     @Override
     public void onRemoteHubClicked(BaseDevice baseDevice) {
-        RemoteHub item = remoteHubs.get(0);
+        RemoteHub item = (RemoteHub) baseDevice;
         transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
         EditRemoteHubFragment editRemoteHubFragment = EditRemoteHubFragment.newInstance(item);
@@ -322,8 +322,16 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
     }
 
     @Override
-    public void onRemoteCLicked(BaseDevice item) {
-        //TODO: REMOTE
+    public void onRemoteCLicked(BaseDevice baseDevice) {
+        Remote item = (Remote) baseDevice;
+        transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_right, R.anim.animation_transition_ext_to_left, R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_from_right);
+        EditRemoteFragment editRemoteHubFragment = EditRemoteFragment.newInstance(item);
+        activity.editRemoteFragment = editRemoteHubFragment;
+        activity.setActionBarTitle(item.getName());
+        transaction.replace(R.id.frameLayout, editRemoteHubFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -381,6 +389,26 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
                 Toast.makeText(activity, item.getName1().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(activity, item.getName1().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
+        }else
+        if (baseDevice instanceof RemoteHub) {
+            RemoteHub item = (RemoteHub) baseDevice;
+            RemoteHub remoteHubToUpdate = new RemoteHub((RemoteHub) baseDevice);
+            remoteHubToUpdate.setVisibility(!item.isVisibility());
+            devicesManagementListFragmentViewModel.updateRemoteHub(remoteHubToUpdate);
+            if (remoteHubToUpdate.isVisibility())
+                Toast.makeText(activity, item.getName().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(activity, item.getName().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
+        }else
+        if (baseDevice instanceof Remote) {
+            Remote item = (Remote) baseDevice;
+            Remote remoteToUpdate = new Remote((Remote) baseDevice);
+            remoteToUpdate.setVisibility(!item.isVisibility());
+            devicesManagementListFragmentViewModel.updateRemote(remoteToUpdate);
+            if (remoteToUpdate.isVisibility())
+                Toast.makeText(activity, item.getName().concat(" مخفی شد"), Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(activity, item.getName().concat(" قابل رویت شد"), Toast.LENGTH_SHORT).show();
         }
     }
 

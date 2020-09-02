@@ -49,7 +49,7 @@ public interface RemoteHubsDAO extends BaseDAO<RemoteHub>{
     @Query("SELECT * FROM RemoteHub WHERE id = :id")
     Maybe<RemoteHub> getRemoteHubFlowable(String id);
 
-    @Query("SELECT topic FROM RemoteHub")
+    @Query("SELECT topic_topic FROM RemoteHub")
     List<String> getAllTopics();
 
     @Update

@@ -8,7 +8,8 @@ public class ApiUtils {
     private ApiUtils(){}
 //    private static final String BASE_URL = "http://5.160.218.92:2233/";
 //    private static final String BASE_URL = "http://api2.rayansmarthome.ir:2233/";
-    private static final String BASE_URL = "https://api2.rayansmarthome.ir:8443/";
+//    private static final String BASE_URL = "https://api2.rayansmarthome.ir:8443/";
+    private static final String BASE_URL = "http://45.156.185.17:3001/";
     public static ApiService getApiService(){
         return RetrofitClient.getRetrofitInstance(BASE_URL).create(ApiService.class);
     }

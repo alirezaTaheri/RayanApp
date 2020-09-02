@@ -68,10 +68,33 @@ public class LoginViewModel extends ViewModel {
 
         return loginResponse;
     }
+    @SuppressLint("CheckResult")
+    public LiveData<BaseResponse> loginv3(String username, String password, DialogPresenter dp){
+        internetProvided().subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean aBoolean) throws Exception {
+                if (aBoolean)
+                    loginObservablev3(username, password).subscribe(loginObserver(loginResponse));
+                else {
+                    dp.showDialog(AppConstants.DIALOG_PROVIDE_INTERNET, new ArrayList<>());
+                    Log.e(TAG, "Internet is not connected");
+                }
+            }
+        });
+
+        return loginResponse;
+    }
 
     private Observable<BaseResponse> loginObservable(String username, String password){
         return ApiUtils.getApiService()
                 .login(username, password)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Observable<BaseResponse> loginObservablev3(String username, String password){
+        return ApiUtils.getApiService()
+                .loginv3(username, password)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

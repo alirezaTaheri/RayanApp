@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddDeviceToGroupRequest {
-    private List<String> users_id;
+    private List<String> devices_id;
     private String group_id;
 
     public AddDeviceToGroupRequest(String user_id, String group_id) {
-        users_id = new ArrayList<>();
-        users_id.add(user_id);
+        devices_id = new ArrayList<>();
+        devices_id.add(user_id);
         this.group_id = group_id;
     }
 }

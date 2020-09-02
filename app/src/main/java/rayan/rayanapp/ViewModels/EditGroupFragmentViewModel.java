@@ -278,7 +278,7 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
 
     public LiveData<BaseResponse> deleteGroup(String groupId){
         final MutableLiveData<BaseResponse> results = new MutableLiveData<>();
-        deleteGroupObservable(new DeleteGroupRequest(groupId)).subscribe(deleteGroupObserver(results));
+        deleteGroupObservablev3(new DeleteGroupRequest(groupId)).subscribe(deleteGroupObserver(results));
         return results;
     }
 
@@ -286,6 +286,13 @@ public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
         ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .deleteGroup(RayanApplication.getPref().getToken(), deleteGroupRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private Observable<BaseResponse> deleteGroupObservablev3(DeleteGroupRequest deleteGroupRequest){
+        ApiService apiService = ApiUtils.getApiService();
+        return apiService
+                .deleteGroupv3(RayanApplication.getPref().getToken(), deleteGroupRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

@@ -138,7 +138,7 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
     @Override
     public void connecting(AccessPoint target) {
         this.targetSSID = target.getSSID();
-        progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
+        progressDialog = new ProgressDialog(getActivity());
         progressDialog.show();
         String password,chipId;
         if (target.getSSID().split("_")[target.getSSID().split("_").length-1].toLowerCase().equals("f"))

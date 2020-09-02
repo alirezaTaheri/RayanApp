@@ -8,22 +8,13 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
@@ -34,30 +25,25 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Remote;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Helper.RayanUtils;
-import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteHubRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
@@ -73,6 +59,8 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeAccessPointResponse;
@@ -81,7 +69,6 @@ import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.EndSettingsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.FactoryResetResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.UpdateResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
 import rayan.rayanapp.Util.AppConstants;
@@ -99,10 +86,10 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         apiServiceScalar = ApiUtils.getApiServiceScalar();
     }
 
-    private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
-        Log.e("?><?><?><?><?><", "editing: " + editDeviceRequest);
+    private Observable<DeviceResponse> editDeviceObservable(EditDeviceTopicRequest editDeviceTopicRequest){
+        Log.e("?><?><?><?><?><", "editing: " + editDeviceTopicRequest);
         return apiService
-                .editDevice(RayanApplication.getPref().getToken(), editDeviceRequest)
+                .editDeviceTopic(RayanApplication.getPref().getToken(), editDeviceTopicRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -110,6 +97,20 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         Log.e("?><?><?><?><?><", "editing remoteHub: " + editRemoteHubRequest);
         return apiService
                 .editRemoteHub(RayanApplication.getPref().getToken(), editRemoteHubRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private Observable<DeviceResponse> editRemoteObservable(EditRemoteRequest editRemoteRequest){
+        Log.e("editRemoteObservable", "editing Remote: " + editRemoteRequest);
+        return apiService
+                .editRemote(RayanApplication.getPref().getToken(), editRemoteRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    private Observable<RemoteHubsResponse> deleteRemoteObservable(String remoteId, String remoteHubId){
+        Log.e("editRemoteObservable", "editing Remote: " + remoteId + "/ RemoteHub: "+ remoteHubId);
+        return apiService
+                .deleteRemote(RayanApplication.getPref().getToken(), remoteHubId, remoteId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -177,7 +178,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     }else Log.e("rererererere", "Auth IS NULL");
                     return false;
                 });
-        Observable.concat(deviceChangeNameObservable, editDeviceObservable(new EditDeviceRequest(id, groupId, name, type, ssid)))
+        Observable.concat(deviceChangeNameObservable, editDeviceObservable(new EditDeviceTopicRequest(id, groupId, name, type, ssid)))
                 .subscribe(new Observer<Object>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -211,9 +212,9 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 });
         return results;
     }
-    public MutableLiveData<String> remoteHubChangeName(RemoteHub remoteHub, String id , String name, boolean accessible, boolean visibility, String mac,String version, String ssid){
+    public MutableLiveData<String> editRemoteHub(RemoteHub remoteHub){
         MutableLiveData<String> results = new MutableLiveData<>();
-        byte[] data = name.getBytes();
+        byte[] data = remoteHub.getName().getBytes();
         String baseName = Base64.encodeToString(data, Base64.DEFAULT);
         Observable<Response<String>> remoteHubChangeNameObservable =
                 Observable.just(remoteHub)
@@ -251,7 +252,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     }else Log.e("rererererere", "Auth IS NULL");
                     return false;
                 });
-        Observable.concat(remoteHubChangeNameObservable, editRemoteHubObservable(new EditRemoteHubRequest(name,version,ssid,mac,id,accessible, visibility)))
+        Observable.concat(remoteHubChangeNameObservable, editRemoteHubObservable(new EditRemoteHubRequest(remoteHub)))
                 .subscribe(new Observer<Object>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -263,7 +264,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                         if (o instanceof DeviceResponse){
                             DeviceResponse deviceResponse = (DeviceResponse) o;
                             if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
-                                results.postValue(AppConstants.CHANGE_NAME_TRUE);
+                                results.postValue(AppConstants.OPERATION_DONE);
                             else if (deviceResponse.getData().getMessage() != null)
                                 results.postValue(deviceResponse.getData().getMessage());
                             else results.postValue(AppConstants.CHANGE_NAME_FALSE);
@@ -274,6 +275,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     @Override
                     public void onError(Throwable e) {
                         Log.d(TAG+"?><?><?><?><", "onError() called with: e = [" + e + "]");
+                        e.printStackTrace();
                         if (e instanceof HttpException)
                             results.postValue(AppConstants.CHANGE_NAME_FALSE);
                     }
@@ -283,6 +285,95 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                         Log.d(TAG+"?><?><?><?><", "onComplete() called");
                     }
                 });
+        return results;
+    }
+
+    public MutableLiveData<String> editRemote(Remote remote){
+        MutableLiveData<String> results = new MutableLiveData<>();
+        editRemoteObservable(new EditRemoteRequest(remote))
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG+"editRemote", "onSubscribe() called with: d = [" + d + "]");
+                    }
+                    @Override
+                    public void onNext(Object o) {
+                        if (o instanceof DeviceResponse){
+                            DeviceResponse deviceResponse = (DeviceResponse) o;
+                            if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+                                results.postValue(AppConstants.OPERATION_DONE);
+                            else if (deviceResponse.getData().getMessage() != null)
+                                results.postValue(deviceResponse.getData().getMessage());
+                            else results.postValue(AppConstants.ERROR);
+                        }
+                        Log.d(TAG+"?><?><?><?><", "onNext() called with: o = [" + o + "]");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG+"?><?><?><?><", "onError() called with: e = [" + e + "]");
+                        if (e instanceof HttpException)
+                            results.postValue(AppConstants.NETWORK_ERROR);
+                        else if (e instanceof SocketTimeoutException)
+                            results.postValue(AppConstants.SOCKET_TIME_OUT);
+                        else results.postValue(AppConstants.ERROR);
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG+"?><?><?><?><", "onComplete() called");
+                    }
+                });
+
+        return results;
+    }
+
+    public MutableLiveData<String> deleteRemote(Remote remote){
+        MutableLiveData<String> results = new MutableLiveData<>();
+        deleteRemoteObservable(remote.getId(), remote.getRemoteHubId())
+                .subscribe(new Observer<RemoteHubsResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG+"editRemote", "onSubscribe() called with: d = [" + d + "]");
+                    }
+
+                    @Override
+                    public void onNext(RemoteHubsResponse o) {
+                        Log.e(TAG+"?><?><?><?><", "onNext() called with: o = [" + o + "]");
+                        if (o.getStatus().getCode().startsWith("20"))
+                            results.postValue(AppConstants.OPERATION_DONE);
+                        else if (o.getStatus().getCode().equals("400"))
+                            results.postValue(AppConstants.ERROR);
+                        else if (o.getStatus().getCode().equals("401"))
+                            results.postValue(AppConstants.AUTHENTICATION_ERROR);
+                        else if (o.getStatus().getCode().equals("403"))
+                            results.postValue(AppConstants.FORBIDDEN);
+                        else if (o.getStatus().getCode().equals("404"))
+                            results.postValue(AppConstants.NOT_FOUND);
+                        else if (o.getStatus().getCode().equals("422"))
+                            results.postValue(AppConstants.MISSING_PARAMS);
+                        else if (o.getStatus().getCode().equals("500"))
+                            results.postValue(AppConstants.SERVER_ERROR);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG+"?><?><?><?><", "onError() called with: e = [" + e + "]");
+                        if (e instanceof HttpException)
+                            results.postValue(AppConstants.NETWORK_ERROR);
+                        else if (e instanceof SocketTimeoutException)
+                            results.postValue(AppConstants.SOCKET_TIME_OUT);
+                        else results.postValue(AppConstants.ERROR);
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG+"?><?><?><?><", "onComplete() called");
+                    }
+                });
+
         return results;
     }
 
@@ -407,7 +498,88 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
                     @Override
                     public void onError(Throwable e) {
+                        e.printStackTrace();
+                        results.postValue(AppConstants.ERROR);
+                    }
 
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+        return results;
+    }
+
+
+    @SuppressLint("CheckResult")
+    public LiveData<String> toRemoteHubFactoryReset(RemoteHub remoteHub){
+        final MutableLiveData<String> results = new MutableLiveData<>();
+        Observable<Response<String>> toDeviceReset =
+                Observable.just(remoteHub)
+                .flatMap(new Function<RemoteHub, Observable<Response<String>>>() {
+                    @Override
+                    public Observable<Response<String>> apply(RemoteHub remoteHub) throws Exception {
+                        return toRemoteHubFactoryResetObservable(remoteHub);
+                    }
+                })
+                        .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                        .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
+                        .takeWhile(response ->{
+                            Log.e("rerererererere", "Toggle Device Response: " + response);
+                            Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                            Log.e("rerererererere", "Body Expected To Be: " + response.body());
+                            Log.e("rerererererere", "Sending Status Word Is: " + remoteHub.getStatusWord());
+                            Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(response.body(), remoteHub.getSecret()));
+                    if (response.headers().get("auth") != null){
+                            Log.e("rererererere", "Auth Is Not NUll");
+                        if (AppConstants.sha1(response.body(), remoteHub.getSecret()).equals(response.headers().get("auth"))){
+                            Log.e("rererererere", "HMACs Are Equal");
+                            FactoryResetResponse factoryResetResponse = RayanUtils.convertToObject(FactoryResetResponse.class, response.body());
+                            remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),remoteHub.getSecret()).split("#")[1])+1));
+                            remoteHub.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),remoteHub.getSecret()).split("#")[0]);
+                            Log.e("TAGTAGTAG", "Should I go: " + factoryResetResponse.getCmd());
+                            if (factoryResetResponse.getCmd().equals("wrong_stword"))
+                                return true;
+                            else{
+                                RemoteHub remoteHubToUpdate = new RemoteHub(remoteHub);
+                                remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),remoteHub.getSecret()).split("#")[1])+1));
+                                remoteHub.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),remoteHub.getSecret()).split("#")[0]);
+                                remoteHubDatabase.updateRemoteHub(remoteHubToUpdate);
+                                return false;
+                            }
+                        }else Log.e("rererererere", "HMACs Are NOT Equal");
+                    }else Log.e("rererererere", "Auth IS NULL");
+                    return false;
+                        }).timeout(4, TimeUnit.SECONDS)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io());
+
+        Observable.concat(toDeviceReset, deleteUserObservable(new DeleteUserRequest(remoteHub.getId(), remoteHub.getGroupId())))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        resetRemoteHubDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        Log.e(TAG, "Response is: " + o.getClass().getCanonicalName());
+                        if (o instanceof BaseResponse){
+                            BaseResponse baseResponse = (BaseResponse) o;
+                            if (baseResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+                                results.postValue(AppConstants.FACTORY_RESET_DONE);
+                            else if (baseResponse.getData().getMessage() != null)
+                                results.postValue(baseResponse.getData().getMessage());
+                            else results.postValue(AppConstants.ERROR);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        results.postValue(AppConstants.ERROR);
                     }
 
                     @Override
@@ -433,29 +605,12 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    private DisposableObserver<DeviceBaseResponse> toDeviceFactoryResetObserver(MutableLiveData<String> results){
-        return new DisposableObserver<DeviceBaseResponse>() {
-
-            @Override
-            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
-                Log.e(TAG,"OnNext "+baseResponse);
-                results.postValue(baseResponse.getCmd());
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
-                e.printStackTrace();
-                if (e instanceof SocketTimeoutException){
-                    results.postValue(AppConstants.SOCKET_TIME_OUT);
-                }
-            }
-
-            @Override
-            public void onComplete() {
-                Log.d(TAG,"Completed");
-            }
-        };
+    private Observable<Response<String>> toRemoteHubFactoryResetObservable(RemoteHub remoteHub) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        Log.e(TAG, "Sending StWord Is: " + remoteHub.getStatusWord());
+        return apiServiceScalar
+                .factoryReset(AppConstants.sha1(new FactoryResetRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret())).ToString(), remoteHub.getSecret()), AppConstants.getDeviceAddress(remoteHub.getIp()),new FactoryResetRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret())))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @SuppressLint("CheckResult")
@@ -498,7 +653,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 }).timeout(4, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
-        Observable.concat(toDeviceChangeAccessPoint, editDeviceObservable(new EditDeviceRequest(device.getId(), device.getGroupId(), device.getName1(), device.getType(), ssid)))
+        Observable.concat(toDeviceChangeAccessPoint, editDeviceObservable(new EditDeviceTopicRequest(device.getId(), device.getGroupId(), device.getName1(), device.getType(), ssid)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Observer<Object>() {
@@ -578,7 +733,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 }).timeout(4, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
-        Observable.concat(toDeviceChangeAccessPoint, editDeviceObservable(new EditDeviceRequest(remoteHub.getId(), remoteHub.getGroupId(), remoteHub.getName(),remoteHub.getDeviceType(), ssid)))
+        Observable.concat(toDeviceChangeAccessPoint, editDeviceObservable(new EditDeviceTopicRequest(remoteHub.getId(), remoteHub.getGroupId(), remoteHub.getName(),remoteHub.getDeviceType(), ssid)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Observer<Object>() {
@@ -691,19 +846,19 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
                 .takeWhile(settingsResponseResponse ->{
-                    Log.e("rerererererere", "Toggle Device Response: " + settingsResponseResponse);
-                    Log.e("rerererererere", "Auth: " + settingsResponseResponse.headers().get("auth"));
-                    Log.e("rerererererere", "Body Expected To Be: " + settingsResponseResponse.body().ToString());
-                    Log.e("rerererererere", "Sending Status Word Is: " + device.getStatusWord());
-                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(settingsResponseResponse.body().ToString(), device.getSecret()));
+                    Log.e("toDeviceEndSettings", "Toggle Device Response: " + settingsResponseResponse);
+                    Log.e("toDeviceEndSettings", "Auth: " + settingsResponseResponse.headers().get("auth"));
+                    Log.e("toDeviceEndSettings", "Body Expected To Be: " + settingsResponseResponse.body().ToString());
+                    Log.e("toDeviceEndSettings", "Sending Status Word Is: " + device.getStatusWord());
+                    Log.e("toDeviceEndSettings", "HMAC of Body: " + AppConstants.sha1(settingsResponseResponse.body().ToString(), device.getSecret()));
                     if (settingsResponseResponse.headers().get("auth") != null){
-                        Log.e("rererererere", "Auth Is Not NUll");
+                        Log.e("toDeviceEndSettings", "Auth Is Not NUll");
                         if (AppConstants.sha1(settingsResponseResponse.body().ToString(), device.getSecret()).equals(settingsResponseResponse.headers().get("auth"))
                                 || AppConstants.sha1(settingsResponseResponse.body().wrongToString(), device.getSecret()).equals(settingsResponseResponse.headers().get("auth"))){
-                            Log.e("rererererere", "HMACs Are Equal");
+                            Log.e("toDeviceEndSettings", "HMACs Are Equal");
                             device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(settingsResponseResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
                             device.setHeader(Encryptor.decrypt(settingsResponseResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                            Log.e("TAGTAGTAG", "Should I go: " + settingsResponseResponse.body().getCmd());
+                            Log.e("toDeviceEndSettings", "Should I go: " + settingsResponseResponse.body().getCmd());
                             if (settingsResponseResponse.body().getCmd().equals("wrong_stword"))
                                 return true;
                             else{
@@ -712,8 +867,8 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                                 result.postValue(AppConstants.END_SETTINGS);
                                 return false;
                             }
-                        }else Log.e("rererererere", "HMACs Are NOT Equal");
-                    }else Log.e("rererererere", "Auth IS NULL");
+                        }else Log.e("toDeviceEndSettings", "HMACs Are NOT Equal");
+                    }else Log.e("toDeviceEndSettings", "Auth IS NULL");
                     return false;
                 }).timeout(4, TimeUnit.SECONDS)
                 .retry(3)
@@ -730,7 +885,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("//////////", "/onError/////" + e + e.getClass());
+                        Log.e("toDeviceEndSettings", "/onError/////" + e + e.getClass());
                         if (e instanceof SocketTimeoutException || e instanceof TimeoutException){
                             result.postValue(AppConstants.SOCKET_TIME_OUT);
                         }
@@ -778,6 +933,12 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     public void updateDevice(Device device){
         deviceDatabase.updateDevice(device);
+    }
+    public void updateRemote(Remote remote){
+        remoteDatabase.updateRemote(remote);
+    }
+    public void updateRemoteHub(RemoteHub remoteHub){
+        remoteHubDatabase.updateRemoteHub(remoteHub);
     }
 
     public LiveData<String> toDeviceReady4Update(Device device){
@@ -856,31 +1017,96 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return null;
     }
 
-    private DisposableObserver<DeviceBaseResponse> toDeviceReady4UpdateObserver(MutableLiveData<String> results){
-        return new DisposableObserver<DeviceBaseResponse>() {
 
-            @Override
-            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
-                Log.e(TAG,"OnNext "+baseResponse);
-                results.postValue(baseResponse.getCmd());
-            }
+    private Disposable resetRemoteHubDisposable;
+    private Disposable settingsRemoteHubObservable;
+    public Disposable getSettingsRemoteHubObservable() { return settingsRemoteHubObservable; }
+    public Disposable getResetRemoteHubDisposable() { return resetRemoteHubDisposable; }
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
-                e.printStackTrace();
-                if (e instanceof SocketTimeoutException){
-                    results.postValue(AppConstants.SOCKET_TIME_OUT);
-                }
-            }
+    @SuppressLint("CheckResult")
+    public MutableLiveData<String> remoteHubReadyForSettings(RemoteHub remoteHub) {
+        Log.e("//////////","Sending ready to device: " + remoteHub);
+        MutableLiveData<String> result = new MutableLiveData<>();
+        Observable.just(remoteHub)
+                .flatMap(new Function<RemoteHub, Observable<Response<String>>>() {
+                    @Override
+                    public Observable<Response<String>> apply(RemoteHub remoteHub) throws Exception {
+                        Log.d(TAG, "apply() called with: upstream = [" + remoteHub + "]");
+                        Log.d(TAG, "StatusWord: " + remoteHub.getStatusWord());
+                        return remoteHubReady4SettingsObservable(remoteHub);
+                    }
+                })
+                .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
+                .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
+                .takeWhile(response -> {
+                    Log.e("rerererererere", "Toggle Device RawResponse: " + response);
+                    Log.e("rerererererere", "Toggle Device RawResponse: " + response.body());
+                    Log.e("rerererererere", "Sending Status Word Is: " + remoteHub.getStatusWord());
+                    Log.e("rerererererere", "Body Expected To Be: " + response.body());
+                    Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
+                    Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(response.body(), remoteHub.getSecret()));
+                    Ready4SettingsResponse ready4SettingsResponse = RayanUtils.convertToObject(Ready4SettingsResponse.class, response.body());
+                    if (ready4SettingsResponse.getCmd().equals("wrong_stword"))
+                        return true;
+                    else if (ready4SettingsResponse.getCmd().equals(AppConstants.SETTINGS)){
+                        result.postValue(AppConstants.SETTINGS);
+                        remoteHubDatabase.updateRemoteHub(remoteHub);
+                        return false;
+                    }
+                    else {
+                        Log.e(this.getClass().getSimpleName(), "So What received? " + ready4SettingsResponse.getCmd());
+                        result.postValue(ready4SettingsResponse.getCmd());
+                        return false;
+                    }
+                })
+                .timeout(4, TimeUnit.SECONDS)
+                .subscribe(new Observer<Response<String>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
+                        settingsRemoteHubObservable = d;
+                    }
 
-            @Override
-            public void onComplete() {
-                Log.d(TAG,"Completed");
-            }
-        };
+                    @Override
+                    public void onNext(Response<String> ready4SettingsResponse) {
+                        Log.d(TAG, "onNext() called with: ready4SettingsResponse = [" + ready4SettingsResponse + "]");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "onError() called with: e = [" + e + "]");
+                        e.printStackTrace();
+                        if (e instanceof SocketTimeoutException || e instanceof TimeoutException){
+                            result.postValue(AppConstants.SOCKET_TIME_OUT);
+                        }
+                        if (e instanceof NullPointerException){
+                            result.postValue(AppConstants.MISSING_PARAMS);
+                        }else
+                        result.postValue(e.toString());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete() called");
+                    }
+                });
+        return result;
     }
 
+    private Observable<Response<String>> remoteHubReady4SettingsObservable(RemoteHub remoteHub) {
+        Log.e(TAG, "device: " + remoteHub);
+        try {
+            return ApiUtils.getApiServiceScalar().settings(AppConstants.sha1(new Ready4SettingsRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret())).ToString(), remoteHub.getSecret()), AppConstants.getDeviceAddress(remoteHub.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret())))
+                    .subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public MutableLiveData<VersionResponse> getDeviceVersion(Device device){
         MutableLiveData<VersionResponse> results = new MutableLiveData<>();

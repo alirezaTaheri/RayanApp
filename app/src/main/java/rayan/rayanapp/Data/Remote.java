@@ -2,6 +2,7 @@ package rayan.rayanapp.Data;
 
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,25 +11,33 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
-import rayan.rayanapp.Util.AppConstants;
 
 @Entity
-public class Remote  extends BaseDevice{
+public class Remote extends BaseDevice implements Parcelable{
     @PrimaryKey
     @NonNull
     @SerializedName("_id")
     private String id;
-    private String name,topic;
+    private String name;
+    @SerializedName("topic")
+    @Expose
+    @Embedded(prefix = "topic_")
+    private Topic topic;
     @SerializedName("user_id")
     private String creatorId;
-    @SerializedName("main_data_id")
-    private String remoteDataId;
+    @SerializedName("main_data_ids")
+    @Ignore
+    private List<String> remoteDatas;
     @SerializedName("remote_hub_id")
     private String remoteHubId;
     private String type;
     private String groupId;
     private boolean accessible,learned,visibility;
+    private String model;
+    private String brand;
 
     public Remote() {
     }
@@ -39,37 +48,74 @@ public class Remote  extends BaseDevice{
         this.name = remote.getName();
         this.topic = remote.getTopic();
         this.creatorId = remote.getCreatorId();
-        this.remoteDataId = remote.getRemoteDataId();
+        this.remoteDatas = remote.getRemoteDatas();
         this.remoteHubId = remote.getRemoteHubId();
         this.type = remote.getType();
         this.groupId = remote.getGroupId();
         this.accessible = remote.isAccessible();
         this.learned = remote.isLearned();
         this.visibility = remote.isVisibility();
+        this.brand = remote.getBrand();
+        this.model= remote.getModel();
     }
 
-    public String getGroupId() {
-        return groupId;
+    protected Remote(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        topic = in.readParcelable(Topic.class.getClassLoader());
+        creatorId = in.readString();
+        remoteDatas = in.createStringArrayList();
+        remoteHubId = in.readString();
+        type = in.readString();
+        groupId = in.readString();
+        accessible = in.readByte() != 0;
+        learned = in.readByte() != 0;
+        visibility = in.readByte() != 0;
+        model = in.readString();
+        brand = in.readString();
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeParcelable(topic, flags);
+        dest.writeString(creatorId);
+        dest.writeStringList(remoteDatas);
+        dest.writeString(remoteHubId);
+        dest.writeString(type);
+        dest.writeString(groupId);
+        dest.writeByte((byte) (accessible ? 1 : 0));
+        dest.writeByte((byte) (learned ? 1 : 0));
+        dest.writeByte((byte) (visibility ? 1 : 0));
+        dest.writeString(model);
+        dest.writeString(brand);
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Remote> CREATOR = new Creator<Remote>() {
+        @Override
+        public Remote createFromParcel(Parcel in) {
+            return new Remote(in);
+        }
+
+        @Override
+        public Remote[] newArray(int size) {
+            return new Remote[size];
+        }
+    };
+
+    @NonNull
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(@NonNull String id) {
         this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getName() {
@@ -80,11 +126,11 @@ public class Remote  extends BaseDevice{
         this.name = name;
     }
 
-    public String getTopic() {
+    public Topic getTopic() {
         return topic;
     }
 
-    public void setTopic(String topic) {
+    public void setTopic(Topic topic) {
         this.topic = topic;
     }
 
@@ -96,12 +142,12 @@ public class Remote  extends BaseDevice{
         this.creatorId = creatorId;
     }
 
-    public String getRemoteDataId() {
-        return remoteDataId;
+    public List<String> getRemoteDatas() {
+        return remoteDatas;
     }
 
-    public void setRemoteDataId(String remoteDataId) {
-        this.remoteDataId = remoteDataId;
+    public void setRemoteDatas(List<String> remoteDatas) {
+        this.remoteDatas = remoteDatas;
     }
 
     public String getRemoteHubId() {
@@ -110,6 +156,22 @@ public class Remote  extends BaseDevice{
 
     public void setRemoteHubId(String remoteHubId) {
         this.remoteHubId = remoteHubId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     public boolean isAccessible() {
@@ -136,23 +198,38 @@ public class Remote  extends BaseDevice{
         this.visibility = visibility;
     }
 
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
 
     @Override
     public String toString() {
         return "Remote{" +
-//                "id='" + id + '\'' +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", pos'" + getPosition() + '\'' +
-//                ", topic='" + topic + '\'' +
-//                ", creatorId='" + creatorId + '\'' +
-//                ", remoteDataId='" + remoteDataId + '\'' +
-//                ", remoteHubId='" + remoteHubId + '\'' +
+                ", topic=" + topic +
+                ", creatorId='" + creatorId + '\'' +
+                ", remoteDatas=" + remoteDatas +
+                ", remoteHubId='" + remoteHubId + '\'' +
                 ", type='" + type + '\'' +
-//                ", groupId='" + groupId + '\'' +
-//                ", accessible=" + accessible +
-//                ", learned=" + learned +
-//                ", visibility=" + visibility +
-                ", favorite=" + isFavorite() ;
-//                '}';
+                ", groupId='" + groupId + '\'' +
+                ", accessible=" + accessible +
+                ", learned=" + learned +
+                ", visibility=" + visibility +
+                ", model='" + model + '\'' +
+                ", brand='" + brand + '\'' +
+                '}';
     }
 }

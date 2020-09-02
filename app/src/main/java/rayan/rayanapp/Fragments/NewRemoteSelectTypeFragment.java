@@ -83,16 +83,17 @@ public class NewRemoteSelectTypeFragment extends Fragment implements OnRemoteTyp
     }
 
     @Override
-    public void goToNextStep(Map<String, String> data) {
-        Map<String, String> map = new HashMap<>();
-        map.put("type", selectedType.first);
-        activity.doOnNext(map);
+    public void goToNextStep(Bundle data) {
+        activity.doOnNext(data);
     }
 
     @Override
     public void verifyStatus() {
-        if (!selectedType.first.equals(""))
-            goToNextStep(null);
+        if (!selectedType.first.equals("")){
+            Bundle data = new Bundle();
+            data.putString("type", selectedType.first);
+            goToNextStep(data);
+        }
     }
 
 }

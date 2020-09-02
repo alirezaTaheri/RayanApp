@@ -72,24 +72,13 @@ public class NewRemoteFragment extends Fragment implements AddNewRemoteNavListen
     }
 
     @Override
-    public void goToNextStep(Map<String, String> data) {
+    public void goToNextStep(Bundle data) {
         activity.doOnNext(data);
     }
 
     @Override
     public void verifyStatus() {
-        alertDialog = new AlertDialog.Builder(activity)
-                .setTitle("افزدون ریموت")
-                .setMessage("آیا مطمئن هستید که این ریموت مناسب دستگاه شما است؟؟")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Map<String, String> data = new HashMap<>();
-                        goToNextStep(data);
-                    }
-                })
-                .setNegativeButton(android.R.string.no, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+        goToNextStep(new Bundle());
     }
 
 }

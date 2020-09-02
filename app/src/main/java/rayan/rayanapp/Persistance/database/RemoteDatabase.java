@@ -85,6 +85,9 @@ public class RemoteDatabase {
     public LiveData<List<Remote>> getFavoriteRemotes(){
         return remoteDAO.getAllFavoritesLive();
     }
+    public LiveData<List<Remote>> getRemotesOfRemoteHub(String remoteHubId){
+        return remoteDAO.getRemotesOfRemoteHub(remoteHubId);
+    }
 
     public List<Remote> getFavorates(){
         return remoteDAO.getAllFavorites();

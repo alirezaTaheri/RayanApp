@@ -53,7 +53,7 @@ public class RemoteViewHolderManagement extends DeviceViewHolderManagement {
         });
         favoriteIcon.setOnClickListener(v ->  listener.onFavoriteIconClicked(item));
         visibilityIcon.setOnClickListener(v -> listener.onVisibilityIconClicked(item));
-//        deviceImage.setImageDrawable(context.getResources().getDrawable(item.getType().equals(AppConstants.REMOTE_TYPE_TV)?R.drawable.ic_tv:R.drawable.ic_air_conditioner));
-        deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_air_conditioner));
+        deviceImage.setImageDrawable(context.getResources().getDrawable(item.getType().equals(AppConstants.REMOTE_TYPE_TV)?R.drawable.ic_tv:R.drawable.ic_air_conditioner));
+//        deviceImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_air_conditioner));
     }
 }

@@ -1,5 +1,6 @@
 package rayan.rayanapp.Fragments;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.wifi.WifiManager;
@@ -169,6 +170,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                 });
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
         if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
@@ -183,7 +185,7 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
         else {
             mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
                 if (aBoolean) {
-                    ProgressDialog progressDialog = new ProgressDialog(getActivity(), R.style.ProgressDialogTheme);
+                    ProgressDialog progressDialog = new ProgressDialog(getActivity());
                     progressDialog.show();
                     progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
                         @Override

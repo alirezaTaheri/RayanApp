@@ -11,7 +11,7 @@ import rayan.rayanapp.Data.Device;
  */
 
 public class DeviceData {
-    @SerializedName("user")
+    @SerializedName("device")
     @Expose
     private Device device;
 

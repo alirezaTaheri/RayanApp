@@ -248,7 +248,7 @@ void onPhoneEditTextFocusChange(){
             if (phoneNumber.length() == 0 | password.length() == 0) {
                 SnackBarSetup.snackBarSetup(findViewById(android.R.id.content),"لطفا اطلاعات خود را کامل وارد کنید");
             } else {
-                loginViewModel.login(phoneEditText.getText().toString(), passwordInput.getText().toString(), new DialogPresenter(getSupportFragmentManager())).observe(this, baseResponse -> {
+                loginViewModel.loginv3(phoneEditText.getText().toString(), passwordInput.getText().toString(), new DialogPresenter(getSupportFragmentManager())).observe(this, baseResponse -> {
                     Log.e("message", baseResponse.getData().getMessage()+" "+ baseResponse.getStatus().getCode());
                     if (baseResponse.getStatus().getCode().equals("200")) {
                         Toast.makeText(this, "با موفقیت وارد شدید", Toast.LENGTH_SHORT).show();
