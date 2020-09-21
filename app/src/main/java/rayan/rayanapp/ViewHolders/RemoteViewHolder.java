@@ -37,4 +37,12 @@ public class RemoteViewHolder extends DeviceViewHolder1Bridge {
         icon.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(),item.getType().equals(AppConstants.REMOTE_TYPE_TV)?R.drawable.ic_tv:R.drawable.ic_air_conditioner));
 //        icon.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(),R.drawable.ic_air_conditioner));
     }
+
+    @Override
+    public void changePosition(BaseDevice item, OnDeviceClickListener<BaseDevice> listener) {
+        Log.d(TAG, "changePosition() called with: item = [" + item + "], listener = [" + listener + "]");
+        if (listener != null){
+            clickableLayout.setOnClickListener(vv -> listener.onClick_Remote(item, item.getPosition()));
+        }
+    }
 }

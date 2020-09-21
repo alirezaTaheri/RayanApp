@@ -28,6 +28,7 @@ import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Listeners.AddNewRemoteNavListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.AddNewRemoteViewModel;
 
 
@@ -76,9 +77,17 @@ public class NewRemoteSetConfigurationFragment extends Fragment implements AddNe
 
         Log.e("FRTFRTFRT", "Adding New Remote " + remote.getRemoteHubId()+remote);
         remoteHub = viewModel.getRemoteHub(remote.getRemoteHubId());
-        remoteHubName.setText(remoteHub.getName());
+        remoteHubName.setText(remoteHub != null ? remoteHub.getName(): "انتخاب کنید");
         Group group = viewModel.getGroup(remote.getGroupId());
-        groupName.setText(group.getName());
+        groupName.setText(group != null ? group.getName(): "---");
+        switch (remote.getType()){
+            case AppConstants.REMOTE_TYPE_TV:
+                type.setText("ریموت تلویزیون");
+                break;
+            case AppConstants.REMOTE_TYPE_AC:
+                type.setText("ریموت کولرگازی");
+                break;
+        }
         favorite.setImageDrawable(ContextCompat.getDrawable(activity,R.drawable.ic_star_empty));
         visibility.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_visibility_on));
         return v;
@@ -135,5 +144,20 @@ public class NewRemoteSetConfigurationFragment extends Fragment implements AddNe
         remote.setVisibility(!remote.isVisibility());
         visibility.setImageDrawable(ContextCompat.getDrawable(activity,remote.isVisibility()?R.drawable.ic_visibility_on:R.drawable.ic_visibility_off));
     }
+    SelectRemoteHubFragment selectRemoteHubFragment;
+    @OnClick({R.id.changeRemoteHub, R.id.remoteHub})
+    public void onChangeRemoteHubClicked(){
+        selectRemoteHubFragment = SelectRemoteHubFragment.newInstance(remoteHub);
+        selectRemoteHubFragment.show(activity.getSupportFragmentManager(), "selectRemoteHub");
+    }
 
+    public void updateRemoteHub(RemoteHub remoteHub){
+        selectRemoteHubFragment.dismiss();
+        this.remoteHub = remoteHub;
+        remoteHubName.setText(remoteHub.getName());
+        remote.setRemoteHubId(remoteHub.getId());
+        remote.setGroupId(remoteHub.getGroupId());
+        Group group = viewModel.getGroup(remote.getGroupId());
+        groupName.setText(group != null ? group.getName(): "---");
+    }
 }

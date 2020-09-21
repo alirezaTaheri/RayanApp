@@ -45,12 +45,11 @@
             android:textSize="15sp"
             android:layout_marginRight="8dp"
             android:id="@+id/type"
-            android:layout_toLeftOf="@id/typeTitle"
+            android:layout_alignParentLeft="true"
             android:text="نوع دستگاه"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@id/typeTitle" />
+            android:layout_marginEnd="8dp" />
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -72,12 +71,11 @@
             android:textSize="15sp"
             android:layout_marginRight="8dp"
             android:id="@+id/remoteHub"
-            android:layout_toLeftOf="@id/ssidTitle"
             android:text="نام مودم"
+            android:layout_toRightOf="@id/changeRemoteHub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@id/ssidTitle" />
+            android:layout_marginEnd="8dp"/>
         <ImageView
             android:layout_centerVertical="true"
             android:padding="8dp"
@@ -106,12 +104,12 @@
             android:textSize="15sp"
             android:layout_marginRight="8dp"
             android:id="@+id/group"
-            android:layout_toLeftOf="@id/groupTitle"
+            android:layout_alignParentLeft="true"
             android:text="نام گروه"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@id/groupTitle" />
+            />
     </RelativeLayout>
 
     <RelativeLayout

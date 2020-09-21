@@ -90,6 +90,7 @@ public class AppConstants {
     public final static String STWORD = "stword";
     public final static String STWORD_HEADER = "header#stword";
     public final static String UNKNOWN_HEADER = "Unknown_header";
+    public final static String UNDEFINED = "undefined";
     //Operations
     public final static String ON_1 = "turn_on_1";
     public final static String ON_2 = "turn_on_2";

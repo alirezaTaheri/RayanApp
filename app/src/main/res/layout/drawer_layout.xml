@@ -118,26 +118,97 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-        <LinearLayout
-            android:id="@+id/addNewDeviceActivity"
+
+        <RelativeLayout
+            android:id="@+id/addNew"
             android:layout_marginRight="4dp"
             android:padding="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
-                app:srcCompat="@drawable/ic_add_new_device"
+                android:id="@+id/addNewIcon"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                app:srcCompat="@drawable/ic_add_new_device" />
             <TextView
+                android:id="@+id/addNewTitle"
+                android:layout_toLeftOf="@+id/addNewIcon"
+                android:layout_alignParentTop="true"
+                android:textStyle="bold"
                 android:text="@string/drawer_add_new_device"
                 android:textSize="15sp"
                 android:layout_marginRight="20dp"
-                android:gravity="right"
-                android:textStyle="bold"
                 android:textColor="@color/ms_black"
+                android:gravity="right"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/add_new_expand_arrow_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                app:srcCompat="@drawable/ic_arrow_down" />
+            <net.cachapa.expandablelayout.ExpandableLayout
+                android:layout_toLeftOf="@+id/addNewIcon"
+                android:layout_below="@+id/addNewTitle"
+                android:id="@+id/addNewExpandable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:el_duration="300"
+                app:el_parallax="0.5">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <LinearLayout
+                    android:onClick="onClick"
+                    android:id="@+id/addNewDeviceActivity"
+                    android:layout_marginRight="4dp"
+                    android:padding="7dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_gravity="center"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:tint="@color/ms_black"
+                        app:srcCompat="@drawable/ic_bulb" />
+                    <TextView
+                        android:text="نصب یک دستگاه فیزیکی"
+                        android:textColor="@color/ms_black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginRight="5dp"
+                        android:gravity="right"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <LinearLayout
+                    android:onClick="onClick"
+                    android:id="@+id/addNewRemoteActivity"
+                    android:layout_marginRight="4dp"
+                    android:padding="7dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_gravity="center"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:srcCompat="@drawable/ic_remote" />
+                    <TextView
+                        android:text="ایجاد یک ریموت جدید"
+                        android:textColor="@color/ms_black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginRight="5dp"
+                        android:gravity="right"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                </LinearLayout>
+            </net.cachapa.expandablelayout.ExpandableLayout>
+        </RelativeLayout>
         <View
             android:background="@color/grey"
             android:layout_width="match_parent"

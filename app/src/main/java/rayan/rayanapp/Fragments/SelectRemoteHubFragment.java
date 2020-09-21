@@ -12,9 +12,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,22 +38,22 @@ import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 
-public class SelectRemoteHubFragment extends BottomSheetDialogFragment implements OnGroupClicked<Group> , View.OnClickListener {
+public class SelectRemoteHubFragment extends BottomSheetDialogFragment {
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.title)
     TextView title;
-    @BindView(R.id.create)
-    TextView create;
     DevicesRecyclerViewAdapter recyclerViewAdapter;
     DevicesFragmentViewModel viewModel;
-    private RemoteHub selectedGroup;
+    private RemoteHub selectedRemoteHub;
     private RemoteHubsAdapter adapter;
-
-    public static SelectRemoteHubFragment newInstance() {
+    List<RemoteHub> remoteHubs = new ArrayList<>();
+    public static SelectRemoteHubFragment newInstance(RemoteHub remoteHub) {
         final SelectRemoteHubFragment fragment = new SelectRemoteHubFragment();
         final Bundle args = new Bundle();
+        if (remoteHub != null)
+            args.putParcelable("remoteHub",remoteHub);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,18 +62,27 @@ public class SelectRemoteHubFragment extends BottomSheetDialogFragment implement
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_select_remote_hub, container, false);
+        View view = inflater.inflate(R.layout.fragment_select_remote_hub, container, false);
+        ButterKnife.bind(this, view);
+        title.setText("لطفا ریموت هاب مورد نظر را انتخاب کنید");
+        viewModel = ViewModelProviders.of(this).get(DevicesFragmentViewModel.class);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        adapter = new RemoteHubsAdapter(remoteHubs, this);
+        selectedRemoteHub = getArguments().getParcelable("remoteHub");
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(activity, 2));
+        viewModel.getAllRemoteHubsLive().observe(this, remoteHubs -> {
+            Log.d("FFFFFFFFFFFFFFF", "All RemoteHubs: " + remoteHubs);
+            this.remoteHubs = remoteHubs;
+            adapter.updateItems(remoteHubs);
+        });
+        return view;
     }
 
     @SuppressLint("CheckResult")
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
-        viewModel = ViewModelProviders.of(this).get(DevicesFragmentViewModel.class);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        adapter = new RemoteHubsAdapter(new ArrayList<>());
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(activity, 2));
+
 //        create.setOnClickListener(this);
 //        if (((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup() != null)
 //            selectedGroupTitle.setText(((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getName());
@@ -82,34 +93,9 @@ public class SelectRemoteHubFragment extends BottomSheetDialogFragment implement
         super.onResume();
     }
 
-    @Override
-    public void onGroupClicked(Group item) {
-//        selectedGroupTitle.setText(item.getName());
-//        selectedGroupTitle.setTextColor(ContextCompat.getColor(getActivity(), R.color.blue));
-//        selectedGroup = item;
-//        SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),""+item.getName());
-    }
-
-
-
-//    @OnClick(R.id.createGroup)
-//    void createGroup(){
-//        createGroupMode();
-//        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-//        transaction.add(R.id.frameLayout, CreateGroupFragment.newInstance());
-//        transaction.commit();
-//    }
-
     @OnClick(R.id.confirm)
     void confirm(){
-//        if (selectedGroup != null){
-//            ((AddNewDeviceActivity)getActivity()).getNewDevice().setGroup(selectedGroup);
-//            ((NewDeviceSetConfigurationFragment)((AddNewDeviceActivity)getActivity()).getStepperAdapter().findStep(1)).setGroupTitle(selectedGroup.getName());
-//
-//            dismiss();
-//        }
-//        else
-//          SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"لطفا یک گروه را انتخاب کنید");
+        activity.getSetConfigurationFragment().updateRemoteHub(selectedRemoteHub);
     }
 
     @OnClick(R.id.cancel)
@@ -117,53 +103,23 @@ public class SelectRemoteHubFragment extends BottomSheetDialogFragment implement
         dismiss();
     }
 
-    private void createGroupMode(){
-        mode = Mode.CREATE_GROUP;
-        recyclerView.setVisibility(View.INVISIBLE);
-//        createGroup.setText("انتخاب گروه");
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-//        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-        transaction.add(R.id.frameLayout, CreateGroupFragment.newInstance(), "createGroup");
-//        transaction.addToBackStack(null);
-        transaction.commit();
+    public void onRemoteHubClicked(RemoteHub remoteHub){
+        selectedRemoteHub = remoteHub;
+        title.setText(remoteHub.getName());
+        adapter.updateItems(remoteHubs);
     }
-
-
-
-    public void selectGroupMode(){
-//        groupsRecyclerViewAdapter.setItems(viewModel.getAllGroups());
-        mode = Mode.SELECT_GROUP;
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-//        transaction.setCustomAnimations(R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left,R.anim.animation_transition_enter_from_left, R.anim.animation_transition_ext_to_left);
-        transaction.remove(getChildFragmentManager().findFragmentByTag("createGroup"));
-        transaction.commit();
-        recyclerView.setVisibility(View.VISIBLE);
-//        createGroup.setText("ایجاد گروه");
-    }
-    public Mode mode = Mode.SELECT_GROUP;
-    private enum Mode {
-        CREATE_GROUP,
-        SELECT_GROUP
-
-    }
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.createGroup){
-            if (mode.equals(Mode.CREATE_GROUP)){
-                selectGroupMode();
-            }else{
-                createGroupMode();
-            }
-        }
-    }
-
 
     public class RemoteHubsAdapter extends RecyclerView.Adapter<RemoteHubViewHolder>{
         List<RemoteHub> items = new ArrayList<>();
-        public RemoteHubsAdapter(List<RemoteHub> items){
+        SelectRemoteHubFragment fragment;
+        public RemoteHubsAdapter(List<RemoteHub> items, SelectRemoteHubFragment fragment){
             this.items = items;
+            this.fragment = fragment;
         }
-
+        public void updateItems(List<RemoteHub> items){
+            this.items = items;
+            notifyDataSetChanged();
+        }
         @NonNull
         @Override
         public RemoteHubViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -172,28 +128,37 @@ public class SelectRemoteHubFragment extends BottomSheetDialogFragment implement
 
         @Override
         public void onBindViewHolder(@NonNull RemoteHubViewHolder remoteHubViewHolder, int i) {
-            remoteHubViewHolder.bind(items.get(i));
+            Log.d("fffffffffffffff", "onBindViewHolder() called with: , i = [" + i + "]");
+            remoteHubViewHolder.bind(items.get(i), fragment);
         }
 
         @Override
         public int getItemCount() {
-            return 0;
+            return items.size();
         }
     }
     public class RemoteHubViewHolder extends RecyclerView.ViewHolder{
 
         @BindView(R.id.name)
         TextView name;
+        @BindView(R.id.strip)
+        ImageView strip;
         public RemoteHubViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
-        public void bind(RemoteHub remoteHub){
+        public void bind(RemoteHub remoteHub, SelectRemoteHubFragment fragment){
+            if (fragment.selectedRemoteHub != null && fragment.selectedRemoteHub.getId().equals(remoteHub.getId()))
+                strip.setBackground(ContextCompat.getDrawable(fragment.activity,R.color.baseColor));
+            else strip.setBackground(ContextCompat.getDrawable(fragment.activity,R.color.grey));
             name.setText(remoteHub.getName());
+            itemView.setOnClickListener(v -> {
+                fragment.onRemoteHubClicked(remoteHub);
+            });
         }
     }
 
-    Activity activity;
+    AddNewRemoteActivity activity;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

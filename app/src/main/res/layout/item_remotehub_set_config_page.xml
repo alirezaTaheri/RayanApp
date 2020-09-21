@@ -9,10 +9,10 @@
     <ImageView
         android:clickable="false"
         android:focusable="false"
-        android:id="@+id/icon"
+        android:id="@+id/strip"
         android:layout_width="4dp"
         android:layout_height="50dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="5dp"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:background="@color/baseColor"

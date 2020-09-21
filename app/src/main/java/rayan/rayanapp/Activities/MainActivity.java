@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -14,7 +13,6 @@ import android.net.wifi.ScanResult;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -56,14 +54,10 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -74,14 +68,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 import rayan.rayanapp.Adapters.recyclerView.SortByGroupRecyclerViewAdapter;
@@ -90,15 +79,11 @@ import rayan.rayanapp.Adapters.viewPager.MainActivityViewPagerAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Data.Remote;
-import rayan.rayanapp.Data.RemoteData;
 import rayan.rayanapp.Data.RemoteHub;
-import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Fragments.FavoritesFragment;
 import rayan.rayanapp.Helper.ControlRequests;
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
-import rayan.rayanapp.Helper.RayanUtils;
 import rayan.rayanapp.Helper.RetryConnectMqtt;
 import rayan.rayanapp.Listeners.DevicesAndFavoritesListener;
 import rayan.rayanapp.Listeners.MqttStatus;
@@ -106,25 +91,15 @@ import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.Mqtt.MqttClient;
 import rayan.rayanapp.Mqtt.MqttClientService;
-import rayan.rayanapp.Persistance.AppDatabase;
-import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Persistance.database.RemoteDataDatabase;
 import rayan.rayanapp.Persistance.database.RemoteDatabase;
 import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
-import rayan.rayanapp.Persistance.database.UserDatabase;
-import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Retrofit.ApiService;
-import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceData;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsData;
-import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
@@ -133,10 +108,7 @@ import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.Util.api.StartupApiRequests;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
-import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
-
-import static rayan.rayanapp.App.RayanApplication.getContext;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus, View.OnClickListener, OnGroupClicked<Group>, NetworkConnectivityListener, DevicesAndFavoritesListener {
     private static final int REQUEST_PHONE_CALL = 1;
@@ -164,12 +136,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ///////////////////////////////////////////////////////
     @BindView(R.id.expand_arrow_icon)
     ImageView expand_arrow_icon;
+    @BindView(R.id.add_new_expand_arrow_icon)
+    ImageView add_new_expand_icon;
     @BindView(R.id.expandable_layout)
     ExpandableLayout expandableLayout;
+    @BindView(R.id.addNewExpandable)
+    ExpandableLayout addNewExpandable;
     @BindView(R.id.groupsActivity)
     LinearLayout drawer_groupsActivity;
+    @BindView(R.id.addNew)
+    RelativeLayout drawer_addNew;
     @BindView(R.id.addNewDeviceActivity)
     LinearLayout drawer_addNewDeviceActivity;
+    @BindView(R.id.addNewRemoteActivity)
+    LinearLayout drawer_addNewRemoteActivity;
     @BindView(R.id.devicesManagementActivity)
     LinearLayout drawer_deviceManagementActivity;
     @BindView(R.id.settingsActivity)
@@ -432,7 +412,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (RayanApplication.getPref().getProtocol() == null){
             RayanApplication.getPref().saveProtocol(AppConstants.UDP);
         }
-        drawer_addNewDeviceActivity.setOnClickListener(this);
+        drawer_addNew.setOnClickListener(this);
         drawer_settings.setOnClickListener(this);
         drawer_profile.setOnClickListener(this);
         drawer_groupsActivity.setOnClickListener(this);
@@ -741,24 +721,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onBackPressed() {
 //        startService(new Intent(this, AlwaysOnService.class));
 
-//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-//            this.drawerLayout.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-        DeviceDatabase deviceDatabase = new DeviceDatabase(this);
-        RemoteDataDatabase remoteDataDatabase = new RemoteDataDatabase(this);
-        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
-        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
-        GroupDatabase groupDatabase = new GroupDatabase(this);
-        Log.e(TAG, "G"+groupDatabase.getAllGroups());
-        Log.e(TAG, "G"+deviceDatabase.getAllDevices());
-        Log.e(TAG, "G"+remoteHubDatabase.getAllRemoteHubs());
-        Log.e(TAG, "G"+remoteDatabase.getAllRemotes());
-        Log.e(TAG, "G"+remoteDataDatabase.getAllRemoteDatas());
-        groupDatabase.getAllCount("");
-
-        mainActivityViewModel.getGroupsv3();
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+//        DeviceDatabase deviceDatabase = new DeviceDatabase(this);
+//        RemoteDataDatabase remoteDataDatabase = new RemoteDataDatabase(this);
+//        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
+//        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
+//        GroupDatabase groupDatabase = new GroupDatabase(this);
+//        Log.e(TAG, "G"+groupDatabase.getAllGroups());
+//        Log.e(TAG, "G"+deviceDatabase.getAllDevices());
+//        Log.e(TAG, "G"+remoteHubDatabase.getAllRemoteHubs());
+//        Log.e(TAG, "G"+remoteDatabase.getAllRemotes());
+//        Log.e(TAG, "G"+remoteDataDatabase.getAllRemoteDatas());
+//        groupDatabase.getAllCount("");
+//
+//        mainActivityViewModel.getGroupsv3();
 
 //        apiService = ApiUtils.getApiService();
 //        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
@@ -1359,9 +1339,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     startActivity(new Intent(this, GroupsActivity.class));
                     drawerLayout.closeDrawer(GravityCompat.START);
                     break;
+                case R.id.addNew:
+                    addNewExpandable.toggle();
+                    if(addNewExpandable.isExpanded()){
+                        add_new_expand_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_up));
+                    }else {add_new_expand_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_down)); }
+                    break;
                 case R.id.addNewDeviceActivity:
-//                    cr.removeAll();
                     startActivity(new Intent(this, AddNewDeviceActivity.class));
+                    addNewExpandable.toggle();
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    break;
+                case R.id.addNewRemoteActivity:
+                    startActivity(new Intent(this, AddNewRemoteActivity.class));
+                    addNewExpandable.toggle();
                     drawerLayout.closeDrawer(GravityCompat.START);
                     break;
                 case R.id.profileActivity:
@@ -1429,8 +1420,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             return new Object();
                         }).subscribe();
                     }
-
-
                     break;
                 case R.id.supportActivity:
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {

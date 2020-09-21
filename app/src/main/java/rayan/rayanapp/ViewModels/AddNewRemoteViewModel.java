@@ -43,6 +43,12 @@ public class AddNewRemoteViewModel extends DevicesFragmentViewModel {
         return new ArrayList<>(Arrays.asList(this.brands));
     }
 
+    private Disposable addRemoteDisposable;
+
+    public Disposable getAddRemoteDisposable() {
+        return addRemoteDisposable;
+    }
+
     public SingleLiveEvent<String> addRemote(Remote remote){
         SingleLiveEvent<String> callback = new SingleLiveEvent<>();
         addRemoteObservable(new AddRemoteRequest(remote)).subscribeOn(Schedulers.io())
@@ -50,6 +56,7 @@ public class AddNewRemoteViewModel extends DevicesFragmentViewModel {
                     @Override
                     public void onSubscribe(Disposable d) {
                         Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
+                        addRemoteDisposable = d;
                     }
 
                     @Override

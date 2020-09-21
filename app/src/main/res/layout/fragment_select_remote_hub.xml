@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
             android:text="تایید"
             android:id="@+id/confirm"
             android:background="?attr/selectableItemBackground"
-            android:layout_alignParentRight="true"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/title"
+            app:layout_constraintBottom_toBottomOf="@id/title"
             android:textSize="17sp"
             android:layout_margin="8dp"
             android:padding="3dp"
@@ -18,13 +21,19 @@
             android:layout_height="wrap_content" />
         <TextView
             android:text="لطفا یک گروه را انتخاب کنید"
+            android:gravity="center"
             android:id="@+id/title"
+            app:layout_constraintWidth_max="wrap"
+            app:layout_constraintWidth_percent="0.7"
             android:background="?attr/selectableItemBackground"
             android:layout_centerInParent="true"
+            app:layout_constraintLeft_toRightOf="@+id/cancel"
+            app:layout_constraintRight_toLeftOf="@id/confirm"
+            app:layout_constraintTop_toTopOf="parent"
             android:textSize="17sp"
             android:layout_margin="8dp"
             android:padding="3dp"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content" />
         <TextView
             android:background="?attr/selectableItemBackground"
@@ -33,23 +42,12 @@
             android:id="@+id/cancel"
             android:padding="3dp"
             android:textSize="17sp"
-            android:layout_alignParentLeft="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@id/title"
+            app:layout_constraintBottom_toBottomOf="@id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-    </RelativeLayout>
-    <TextView
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="8dp"
-        android:id="@+id/create"
-        android:gravity="center"
-        android:padding="10dp"
-        android:drawableRight="@drawable/ic_add"
-        android:background="@drawable/background_base_color_button"
-        android:text="ایجاد گروه جدید"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    </android.support.constraint.ConstraintLayout>
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"

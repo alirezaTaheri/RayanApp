@@ -59,7 +59,7 @@
         android:textSize="15sp"
         android:gravity="center"
         android:id="@+id/message"
-        android:text="لطفا نوع دستگاه خود را انتخاب کنید"
+        android:text="قصد انجام چه کاری را دارید؟"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toLeftOf="@id/next"
         app:layout_constraintLeft_toRightOf="@id/back"

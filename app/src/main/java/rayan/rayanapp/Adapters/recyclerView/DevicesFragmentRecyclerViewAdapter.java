@@ -69,7 +69,7 @@ public class DevicesFragmentRecyclerViewAdapter extends RecyclerView.Adapter<Bas
         else if (viewType == 2)
             return new DeviceViewHolder2Bridges(inflate(R.layout.item_device_2_bridge, parent));
         else if (viewType == 3)
-            return new DeviceViewHolderPlug(inflate(R.layout.item_device_2_bridge, parent));
+            return new DeviceViewHolder2Bridges(inflate(R.layout.item_device_2_bridge, parent));
         else if (viewType == 4)
             return new DeviceViewHolderPlug(inflate(R.layout.item_device_plug, parent));
         else if (viewType == 5)

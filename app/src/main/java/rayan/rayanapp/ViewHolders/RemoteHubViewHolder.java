@@ -42,4 +42,12 @@ public class RemoteHubViewHolder extends DeviceViewHolder1Bridge {
         });
     }
 
+    @Override
+    public void changePosition(BaseDevice item, OnDeviceClickListener<BaseDevice> listener) {
+        Log.d(TAG, "changePosition() called with: item = [" + item + "], listener = [" + listener + "]");
+        if (listener != null){
+            clickableLayout.setOnClickListener(vv -> listener.onClick_RemoteHub(item, item.getPosition()));
+        }
+    }
+
 }

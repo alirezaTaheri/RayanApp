@@ -22,8 +22,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Data.Remote;
 import rayan.rayanapp.Data.RemoteHub;
+import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Fragments.NewRemoteFragment;
 import rayan.rayanapp.Fragments.NewRemoteSelectBrandFragment;
+import rayan.rayanapp.Fragments.NewRemoteSelectLearnedFragment;
 import rayan.rayanapp.Fragments.NewRemoteSelectTypeFragment;
 import rayan.rayanapp.Fragments.NewRemoteSetConfigurationFragment;
 import rayan.rayanapp.Listeners.AddNewRemoteNavListener;
@@ -40,6 +42,7 @@ public class AddNewRemoteActivity extends AppCompatActivity {
     FragmentTransaction ft;
     private String selectedBrand;
     AddNewRemoteViewModel viewModel;
+    private NewRemoteSelectLearnedFragment selectLearnedFragment;
     private NewRemoteSelectTypeFragment selectTypeFragment;
     private NewRemoteSelectBrandFragment selectBrandFragment;
     private NewRemoteFragment newRemoteFragment;
@@ -59,17 +62,19 @@ public class AddNewRemoteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_new_remote_activity);
-        remoteHub = getIntent().getExtras().getParcelable("remoteHub");
+        if (getIntent().getExtras() != null)
+            remoteHub = getIntent().getExtras().getParcelable("remoteHub");
         ButterKnife.bind(this);
         viewModel = ViewModelProviders.of(this).get(AddNewRemoteViewModel.class);
         fm = getSupportFragmentManager();
         ft = fm.beginTransaction();
-        newRemoteData.putString("remoteHubId", remoteHub.getId());
+        progressDialog = new ProgressDialog(this);
+        newRemoteData.putString("remoteHubId", remoteHub!=null?remoteHub.getId():"");
         onFragmentChanged();
-        selectTypeFragment = NewRemoteSelectTypeFragment.newInstance();
-        currentFragment = (AddNewRemoteNavListener) selectTypeFragment;
+        selectLearnedFragment= NewRemoteSelectLearnedFragment.newInstance();
+        currentFragment = (NewRemoteSelectLearnedFragment) selectLearnedFragment;
         if (savedInstanceState == null) {
-            ft.add(R.id.container, selectTypeFragment)
+            ft.add(R.id.container, selectLearnedFragment)
                     .commit();
         }
     }
@@ -83,11 +88,17 @@ public class AddNewRemoteActivity extends AppCompatActivity {
     public void onNextClicked() {
         currentFragment.verifyStatus();
     }
-
+    ProgressDialog progressDialog;
 
     public void doOnNext(Bundle data) {
         newRemoteData.putAll(data);
-        if (currentFragment instanceof NewRemoteSelectTypeFragment) {
+        if (currentFragment instanceof NewRemoteSelectLearnedFragment) {
+            selectTypeFragment = NewRemoteSelectTypeFragment.newInstance();
+            currentFragment = (NewRemoteSelectTypeFragment) selectTypeFragment;
+            fm.beginTransaction().add(R.id.container, selectTypeFragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else if (currentFragment instanceof NewRemoteSelectTypeFragment) {
             selectBrandFragment = NewRemoteSelectBrandFragment.newInstance(newRemoteData.getString("type"));
             currentFragment = (AddNewRemoteNavListener) selectBrandFragment;
             fm.beginTransaction().add(R.id.container, selectBrandFragment)
@@ -109,8 +120,14 @@ public class AddNewRemoteActivity extends AppCompatActivity {
                     .commit();
         }else if (currentFragment instanceof NewRemoteSetConfigurationFragment) {
             modifyRemote(newRemoteData);
+            progressDialog.show();
+            progressDialog.cancel.setOnClickListener(v -> {
+                progressDialog.dismiss();
+                viewModel.getAddRemoteDisposable().dispose();
+            });
             viewModel.addRemote(remote).observe(this,s -> {
                 Log.e(TAG, "Remote Successfully Added");
+                progressDialog.dismiss();
                 switch (s){
                     case AppConstants.FORBIDDEN:
                         Toast.makeText(this, "شما دسترسی لازم برای این کار را ندارید", Toast.LENGTH_SHORT).show();
@@ -171,42 +188,46 @@ public class AddNewRemoteActivity extends AppCompatActivity {
             @Override
             public void onBackStackChanged() {
                 String topFragment = fm.getFragments().get(fm.getFragments().size() - 1).getClass().getName();
-                if (topFragment.equals(selectTypeFragment.getClass().getName())){
+                if (topFragment.equals(selectLearnedFragment.getClass().getName())){
+                    setMessage("قصد انجام چه کاری را دارید؟");
+                } else if (topFragment.equals(selectTypeFragment.getClass().getName())){
                     setMessage("لطفا نوع دستگاه خود را انتخاب کنید");
                 }else if (topFragment.equals(selectBrandFragment.getClass().getName())){
                     remotePanel.setVisibility(View.GONE);
                     nextButton.setText("بعدی");
                     setMessage("لطفا برند دستگاه مورد نظر را وارد کنید");
                 }else if (topFragment.equals(newRemoteFragment.getClass().getName())){
-                    remotePanel.setVisibility(View.GONE);
-                    nextButton.setText("بعدی");
-                    setMessage("لطفا برند دستگاه مورد نظر را وارد کنید");
-                }else if (topFragment.equals(setConfigurationFragment.getClass().getName())){
-                    remotePanel.setVisibility(View.GONE);
-                    nextButton.setText("تمام");
-                    setMessage("لطفا نام و مشخصات ریموت را وارد کنید");
-                }else {
                     if (getCurrentFocus() != null) {
                         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                     }
                     remotePanel.setVisibility(View.VISIBLE);
-                    nextButton.setText("تایید");
+                    nextButton.setText("بعدی");
                     message.setText("لطفا ریموت متناسب با دستگاه را انتخاب کنید");
+                }else if (topFragment.equals(setConfigurationFragment.getClass().getName())){
+                    remotePanel.setVisibility(View.GONE);
+                    nextButton.setText("تمام");
+                    setMessage("لطفا نام و مشخصات ریموت را وارد کنید");
                 }
             }
         });
     }
     public void modifyRemote(Bundle data){
         remote = new Remote();
-        remote.setGroupId(remoteHub.getGroupId());
+        if (remoteHub != null){
+            remote.setGroupId(remoteHub.getGroupId());
+            remote.setTopic(new Topic(remoteHub.getGroupId()+"/"+remoteHub.getId()+"/"));
+        }
         remote.setName(data.getString("name"));
         remote.setType(data.getString("type"));
-        remote.setTopic(new Topic(remoteHub.getGroupId()+"/"+remoteHub.getId()+"/"));
         remote.setBrand(data.getString("brand"));
         remote.setModel(data.getString("model"));
         remote.setRemoteHubId(data.getString("remoteHubId"));
         remote.setVisibility(data.getBoolean("visibility"));
         remote.setFavorite(data.getBoolean("favorite"));
+    }
+
+    public NewRemoteSetConfigurationFragment getSetConfigurationFragment() {
+        return setConfigurationFragment;
     }
 }
