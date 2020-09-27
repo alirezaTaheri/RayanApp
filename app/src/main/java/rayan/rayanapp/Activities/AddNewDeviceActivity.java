@@ -172,7 +172,7 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
                         };
                         Log.e("AddNewDeviceffffffff","Permissions: "+ hasPermissions(AddNewDeviceActivity.this, PERMISSIONS));
                     }
-                    Toast.makeText(AddNewDeviceActivity.this, "" + ssid, Toast.LENGTH_SHORT).show();
+                    Log.e("AddNewDeviceffffffff","SSID is: "+ssid);
                     if (manager.isActiveNetworkMetered()){
                         Log.e("AddNewDeviceffffffff","Network is metered or lte "+ssid);
                         ((RayanApplication) getApplication()).getNetworkBus().send(ssid);
@@ -204,7 +204,8 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
 //            }
         }else{
             Log.e(TAG,"Sorry we don't support this option");
-            // TODO: Remember to add this ............................important.................................
+        connectionLiveData = new ConnectionLiveData(getApplicationContext(),((RayanApplication) (getApplication())).getNetworkBus());
+        connectionLiveData.observe(this, getConnectionObserver());
 //            IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
 //            AddNewDeviceActivity.this.registerReceiver(networkReceiver, filter);
         }

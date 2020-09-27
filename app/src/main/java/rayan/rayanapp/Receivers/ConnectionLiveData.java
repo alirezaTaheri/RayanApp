@@ -81,7 +81,7 @@ public class ConnectionLiveData extends LiveData<ConnectionStatusModel> {
                         };
                         Log.e(TAG,"Permissions: "+ hasPermissions(context, PERMISSIONS));
                     }
-                    Toast.makeText(context, "" + ssid, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "" + ssid, Toast.LENGTH_SHORT).show();
                     if (manager.isActiveNetworkMetered()){
                         Log.e(TAG,"Network is metered or lte "+ssid);
                         postValue(new ConnectionStatusModel(ssid,ConnectivityManager.TYPE_MOBILE,

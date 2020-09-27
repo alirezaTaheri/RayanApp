@@ -704,7 +704,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
 
-
 //        Observable<Integer> o1 =
 //                Observable.just(1,10,20,30,40, 140, 150, 170)
 //                        .flatMap(new Function<Integer, Observable<Integer>>() {

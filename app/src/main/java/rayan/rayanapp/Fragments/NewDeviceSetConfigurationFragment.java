@@ -136,39 +136,6 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 //        changeGroupFragment.selectGroupMode();
     }
 
-    @OnClick(R.id.sendInfo)
-    public void sendInfo(){
-        mViewModel.sendInfoToDevice((WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
-                ((AddNewDeviceActivity) getActivity()), new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getName(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
-                , AppConstants.NEW_DEVICE_IP)
-                .observe(this, s -> {
-                    if (s != null && s.getCmd() != null)
-                        switch (s.getCmd()) {
-                            case AppConstants.NEW_DEVICE_TOGGLE_CMD:
-                                ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
-                                ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
-                                activity.stepperLayout.setCurrentStepPosition(activity.stepperLayout.getCurrentStepPosition()+1);
-                                break;
-                            case AppConstants.NEW_DEVICE_PHV_START:
-                                activity.stepperLayout.setCurrentStepPosition(activity.stepperLayout.getCurrentStepPosition()+1);
-                                break;
-                            case AppConstants.SOCKET_TIME_OUT:
-                                AddNewDeviceActivity.getNewDevice().setFailed(true);
-                                Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                                break;
-                            case AppConstants.UNKNOWN_EXCEPTION:
-                                Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
-                                break;
-                            case AppConstants.CONNECT_EXCEPTION:
-                                Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
-                                break;
-                            case AppConstants.UNKNOWN_HOST_EXCEPTION:
-                                Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
-                                break;
-                        }else Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                });
-    }
-
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
         if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
