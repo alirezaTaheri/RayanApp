@@ -5,15 +5,20 @@ import java.util.Map;
 import io.reactivex.Observable;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteHubRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteHubToGroupRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.ChangePasswordRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateGroupRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRemoteHubRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteDeviceRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteRemoteHubRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteHubRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteHubTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.EditUserRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitRequest;
@@ -40,6 +45,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponsev3;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteDatasResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
@@ -117,6 +123,9 @@ public interface ApiService {
     @POST("api/v3/groups/delete_device")
     Observable<BaseResponse> deleteDeviceFromGroup(@Header("Authorization") String token, @Body DeleteDeviceRequest deleteDeviceRequest);
 
+    @POST("api/v3/groups/delete_remote_hub")
+    Observable<BaseResponse> deleteRemoteHubFromGroup(@Header("Authorization") String token, @Body DeleteRemoteHubRequest deleteRemoteHubRequest);
+
     @POST("api/v3/groups/deleteadmin")
     Observable<BaseResponse> deleteAdmin(@Header("Authorization") String token, @Body DeleteUserRequest deleteUserRequest);
 
@@ -136,6 +145,9 @@ public interface ApiService {
     @POST("api/v3/groups/edit_topic_device")
     Observable<DeviceResponse> editDeviceTopic(@Header("Authorization") String token, @Body EditDeviceTopicRequest editDeviceTopicRequest);
 
+    @POST("api/v3/groups/edit_topic_remote_hub")
+    Observable<RemoteHubResponse> editRemoteHubTopic(@Header("Authorization") String token, @Body EditRemoteHubTopicRequest editRemoteHubTopicRequest);
+
     @POST("api/v3/devicev2s/edit")
     Observable<DeviceResponse> editDevice(@Header("Authorization") String token, @Body EditDeviceRequest editDeviceRequest);
 
@@ -143,7 +155,10 @@ public interface ApiService {
     Observable<RemoteHubsResponse> addRemote(@Header("Authorization") String token, @Body AddRemoteRequest addRemoteRequest);
 
     @POST("api/v3/remotehubs/edit")
-    Observable<DeviceResponse> editRemoteHub(@Header("Authorization") String token, @Body EditRemoteHubRequest editRemoteHubRequest);
+    Observable<RemoteHubResponse> editRemoteHub(@Header("Authorization") String token, @Body EditRemoteHubRequest editRemoteHubRequest);
+
+    @POST("api/v3/remotehubs")
+    Observable<RemoteHubResponse> addRemoteHub(@Header("Authorization") String token, @Body AddRemoteHubRequest addRemoteHubRequest);
 
     @POST("api/v3/remotehubs/edit_remote")
     Observable<DeviceResponse> editRemote(@Header("Authorization") String token, @Body EditRemoteRequest editRemoteRequest);
@@ -154,6 +169,9 @@ public interface ApiService {
 
     @POST("api/v3/groups/add_topic_device")
     Observable<DeviceResponse> createTopic(@Header("Authorization") String token, @Body CreateTopicRequest createTopicRequest);
+
+    @POST("api/v3/groups/add_topic_remote_hub")
+    Observable<RemoteHubResponse> createTopicRemoteHub(@Header("Authorization") String token, @Body CreateTopicRemoteHubRequest createTopicRequest);
 
     @POST("api/v3/users/edit")
     Observable<BaseResponse> editUser(@Header("Authorization") String token, @Body EditUserRequest editUserRequest);
@@ -166,6 +184,9 @@ public interface ApiService {
 
     @POST("api/v3/groups/add_device")
     Observable<BaseResponse> addDeviceToGroup(@Header("Authorization") String token, @Body AddDeviceToGroupRequest addDeviceToGroupRequest);
+
+    @POST("api/v3/groups/add_remote_hub")
+    Observable<BaseResponse> addRemoteHubToGroup(@Header("Authorization") String token, @Body AddRemoteHubToGroupRequest addDeviceToGroupRequest);
 
     @POST
     Observable<Response<String>> changeName(@Header("auth") String auth, @Url String url, @Body ChangeNameRequest changeNameRequest);

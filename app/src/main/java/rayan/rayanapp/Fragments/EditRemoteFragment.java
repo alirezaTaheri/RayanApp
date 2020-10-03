@@ -123,7 +123,7 @@ public class EditRemoteFragment extends BackHandledFragment implements OnBottomS
                 break;
         }
         name.setText(remote.getName());
-        RemoteHub remoteHub = editDeviceFragmentViewModel.getRemoteHub(remote.getRemoteHubId());
+        RemoteHub remoteHub = editDeviceFragmentViewModel.getRemoteHubById(remote.getRemoteHubId());
         accessPointSsid.setText(remoteHub.getName());
         Group group = editDeviceFragmentViewModel.getGroup(remote.getGroupId());
         groupName.setText(group.getName());

@@ -5,7 +5,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 
 public class NewDevice {
 
-    private String id,type,name,ssid,accessPointName;
+    private String id,type,name,ssid,mac,accessPointName;
     private int toggleCount;
     private String pwd;
     private Topic topic;
@@ -21,10 +21,44 @@ public class NewDevice {
     private String pin2;
     private NodeStatus status;
     private int networkId;
+    private String version;
+    private boolean visible, accessible, favorite;
     private boolean failed = false;
     public enum NodeStatus {
             IDLE,
             NEW
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public boolean isAccessible() {
+        return accessible;
+    }
+
+    public void setAccessible(boolean accessible) {
+        this.accessible = accessible;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public boolean isFailed() {
@@ -187,6 +221,14 @@ public class NewDevice {
         this.preGroupId = preGroupId;
     }
 
+    public String getMac() {
+        return mac;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
+
     @Override
     public String toString() {
         return "NewDevice{" +
@@ -194,6 +236,7 @@ public class NewDevice {
                 ", type='" + type + '\'' +
                 ", name='" + name + '\'' +
                 ", ssid='" + ssid + '\'' +
+                ", mac='" + mac + '\'' +
                 ", accessPointName='" + accessPointName + '\'' +
                 ", toggleCount=" + toggleCount +
                 ", pwd='" + pwd + '\'' +
@@ -204,10 +247,14 @@ public class NewDevice {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", group=" + group +
+                ", preGroupId='" + preGroupId + '\'' +
                 ", chip_id='" + chip_id + '\'' +
                 ", pin1='" + pin1 + '\'' +
                 ", pin2='" + pin2 + '\'' +
                 ", status=" + status +
+                ", networkId=" + networkId +
+                ", version='" + version + '\'' +
+                ", failed=" + failed +
                 '}';
     }
 }

@@ -32,6 +32,7 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteHubRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Util.AppConstants;
@@ -137,39 +138,6 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 //        changeGroupFragment.selectGroupMode();
     }
 
-    @OnClick(R.id.sendInfo)
-    public void sendInfo(){
-        mViewModel.sendInfoToDevice((WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
-                ((AddNewDeviceActivity) getActivity()), new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getName(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
-                , AppConstants.NEW_DEVICE_IP)
-                .observe(this, s -> {
-                    if (s != null && s.getCmd() != null)
-                        switch (s.getCmd()) {
-                            case AppConstants.NEW_DEVICE_TOGGLE_CMD:
-                                ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
-                                ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
-                                activity.stepperLayout.setCurrentStepPosition(activity.stepperLayout.getCurrentStepPosition()+1);
-                                break;
-                            case AppConstants.NEW_DEVICE_PHV_START:
-                                activity.stepperLayout.setCurrentStepPosition(activity.stepperLayout.getCurrentStepPosition()+1);
-                                break;
-                            case AppConstants.SOCKET_TIME_OUT:
-                                AddNewDeviceActivity.getNewDevice().setFailed(true);
-                                Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                                break;
-                            case AppConstants.UNKNOWN_EXCEPTION:
-                                Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
-                                break;
-                            case AppConstants.CONNECT_EXCEPTION:
-                                Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
-                                break;
-                            case AppConstants.UNKNOWN_HOST_EXCEPTION:
-                                Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
-                                break;
-                        }else Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                });
-    }
-
     @SuppressLint("CheckResult")
     @Override
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
@@ -183,52 +151,106 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
             Toast.makeText(getContext(), "لطفا یک مودم را انتخاب کنید", Toast.LENGTH_SHORT).show();
 //            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "لطفا یک مودم را انتخاب کنید");
         else {
+            Log.e("GGbbGG", "Installing"+activity.getNewDevice());
             mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
                 if (aBoolean) {
                     ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                    progressDialog.show();
-                    progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Log.e(getClass().getSimpleName(), ">>>>>>>>>>>>>>>>>Canceling The Process");
-                            mViewModel.getConfigDeviceDisposable().dispose();
-                            progressDialog.dismiss();
-                        }
-                    });
+
                     callback.getStepperLayout().showProgress("درحال برقراری ارتباط با دستگاه" + "\n" + "لطفا کمی صبرکنید");
                     ((AddNewDeviceActivity) getActivity()).getNewDevice().setName(nameEditText.getText().toString());
-                    mViewModel.registerDeviceSendToDevice(
-                            (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
-                            ((AddNewDeviceActivity) getActivity()), new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getName(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
-                            , AppConstants.NEW_DEVICE_IP)
-                            .observe(this, s -> {
-                                if (s != null && s.getCmd() != null)
-                                switch (s.getCmd()) {
-                                    case AppConstants.NEW_DEVICE_TOGGLE_CMD:
-                                        ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
-                                        ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
-                                        callback.goToNextStep();
-                                        break;
-                                    case AppConstants.NEW_DEVICE_PHV_START:
-                                        callback.goToNextStep();
-                                        break;
-                                    case AppConstants.SOCKET_TIME_OUT:
-                                        AddNewDeviceActivity.getNewDevice().setFailed(true);
-                                        Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case AppConstants.UNKNOWN_EXCEPTION:
-                                        Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case AppConstants.CONNECT_EXCEPTION:
-                                        Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case AppConstants.UNKNOWN_HOST_EXCEPTION:
-                                        Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
-                                        break;
-                                }else Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                                callback.getStepperLayout().hideProgress();
+                    if (activity.getNewDevice().getType()!= null & !activity.getNewDevice().getType().equals(AppConstants.DEVICE_TYPE_RemoteHub)) {
+                        progressDialog.show();
+                        progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.e(getClass().getSimpleName(), ">>>>>>>>>>>>>>>>>Canceling The Process");
+                                mViewModel.getConfigDeviceDisposable().dispose();
                                 progressDialog.dismiss();
-                            });
+                            }
+                        });
+                        mViewModel.registerDeviceSendToDevice(
+                                (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
+                                ((AddNewDeviceActivity) getActivity()), new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getName(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
+                                , AppConstants.NEW_DEVICE_IP)
+                                .observe(this, s -> {
+                                    if (s != null && s.getCmd() != null)
+                                        switch (s.getCmd()) {
+                                            case AppConstants.NEW_DEVICE_TOGGLE_CMD:
+                                                ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
+                                                ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
+                                                callback.goToNextStep();
+                                                break;
+                                            case AppConstants.NEW_DEVICE_PHV_START:
+                                                callback.goToNextStep();
+                                                break;
+                                            case AppConstants.SOCKET_TIME_OUT:
+                                                AddNewDeviceActivity.getNewDevice().setFailed(true);
+                                                Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            case AppConstants.UNKNOWN_EXCEPTION:
+                                                Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            case AppConstants.CONNECT_EXCEPTION:
+                                                Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                                                Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
+                                                break;
+                                        }
+                                    else
+                                        Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                                    callback.getStepperLayout().hideProgress();
+                                    progressDialog.dismiss();
+                                });
+                    }
+                    else if (activity.getNewDevice().getType()!= null & activity.getNewDevice().getType().equals(AppConstants.DEVICE_TYPE_RemoteHub)) {
+                        progressDialog.show();
+                        progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.e(getClass().getSimpleName(), ">>>>>>>>>>>>>>>>>Canceling The Process");
+                                mViewModel.getConfigDeviceDisposable().dispose();
+                                progressDialog.dismiss();
+                            }
+                        });
+                        activity.getNewDevice().setUsername(activity.getNewDevice().getChip_id());
+                        mViewModel.registerRemoteHubAndSendInfo(
+                                (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
+                                ((AddNewDeviceActivity) getActivity()), new AddRemoteHubRequest(activity.getNewDevice())
+                                , AppConstants.NEW_DEVICE_IP)
+                                .observe(this, s -> {
+                                    if (s != null && s.getCmd() != null)
+                                        switch (s.getCmd()) {
+                                            case AppConstants.NEW_DEVICE_TOGGLE_CMD:
+                                                ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
+                                                ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
+                                                callback.goToNextStep();
+                                                break;
+                                            case AppConstants.NEW_DEVICE_PHV_START:
+                                                callback.goToNextStep();
+                                                break;
+                                            case AppConstants.SOCKET_TIME_OUT:
+                                                AddNewDeviceActivity.getNewDevice().setFailed(true);
+                                                Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            case AppConstants.UNKNOWN_EXCEPTION:
+                                                Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            case AppConstants.CONNECT_EXCEPTION:
+                                                Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                                                Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
+                                                break;
+                                        }
+                                    else
+                                        Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                                    callback.getStepperLayout().hideProgress();
+                                    progressDialog.dismiss();
+                                });
+                    }
+                    else
+                        Toast.makeText(activity, "نوع دستگاه انتخابی مشخص نیست", Toast.LENGTH_SHORT).show();
                 } else {
                     ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
                 }

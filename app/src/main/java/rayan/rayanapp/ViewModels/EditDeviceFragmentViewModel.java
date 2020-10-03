@@ -59,6 +59,7 @@ import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
@@ -93,7 +94,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    private Observable<DeviceResponse> editRemoteHubObservable(EditRemoteHubRequest editRemoteHubRequest){
+    private Observable<RemoteHubResponse> editRemoteHubObservable(EditRemoteHubRequest editRemoteHubRequest){
         Log.e("?><?><?><?><?><", "editing remoteHub: " + editRemoteHubRequest);
         return apiService
                 .editRemoteHub(RayanApplication.getPref().getToken(), editRemoteHubRequest)

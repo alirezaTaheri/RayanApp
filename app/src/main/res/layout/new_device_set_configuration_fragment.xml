@@ -34,16 +34,6 @@
         android:id="@+id/changeAccessPoint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <TextView
-        android:layout_marginTop="40dp"
-        android:padding="10dp"
-        android:textColor="#000000"
-        android:gravity="center"
-        android:background="#E0E0E0"
-        android:text="Send Info"
-        android:id="@+id/sendInfo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
 </LinearLayout>
 </FrameLayout>

@@ -40,7 +40,7 @@
                     android:tint="#757575"
                     android:foregroundGravity="top"
                     android:layout_marginTop="5dp"
-                    app:srcCompat="@drawable/ic_hub"
+                    app:srcCompat="@drawable/ic_remote_hub"
                     />
 
             </RelativeLayout>

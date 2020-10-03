@@ -39,9 +39,9 @@ public interface RemotesDAO extends BaseDAO<Remote>{
 //    @Query("SELECT * FROM Remote WHERE groupId = :groupId")
 //    Single<List<Remote>> getAllInGroupSingle(String groupId);
 //
-//    @Query("SELECT * FROM Remote WHERE groupId = :groupId")
-//    LiveData<List<Remote>> getAllInGroupLive(String groupId);
-//
+    @Query("SELECT * FROM Remote WHERE groupId = :groupId")
+    LiveData<List<Remote>> getAllInGroupLive(String groupId);
+
     @Query("SELECT * FROM Remote WHERE id = :id")
     Remote getRemote(String id);
 //

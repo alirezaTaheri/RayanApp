@@ -27,6 +27,9 @@ public class RemoteHubDatabase {
     public RemoteHub getRemoteHub(String chipId){
         return remoteHubDAO.getRemoteHub(chipId);
     }
+    public RemoteHub getRemoteHubById(String chipId){
+        return remoteHubDAO.getRemoteHubById(chipId);
+    }
 
     public Maybe<RemoteHub> getRemoteHubFlowable(String chipId){
         return remoteHubDAO.getRemoteHubFlowable(chipId);
@@ -68,9 +71,9 @@ public class RemoteHubDatabase {
 //    public Single<List<RemoteHub>> getAllInGroupSingle(String groupId){
 //        return remoteHubDAO.getAllInGroupSingle(groupId);
 //    }
-//    public LiveData<List<RemoteHub>> getAllInGroupLive(String groupId){
-//        return remoteHubDAO.getAllInGroupLive(groupId);
-//    }
+    public LiveData<List<RemoteHub>> getAllInGroupLive(String groupId){
+        return remoteHubDAO.getAllInGroupLive(groupId);
+    }
 
     public void deleteRemoteHubs(List<RemoteHub> remoteHubs){
         remoteHubDAO.deleteRemoteHubs(remoteHubs);

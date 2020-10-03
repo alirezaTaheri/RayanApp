@@ -138,7 +138,7 @@ public class AppConstants {
     public final static String BaseDeviceType_SWITCH_2 = "switch_2";
     public final static String BaseDeviceType_TOUCH_2 = "touch_2";
     public final static String BaseDeviceType_PLUG = "plug";
-    public final static String BaseDeviceType_REMOTE_HUB = "remoteHub";
+    public final static String BaseDeviceType_REMOTE_HUB = "remote_hub";
     public final static String BaseDeviceType_REMOTE = "remote";
 
     /**
@@ -147,6 +147,7 @@ public class AppConstants {
     public final static String ADMIN_TYPE = "admin";
     public final static String USER_TYPE = "user";
     public final static String DUPLICATE_USER = "duplicate user";
+    public final static String DUPLICATE_REMOTE_HUB = "duplicate remoteHub";
     public final static String UNKNOWN_SSID = "Unknown SSID";
     public final static String UNKNOWN_NAME = "Unknown NAME";
     public final static String UNKNOWN_REMOTE_TYPE = "Unknown Remote Type";

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,24 +14,24 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Objects;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.Data.Remote;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Dialogs.ProgressDialog;
+import rayan.rayanapp.Fragments.ACRemoteFragment;
+import rayan.rayanapp.Fragments.NewRemoteControlBase;
 import rayan.rayanapp.Fragments.NewRemoteFragment;
 import rayan.rayanapp.Fragments.NewRemoteSelectBrandFragment;
 import rayan.rayanapp.Fragments.NewRemoteSelectLearnedFragment;
 import rayan.rayanapp.Fragments.NewRemoteSelectTypeFragment;
 import rayan.rayanapp.Fragments.NewRemoteSetConfigurationFragment;
+import rayan.rayanapp.Fragments.TvRemoteFragment;
 import rayan.rayanapp.Listeners.AddNewRemoteNavListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
 import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.AddNewRemoteViewModel;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -45,7 +44,7 @@ public class AddNewRemoteActivity extends AppCompatActivity {
     private NewRemoteSelectLearnedFragment selectLearnedFragment;
     private NewRemoteSelectTypeFragment selectTypeFragment;
     private NewRemoteSelectBrandFragment selectBrandFragment;
-    private NewRemoteFragment newRemoteFragment;
+    private NewRemoteControlBase newRemoteControlBase;
     private NewRemoteSetConfigurationFragment setConfigurationFragment;
     private AddNewRemoteNavListener currentFragment;
     @BindView(R.id.message)
@@ -105,12 +104,13 @@ public class AddNewRemoteActivity extends AppCompatActivity {
                     .addToBackStack(null)
                     .commit();
         } else if (currentFragment instanceof NewRemoteSelectBrandFragment) {
-            newRemoteFragment = NewRemoteFragment.newInstance(newRemoteData.getString("type"));
-            currentFragment = (AddNewRemoteNavListener) newRemoteFragment;
-            fm.beginTransaction().add(R.id.container, newRemoteFragment)
+            newRemoteControlBase = newRemoteData.getString("type").equals(AppConstants.REMOTE_TYPE_TV)? TvRemoteFragment.newInstance():
+            ACRemoteFragment.newInstance(newRemoteData.getString("brand"));
+            currentFragment = newRemoteControlBase;
+            fm.beginTransaction().add(R.id.container, newRemoteControlBase)
                     .addToBackStack(null)
                     .commit();
-        } else if (currentFragment instanceof NewRemoteFragment) {
+        } else if (currentFragment instanceof NewRemoteControlBase) {
             modifyRemote(newRemoteData);
             Log.e(TAG, "AFTER: "+remote);
             setConfigurationFragment = NewRemoteSetConfigurationFragment.newInstance(remote);
@@ -196,12 +196,13 @@ public class AddNewRemoteActivity extends AppCompatActivity {
                     remotePanel.setVisibility(View.GONE);
                     nextButton.setText("بعدی");
                     setMessage("لطفا برند دستگاه مورد نظر را وارد کنید");
-                }else if (topFragment.equals(newRemoteFragment.getClass().getName())){
+                }else if (topFragment.equals(newRemoteControlBase.getClass().getName())){
                     if (getCurrentFocus() != null) {
                         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                     }
                     remotePanel.setVisibility(View.VISIBLE);
+                    findViewById(R.id.nextModel).setOnClickListener(v -> newRemoteControlBase.nextModel());
                     nextButton.setText("بعدی");
                     message.setText("لطفا ریموت متناسب با دستگاه را انتخاب کنید");
                 }else if (topFragment.equals(setConfigurationFragment.getClass().getName())){

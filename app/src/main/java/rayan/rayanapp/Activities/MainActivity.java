@@ -721,19 +721,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onBackPressed() {
 //        startService(new Intent(this, AlwaysOnService.class));
 
-        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            this.drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//            this.drawerLayout.closeDrawer(GravityCompat.START);
+//        } else {
+//            super.onBackPressed();
+//        }
 //        DeviceDatabase deviceDatabase = new DeviceDatabase(this);
 //        RemoteDataDatabase remoteDataDatabase = new RemoteDataDatabase(this);
 //        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
-//        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
+        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
 //        GroupDatabase groupDatabase = new GroupDatabase(this);
 //        Log.e(TAG, "G"+groupDatabase.getAllGroups());
 //        Log.e(TAG, "G"+deviceDatabase.getAllDevices());
-//        Log.e(TAG, "G"+remoteHubDatabase.getAllRemoteHubs());
+        Log.e(TAG, "G"+remoteHubDatabase.getAllRemoteHubs());
 //        Log.e(TAG, "G"+remoteDatabase.getAllRemotes());
 //        Log.e(TAG, "G"+remoteDataDatabase.getAllRemoteDatas());
 //        groupDatabase.getAllCount("");

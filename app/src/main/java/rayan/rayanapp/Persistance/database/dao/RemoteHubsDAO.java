@@ -40,11 +40,14 @@ public interface RemoteHubsDAO extends BaseDAO<RemoteHub>{
 //    @Query("SELECT * FROM RemoteHub WHERE groupId = :groupId")
 //    Single<List<RemoteHub>> getAllInGroupSingle(String groupId);
 //
-//    @Query("SELECT * FROM RemoteHub WHERE groupId = :groupId")
-//    LiveData<List<RemoteHub>> getAllInGroupLive(String groupId);
-//
-    @Query("SELECT * FROM RemoteHub WHERE id = :id")
-    RemoteHub getRemoteHub(String id);
+    @Query("SELECT * FROM RemoteHub WHERE groupId = :groupId")
+    LiveData<List<RemoteHub>> getAllInGroupLive(String groupId);
+
+    @Query("SELECT * FROM RemoteHub WHERE chipId = :chipId")
+    RemoteHub getRemoteHub(String chipId);
+
+    @Query("SELECT * FROM RemoteHub WHERE id = :remoteHubId")
+    RemoteHub getRemoteHubById(String remoteHubId);
 //
     @Query("SELECT * FROM RemoteHub WHERE id = :id")
     Maybe<RemoteHub> getRemoteHubFlowable(String id);

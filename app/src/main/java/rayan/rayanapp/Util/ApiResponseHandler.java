@@ -79,6 +79,7 @@ public class ApiResponseHandler {
             for (int z = 0;z<remoteHubs.size();z++) {
                 if (remoteHubs.get(z).getGroupId().equals(g.getId())) {
                     remoteHubs.get(z).setPosition(nOd);
+                    remoteHubs.get(z).setSecret(g.getSecret());
                     remoteHubs.get(z).setInGroupPosition(devices.size() + z);
                     nOd++;
                     for (int i = 0; i < remotes.size(); i++) {
@@ -201,7 +202,6 @@ public class ApiResponseHandler {
         }
         if (remoteHubs != null)
             for (RemoteHub remoteHub: remoteHubs){
-                remoteHub.setChipId(remoteHub.getId());
                 remoteHub.setDeviceType(AppConstants.BaseDeviceType_REMOTE_HUB);
                 remoteHub.setBaseId(remoteHub.getId());
                 tempTopics.add(remoteHub.getTopic().getTopic());
@@ -308,9 +308,10 @@ public class ApiResponseHandler {
                         remoteHub.setGroupId(g.getId());
                         remoteHub.setPosition(nOd);
                         if (remoteHub.getName() == null)
-                        remoteHub.setName(AppConstants.UNKNOWN_NAME);
+                            remoteHub.setName(AppConstants.UNKNOWN_NAME);
+                        if (remoteHub.getSsid() == null)
+                            remoteHub.setSsid(AppConstants.UNKNOWN_SSID);
                         remoteHub.setVisibility(true);
-                        remoteHub.setSsid(AppConstants.UNKNOWN_SSID);
                         remoteHub.setInGroupPosition(devices.size() + z);
                         nOd++;
                         for (int i = 0; i < remotes.size(); i++) {
@@ -455,7 +456,6 @@ public class ApiResponseHandler {
             }
             if (remoteHubs != null)
                 for (RemoteHub remoteHub : remoteHubs) {
-                    remoteHub.setChipId(remoteHub.getId());
                     remoteHub.setDeviceType(AppConstants.BaseDeviceType_REMOTE_HUB);
                     remoteHub.setBaseId(remoteHub.getId());
                     tempTopics.add(remoteHub.getTopic().getTopic());

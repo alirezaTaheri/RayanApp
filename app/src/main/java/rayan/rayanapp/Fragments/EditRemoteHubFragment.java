@@ -3,6 +3,7 @@ package rayan.rayanapp.Fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +33,7 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Activities.AddNewRemoteActivity;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
 import rayan.rayanapp.Adapters.recyclerView.RemotesRecyclerViewAdapter;
 import rayan.rayanapp.Data.Remote;
@@ -40,6 +42,7 @@ import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
+import rayan.rayanapp.Listeners.OnRemoteClicked;
 import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
@@ -47,7 +50,7 @@ import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
-public class EditRemoteHubFragment extends BackHandledFragment implements DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked, YesNoDialogListener {
+public class EditRemoteHubFragment extends BackHandledFragment implements DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked, YesNoDialogListener, OnRemoteClicked<Remote> {
     private final String newSSID= "newSSID";
     private final String newName="newName";
     private final String newPass="newPass";
@@ -88,6 +91,7 @@ public class EditRemoteHubFragment extends BackHandledFragment implements DoneWi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         remotesRecyclerViewAdapter = new RemotesRecyclerViewAdapter(activity, new ArrayList<>());
+        remotesRecyclerViewAdapter.setListener(this);
         remoteHub = getArguments().getParcelable("remoteHub");
         setHasOptionsMenu(true);
         progressDialog = new ProgressDialog(activity);
@@ -365,5 +369,15 @@ public class EditRemoteHubFragment extends BackHandledFragment implements DoneWi
         visibilityButton.setImageDrawable(ContextCompat.getDrawable(activity,remoteHub.isVisibility()?R.drawable.ic_visibility_on:R.drawable.ic_visibility_off));
         editDeviceFragmentViewModel.editRemoteHub(remoteHub);
         SnackBarSetup.snackBarSetup(Objects.requireNonNull(activity).findViewById(android.R.id.content), remoteHub.getName().concat(remoteHub.isVisibility()?" به موردعلاقه ها اضافه شد":" از موردعلاقه ها حذف شد"));
+    }
+
+    @Override
+    public void onRemoteClicked(Remote item) {
+//        Toast.makeText(activity, "Clicked", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.emptyRecyclerView)
+    public void addNewRemoteClicked(){
+        startActivity(new Intent(activity, AddNewRemoteActivity.class));
     }
 }

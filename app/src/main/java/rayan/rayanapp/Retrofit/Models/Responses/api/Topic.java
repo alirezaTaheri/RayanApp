@@ -1,5 +1,6 @@
 package rayan.rayanapp.Retrofit.Models.Responses.api;
 
+import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -18,10 +19,12 @@ public class Topic implements Parcelable {
     private String id;
     public Topic(){}
 
+    @Ignore
     public Topic(String topic) {
         this.topic = topic;
     }
 
+    @Ignore
     protected Topic(Parcel in) {
         topic = in.readString();
         type = in.readString();

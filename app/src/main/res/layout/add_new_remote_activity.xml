@@ -84,12 +84,12 @@
             app:layout_constraintTop_toTopOf="parent"
             android:text="مدل 1 از 8\nاگر دکمه های این ریموت به درستی کار نمیکند با لمس بعدی ریموت دیگری را امتحان کنید"
             android:layout_width="0dp"
-            app:layout_constraintRight_toLeftOf="@+id/nextRemote"
+            app:layout_constraintRight_toLeftOf="@+id/nextModel"
             android:layout_height="wrap_content" />
         <View
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/nextRemote"
+            app:layout_constraintRight_toLeftOf="@+id/nextModel"
             android:layout_width="1dp"
             android:layout_height="0dp"
             android:background="@color/baseColor"/>
@@ -102,7 +102,7 @@
             android:drawableRight="@drawable/ic_arrow_right"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:id="@+id/nextRemote"
+            android:id="@+id/nextModel"
             android:textSize="15sp"
             android:layout_marginLeft="5dp"
             android:text="بعدی"

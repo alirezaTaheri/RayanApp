@@ -91,6 +91,8 @@ public class User implements Parcelable {
         this.role = role;
     }
     public User(){}
+
+    @Ignore
     public User(@NonNull String id, String username, String registered, UserInfo userInfo, String groupId, String role, String email) {
         this.id = id;
         this.username = username;

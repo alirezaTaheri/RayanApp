@@ -249,26 +249,29 @@ public class NewDevicesListFragment extends BackHandledFragment implements OnNew
         if (selectedAccessPoint == null)
             Toast.makeText(getContext(), "لطفا یک دستگاه را انتخاب کنید", Toast.LENGTH_SHORT).show();
         else{
-            ((AddNewDeviceActivity)getActivity()).getNewDevice().setAccessPointName(selectedAccessPoint.getSSID());
+            activity.getNewDevice().setAccessPointName(selectedAccessPoint.getSSID());
             if (selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-1].toLowerCase().equals("f")){
-            ((AddNewDeviceActivity)getActivity()).getNewDevice().setChip_id(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-2]);
-                ((AddNewDeviceActivity)getActivity()).getNewDevice().setStatus(NewDevice.NodeStatus.NEW);
+            activity.getNewDevice().setChip_id(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-2]);
+                activity.getNewDevice().setStatus(NewDevice.NodeStatus.NEW);
             }
             else{
-                ((AddNewDeviceActivity)getActivity()).getNewDevice().setChip_id(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-1]);
-                ((AddNewDeviceActivity)getActivity()).getNewDevice().setStatus(NewDevice.NodeStatus.IDLE);
+                activity.getNewDevice().setChip_id(selectedAccessPoint.getSSID().split("_")[selectedAccessPoint.getSSID().split("_").length-1]);
+                activity.getNewDevice().setStatus(NewDevice.NodeStatus.IDLE);
             }
-            if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
-                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_1);
+            if (activity.getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_SWITCH_1))
+                activity.getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_1);
 
-            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_SWITCH_2))
-                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_2);
+            else if (activity.getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_SWITCH_2))
+                activity.getNewDevice().setType(AppConstants.DEVICE_TYPE_SWITCH_2);
 
-            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_TOUCH_2))
-                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_TOUCH_2);
+            else if (activity.getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_TOUCH_2))
+                activity.getNewDevice().setType(AppConstants.DEVICE_TYPE_TOUCH_2);
 
-            else if (((AddNewDeviceActivity)getActivity()).getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_PLUG))
-                ((AddNewDeviceActivity)getActivity()).getNewDevice().setType(AppConstants.DEVICE_TYPE_PLUG);
+            else if (activity.getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_PLUG))
+                activity.getNewDevice().setType(AppConstants.DEVICE_TYPE_PLUG);
+
+            else if (activity.getNewDevice().getAccessPointName().toLowerCase().contains(AppConstants.DEVICE_TYPE_RemoteHub))
+                activity.getNewDevice().setType(AppConstants.DEVICE_TYPE_RemoteHub);
 
             Log.e("//////////" , "Device is:  " + ((AddNewDeviceActivity) getActivity()).getNewDevice());
             callback.goToNextStep();

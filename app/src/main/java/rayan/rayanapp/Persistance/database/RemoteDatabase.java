@@ -67,9 +67,9 @@ public class RemoteDatabase {
 //    public Single<List<Remote>> getAllInGroupSingle(String groupId){
 //        return remoteDAO.getAllInGroupSingle(groupId);
 //    }
-//    public LiveData<List<Remote>> getAllInGroupLive(String groupId){
-//        return remoteDAO.getAllInGroupLive(groupId);
-//    }
+    public LiveData<List<Remote>> getAllInGroupLive(String groupId){
+        return remoteDAO.getAllInGroupLive(groupId);
+    }
 
     public void deleteRemotes(List<Remote> remotes){
         remoteDAO.deleteRemotes(remotes);

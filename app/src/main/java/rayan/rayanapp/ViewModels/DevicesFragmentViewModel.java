@@ -137,6 +137,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     public RemoteHub getRemoteHub(String remoteHubId){
             return remoteHubDatabase.getRemoteHub(remoteHubId);
     }
+    public RemoteHub getRemoteHubById(String remoteHubId){
+            return remoteHubDatabase.getRemoteHubById(remoteHubId);
+    }
     public Group getGroup(String groupId){
             return groupDatabase.getGroup(groupId);
     }
@@ -148,6 +151,12 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     }
     public LiveData<List<Device>> getAllDevicesInGroupLive(String groupId){
             return deviceDatabase.getAllInGroupLive(groupId);
+    }
+    public LiveData<List<RemoteHub>> getAllRemoteHubsInGroupLive(String groupId){
+            return remoteHubDatabase.getAllInGroupLive(groupId);
+    }
+    public LiveData<List<Remote>> getAllRemotesInGroupLive(String groupId){
+            return remoteDatabase.getAllInGroupLive(groupId);
     }
 
     public void updateDevice(Device device){

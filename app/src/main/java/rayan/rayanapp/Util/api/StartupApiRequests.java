@@ -147,8 +147,8 @@ public class StartupApiRequests {
                     public void onNext(Object o) {
                         if (o instanceof RemoteHubsResponse){
                             RemoteHubsResponse remoteHubsResponse = (RemoteHubsResponse)o;
-                            Log.e(TAG, "RemoteHubs: " + remoteHubsResponse.getData().getRemotes().size());
-                            newRemoteHubs.addAll(remoteHubsResponse.getData().getRemotes());
+                            Log.e(TAG, "RemoteHubs: " + remoteHubsResponse.getData().getRemoteHubs().size());
+                            newRemoteHubs.addAll(remoteHubsResponse.getData().getRemoteHubs());
                         }else if (o instanceof RemotesResponse){
                             RemotesResponse remotesResponse = (RemotesResponse)o;
                             Log.e(TAG, "Remotes: " + remotesResponse.getData().getRemotes().size());
@@ -415,7 +415,8 @@ public class StartupApiRequests {
                     @Override
                     public boolean test(RemoteHubsResponse remoteHubsResponse) throws Exception {
                         Log.e("v3v3v3v3", "Limit: "+urlParams.get(URL_REMOTE_HUB + URL_LIMIT)+" / Skip: " + urlParams.get(URL_REMOTE_HUB + URL_SKIP));
-                        List<RemoteHub> results = remoteHubsResponse.getData().getRemotes();
+                        List<RemoteHub> results = remoteHubsResponse.getData().getRemoteHubs();
+                        Log.e("v3v3v3v3", "Response is:"+results);
                         if (results != null) {
                             newRemoteHubs.addAll(results);
                             for (int i = 0;i<results.size();i++) {

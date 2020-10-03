@@ -24,6 +24,7 @@ public class RemoteHub extends BaseDevice implements Parcelable {
     @NonNull
     @SerializedName("_id")
     private String id;
+    private String username, password;
     private String name,version;
     @SerializedName("topic")
     @Expose
@@ -39,19 +40,13 @@ public class RemoteHub extends BaseDevice implements Parcelable {
     private String groupId;
     private boolean accessible,visibility;
     private String secret,ip,statusWord,header,style;
+    @SerializedName("device_pass")
+    @Expose
+    private String devicePassword;
     @Ignore
     private List<Remote> remotes;
 
-    public List<Remote> getRemotes() {
-        return remotes;
-    }
-
-    public void setRemotes(List<Remote> remotes) {
-        this.remotes = remotes;
-    }
-
-    public RemoteHub() {
-    }
+    public RemoteHub(){}
 
     public RemoteHub(RemoteHub remoteHub) {
         super(remoteHub);
@@ -71,11 +66,16 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         this.statusWord = remoteHub.getStatusWord();
         this.header = remoteHub.getHeader();
         this.style = remoteHub.getStyle();
+        this.username = remoteHub.getUsername();
+        this.password = remoteHub.getPassword();
+        this.devicePassword = remoteHub.getDevicePassword();
     }
 
     protected RemoteHub(Parcel in) {
         chipId = in.readString();
         id = in.readString();
+        username = in.readString();
+        password = in.readString();
         name = in.readString();
         version = in.readString();
         topic = in.readParcelable(Topic.class.getClassLoader());
@@ -90,6 +90,37 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         statusWord = in.readString();
         header = in.readString();
         style = in.readString();
+        devicePassword = in.readString();
+        remotes = in.createTypedArrayList(Remote.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(chipId);
+        dest.writeString(id);
+        dest.writeString(username);
+        dest.writeString(password);
+        dest.writeString(name);
+        dest.writeString(version);
+        dest.writeParcelable(topic, flags);
+        dest.writeString(ssid);
+        dest.writeString(mac);
+        dest.writeString(creatorId);
+        dest.writeString(groupId);
+        dest.writeByte((byte) (accessible ? 1 : 0));
+        dest.writeByte((byte) (visibility ? 1 : 0));
+        dest.writeString(secret);
+        dest.writeString(ip);
+        dest.writeString(statusWord);
+        dest.writeString(header);
+        dest.writeString(style);
+        dest.writeString(devicePassword);
+        dest.writeTypedList(remotes);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<RemoteHub> CREATOR = new Creator<RemoteHub>() {
@@ -119,6 +150,22 @@ public class RemoteHub extends BaseDevice implements Parcelable {
 
     public void setId(@NonNull String id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getName() {
@@ -233,11 +280,29 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         this.style = style;
     }
 
+    public String getDevicePassword() {
+        return devicePassword;
+    }
+
+    public void setDevicePassword(String devicePassword) {
+        this.devicePassword = devicePassword;
+    }
+
+    public List<Remote> getRemotes() {
+        return remotes;
+    }
+
+    public void setRemotes(List<Remote> remotes) {
+        this.remotes = remotes;
+    }
+
     @Override
     public String toString() {
         return "RemoteHub{" +
                 "chipId='" + chipId + '\'' +
                 ", id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 ", version='" + version + '\'' +
                 ", topic=" + topic +
@@ -252,32 +317,8 @@ public class RemoteHub extends BaseDevice implements Parcelable {
                 ", statusWord='" + statusWord + '\'' +
                 ", header='" + header + '\'' +
                 ", style='" + style + '\'' +
+                ", devicePassword='" + devicePassword + '\'' +
                 ", remotes=" + remotes +
                 '}';
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(chipId);
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(version);
-        dest.writeParcelable(topic, flags);
-        dest.writeString(ssid);
-        dest.writeString(mac);
-        dest.writeString(creatorId);
-        dest.writeString(groupId);
-        dest.writeByte((byte) (accessible ? 1 : 0));
-        dest.writeByte((byte) (visibility ? 1 : 0));
-        dest.writeString(secret);
-        dest.writeString(ip);
-        dest.writeString(statusWord);
-        dest.writeString(header);
-        dest.writeString(style);
     }
 }

@@ -12,18 +12,20 @@ import rayan.rayanapp.Data.RemoteHub;
  * Created by alireza321 on 21/12/2018.
  */
 
-public class RemoteHubsData {
-    @SerializedName("user")
-    @Expose
-    private User user;
+public class RemoteHubData {
+//    @SerializedName("user")
+//    @Expose
+//    private User user;
 
     @SerializedName("message")
     @Expose
     private String message;
 
-    @SerializedName("items")
+//    @SerializedName("data")
+    @SerializedName("remoteHub")
     @Expose
-    private List<RemoteHub> remotes;
+    private RemoteHub remotes;
+
     @SerializedName("token")
     @Expose
     private String token;
@@ -32,13 +34,13 @@ public class RemoteHubsData {
     @Expose
     private int count;
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 
     public String getMessage() {
         return message;
@@ -48,11 +50,11 @@ public class RemoteHubsData {
         this.message = message;
     }
 
-    public List<RemoteHub> getRemoteHubs() {
+    public RemoteHub getRemoteHub() {
         return remotes;
     }
 
-    public void setRemotes(List<RemoteHub> remotes) {
+    public void setRemotes(RemoteHub remotes) {
         this.remotes = remotes;
     }
 
@@ -75,7 +77,7 @@ public class RemoteHubsData {
     @Override
     public String toString() {
         return "RemoteHubsData{" +
-                "user=" + user +
+//                "user=" + user +
                 ", message='" + message + '\'' +
                 ", remotes=" + remotes +
                 ", token='" + token + '\'' +

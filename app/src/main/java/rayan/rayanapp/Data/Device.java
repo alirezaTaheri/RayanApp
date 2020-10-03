@@ -2,6 +2,7 @@ package rayan.rayanapp.Data;
 
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -60,6 +61,7 @@ public class Device extends BaseDevice implements Parcelable {
     public Device() {
     }
 
+    @Ignore
     public Device(Device device) {
         super(device);
         this.pin1 = device.getPin1();
@@ -88,7 +90,7 @@ public class Device extends BaseDevice implements Parcelable {
         return header;
     }
 
-
+    @Ignore
     public Device(@NonNull String chipId, String name1, String id, String type, String username, Topic topic, String groupId, String secret) {
         this.chipId = chipId;
         this.name1 = name1;

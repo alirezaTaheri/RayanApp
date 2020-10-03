@@ -2,63 +2,47 @@ package rayan.rayanapp.Fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
+import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.AddNewRemoteActivity;
-import rayan.rayanapp.Adapters.recyclerView.RemoteBrandsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.AddNewRemoteNavListener;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.AddNewRemoteViewModel;
 
 
-public class TvRemoteFragment extends NewRemoteControlBase implements AddNewRemoteNavListener {
+public class NewRemoteControlBase extends Fragment implements AddNewRemoteNavListener {
 
     AddNewRemoteActivity activity;
     AlertDialog alertDialog;
-
-    public static TvRemoteFragment newInstance() {
-        return new TvRemoteFragment();
+    AddNewRemoteViewModel viewModel;
+    public static NewRemoteControlBase newInstance(String type) {
+        NewRemoteControlBase newRemoteFragment = new NewRemoteControlBase();
+        Bundle b = new Bundle();
+        b.putString("type", type);
+        newRemoteFragment.setArguments(b);
+        return newRemoteFragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.remote_tv, container, false);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            Window window = getActivity().getWindow();
-//            window.setStatusBarColor(Color.BLACK);
-//            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-////            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//        }
-        ButterKnife.bind(this, v);
-        return v;
+        return null;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        viewModel = ViewModelProviders.of(this).get(AddNewRemoteViewModel.class);
     }
 
 
@@ -80,8 +64,10 @@ public class TvRemoteFragment extends NewRemoteControlBase implements AddNewRemo
 
     @Override
     public void verifyStatus() {
-        Bundle data = new Bundle();
-        goToNextStep(data);
+        goToNextStep(new Bundle());
     }
 
+    public void nextModel(){
+
+    }
 }

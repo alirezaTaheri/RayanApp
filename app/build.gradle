@@ -170,4 +170,5 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-scalars:2.5.0'
 //    implementation 'co.ronash.android:pushe-base:1.6.3'
 //    implementation 'com.github.shinelw.colorarcprogressbar:library:1.0.3'
+    implementation 'com.orhanobut:logger:2.2.0'
 }

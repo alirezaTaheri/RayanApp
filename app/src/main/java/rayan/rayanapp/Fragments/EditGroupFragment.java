@@ -26,7 +26,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.orhanobut.logger.Logger;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -36,8 +39,11 @@ import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Adapters.recyclerView.AdminsRecyclerViewAdapter;
 import rayan.rayanapp.Adapters.recyclerView.GroupDevicesRecyclerViewAdapter;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Contact;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.Models.Responses.api.User;
@@ -54,6 +60,11 @@ public class EditGroupFragment extends Fragment {
     private String userId;
     public List<User> admins;
     public List<User> users;
+    private List<Device> devices=new ArrayList<>();;
+    private List<RemoteHub> remoteHubs=new ArrayList<>();;
+    private List<Remote> remotes=new ArrayList<>();;
+    private List<BaseDevice> baseDevices=new ArrayList<>();;
+    private final Object listLock = new Object();
     ArrayList<String> adminsUserNames = new ArrayList<>();
     ArrayList<String> usersUserName = new ArrayList<>();
     private final String TAG = EditGroupFragment.class.getSimpleName();
@@ -87,8 +98,50 @@ public class EditGroupFragment extends Fragment {
         if (getArguments() != null) {
             editGroupFragmentViewModel.getAllDevicesInGroupLive(getArguments().getString("id")).observe(this, new Observer<List<Device>>() {
                 @Override
-                public void onChanged(@Nullable List<Device> devices) {
-                    devicesRecyclerViewAdapter.setItems(devices);
+                public void onChanged(@Nullable List<Device> items) {
+                    devices = items;
+                    synchronized (listLock){
+                        baseDevices.clear();
+                        baseDevices.addAll(devices);
+                        baseDevices.addAll(remoteHubs);
+                        baseDevices.addAll(remotes);
+                        Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                        if (baseDevices.size() == 0){
+//                            slkdfj?
+                        }else{}
+                        Log.e(TAG, "DeviceItems:"+items.size()+" - baseDevices: "+baseDevices.size());
+                        devicesRecyclerViewAdapter.setItems(baseDevices);
+                    }
+                }
+            });
+            editGroupFragmentViewModel.getAllRemoteHubsInGroupLive(getArguments().getString("id")).observe(this, items -> {
+                remoteHubs = items;
+                synchronized (listLock){
+                    baseDevices.clear();
+                    baseDevices.addAll(devices);
+                    baseDevices.addAll(remoteHubs);
+                    baseDevices.addAll(remotes);
+                    Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                    if (baseDevices.size() == 0){
+//                            slkdfj?
+                    }else{}
+                    Log.e("fff", "RemoteHubsItems:"+items.size()+" - baseDevices: "+baseDevices);
+                    devicesRecyclerViewAdapter.setItems(baseDevices);
+                }
+            });
+            editGroupFragmentViewModel.getAllRemotesInGroupLive(getArguments().getString("id")).observe(this, items -> {
+                remotes = items;
+                synchronized (listLock){
+                    baseDevices.clear();
+                    baseDevices.addAll(devices);
+                    baseDevices.addAll(remoteHubs);
+                    baseDevices.addAll(remotes);
+                    Collections.sort(baseDevices, (obj1, obj2) -> Integer.compare(obj1.getPosition(), obj2.getPosition()));
+                    if (baseDevices.size() == 0){
+//                            slkdfj?
+                    }else{}
+                    Log.e("fff", "RemoteItems:"+items.size()+" - baseDevices: "+baseDevices);
+                    devicesRecyclerViewAdapter.setItems(baseDevices);
                 }
             });
             editGroupFragmentViewModel.getJustAdminsInGroup(getArguments().getString("id")).observe(this, new Observer<List<User>>() {
