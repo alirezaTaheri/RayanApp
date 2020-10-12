@@ -28,9 +28,9 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
     private final String TAG = DeviceViewHolder2Bridges.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.pin1)
+    @BindView(R.id.port1)
     ImageView pin1;
-    @BindView(R.id.pin2)
+    @BindView(R.id.port2)
     ImageView pin2;
     @BindView(R.id.bottomStrip2)
     View bottomStrip2;
@@ -121,7 +121,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
 //        pin2.setEnabled(true);
 //        if (v != null) {
 //            v.cancel();
-//            if (item.getPin2().equals(AppConstants.ON_STATUS)) {
+//            if (item.getPort2().equals(AppConstants.ON_STATUS)) {
 //                v.setIntValues((int) v.getAnimatedValue(),
 //                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
 //                        ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3 * 2),
@@ -134,7 +134,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
 //            }
 //        }
 //        else {
-//            if (item.getPin2().equals(AppConstants.ON_STATUS))
+//            if (item.getPort2().equals(AppConstants.ON_STATUS))
 //                v = ValueAnimator.ofInt(0,getDeviceItemWidth());
 //            else
 //                v = ValueAnimator.ofInt(getDeviceItemWidth(), 0);
@@ -148,7 +148,7 @@ public class DeviceViewHolder2Bridges extends DeviceViewHolder1Bridge {
 //        }
 //        v.setDuration(300);
 //        v.start();
-//        pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
+//        pin1.setChecked(item.getPort1().equals(AppConstants.ON_STATUS));
         pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)?ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
         pin2.setImageDrawable(item.getPin2().equals(AppConstants.ON_STATUS)?ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
 //        pin2.setChecked();

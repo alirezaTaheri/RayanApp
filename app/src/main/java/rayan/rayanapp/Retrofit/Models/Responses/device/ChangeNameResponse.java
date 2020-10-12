@@ -1,27 +1,23 @@
 package rayan.rayanapp.Retrofit.Models.Responses.device;
 
-import android.util.Log;
-
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 public class ChangeNameResponse extends DeviceBaseResponse{
     private String name;
-    private String stword;
+    private String STWORD, result, error;
     public String getName() {
         return name;
     }
 
-    public String getStword() {
-        return stword;
+    public String getSTWORD() {
+        return STWORD;
     }
-
 
     public String ToString(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("cmd", getCmd());
         jsonObject.addProperty("src", getSrc());
-        jsonObject.addProperty("stword", stword);
+        jsonObject.addProperty("STWORD", STWORD);
         jsonObject.addProperty("name", name);
         return jsonObject.toString();
     }
@@ -31,4 +27,41 @@ public class ChangeNameResponse extends DeviceBaseResponse{
 //        Log.e("><><><", "Gson: " + s);
 //        return s;
 //    }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSTWORD(String STWORD) {
+        this.STWORD = STWORD;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    @Override
+    public String toString() {
+        return "ChangeNameResponse{" +
+                "name='" + name + '\'' +
+                ", STWORD='" + STWORD + '\'' +
+                ", result='" + result + '\'' +
+                ", error='" + error + '\'' +
+                ", src='" + src + '\'' +
+                ", cmd='" + cmd + '\'' +
+                '}';
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
 }

@@ -18,7 +18,7 @@ public class ActionViewHolder1Bridge extends BasicViewHolder<Device, ScenarioOnA
     private final String TAG = ActionViewHolder1Bridge.class.getSimpleName();
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.pin1)
+    @BindView(R.id.port1)
     ImageView pin1;
     @BindView(R.id.bottomStrip)
     View bottomStrip;

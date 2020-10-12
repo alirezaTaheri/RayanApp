@@ -28,7 +28,7 @@ public class DeviceViewHolderRemote extends DeviceViewHolder1Bridge {
     private Map<String, ValueAnimator> animators = new HashMap<>();
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.pin1)
+    @BindView(R.id.port1)
     ImageView pin1;
     @BindView(R.id.bottomStrip)
     View bottomStrip;

@@ -45,8 +45,8 @@ public class DevicesDiffCallBack extends DiffUtil.Callback {
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
         Device oldDevice = oldDevices.get(oldItemPosition);
         Device newDevice = newDevices.get(newItemPosition);
-//        Log.e(this.getClass().getSimpleName(), "GoodBye areContentsTheSame: "+newDevice.getName1()+" " +newDevice.getPin1()+" __ "+ oldDevice.getPin1());
-//                && oldDevice.getPin2().equals(newDevice.getPin2())
+//        Log.e(this.getClass().getSimpleName(), "GoodBye areContentsTheSame: "+newDevice.getName1()+" " +newDevice.getPort1()+" __ "+ oldDevice.getPort1());
+//                && oldDevice.getPort2().equals(newDevice.getPort2())
 //                && oldDevice.getName1().equals(newDevice.getName1())
 //                && oldDevice.isFavorite() == newDevice.isFavorite()
 //                && oldDevice.isLocallyAccessibility() == newDevice.isLocallyAccessibility()));

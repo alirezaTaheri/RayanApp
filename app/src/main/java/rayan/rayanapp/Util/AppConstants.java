@@ -1,5 +1,6 @@
 package rayan.rayanapp.Util;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -44,6 +45,7 @@ public class AppConstants {
     public final static String NEW_DEVICE_TYPE_PLUG = "plug";
     public final static String NEW_DEVICE_TOGGLE_CMD = "toggle";
     public final static String NEW_DEVICE_ITET = "ITET";
+    public final static String NEW_DEVICE_PHYSICAL_VERIFICATION = "physical_verification";
     public final static String NEW_DEVICE_ON_STATUS = "2";
     public final static String NEW_DEVICE_OFF_STATUS = "1";
     public final static String NEW_DEVICE_PHV_TRUE = "phv_true";
@@ -52,12 +54,14 @@ public class AppConstants {
     public final static String NEW_DEVICE_PHV_START = "phv_start";
     public final static String NEW_DEVICE_PHV_TIMEOUT = "phv_timeout";
     public final static String NEW_DEVICE_config = "config";
+    public final static String PRIMARY_CONFIG = "config init";
     public final static String PRIMARY_CONFIG_TRUE = "primary_config_true";
     public final static String PRIMARY_CONFIG_FALSE = "primary_config_false";
     public final static String EXPIRED = "EXPIRED";
     public final static String NEW_DEVICE_IP = "192.168.4.1";
 //    public final static String NEW_DEVICE_IP = "192.168.137.1";
     public final static String GET_VERSION = "version";
+    public final static String NODE_INFO = "info";
     public final static String NAMING_PREFIX_PIN1 = "_1";
     public final static String NAMING_PREFIX_PIN2 = "_2";
     public final static String NAMING_PREFIX_PIN1_PIN2 = "_1_2";
@@ -67,11 +71,12 @@ public class AppConstants {
     public final static String TO_DEVICE_TLMS = "TLMS";
     public final static String TO_DEVICE_VERIFY = "verify";
     public final static String TO_DEVICE_NOT_VERIFY = "not_verify";
-    public final static String FROM_DEVICE_VERIFY_DONE = "verify_done";
+    public final static String FROM_DEVICE_VERIFY_SUCCESSFUL = "successful";
     public final static String OPERATION_DONE = "Done";
     public final static String MISSING_PARAMS = "Missing_Parameters";
     public final static String NOT_FOUND = "Not_found";
     public final static String DEVICE_TOGGLE = "tgl";
+    public final static String DEVICE_TOGGLE_CMD = "toggle";
     public final static String ERROR = "error";
     public final static String SERVER_ERROR= "SERVER_ERROR";
     public final static String FORBIDDEN = "Forbidden";
@@ -104,17 +109,27 @@ public class AppConstants {
     //ConnectionStatus
     public final static String ON_STATUS = "on";
     public final static String OFF_STATUS = "off";
+    public final static String EVENT_GPIO_CHANGED = "gpio_changed";
+    public final static String EVENT_SUBSCRIBED = "subscribed";
+    public final static String EVENT_NODE_DISCOVER = "node_discover";
+    public final static String EVENT_NODE_STATUS = "node_status";
+    public final static int OFF_GPIO = 0;
+    public final static int ON_GPIO = 1;
 
     /**
      * Device Settings
      */
     public final static String CHANGE_NAME_FALSE = "change_hname_false";
+    public final static String CHANGE_AP = "change_ap";
+    public final static String CHANGE_NAME = "change_name";
     public final static String CHANGE_NAME_TRUE = "change_hname_true";
     public final static String SOCKET_TIME_OUT = "SocketTimeoutException";
     public final static String CONNECT_EXCEPTION = "ConnectException";
     public final static String UNKNOWN_EXCEPTION = "UnknownException";
     public final static String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
     public final static String SETTINGS = "settings";
+    public final static String SETTINGS_ENTER = "settings_enter";
+    public final static String SETTINGS_EXIT = "settings_exit";
     public final static String END_SETTINGS = "end_settings";
     public final static String SET_TOPIC_MQTT = "MQTT";
     public final static String CHANGE_WIFI = "change_wifi";
@@ -154,15 +169,19 @@ public class AppConstants {
     public final static String NULL_SSID = "Null SSID";
     public final static String UNKNOWN_IP = "Unknown IP";
     public final static String SUCCESS_DESCRIPTION = "success";
+    public final static String SUCCESSFUL = "successful";
+    public final static String CONTINUE = "continue";
     public final static String ERROR_DESCRIPTION = "error";
     public final static String USER_NOT_FOUND_RESPONSE = "User not found";
     public final static String WRONG_PASSWORD_RESPONSE = "Wrong password";
+    public final static String WRONG_STWORD = "Wrong STWORD.";
     public final static String DEVICE_IS_READY_FOR_UPDATE = "update";
     public final static String DEVICE_READY_FOR_UPDATE = "update";
     public final static String DEVICE_UPDATE_CODE_WROTE = "codes_wrote";
     public final static String DEVICE_UPDATE_END = "update_end";
     public final static String DEVICE_UPDATE_DONE = "updating_done";
     public final static String DEVICE_DO_UPDATE = "update";
+    public final static String DEVICE_UPDATE = "update";
     public final static String DEVICE_ALL_FILES_LIST = "all_files_list";
     public final static String DEVICE_SEND_FILES_PERMIT = "send_files_to_device?";
 
@@ -184,6 +203,58 @@ public class AppConstants {
     public static String getDeviceAddress(String ip){
         return "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT;
 //        return "http://192.168.137.1/test.php";
+    }
+    public static String getDeviceAddress(String ip, String cmd){
+        String address = "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT+"/";
+        switch (cmd){
+            case AppConstants.PRIMARY_CONFIG:
+                address = address.concat("api/v1/config/init");
+                break;
+            case AppConstants.TO_DEVICE_VERIFY:
+                address = address.concat("api/v1/node/verification");
+                break;
+            case AppConstants.DEVICE_TOGGLE_CMD:
+                address = address.concat("api/v1/gpio/change_status");
+                break;
+            case AppConstants.NEW_DEVICE_PHYSICAL_VERIFICATION:
+                address = address.concat("api/v1/config/physical_verification");
+                break;
+            case AppConstants.SETTINGS_ENTER:
+                address = address.concat("api/v1/settings/enter");
+                break;
+            case AppConstants.CHANGE_NAME:
+                address = address.concat("api/v1/settings/change_name");
+                break;
+            case AppConstants.CHANGE_AP:
+                address = address.concat("api/v1/settings/change_ap");
+                break;
+            case AppConstants.FACTORY_RESET:
+                address = address.concat("api/v1/settings/reset_factory");
+                break;
+            case AppConstants.END_SETTINGS:
+                address = address.concat("api/v1/settings/exit");
+                break;
+            case AppConstants.DEVICE_UPDATE:
+                address = address.concat("api/v1/ota/start");
+                break;
+            case AppConstants.NODE_INFO:
+                address = address.concat("api/v1/system/info");
+                break;
+                default: throw new RuntimeException("No Suitable Found");
+        }
+        return address;
+    }
+
+    public static String resolveStword(String statusWord, String secret){
+        Log.e("Appconstants", "Resolving Status Word");
+        String decrypted = String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, secret)));
+        Log.e("Appconstants", "Decrypted word is: " + decrypted);
+        int head = Integer.parseInt(String.valueOf(decrypted.charAt(0)));
+        int tail = Integer.parseInt(String.valueOf(decrypted.charAt(decrypted.length()-1)));
+        Log.e("Appconstants","Head is: "+ head +" Tail is: " + tail);
+        String stword = decrypted.substring(head,decrypted.length()-tail-1);
+        Log.e("Appconstants","STWORD is: "+ stword);
+        return stword;
     }
 
     public static void disableEnableControls(boolean enable, ViewGroup vg){

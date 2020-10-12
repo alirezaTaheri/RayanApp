@@ -141,7 +141,7 @@ public class NewDevice_Switch_PhysicalVerificationFragment extends Fragment impl
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getPassword(),
                         AppConstants.DEVICE_CONNECTED_STYLE,
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getSecret())).observe(this, configResponse -> {
-                                            switch (configResponse.getCmd()) {
+                                            switch (configResponse.getResult()) {
                                                 case AppConstants.NEW_DEVICE_TOGGLE_CMD:
                                                     ((AddNewDeviceActivity)getActivity()).getNewDevice().setToggleCount(Integer.parseInt(configResponse.getCount()));
                                                     toggleCount = ((AddNewDeviceActivity)getActivity()).getNewDevice().getToggleCount();

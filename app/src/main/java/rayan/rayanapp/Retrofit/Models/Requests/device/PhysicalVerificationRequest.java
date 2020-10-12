@@ -5,22 +5,13 @@ import android.util.Log;
 import com.google.gson.GsonBuilder;
 
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Util.AppConstants;
 
-public class EndSettingsRequest extends BaseRequest{
-    private String STWORD;
+public class PhysicalVerificationRequest extends BaseRequest{
+    private String output_status;
 
-    public EndSettingsRequest(String stword) {
-        this.STWORD = stword;
-        this.setCmd(AppConstants.END_SETTINGS);
+    public PhysicalVerificationRequest(String output_status) {
         this.setSrc(RayanApplication.getPref().getId());
-    }
-
-    @Override
-    public String toString() {
-        return "EndSettingsRequest{" +
-                "STWORD='" + STWORD + '\'' +
-                '}';
+        this.output_status= output_status;
     }
 
     public String ToString(){
@@ -28,4 +19,5 @@ public class EndSettingsRequest extends BaseRequest{
         Log.e("><><><", "Gson: " + s);
         return s;
     }
+
 }

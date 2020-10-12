@@ -90,21 +90,21 @@ public class DevicesRecyclerViewAdapter
 //                }
 //                if (key.equals("pin1")){
 //                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge1" + device);
-//                    if (device.getPin1().equals(AppConstants.ON_STATUS))
+//                    if (device.getPort1().equals(AppConstants.ON_STATUS))
 //                        fragment.turnOnDevicePin1(device.getChipId(), position, device.getType());
 //                    else fragment.turnOffDevicePin1(device.getChipId(), position, device.getType());
 //                    holder.stopToggleAnimationPin1(animatorMap.get(device.getChipId()+"1"),getListener(), device);
-////                    holder.pin1Toggled(device.getPin1().endsWith(AppConstants.ON_STATUS));
+////                    holder.pin1Toggled(device.getPort1().endsWith(AppConstants.ON_STATUS));
 //                }
 //                if (key.equals("pin2")){
 //                    Log.e("<<<<<<<<<<<<<<<<","Adapter<<Stopping bridge2" + device);
 //                    if (device.getType().equals(AppConstants.DEVICE_TYPE_SWITCH_2) || device.getType().equals(AppConstants.DEVICE_TYPE_TOUCH_2)){
-//                        if (device.getPin2().equals(AppConstants.ON_STATUS))
+//                        if (device.getPort2().equals(AppConstants.ON_STATUS))
 //                            fragment.turnOnDevicePin2(device.getChipId(), position, device.getType());
 //                        else fragment.turnOffDevicePin2(device.getChipId(), position, device.getType());
 //                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(device.getChipId()+"2"),getListener(), device);
 ////                        ((DeviceViewHolder2Bridges)holder).stopToggleAnimationPin2(animatorMap.get(device.getChipId()+"2"),getListener(), device);
-////                        ((DeviceViewHolder2Bridges)holder).pin2Toggled(device.getPin2().endsWith(AppConstants.ON_STATUS));
+////                        ((DeviceViewHolder2Bridges)holder).pin2Toggled(device.getPort2().endsWith(AppConstants.ON_STATUS));
 //                    }
 //                }
 //                if (key.equals("name")){

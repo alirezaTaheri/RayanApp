@@ -34,7 +34,7 @@
                     android:focusable="false"
                     android:padding="3dp"
                     android:layout_height="50dp"
-                    android:id="@+id/pin1"
+                    android:id="@+id/port1"
                     android:layout_width="match_parent"
                     android:foregroundGravity="top"
                     android:layout_marginTop="5dp"

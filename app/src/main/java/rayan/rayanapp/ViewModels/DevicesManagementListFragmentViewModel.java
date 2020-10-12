@@ -90,7 +90,8 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
     public Observable<Response<String>> setReady4SettingsObservable(Device device) {
         Log.e(TAG, "device: " + device);
         try {
-            return ApiUtils.getApiServiceScalar().settings(AppConstants.sha1(new Ready4SettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
+            Ready4SettingsRequest request = new Ready4SettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret()));
+            return ApiUtils.getApiServiceScalar().settings(AppConstants.sha1(request.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp(), AppConstants.SETTINGS_ENTER),request)
                     .subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -129,11 +130,11 @@ public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewM
 //                        if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
 //                        Log.e("rererererere", "HMACs Are Equal");
                         Ready4SettingsResponse ready4SettingsResponse = RayanUtils.convertToObject(Ready4SettingsResponse.class, response.body());
-//                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(ready4SettingsResponse.getStword(),device.getSecret()).split("#")[1])+1));
-//                        device.setHeader(Encryptor.decrypt(ready4SettingsResponse.getStword(),device.getSecret()).split("#")[0]);
-                        if (ready4SettingsResponse.getCmd().equals("wrong_stword"))
+                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(ready4SettingsResponse.getSTWORD(),device.getSecret()).split("#")[1])+1));
+                        device.setHeader(Encryptor.decrypt(ready4SettingsResponse.getSTWORD(),device.getSecret()).split("#")[0]);
+                        if (ready4SettingsResponse.getResult().equals(AppConstants.WRONG_STWORD))
                             return true;
-                        else if (ready4SettingsResponse.getCmd().equals(AppConstants.SETTINGS)){
+                        else if (ready4SettingsResponse.getResult().equals(AppConstants.SUCCESSFUL)){
                             result.postValue(AppConstants.SETTINGS);
                             deviceDatabase.updateDevice(device);
                             return false;

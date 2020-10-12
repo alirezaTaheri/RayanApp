@@ -371,7 +371,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
 //        Bundle b = new Bundle();
 //        b.putString("startTogglingPin1", "startTogglingPin1");
 //        b.putString("chipId", chipId);
-//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPort1().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
 //        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
 //    }
 //
@@ -380,7 +380,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
 //        Bundle b = new Bundle();
 //        b.putString("startTogglingPin2", "startTogglingPin2");
 //        b.putString("chipId", chipId);
-//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPin2().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
+//        b.putString("status", devicesRecyclerViewAdapter.getItem(position).getPort2().equals(AppConstants.ON_STATUS)?AppConstants.ON_STATUS:AppConstants.OFF_STATUS);
 //        devicesRecyclerViewAdapter.notifyItemChanged(position,b);
 //    }
 //

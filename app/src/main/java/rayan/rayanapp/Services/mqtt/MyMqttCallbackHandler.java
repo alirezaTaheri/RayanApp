@@ -21,8 +21,10 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Mqtt.MqttClient;
 import rayan.rayanapp.Mqtt.MqttClientService;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 
@@ -94,15 +96,16 @@ public class MyMqttCallbackHandler implements MqttCallback {
           public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
               Log.e(TAG, "MQTT Message Received//: " + message.toString()+"\tTopic: " + topic +" htisis: " +MyMqttCallbackHandler.this);
               JSONObject jsonMessage = isJSONValid(message.toString());
+              String src, pin1, pin2, STWORD;
                   if (jsonMessage != null) {
                       try {
-                          String cmd = jsonMessage.getString("cmd");
-                          switch (cmd) {
-                              case "tgl":
-                                  String src = jsonMessage.getString("src");
-                                  String sid = jsonMessage.getString("sid");
-                                  String pin1 = jsonMessage.getString("pin1");
-                                  String pin2 = jsonMessage.getString("pin2");
+                          String event = jsonMessage.getString("event");
+                          switch (event) {
+                              case AppConstants.EVENT_GPIO_CHANGED:
+                                  src = jsonMessage.getString("src");
+                                  pin1 = jsonMessage.getString("port1");
+                                  pin2 = jsonMessage.getString("port2");
+                                  STWORD = jsonMessage.getString("STWORD");
                                   rayanApplication.getMqttMessagesController().responseReceived(src, jsonMessage);
                                   rayanApplication.getScenariosMqttMessagesController().responseReceived(src, jsonMessage);
                                   getDeviceAsync(src).subscribe(device -> {
@@ -110,12 +113,32 @@ public class MyMqttCallbackHandler implements MqttCallback {
 //                          ((RayanApplication)context.getApplicationContext()).getDevicesAccessibilityBus().send(src);
                                           device.setPin1(pin1);
                                           device.setPin2(pin2);
+                                          device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(STWORD,device.getSecret()).split("#")[1])+1));
+                                          device.setHeader(Encryptor.decrypt(STWORD,device.getSecret()).split("#")[0]);
                                           deviceDatabase.updateDevice(device);
                                       } else {
                                           Log.e(TAG, "Can't find device with chipId: " + src);
                                       }
                                   });
                                   break;
+                              case AppConstants.EVENT_SUBSCRIBED:
+                                  STWORD = jsonMessage.getString("STWORD");
+                                  src = jsonMessage.getString("src");
+                                  pin1 = jsonMessage.getString("port1");
+                                  pin2 = jsonMessage.getString("port2");
+                                  getDeviceAsync(src).subscribe(device -> {
+                                      if (device != null) {
+                                          device.setPin1(pin1);
+                                          device.setPin2(pin2);
+                                          device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(STWORD,device.getSecret()).split("#")[1])+1));
+                                          device.setHeader(Encryptor.decrypt(STWORD,device.getSecret()).split("#")[0]);
+                                          deviceDatabase.updateDevice(device);
+                                      } else {
+                                          Log.e(TAG, "Can't find device with chipId: " + src);
+                                      }
+                                  });
+                                  break;
+                                  default: Log.e(TAG, "This message has no effect because of the Event");
                           }
                       } catch (Exception e) {
                           Log.e(TAG, "There is an error after receiving message... " + e);

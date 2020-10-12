@@ -13,7 +13,7 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/pin1"
+            android:id="@+id/port1"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_alignParentRight="true"
@@ -22,10 +22,10 @@
             app:srcCompat="@drawable/ic_lamp_off"
            />
         <ImageView
-            android:id="@+id/pin2"
+            android:id="@+id/port2"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_toLeftOf="@+id/pin1"
+            android:layout_toLeftOf="@+id/port1"
             android:layout_centerVertical="true"
             app:srcCompat="@drawable/ic_lamp_off"
            />

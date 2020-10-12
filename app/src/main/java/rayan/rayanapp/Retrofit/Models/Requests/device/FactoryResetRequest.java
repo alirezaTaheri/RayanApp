@@ -2,17 +2,16 @@ package rayan.rayanapp.Retrofit.Models.Requests.device;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Util.AppConstants;
 
 public class FactoryResetRequest extends BaseRequest{
-    private String stword;
+    private String STWORD;
 
     public FactoryResetRequest(String stword) {
-        this.stword = stword;
+        this.STWORD = stword;
         this.setCmd(AppConstants.FACTORY_RESET);
         this.setSrc(RayanApplication.getPref().getId());
     }
@@ -20,7 +19,7 @@ public class FactoryResetRequest extends BaseRequest{
     @Override
     public String toString() {
         return "Ready4SettingsRequest{" +
-                "stword='" + stword + '\'' +
+                "STWORD='" + STWORD + '\'' +
                 '}';
     }
 

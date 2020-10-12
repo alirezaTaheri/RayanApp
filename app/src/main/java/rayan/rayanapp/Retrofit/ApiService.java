@@ -238,7 +238,7 @@ public interface ApiService {
     @POST
     Observable<DeviceBaseResponse> sendMqtt(@Url String url, @Body MqttTopicRequest mqttTopicRequest);
     @POST
-    Observable<Response<EndSettingsResponse>> endSettings(@Header("auth") String auth, @Url String url, @Body EndSettingsRequest baseRequest);
+    Observable<Response<String>> endSettings(@Header("auth") String auth, @Url String url, @Body EndSettingsRequest baseRequest);
 
     @POST("api/v3/users/register")
     Observable<BaseResponse> registerUser(@Header("Authorization") String token, @Body RegisterUserRequest registerUserRequest);

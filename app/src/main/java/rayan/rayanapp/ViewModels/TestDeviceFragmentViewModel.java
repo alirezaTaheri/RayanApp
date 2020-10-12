@@ -31,7 +31,7 @@ public class TestDeviceFragmentViewModel extends AndroidViewModel {
     private Observable<ToggleDeviceResponse> toDeviceToggleObservable(BaseRequest baseRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .toggle(AppConstants.getDeviceAddress(ip), baseRequest)
+                .toggle(AppConstants.getDeviceAddress(ip, AppConstants.NEW_DEVICE_TOGGLE_CMD), baseRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

@@ -71,10 +71,10 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
 
     @OnClick(R.id.onIcon)
     void sendOnStatus(){
-        viewModel.toDeviceStatus(AppConstants.NEW_DEVICE_ON_STATUS).observe(this, deviceBaseResponse -> {
+        viewModel.toDeviceStatus(AppConstants.ON_GPIO).observe(this, deviceBaseResponse -> {
             responses.append("\n"+deviceBaseResponse.toString());
             switch (deviceBaseResponse.getCmd()){
-                case AppConstants.NEW_DEVICE_PHV_TRUE:
+                case AppConstants.CONTINUE:
                     Toast.makeText(getActivity(), "درست", Toast.LENGTH_SHORT).show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_FALSE:
@@ -85,7 +85,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                 case AppConstants.NEW_DEVICE_PHV_TIMEOUT:
                     Toast.makeText(getActivity(), "زمان شما به پایان رسیده است", Toast.LENGTH_SHORT).show();
                     break;
-                case AppConstants.NEW_DEVICE_PHV_VERIFIED:
+                case AppConstants.SUCCESSFUL:
                     Toast.makeText(getActivity(), "دسترسی شما تایید شد", Toast.LENGTH_SHORT).show();
                     ((AddNewDeviceActivity)getContext()).setStepperPosition(3);
                     break;
@@ -97,10 +97,10 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
     }
     @OnClick(R.id.offIcon)
     void sendOffStatus(){
-        viewModel.toDeviceStatus(AppConstants.NEW_DEVICE_OFF_STATUS).observe(this, deviceBaseResponse -> {
+        viewModel.toDeviceStatus(AppConstants.OFF_GPIO).observe(this, deviceBaseResponse -> {
             responses.append("\n"+deviceBaseResponse.toString());
             switch (deviceBaseResponse.getCmd()){
-                case AppConstants.NEW_DEVICE_PHV_TRUE:
+                case AppConstants.CONTINUE:
                     Toast.makeText(getActivity(), "درست", Toast.LENGTH_SHORT).show();
                     break;
                 case AppConstants.NEW_DEVICE_PHV_FALSE:
@@ -111,7 +111,7 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                 case AppConstants.NEW_DEVICE_PHV_TIMEOUT:
                     Toast.makeText(getActivity(), "زمان شما به پایان رسیده است", Toast.LENGTH_SHORT).show();
                     break;
-                case AppConstants.NEW_DEVICE_PHV_VERIFIED:
+                case AppConstants.SUCCESSFUL:
                     Toast.makeText(getActivity(), "دسترسی شما تایید شد", Toast.LENGTH_SHORT).show();
                     ((AddNewDeviceActivity)getContext()).setStepperPosition(3);
                     break;
@@ -153,8 +153,8 @@ public class NewDevice_Plug_PhysicalVerificationFragment extends Fragment implem
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getPassword(),
                         AppConstants.DEVICE_CONNECTED_STYLE,
                         ((AddNewDeviceActivity)getActivity()).getNewDevice().getGroup().getSecret())).observe(this, configResponse -> {
-            switch (configResponse.getCmd()) {
-                case AppConstants.NEW_DEVICE_PHV_START:
+            switch (configResponse.getResult()) {
+                case AppConstants.SUCCESSFUL:
                     yesNoDialog.dismiss();
                     break;
                 case AppConstants.SOCKET_TIME_OUT:

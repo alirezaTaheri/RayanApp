@@ -76,7 +76,7 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
     private Observable<SetPrimaryConfigResponse> toDeviceFirstConfigObservable(SetPrimaryConfigRequest setPrimaryConfigRequest, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .sendFirstConfig(AppConstants.getDeviceAddress(ip), setPrimaryConfigRequest)
+                .sendFirstConfig(AppConstants.getDeviceAddress(ip, AppConstants.PRIMARY_CONFIG), setPrimaryConfigRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -228,7 +228,7 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
 
     public MutableLiveData<String> getDeviceVersion(Device device){
         MutableLiveData<String> results = new MutableLiveData<>();
-        ApiUtils.getApiService().getVersion(AppConstants.getDeviceAddress(device.getIp()), new BaseRequest(AppConstants.GET_VERSION))
+        ApiUtils.getApiService().getVersion(AppConstants.getDeviceAddress(device.getIp(), AppConstants.NODE_INFO), new BaseRequest(AppConstants.GET_VERSION))
                 .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
                 .subscribe(new Observer<DeviceBaseResponse>() {
                     @Override
@@ -365,17 +365,17 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                         Log.e(TAG, "Flow of install onError::::" + e);
                         SetPrimaryConfigResponse errorResponse = new SetPrimaryConfigResponse();
                         if (e instanceof SocketTimeoutException){
-                            errorResponse.setCmd(AppConstants.SOCKET_TIME_OUT);
+                            errorResponse.setResult(AppConstants.SOCKET_TIME_OUT);
                         }
                         else if (e instanceof UnknownHostException){
-                            errorResponse.setCmd(AppConstants.UNKNOWN_HOST_EXCEPTION);
+                            errorResponse.setResult(AppConstants.UNKNOWN_HOST_EXCEPTION);
                         }
                         else if (e.toString().contains("Unauthorized"))
                             login();
                         else if (e instanceof ConnectException)
-                            errorResponse.setCmd(AppConstants.CONNECT_EXCEPTION);
+                            errorResponse.setResult(AppConstants.CONNECT_EXCEPTION);
                         else{
-                            errorResponse.setCmd(AppConstants.UNKNOWN_EXCEPTION);
+                            errorResponse.setResult(AppConstants.UNKNOWN_EXCEPTION);
                         }
                         e.printStackTrace();
                         result.postValue(errorResponse);

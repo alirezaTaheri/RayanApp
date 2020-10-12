@@ -35,42 +35,6 @@ public class GroupsListFragmentViewModel extends DevicesFragmentViewModel {
         groupDatabase = new GroupDatabase(application);
     }
 
-
-    public LiveData<ToggleDeviceResponse> toDeviceToggle(String command){
-        final MutableLiveData<ToggleDeviceResponse> results = new MutableLiveData<>();
-        toDeviceToggleObservable(new BaseRequest(command), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceToggleObserver(results));
-        return results;
-    }
-    public Observable<ToggleDeviceResponse> toDeviceToggleObservable(BaseRequest baseRequest, String ip){
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .toggle(AppConstants.getDeviceAddress(ip), baseRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-    private DisposableObserver<ToggleDeviceResponse> toDeviceToggleObserver(MutableLiveData<ToggleDeviceResponse> results){
-        return new DisposableObserver<ToggleDeviceResponse>() {
-
-            @Override
-            public void onNext(@NonNull ToggleDeviceResponse baseResponse) {
-                Log.e(TAG,"OnNext "+baseResponse);
-                results.postValue(baseResponse);
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onComplete() {
-                Log.d(TAG,"Completed");
-            }
-        };
-    }
-
-
     public LiveData<List<Group>> getAllGroupsLive(){
         return groupDatabase.getAllGroupsLive();
     }

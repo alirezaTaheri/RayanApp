@@ -23,9 +23,9 @@ public class GroupBaseDevicesViewHolder extends BaseViewHolder {
 
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.pin1)
+    @BindView(R.id.port1)
     ImageView pin1;
-    @BindView(R.id.pin2)
+    @BindView(R.id.port2)
     ImageView pin2;
     @BindView(R.id.type)
     TextView type;

@@ -173,14 +173,9 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                                 ((AddNewDeviceActivity) getActivity()), new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getName(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
                                 , AppConstants.NEW_DEVICE_IP)
                                 .observe(this, s -> {
-                                    if (s != null && s.getCmd() != null)
-                                        switch (s.getCmd()) {
-                                            case AppConstants.NEW_DEVICE_TOGGLE_CMD:
-                                                ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
-                                                ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
-                                                callback.goToNextStep();
-                                                break;
-                                            case AppConstants.NEW_DEVICE_PHV_START:
+                                    if (s != null && s.getResult() != null)
+                                        switch (s.getResult()) {
+                                            case AppConstants.SUCCESSFUL:
                                                 callback.goToNextStep();
                                                 break;
                                             case AppConstants.SOCKET_TIME_OUT:
@@ -196,6 +191,13 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                                             case AppConstants.UNKNOWN_HOST_EXCEPTION:
                                                 Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
                                                 break;
+                                                default:
+                                                    if (s.getResult().contains(AppConstants.SUCCESSFUL)) {
+                                                        ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
+                                                        ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
+                                                        callback.goToNextStep();
+                                                    }
+                                                    break;
                                         }
                                     else
                                         Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();

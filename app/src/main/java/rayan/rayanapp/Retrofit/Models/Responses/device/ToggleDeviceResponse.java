@@ -2,40 +2,27 @@ package rayan.rayanapp.Retrofit.Models.Responses.device;
 
 import com.google.gson.JsonObject;
 
-import java.util.List;
-
-import okhttp3.internal.http2.Header;
-
 public class ToggleDeviceResponse extends DeviceBaseResponse{
-    private String sid, pin1, pin2,stword, msg;
+    private String port1, port2, STWORD, msg, result,error;
 
-
-    public String getSid() {
-        return sid;
+    public String getSTWORD() {
+        return STWORD;
     }
 
-    public String getStword() {
-        return stword;
+    public String getPort1() {
+        return port1;
     }
 
-    public void setSid(String sid) {
-        this.sid = sid;
+    public void setPort1(String port1) {
+        this.port1 = port1;
     }
 
-    public String getPin1() {
-        return pin1;
+    public String getPort2() {
+        return port2;
     }
 
-    public void setPin1(String pin1) {
-        this.pin1 = pin1;
-    }
-
-    public String getPin2() {
-        return pin2;
-    }
-
-    public void setPin2(String pin2) {
-        this.pin2 = pin2;
+    public void setPort2(String port2) {
+        this.port2 = port2;
     }
 
     public String getMsg() {
@@ -46,28 +33,49 @@ public class ToggleDeviceResponse extends DeviceBaseResponse{
         this.msg = msg;
     }
 
+    public void setSTWORD(String STWORD) {
+        this.STWORD = STWORD;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
 
     public String ToString(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("cmd", cmd);
         jsonObject.addProperty("src", src);
-        if (pin1 != null)
-        jsonObject.addProperty("pin1", pin1);
-        if (pin2 != null)
-        jsonObject.addProperty("pin2", pin2);
-        jsonObject.addProperty("stword", stword);
-        if (sid != null)
-        jsonObject.addProperty("sid", sid);
+        if (port1 != null)
+        jsonObject.addProperty("port1", port1);
+        if (port2 != null)
+        jsonObject.addProperty("port2", port2);
+        jsonObject.addProperty("STWORD", STWORD);
         return jsonObject.toString();
     }
+
     @Override
     public String toString() {
         return "ToggleDeviceResponse{" +
-                "sid='" + sid + '\'' +
-                ", pin1='" + pin1 + '\'' +
-                ", pin2='" + pin2 + '\'' +
-                ", stword='" + stword + '\'' +
+                "port1='" + port1 + '\'' +
+                ", port2='" + port2 + '\'' +
+                ", STWORD='" + STWORD + '\'' +
                 ", msg='" + msg + '\'' +
+                ", result='" + result + '\'' +
+                ", error='" + error + '\'' +
+                ", src='" + src + '\'' +
+                ", cmd='" + cmd + '\'' +
                 '}';
     }
 }

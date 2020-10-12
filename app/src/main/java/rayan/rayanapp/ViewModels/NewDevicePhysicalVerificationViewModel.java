@@ -18,6 +18,7 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.Models.Requests.device.PhysicalVerificationRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
 import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
@@ -34,13 +35,13 @@ public class NewDevicePhysicalVerificationViewModel extends NewDeviceSetConfigur
 
     public LiveData<DeviceBaseResponse> toDeviceITET(){
         final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();
-        toDeviceITETObservable(new BaseRequest(AppConstants.NEW_DEVICE_ITET), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceITETObserver(results));
+        toDeviceITETObservable(new PhysicalVerificationRequest(null), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceITETObserver(results));
         return results;
     }
-    private Observable<DeviceBaseResponse> toDeviceITETObservable(BaseRequest baseRequest, String ip){
+    private Observable<DeviceBaseResponse> toDeviceITETObservable(PhysicalVerificationRequest request, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .ITET(AppConstants.getDeviceAddress(ip), baseRequest)
+                .ITET(AppConstants.getDeviceAddress(ip, AppConstants.NEW_DEVICE_PHYSICAL_VERIFICATION), request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -81,7 +82,7 @@ public class NewDevicePhysicalVerificationViewModel extends NewDeviceSetConfigur
         };
     }
 
-    public LiveData<DeviceBaseResponse> toDeviceStatus(String status){
+    public LiveData<DeviceBaseResponse> toDeviceStatus(int status){
         final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();
         toDeviceStatusObservable(new PlugPhysicalVerificationRequest(status), AppConstants.NEW_DEVICE_IP).subscribe(toDeviceStatusObserver(results));
         return results;
@@ -89,7 +90,7 @@ public class NewDevicePhysicalVerificationViewModel extends NewDeviceSetConfigur
     private Observable<DeviceBaseResponse> toDeviceStatusObservable(PlugPhysicalVerificationRequest request, String ip){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
-                .plugStatusVerification(AppConstants.getDeviceAddress(ip), request)
+                .plugStatusVerification(AppConstants.getDeviceAddress(ip, AppConstants.NEW_DEVICE_PHYSICAL_VERIFICATION), request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

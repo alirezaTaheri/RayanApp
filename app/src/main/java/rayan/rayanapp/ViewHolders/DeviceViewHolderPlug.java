@@ -26,7 +26,7 @@ public class DeviceViewHolderPlug extends DeviceViewHolder1Bridge {
     private Map<String, ValueAnimator> animators = new HashMap<>();
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.pin1)
+    @BindView(R.id.port1)
     ImageView pin1;
     @BindView(R.id.bottomStrip)
     View bottomStrip;
@@ -116,7 +116,7 @@ public class DeviceViewHolderPlug extends DeviceViewHolder1Bridge {
         v.setDuration(300);
         v.start();
         pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS)? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_plug_on_1):ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_plug_off_1));
-//            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
+//            pin1.setChecked(item.getPort1().equals(AppConstants.ON_STATUS));
         if (listener != null){
             clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
         }

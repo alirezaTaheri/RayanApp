@@ -61,7 +61,6 @@ import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
 import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
 import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeAccessPointResponse;
@@ -164,10 +163,10 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                         if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                     Log.e("rererererere", "HMACs Are Equal");
                     ChangeNameResponse changeNameResponse = RayanUtils.convertToObject(ChangeNameResponse.class, response.body());
-                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeNameResponse.getStword(),device.getSecret()).split("#")[1])+1));
-                    device.setHeader(Encryptor.decrypt(changeNameResponse.getStword(),device.getSecret()).split("#")[0]);
+                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeNameResponse.getSTWORD(),device.getSecret()).split("#")[1])+1));
+                    device.setHeader(Encryptor.decrypt(changeNameResponse.getSTWORD(),device.getSecret()).split("#")[0]);
                     Log.e("TAGTAGTAG", "Should I go: " + changeNameResponse.getCmd().equals("wrong_stword"));
-                    if (changeNameResponse.getCmd().equals("wrong_stword")) {
+                    if (changeNameResponse.getError().equals(AppConstants.WRONG_STWORD)) {
                         Log.e(TAG, "stword is wrong");
                         return true;
                     }
@@ -238,10 +237,10 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                         if (AppConstants.sha1(response.body(), remoteHub.getSecret()).equals(response.headers().get("auth"))){
                     Log.e("rererererere", "HMACs Are Equal");
                     ChangeNameResponse changeNameResponse = RayanUtils.convertToObject(ChangeNameResponse.class, response.body());
-                    remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeNameResponse.getStword(),remoteHub.getSecret()).split("#")[1])+1));
-                    remoteHub.setHeader(Encryptor.decrypt(changeNameResponse.getStword(),remoteHub.getSecret()).split("#")[0]);
+                    remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeNameResponse.getSTWORD(),remoteHub.getSecret()).split("#")[1])+1));
+                    remoteHub.setHeader(Encryptor.decrypt(changeNameResponse.getSTWORD(),remoteHub.getSecret()).split("#")[0]);
                     Log.e("TAGTAGTAG", "Should I go: " + changeNameResponse.getCmd().equals("wrong_stword"));
-                    if (changeNameResponse.getCmd().equals("wrong_stword")) {
+                    if (changeNameResponse.getError().equals(AppConstants.WRONG_STWORD)) {
                         Log.e(TAG, "stword is wrong");
                         return true;
                     }
@@ -381,7 +380,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<Response<String>> toDeviceChangeNameObservable(ChangeNameRequest changeNameRequest, Device device) {
         try {
             return apiServiceScalar
-                    .changeName(AppConstants.sha1(changeNameRequest.ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), changeNameRequest)
+                    .changeName(AppConstants.sha1(changeNameRequest.ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp(), AppConstants.CHANGE_NAME), changeNameRequest)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
         } catch (UnsupportedEncodingException e) {
@@ -396,7 +395,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<Response<String>> toRemoteHubChangeNameObservable(ChangeNameRequest changeNameRequest, RemoteHub remoteHub) {
         try {
             return apiServiceScalar
-                    .changeName(AppConstants.sha1(changeNameRequest.ToString(), remoteHub.getSecret()),AppConstants.getDeviceAddress(remoteHub.getIp()), changeNameRequest)
+                    .changeName(AppConstants.sha1(changeNameRequest.ToString(), remoteHub.getSecret()),AppConstants.getDeviceAddress(remoteHub.getIp(),AppConstants.CHANGE_NAME), changeNameRequest)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
         } catch (UnsupportedEncodingException e) {
@@ -456,15 +455,15 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                         if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                             Log.e("rererererere", "HMACs Are Equal");
                             FactoryResetResponse factoryResetResponse = RayanUtils.convertToObject(FactoryResetResponse.class, response.body());
-                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[1])+1));
-                            device.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[0]);
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getSTWORD(),device.getSecret()).split("#")[1])+1));
+                            device.setHeader(Encryptor.decrypt(factoryResetResponse.getSTWORD(),device.getSecret()).split("#")[0]);
                             Log.e("TAGTAGTAG", "Should I go: " + factoryResetResponse.getCmd());
-                            if (factoryResetResponse.getCmd().equals("wrong_stword"))
+                            if (factoryResetResponse.getError().equals(AppConstants.WRONG_STWORD))
                                 return true;
                             else{
                                 Device deviceToUpdate = new Device(device);
-                                device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[1])+1));
-                                device.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),device.getSecret()).split("#")[0]);
+                                device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getSTWORD(),device.getSecret()).split("#")[1])+1));
+                                device.setHeader(Encryptor.decrypt(factoryResetResponse.getSTWORD(),device.getSecret()).split("#")[0]);
                                 deviceDatabase.updateDevice(deviceToUpdate);
                                 return false;
                             }
@@ -536,15 +535,15 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                         if (AppConstants.sha1(response.body(), remoteHub.getSecret()).equals(response.headers().get("auth"))){
                             Log.e("rererererere", "HMACs Are Equal");
                             FactoryResetResponse factoryResetResponse = RayanUtils.convertToObject(FactoryResetResponse.class, response.body());
-                            remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),remoteHub.getSecret()).split("#")[1])+1));
-                            remoteHub.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),remoteHub.getSecret()).split("#")[0]);
+                            remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getSTWORD(),remoteHub.getSecret()).split("#")[1])+1));
+                            remoteHub.setHeader(Encryptor.decrypt(factoryResetResponse.getSTWORD(),remoteHub.getSecret()).split("#")[0]);
                             Log.e("TAGTAGTAG", "Should I go: " + factoryResetResponse.getCmd());
-                            if (factoryResetResponse.getCmd().equals("wrong_stword"))
+                            if (factoryResetResponse.getError().equals(AppConstants.WRONG_STWORD))
                                 return true;
                             else{
                                 RemoteHub remoteHubToUpdate = new RemoteHub(remoteHub);
-                                remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getStword(),remoteHub.getSecret()).split("#")[1])+1));
-                                remoteHub.setHeader(Encryptor.decrypt(factoryResetResponse.getStword(),remoteHub.getSecret()).split("#")[0]);
+                                remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(factoryResetResponse.getSTWORD(),remoteHub.getSecret()).split("#")[1])+1));
+                                remoteHub.setHeader(Encryptor.decrypt(factoryResetResponse.getSTWORD(),remoteHub.getSecret()).split("#")[0]);
                                 remoteHubDatabase.updateRemoteHub(remoteHubToUpdate);
                                 return false;
                             }
@@ -601,15 +600,17 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     private Observable<Response<String>> toDeviceFactoryResetObservable(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         Log.e(TAG, "Sending StWord Is: " + device.getStatusWord());
+        FactoryResetRequest request = new FactoryResetRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret()));
         return apiServiceScalar
-                .factoryReset(AppConstants.sha1(new FactoryResetRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())).ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()),new FactoryResetRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())))
+                .factoryReset(AppConstants.sha1(request.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp(), AppConstants.FACTORY_RESET),request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
     private Observable<Response<String>> toRemoteHubFactoryResetObservable(RemoteHub remoteHub) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         Log.e(TAG, "Sending StWord Is: " + remoteHub.getStatusWord());
+        FactoryResetRequest request = new FactoryResetRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret()));
         return apiServiceScalar
-                .factoryReset(AppConstants.sha1(new FactoryResetRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret())).ToString(), remoteHub.getSecret()), AppConstants.getDeviceAddress(remoteHub.getIp()),new FactoryResetRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret())))
+                .factoryReset(AppConstants.sha1(request.ToString(), remoteHub.getSecret()), AppConstants.getDeviceAddress(remoteHub.getIp(), AppConstants.FACTORY_RESET),request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -636,15 +637,15 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     ChangeAccessPointResponse changeAccessPointResponse = RayanUtils.convertToObject(ChangeAccessPointResponse.class, response.body());
                     if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                     Log.e("rererererere", "HMACs Are Equal");
-                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getStword(),device.getSecret()).split("#")[1])+1));
-                    device.setHeader(Encryptor.decrypt(changeAccessPointResponse.getStword(),device.getSecret()).split("#")[0]);
+                    device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getSTWORD(),device.getSecret()).split("#")[1])+1));
+                    device.setHeader(Encryptor.decrypt(changeAccessPointResponse.getSTWORD(),device.getSecret()).split("#")[0]);
                     Log.e("TAGTAGTAG", "Should I go: " + changeAccessPointResponse.getCmd());
-                    if (changeAccessPointResponse.getCmd().equals("wrong_stword"))
+                    if (changeAccessPointResponse.getError().equals(AppConstants.WRONG_STWORD))
                         return true;
                     else{
                         Device deviceToUpdate = new Device(device);
-                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getStword(),device.getSecret()).split("#")[1])+1));
-                        device.setHeader(Encryptor.decrypt(changeAccessPointResponse.getStword(),device.getSecret()).split("#")[0]);
+                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getSTWORD(),device.getSecret()).split("#")[1])+1));
+                        device.setHeader(Encryptor.decrypt(changeAccessPointResponse.getSTWORD(),device.getSecret()).split("#")[0]);
                         deviceDatabase.updateDevice(deviceToUpdate);
                         return false;
                     }
@@ -690,7 +691,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
     private Observable<Response<String>> toDeviceChangeAccessPointObservable(Device device, ChangeAccessPointRequest changeAccessPointRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         return apiServiceScalar
-                .changeAccessPoint(AppConstants.sha1(changeAccessPointRequest.ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp()), changeAccessPointRequest)
+                .changeAccessPoint(AppConstants.sha1(changeAccessPointRequest.ToString(), device.getSecret()),AppConstants.getDeviceAddress(device.getIp(), AppConstants.CHANGE_AP), changeAccessPointRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -716,15 +717,15 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     ChangeAccessPointResponse changeAccessPointResponse = RayanUtils.convertToObject(ChangeAccessPointResponse.class, response.body());
                     if (AppConstants.sha1(response.body(), remoteHub.getSecret()).equals(response.headers().get("auth"))){
                     Log.e("rererererere", "HMACs Are Equal");
-                        remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getStword(),remoteHub.getSecret()).split("#")[1])+1));
-                        remoteHub.setHeader(Encryptor.decrypt(changeAccessPointResponse.getStword(),remoteHub.getSecret()).split("#")[0]);
+                        remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getSTWORD(),remoteHub.getSecret()).split("#")[1])+1));
+                        remoteHub.setHeader(Encryptor.decrypt(changeAccessPointResponse.getSTWORD(),remoteHub.getSecret()).split("#")[0]);
                     Log.e("TAGTAGTAG", "Should I go: " + changeAccessPointResponse.getCmd());
-                    if (changeAccessPointResponse.getCmd().equals("wrong_stword"))
+                    if (changeAccessPointResponse.getError().equals("wrong_stword"))
                         return true;
                     else{
                         RemoteHub deviceToUpdate = new RemoteHub(remoteHub);
-                        remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getStword(),remoteHub.getSecret()).split("#")[1])+1));
-                        remoteHub.setHeader(Encryptor.decrypt(changeAccessPointResponse.getStword(),remoteHub.getSecret()).split("#")[0]);
+                        remoteHub.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(changeAccessPointResponse.getSTWORD(),remoteHub.getSecret()).split("#")[1])+1));
+                        remoteHub.setHeader(Encryptor.decrypt(changeAccessPointResponse.getSTWORD(),remoteHub.getSecret()).split("#")[0]);
                         remoteHubDatabase.updateRemoteHub(deviceToUpdate);
                         return false;
                     }
@@ -770,7 +771,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
     private Observable<Response<String>> toRemoteHubChangeAccessPointObservable(RemoteHub remoteHub, ChangeAccessPointRequest changeAccessPointRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         return apiServiceScalar
-                .changeAccessPoint(AppConstants.sha1(changeAccessPointRequest.ToString(), remoteHub.getSecret()),AppConstants.getDeviceAddress(remoteHub.getIp()), changeAccessPointRequest)
+                .changeAccessPoint(AppConstants.sha1(changeAccessPointRequest.ToString(), remoteHub.getSecret()),AppConstants.getDeviceAddress(remoteHub.getIp(), AppConstants.CHANGE_AP), changeAccessPointRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -799,68 +800,33 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         };
     }
 
-
-    public LiveData<DeviceBaseResponse> toDeviceMqtt(String host, String user, String pass, String topic, String port, String ip){
-        final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();
-        toDeviceMqttObservable(new MqttTopicRequest(host,user,pass,topic,port),ip).subscribe(toDeviceMqttObserver(results));
-        return results;
-    }
-    public Observable<DeviceBaseResponse> toDeviceMqttObservable(MqttTopicRequest mqttTopicRequest, String ip){
-        return apiService
-                .sendMqtt(AppConstants.getDeviceAddress(ip), mqttTopicRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-    private DisposableObserver<DeviceBaseResponse> toDeviceMqttObserver(MutableLiveData<DeviceBaseResponse> results){
-        return new DisposableObserver<DeviceBaseResponse>() {
-
-            @Override
-            public void onNext(@NonNull DeviceBaseResponse baseResponse) {
-                Log.e(TAG,"OnNext "+baseResponse);
-                results.postValue(baseResponse);
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {
-                Log.d(TAG,"Error"+e);
-                e.printStackTrace();
-                if (e.toString().contains("Unauthorized"))
-                    login();
-            }
-
-            @Override
-            public void onComplete() {
-                Log.d(TAG,"Completed");
-            }
-        };
-    }
-
     public LiveData<String> toDeviceEndSettings(Device device) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         final MutableLiveData<String> result = new MutableLiveData<>();
         Observable.just(device)
-                .flatMap(new Function<Device, Observable<Response<EndSettingsResponse>>>() {
+                .flatMap(new Function<Device, Observable<Response<String>>>() {
                     @Override
-                    public Observable<Response<EndSettingsResponse>> apply(Device device) throws Exception {
+                    public Observable<Response<String>> apply(Device device) throws Exception {
                         return toDeviceEndSettingsObservable(device, new EndSettingsRequest(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret())));
                     }
                 })
                 .subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
                 .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
-                .takeWhile(settingsResponseResponse ->{
-                    Log.e("toDeviceEndSettings", "Toggle Device Response: " + settingsResponseResponse);
-                    Log.e("toDeviceEndSettings", "Auth: " + settingsResponseResponse.headers().get("auth"));
-                    Log.e("toDeviceEndSettings", "Body Expected To Be: " + settingsResponseResponse.body().ToString());
+                .takeWhile(response ->{
+                    Log.e("toDeviceEndSettings", "Toggle Device Response: " + response);
+                    Log.e("toDeviceEndSettings", "Auth: " + response.headers().get("auth"));
+                    Log.e("toDeviceEndSettings", "Body Expected To Be: " + response.body());
                     Log.e("toDeviceEndSettings", "Sending Status Word Is: " + device.getStatusWord());
-                    Log.e("toDeviceEndSettings", "HMAC of Body: " + AppConstants.sha1(settingsResponseResponse.body().ToString(), device.getSecret()));
-                    if (settingsResponseResponse.headers().get("auth") != null){
+                    Log.e("toDeviceEndSettings", "HMAC of Body: " + AppConstants.sha1(response.body(), device.getSecret()));
+                    EndSettingsResponse settingsResponse = RayanUtils.convertToObject(EndSettingsResponse.class, response.body());
+                    if (response.headers().get("auth") != null){
                         Log.e("toDeviceEndSettings", "Auth Is Not NUll");
-                        if (AppConstants.sha1(settingsResponseResponse.body().ToString(), device.getSecret()).equals(settingsResponseResponse.headers().get("auth"))
-                                || AppConstants.sha1(settingsResponseResponse.body().wrongToString(), device.getSecret()).equals(settingsResponseResponse.headers().get("auth"))){
+                        if (AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
+//                                || AppConstants.sha1(response.body(), device.getSecret()).equals(response.headers().get("auth"))){
                             Log.e("toDeviceEndSettings", "HMACs Are Equal");
-                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(settingsResponseResponse.body().getStword(),device.getSecret()).split("#")[1])+1));
-                            device.setHeader(Encryptor.decrypt(settingsResponseResponse.body().getStword(),device.getSecret()).split("#")[0]);
-                            Log.e("toDeviceEndSettings", "Should I go: " + settingsResponseResponse.body().getCmd());
-                            if (settingsResponseResponse.body().getCmd().equals("wrong_stword"))
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(settingsResponse.getSTWORD(),device.getSecret()).split("#")[1])+1));
+                            device.setHeader(Encryptor.decrypt(settingsResponse.getSTWORD(),device.getSecret()).split("#")[0]);
+                            Log.e("toDeviceEndSettings", "Should I go: " + settingsResponse.getCmd());
+                            if (settingsResponse.getError().equals(AppConstants.WRONG_STWORD))
                                 return true;
                             else{
                                 Device deviceToUpdate = new Device(device);
@@ -873,14 +839,14 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     return false;
                 }).timeout(4, TimeUnit.SECONDS)
                 .retry(3)
-                .subscribe(new Observer<Response<EndSettingsResponse>>() {
+                .subscribe(new Observer<Response<String>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         Log.d(TAG, "onSubscribe() called with: d = [" + d + "]");
                     }
 
                     @Override
-                    public void onNext(Response<EndSettingsResponse> endSettingsResponseResponse) {
+                    public void onNext(Response<String> endSettingsResponseResponse) {
                         Log.d(TAG, "onNext() called with: endSettingsResponseResponse = [" + endSettingsResponseResponse + "]");
                     }
 
@@ -902,9 +868,9 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
         return result;
     }
 
-    private Observable<Response<EndSettingsResponse>> toDeviceEndSettingsObservable(Device device, EndSettingsRequest endSettingsRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    private Observable<Response<String>> toDeviceEndSettingsObservable(Device device, EndSettingsRequest endSettingsRequest) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         return apiService
-                .endSettings(AppConstants.sha1(endSettingsRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()), endSettingsRequest)
+                .endSettings(AppConstants.sha1(endSettingsRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp(), AppConstants.END_SETTINGS), endSettingsRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -1005,7 +971,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<Response<String>> toDeviceReady4UpdateObservable(UpdateRequest baseRequest, Device device){
         try {
             return apiServiceScalar
-                    .deviceUpdate(AppConstants.sha1(baseRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp()), baseRequest)
+                    .deviceUpdate(AppConstants.sha1(baseRequest.ToString(), device.getSecret()), AppConstants.getDeviceAddress(device.getIp(), AppConstants.DEVICE_UPDATE), baseRequest)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
         } catch (UnsupportedEncodingException e) {
@@ -1047,7 +1013,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                     Log.e("rerererererere", "Auth: " + response.headers().get("auth"));
                     Log.e("rerererererere", "HMAC of Body: " + AppConstants.sha1(response.body(), remoteHub.getSecret()));
                     Ready4SettingsResponse ready4SettingsResponse = RayanUtils.convertToObject(Ready4SettingsResponse.class, response.body());
-                    if (ready4SettingsResponse.getCmd().equals("wrong_stword"))
+                    if (ready4SettingsResponse.getError().equals(AppConstants.WRONG_STWORD))
                         return true;
                     else if (ready4SettingsResponse.getCmd().equals(AppConstants.SETTINGS)){
                         result.postValue(AppConstants.SETTINGS);
@@ -1097,7 +1063,8 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     private Observable<Response<String>> remoteHubReady4SettingsObservable(RemoteHub remoteHub) {
         Log.e(TAG, "device: " + remoteHub);
         try {
-            return ApiUtils.getApiServiceScalar().settings(AppConstants.sha1(new Ready4SettingsRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret())).ToString(), remoteHub.getSecret()), AppConstants.getDeviceAddress(remoteHub.getIp()),new Ready4SettingsRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret())))
+            Ready4SettingsRequest request = new Ready4SettingsRequest(Encryptor.encrypt(remoteHub.getHeader().concat("#").concat(remoteHub.getStatusWord()).concat("#"), remoteHub.getSecret()));
+            return ApiUtils.getApiServiceScalar().settings(AppConstants.sha1(request.ToString(), remoteHub.getSecret()), AppConstants.getDeviceAddress(remoteHub.getIp(), AppConstants.SETTINGS_ENTER),request)
                     .subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -1111,7 +1078,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
 
     public MutableLiveData<VersionResponse> getDeviceVersion(Device device){
         MutableLiveData<VersionResponse> results = new MutableLiveData<>();
-        apiService.getVersion(AppConstants.getDeviceAddress(device.getIp()), new BaseRequest(AppConstants.GET_VERSION))
+        apiService.getVersion(AppConstants.getDeviceAddress(device.getIp(), AppConstants.NODE_INFO), new BaseRequest(AppConstants.GET_VERSION))
                 .observeOn(Schedulers.io()).subscribeOn(Schedulers.io())
                 .subscribe(new Observer<VersionResponse>() {
                     @Override
@@ -1158,7 +1125,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     }
 
     private Observable<DeviceBaseResponse> toDeviceDoUpdateObservable(UpdateDeviceRequest updateDeviceRequest, String ip){
-        return apiService.deviceDoUpdate(AppConstants.getDeviceAddress(ip), updateDeviceRequest)
+        return apiService.deviceDoUpdate(AppConstants.getDeviceAddress(ip, AppConstants.DEVICE_UPDATE), updateDeviceRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

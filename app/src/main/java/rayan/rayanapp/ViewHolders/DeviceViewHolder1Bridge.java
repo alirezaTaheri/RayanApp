@@ -36,7 +36,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder {
     private Map<String, ValueAnimator> animators = new HashMap<>();
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.pin1)
+    @BindView(R.id.port1)
     ImageView pin1;
     @BindView(R.id.bottomStrip)
     View bottomStrip;
@@ -111,7 +111,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder {
             AppConstants.disableEnableControls(true, clickableLayout);
 //            if (v != null) {
 //                v.cancel();
-//                if (item.getPin1().equals(AppConstants.ON_STATUS)) {
+//                if (item.getPort1().equals(AppConstants.ON_STATUS)) {
 ////                    playSoundSwitchOn();
 //                    v.setIntValues((int) v.getAnimatedValue(),
 //                            ((int) v.getAnimatedValue() + (itemView.getWidth() - (int) v.getAnimatedValue()) / 3),
@@ -125,7 +125,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder {
 //                            0);
 //                }
 //            } else {
-//                if (item.getPin1().equals(AppConstants.ON_STATUS)) {
+//                if (item.getPort1().equals(AppConstants.ON_STATUS)) {
 ////                    playSoundSwitchOn();
 //                    v = ValueAnimator.ofInt(0, getDeviceItemWidth());
 //                } else {
@@ -143,7 +143,7 @@ public class DeviceViewHolder1Bridge extends BaseViewHolder {
 //            v.setDuration(300);
 //            v.start();
             pin1.setImageDrawable(item.getPin1().equals(AppConstants.ON_STATUS) ? ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_on) : ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_lamp_off));
-//            pin1.setChecked(item.getPin1().equals(AppConstants.ON_STATUS));
+//            pin1.setChecked(item.getPort1().equals(AppConstants.ON_STATUS));
             if (listener != null) {
                 clickableLayout.setOnClickListener(vv -> listener.onPin1Clicked(item, this.getAdapterPosition()));
             }

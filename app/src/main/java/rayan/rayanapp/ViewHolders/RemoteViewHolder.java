@@ -20,7 +20,7 @@ public class RemoteViewHolder extends DeviceViewHolder1Bridge {
 
     @BindView(R.id.name)
     TextView name;
-    @BindView(R.id.pin1)
+    @BindView(R.id.port1)
     ImageView icon;
     private final String TAG = "RemoteViewHolderAddNewRemote";
     public RemoteViewHolder(View itemView) {
