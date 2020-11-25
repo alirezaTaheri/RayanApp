@@ -1,6 +1,6 @@
 package rayan.rayanapp.Receivers;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,9 +15,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
-import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.ConnectionStatusModel;
 import rayan.rayanapp.RxBus.NetworkConnectionBus;
 import rayan.rayanapp.Util.AppConstants;

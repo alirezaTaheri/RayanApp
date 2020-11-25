@@ -1,11 +1,11 @@
 package rayan.rayanapp.Fragments;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,10 +31,8 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDeviceSetConfigurationFragmentViewModel;
 
 public class NewDeviceSetConfigurationFragment extends BackHandledFragment implements BlockingStep {

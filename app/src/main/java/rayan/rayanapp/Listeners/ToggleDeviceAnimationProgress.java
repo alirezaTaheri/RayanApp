@@ -1,7 +1,6 @@
 package rayan.rayanapp.Listeners;
 
-import android.animation.ValueAnimator;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import rayan.rayanapp.Helper.DeviceAnimator;
 

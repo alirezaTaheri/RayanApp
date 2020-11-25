@@ -1,29 +1,25 @@
 package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
-import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Listeners.StepperItemSimulation;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;

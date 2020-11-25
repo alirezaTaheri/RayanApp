@@ -1,18 +1,15 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.util.ListUpdateCallback;
-import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -28,25 +25,17 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
-import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Data.DeviceMinimalSSIDIP;
 import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Helper.DialogPresenter;
-import rayan.rayanapp.Helper.Encryptor;
-import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Persistance.database.GroupDatabase;
@@ -54,15 +43,12 @@ import rayan.rayanapp.Persistance.database.UserDatabase;
 import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.Services.mqtt.Connection;
-import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
-import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
 
 public class DevicesFragmentViewModel extends AndroidViewModel {
     protected DeviceDatabase deviceDatabase;

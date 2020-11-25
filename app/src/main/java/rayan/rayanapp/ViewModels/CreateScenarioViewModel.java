@@ -1,13 +1,11 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
-import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+import androidx.annotation.NonNull;
 
 import rayan.rayanapp.Data.Scenario;
 import rayan.rayanapp.Persistance.database.ScenarioDatabase;
-import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
-import rayan.rayanapp.ViewModels.ScenariosFragmentViewModel;
 
 public class CreateScenarioViewModel extends ScenariosFragmentViewModel {
     ScenarioDatabase scenarioDatabase;

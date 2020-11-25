@@ -1,8 +1,8 @@
 package rayan.rayanapp.Activities;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -17,32 +17,24 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
 import com.stepstone.stepper.StepperLayout;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Adapters.viewPager.AddNewDeviceStepperAdapter;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.AccessPoint;
@@ -61,19 +53,13 @@ import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Receivers.WifiScanReceiver;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 import rayan.rayanapp.Wifi.WifiHandler;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class AddNewDeviceActivity extends AppCompatActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked, YesNoDialogListener, NetworkConnectivityListener {
+public class AddNewDeviceActivity extends BaseActivity implements BackHandledFragment.BackHandlerInterface, DoneWithFragment, DoneWithSelectAccessPointFragment, OnBottomSheetSubmitClicked, YesNoDialogListener, NetworkConnectivityListener {
     private final String TAG = AddNewDeviceActivity.class.getSimpleName();
 
     private WifiHandler wifiHandler;
@@ -93,9 +79,6 @@ public class AddNewDeviceActivity extends AppCompatActivity implements BackHandl
     public String currentSsid;
 //    @BindView(R.id.toolbar)
 //    Toolbar toolbar;
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
     ConnectionLiveData connectionLiveData;
     @SuppressLint("CheckResult")
     @Override

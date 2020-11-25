@@ -28,7 +28,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="40dp">
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/loginSplash"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -40,7 +40,7 @@
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/signUpSplash"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

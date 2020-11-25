@@ -1,11 +1,11 @@
 package rayan.rayanapp.Persistance.database.dao;
 
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
+import androidx.room.Insert;
+import androidx.room.Query;
 
 import java.util.List;
 
-import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
+import static androidx.room.OnConflictStrategy.REPLACE;
 
 public interface BaseDAO<T> {
     @Insert(onConflict = REPLACE)

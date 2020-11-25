@@ -1,16 +1,13 @@
 package rayan.rayanapp.Activities;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -28,13 +25,11 @@ import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.OnAddUserToGroupSubmitClicked;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
-import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
-public class GroupsActivity extends AppCompatActivity implements EditGroupFragment.ClickOnEditGroupButton, EditGroupFragment2.ClickOnButton, GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked, OnAddUserToGroupSubmitClicked {
+public class GroupsActivity extends BaseActivity implements EditGroupFragment.ClickOnEditGroupButton, EditGroupFragment2.ClickOnButton, GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked, OnAddUserToGroupSubmitClicked {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.status)
@@ -48,10 +43,6 @@ public class GroupsActivity extends AppCompatActivity implements EditGroupFragme
     EditGroupUsersFragment editGroupUsersFragment;
     EditGroupFragment2 editGroupFragment2;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
-
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

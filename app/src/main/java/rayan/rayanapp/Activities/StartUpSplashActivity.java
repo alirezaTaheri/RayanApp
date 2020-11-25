@@ -1,23 +1,14 @@
 package rayan.rayanapp.Activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rayan.rayanapp.R;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class StartUpSplashActivity extends AppCompatActivity {
+public class StartUpSplashActivity extends BaseActivity {
 
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -1,8 +1,7 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
-import android.support.annotation.NonNull;
-import rayan.rayanapp.Services.udp.SendUDPMessage;
+import androidx.annotation.NonNull;
 
 public class DevicesManagementActivityViewModel extends DevicesFragmentViewModel {
     private final String TAG = DevicesManagementActivityViewModel.class.getSimpleName();

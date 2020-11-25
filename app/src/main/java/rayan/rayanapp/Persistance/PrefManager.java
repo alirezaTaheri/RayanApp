@@ -3,7 +3,7 @@ package rayan.rayanapp.Persistance;
 import android.content.SharedPreferences;
 
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Retrofit.Models.Responses.api.UserInfo;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.UserInfo;
 
 public class PrefManager {
     private SharedPreferences pref;
@@ -32,6 +32,7 @@ public class PrefManager {
     private final String KEY_CURRENT_SHOWING_GROUP = "KEY_CURRENT_SHOWING_GROUP";
     private final String KEY_SELECTED_GROUP_ALL_ON_SCENARIO = "KEY_SELECTED_GROUP_ALL_ON_SCENARIO";
     private final String KEY_SELECTED_GROUP_ALL_OFF_SCENARIO = "KEY_SELECTED_GROUP_ALL_OFF_SCENARIO";
+    private final String KEY_PRIVACY_POLICY_ACCEPTED = "KEY_PRIVACY_POLICY_ACCEPTED";
 
     public PrefManager(){
         pref = RayanApplication.getContext().getSharedPreferences(PREF_NAME, PRIVATE_MODE);
@@ -83,6 +84,15 @@ public class PrefManager {
 
     public boolean isLoggedIn() {
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
+    }
+
+    public boolean isPrivacyPolicyAccepted() {
+        return pref.getBoolean(KEY_PRIVACY_POLICY_ACCEPTED,false);
+    }
+
+    public void setPrivacyPolicyAccepted(){
+        editor.putBoolean(KEY_PRIVACY_POLICY_ACCEPTED, true);
+        editor.commit();
     }
 
     public void createSession(String id,String username, String password, UserInfo userInfo,String email){

@@ -1,9 +1,9 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.net.ConnectException;
@@ -16,13 +16,9 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.PlugPhysicalVerificationRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Util.AppConstants;
 
 public class NewDevicePhysicalVerificationViewModel extends NewDeviceSetConfigurationFragmentViewModel {

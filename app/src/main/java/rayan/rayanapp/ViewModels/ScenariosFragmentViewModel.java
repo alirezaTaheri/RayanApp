@@ -2,12 +2,9 @@ package rayan.rayanapp.ViewModels;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 
@@ -30,14 +27,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Scenario;
@@ -48,13 +42,12 @@ import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Persistance.database.ScenarioDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDeviceWithLastCommand;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ToggleDevice;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ToggleDeviceWithLastCommand;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.ToggleDeviceResponse;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Util.AppConstants;
-import retrofit2.Call;
 import retrofit2.Response;
 
 public class ScenariosFragmentViewModel extends DevicesFragmentViewModel{

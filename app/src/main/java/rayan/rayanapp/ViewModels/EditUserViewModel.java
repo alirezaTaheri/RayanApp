@@ -2,9 +2,9 @@ package rayan.rayanapp.ViewModels;
 
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -12,9 +12,9 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditUserRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.UserInfo;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditUserRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.UserInfo;
 
 public class EditUserViewModel extends DevicesFragmentViewModel {
     private final String TAG = EditUserViewModel.class.getSimpleName();

@@ -1,27 +1,19 @@
 package rayan.rayanapp.Dialogs;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.varunest.sparkbutton.SparkButton;
 
 import androidx.annotation.NonNull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Listeners.DeviceManagementOptionsClickListener;
-import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
 
 public class DeviceManagementPopupDialog extends AlertDialog {

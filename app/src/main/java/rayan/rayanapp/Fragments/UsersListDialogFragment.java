@@ -2,16 +2,16 @@ package rayan.rayanapp.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +29,8 @@ import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.ContactsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnContactClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class UsersListDialogFragment extends BottomSheetDialogFragment implements OnContactClicked<User> {

@@ -7,7 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.support.multidex.MultiDex;
+import androidx.multidex.MultiDex;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -24,15 +24,15 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Locale;
 
-import rayan.rayanapp.Helper.DeviceAnimator;
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
 import rayan.rayanapp.Helper.MqttMessagesController;
 import rayan.rayanapp.Helper.MqttSubscriptionController;
 import rayan.rayanapp.Helper.RequestManager;
 import rayan.rayanapp.Helper.ScenariosMqttMessagesController;
 import rayan.rayanapp.Helper.SendMessageToDevice;
-import rayan.rayanapp.Mqtt.MqttClient;
-import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.Persistance.PrefManager;
 import rayan.rayanapp.R;
 import rayan.rayanapp.RxBus.DevicesAccessibilityBus;
@@ -40,7 +40,6 @@ import rayan.rayanapp.RxBus.NetworkConnectionBus;
 import rayan.rayanapp.RxBus.UDPMessageRxBus;
 import rayan.rayanapp.RxBus.WifiScanResultsBus;
 import rayan.rayanapp.Util.JsonMaker;
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class RayanApplication extends Application {
     private static final String TAG = "RayanApplication";
@@ -74,12 +73,13 @@ public class RayanApplication extends Application {
             getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
         }
 //        Fabric.with(this, new Crashlytics());
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/IRANSans1.ttf")
-//                .setDefaultFontPath("fonts/aseman.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/IRANSans1.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
         wifiBus = new WifiScanResultsBus();
         devicesAccessibilityBus = new DevicesAccessibilityBus(this);
 //        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()

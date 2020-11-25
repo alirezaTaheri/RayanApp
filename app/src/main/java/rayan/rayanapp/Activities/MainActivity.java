@@ -2,11 +2,10 @@ package rayan.rayanapp.Activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -14,27 +13,25 @@ import android.net.wifi.ScanResult;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.util.ListUpdateCallback;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListUpdateCallback;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -83,7 +80,6 @@ import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Fragments.FavoritesFragment;
 import rayan.rayanapp.Helper.ControlRequests;
 import rayan.rayanapp.Helper.MessageTransmissionDecider;
-import rayan.rayanapp.Helper.RayanUtils;
 import rayan.rayanapp.Helper.RetryConnectMqtt;
 import rayan.rayanapp.Listeners.DevicesAndFavoritesListener;
 import rayan.rayanapp.Listeners.MqttStatus;
@@ -93,7 +89,7 @@ import rayan.rayanapp.Mqtt.MqttClient;
 import rayan.rayanapp.Mqtt.MqttClientService;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
@@ -101,11 +97,8 @@ import rayan.rayanapp.Util.CustomViewPager;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.Util.diffUtil.DevicesDiffCallBack;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import static rayan.rayanapp.App.RayanApplication.getContext;
-
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus, View.OnClickListener, OnGroupClicked<Group>, NetworkConnectivityListener, DevicesAndFavoritesListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MqttStatus, View.OnClickListener, OnGroupClicked<Group>, NetworkConnectivityListener, DevicesAndFavoritesListener {
     private static final int REQUEST_PHONE_CALL = 1;
     @BindView(R.id.connectionAnimation)
     LottieAnimationView connectionAnimation;
@@ -163,11 +156,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RetryConnectMqtt retryConnectMqtt;
     boolean networkConnected = false;
     Animation fadeIn, fadeOut;
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
     @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1032,7 +1020,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DevicesDiffCallBack devicesDiffCallBack;
     List<Device> devices = new ArrayList<>();
     public void observeDevicesForPlaySoundEffect(){
-        mainActivityViewModel.getAllDevicesLive().observe(this, new android.arch.lifecycle.Observer<List<Device>>() {
+        mainActivityViewModel.getAllDevicesLive().observe(this, new androidx.lifecycle.Observer<List<Device>>() {
             @Override
             public void onChanged(@Nullable List<Device> newDevices) {
                 devicesDiffCallBack = new DevicesDiffCallBack(newDevices, devices);

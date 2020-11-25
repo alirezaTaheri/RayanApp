@@ -1,6 +1,6 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,10 +10,8 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Scenario;
-import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.Listeners.OnScenarioClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
 
 public class ScenarioViewHolder extends BaseViewHolder<Scenario, OnScenarioClicked<Scenario>> {
 

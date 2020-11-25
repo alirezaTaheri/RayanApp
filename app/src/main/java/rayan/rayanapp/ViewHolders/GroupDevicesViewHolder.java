@@ -1,13 +1,10 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.varunest.sparkbutton.SparkButton;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

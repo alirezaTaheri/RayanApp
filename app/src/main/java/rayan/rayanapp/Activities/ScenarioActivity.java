@@ -1,10 +1,10 @@
 package rayan.rayanapp.Activities;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -13,7 +13,7 @@ import rayan.rayanapp.Fragments.CreateScenarioFragment;
 import rayan.rayanapp.R;
 import rayan.rayanapp.ViewModels.ScenarioActivityViewModel;
 
-public class ScenarioActivity extends AppCompatActivity {
+public class ScenarioActivity extends BaseActivity {
 
     CreateScenarioFragment createScenarioFragment;
     ScenarioActivityViewModel viewModel;

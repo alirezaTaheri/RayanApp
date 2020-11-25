@@ -1,9 +1,8 @@
 package rayan.rayanapp.Helper;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.Context;
-import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;

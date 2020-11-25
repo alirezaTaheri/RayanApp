@@ -1,6 +1,6 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,8 +13,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
-import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 public class GroupUserViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> {
     private final String TAG = GroupUserViewHolder.class.getSimpleName();

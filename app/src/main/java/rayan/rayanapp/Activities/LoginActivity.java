@@ -1,17 +1,12 @@
 package rayan.rayanapp.Activities;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Paint;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,7 +24,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
-import butterknife.OnTouch;
 //import co.ronash.pushe.Pushe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -38,6 +32,8 @@ import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Dialogs.PrivacyPolicyDialog;
+import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;
@@ -45,9 +41,8 @@ import rayan.rayanapp.Util.KeyboardUtil;
 import rayan.rayanapp.Util.NetworkUtil;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.LoginViewModel;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
     private final String TAG = LoginActivity.class.getSimpleName();
     LoginViewModel loginViewModel;
     @BindView(R.id.phoneNumberEditText)
@@ -56,9 +51,6 @@ public class LoginActivity extends AppCompatActivity {
     EditText passwordInput;
     @BindView(R.id.forgotPasswordTextView)
     TextView forgotPasswordTextView;
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
             SnackBarSetup.snackBarSetup(this.findViewById(android.R.id.content),"دستگاه به اینترنت متصل نیست");
         }
         ButterKnife.bind(this);
-
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //            if(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 //                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);

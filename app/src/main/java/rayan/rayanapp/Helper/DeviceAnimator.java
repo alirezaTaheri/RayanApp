@@ -1,14 +1,11 @@
 package rayan.rayanapp.Helper;
 
 import android.animation.ValueAnimator;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Util.AppConstants;
 

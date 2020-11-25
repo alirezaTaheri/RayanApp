@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="@color/grey_light_2"
     android:layout_height="match_parent">
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/nestedscrolview"
@@ -24,7 +24,7 @@
                 android:paddingLeft="46dp"
                 android:layout_gravity="center_vertical"
                 android:layout_height="wrap_content">
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_marginTop="15dp"
                     android:layout_marginRight="20dp"
@@ -41,7 +41,7 @@
                         android:textSize="17sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
                 <TextView
                     android:visibility="invisible"
                     android:id="@+id/saveGroupName"
@@ -163,6 +163,6 @@
                 android:paddingEnd="20dp"
                 android:background="@color/white"/>
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

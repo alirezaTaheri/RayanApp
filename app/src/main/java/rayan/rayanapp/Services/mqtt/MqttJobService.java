@@ -1,19 +1,12 @@
 package rayan.rayanapp.Services.mqtt;
 
-import android.annotation.SuppressLint;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.Toast;
 
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,18 +16,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.mqtt.model.Subscription;
-import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.ViewModels.MainActivityViewModel;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MqttJobService extends JobService {

@@ -2,8 +2,8 @@ package rayan.rayanapp.ViewModels;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
@@ -15,29 +15,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.ObservableTransformer;
 import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.ResponseBody;
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Data.CustomResponse;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Helper.RayanUtils;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.Ready4SettingsRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.Ready4SettingsResponse;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
-import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.adapter.rxjava2.Result;
 
 public class DevicesManagementListFragmentViewModel extends DevicesFragmentViewModel {
 

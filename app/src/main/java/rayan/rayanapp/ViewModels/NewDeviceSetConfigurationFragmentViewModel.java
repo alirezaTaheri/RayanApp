@@ -2,11 +2,11 @@ package rayan.rayanapp.ViewModels;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -14,8 +14,6 @@ import android.widget.Toast;
 import com.thanosfisherman.wifiutils.WifiUtils;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
-
-import org.reactivestreams.Subscription;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -26,8 +24,6 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.internal.operators.observable.ObservableAny;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
@@ -36,20 +32,19 @@ import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddDeviceToGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.CreateTopicRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.RegisterDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.DeviceBaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SingleLiveEvent;
-import rayan.rayanapp.Wifi.WifiHandler;
 
 public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListViewModel {
 

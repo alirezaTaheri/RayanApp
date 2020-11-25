@@ -1,21 +1,17 @@
 package rayan.rayanapp.Services;
 
 import android.app.Service;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.github.pwittchen.reactivenetwork.library.rx2.Connectivity;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -36,10 +32,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Receivers.ConnectionLiveData;
-import rayan.rayanapp.Services.mqtt.ActionListener;
 import rayan.rayanapp.Services.mqtt.Connection;
-import rayan.rayanapp.Services.mqtt.MyMqttCallbackHandler;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.MainActivityViewModel;
 

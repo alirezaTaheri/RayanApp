@@ -1,27 +1,23 @@
 package rayan.rayanapp.Activities;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
+
 import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class SettingssActivity extends AppCompatActivity {
+public class SettingssActivity extends BaseActivity {
     @BindView(R.id.soundswitch)
     SwitchCompat soundswitch;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

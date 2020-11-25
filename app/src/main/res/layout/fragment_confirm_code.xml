@@ -7,12 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.ConfirmCodeFragment">
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_marginTop="15dp"
             android:layout_height="wrap_content">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/code_confirm_EditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -23,9 +23,9 @@
                 android:imeOptions="actionDone"
                 android:maxLines="1"
                 android:textSize="16sp" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/register_code_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

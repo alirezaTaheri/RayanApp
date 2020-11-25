@@ -1,6 +1,6 @@
 package rayan.rayanapp.Wifi;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.net.wifi.ScanResult;
 
 import java.util.List;

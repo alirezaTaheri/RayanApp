@@ -1,8 +1,8 @@
 package rayan.rayanapp.Persistance;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 import android.content.Context;
 
 import rayan.rayanapp.Data.Device;
@@ -15,8 +15,8 @@ import rayan.rayanapp.Persistance.database.dao.LocallyChangesDAO;
 import rayan.rayanapp.Persistance.database.dao.ScenariosDAO;
 import rayan.rayanapp.Persistance.database.dao.UserMembershipDAO;
 import rayan.rayanapp.Persistance.database.dao.UsersDAO;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 @Database(entities = {Device.class, Group.class, User.class,UserMembership.class, LocallyChange.class, Scenario.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {

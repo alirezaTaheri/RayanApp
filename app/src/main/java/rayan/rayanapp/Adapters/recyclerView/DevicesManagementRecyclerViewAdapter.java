@@ -1,12 +1,11 @@
 package rayan.rayanapp.Adapters.recyclerView;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import rayan.rayanapp.Data.Device;

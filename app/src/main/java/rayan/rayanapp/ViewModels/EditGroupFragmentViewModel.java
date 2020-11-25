@@ -1,8 +1,8 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -11,7 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.io.InputStream;
@@ -30,14 +30,14 @@ import rayan.rayanapp.Persistance.database.UserDatabase;
 import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddAdminRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddUserByMobileRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
     GroupDatabase groupDatabase;

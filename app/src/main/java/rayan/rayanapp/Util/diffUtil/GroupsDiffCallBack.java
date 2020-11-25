@@ -1,11 +1,10 @@
 package rayan.rayanapp.Util.diffUtil;
 
-import android.support.v7.util.DiffUtil;
+import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.List;
 
-import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 
 public class GroupsDiffCallBack extends DiffUtil.Callback {
     private List<Group> newGroups;

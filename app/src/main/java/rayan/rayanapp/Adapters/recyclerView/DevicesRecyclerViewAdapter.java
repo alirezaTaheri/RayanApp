@@ -3,9 +3,8 @@ package rayan.rayanapp.Adapters.recyclerView;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v7.util.DiffUtil;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import android.util.Log;
 import android.view.ViewGroup;
 
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Util.AppConstants;

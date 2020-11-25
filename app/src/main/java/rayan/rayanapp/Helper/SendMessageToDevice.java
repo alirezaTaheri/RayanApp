@@ -1,7 +1,6 @@
 package rayan.rayanapp.Helper;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -25,8 +24,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -39,11 +36,11 @@ import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
-import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ToggleDevice;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.TlmsDoneResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.YesResponse;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;

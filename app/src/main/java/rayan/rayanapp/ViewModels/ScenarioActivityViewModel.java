@@ -1,7 +1,7 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import rayan.rayanapp.Data.Scenario;
 import rayan.rayanapp.Persistance.database.ScenarioDatabase;

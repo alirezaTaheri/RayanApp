@@ -1,37 +1,31 @@
 package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
+
+import androidx.lifecycle.ViewModelProviders;
+
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.StepperLayout;
-import com.stepstone.stepper.VerificationError;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
-import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Listeners.StepperItemSimulation;
 import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.NewDevicePhysicalVerificationViewModel;
 

@@ -1,50 +1,29 @@
 package rayan.rayanapp.Fragments;
 
-import android.Manifest;
-import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import androidx.core.content.ContextCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.varunest.sparkbutton.SparkButton;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import rayan.rayanapp.Activities.AddNewDeviceActivity;
-import rayan.rayanapp.Adapters.recyclerView.UsersRecyclerViewAdapter;
-import rayan.rayanapp.Data.Contact;
 import rayan.rayanapp.Data.NewDevice;
 import rayan.rayanapp.Listeners.TestNewDeviceDialogControllerListener;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
 import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.ViewModels.CreateGroupViewModel;
 import rayan.rayanapp.ViewModels.TestDeviceFragmentViewModel;
 
 public class TestDeviceFragment extends BottomSheetDialogFragment implements View.OnClickListener {

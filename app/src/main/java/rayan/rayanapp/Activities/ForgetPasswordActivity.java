@@ -1,21 +1,16 @@
 package rayan.rayanapp.Activities;
 
-import android.content.Context;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import rayan.rayanapp.Fragments.ForgetPasswordFragment;
 import rayan.rayanapp.R;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class ForgetPasswordActivity extends AppCompatActivity {
+public class ForgetPasswordActivity extends BaseActivity {
     FragmentTransaction transaction;
     FragmentManager fragmentManager;
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -12,9 +12,6 @@ import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 
-import com.google.gson.JsonObject;
-import com.scottyab.aescrypt.AESCrypt;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,19 +34,15 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Helper.AES;
 import rayan.rayanapp.Helper.Encryptor;
-import rayan.rayanapp.Helper.SendMessageToDevice;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.VerifyDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
-import rayan.rayanapp.Retrofit.Models.Responses.device.VerifyDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.VerifyDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.VerifyDeviceResponse;
 import rayan.rayanapp.Util.AppConstants;
 import retrofit2.Response;
-import se.simbio.encryption.Encryption;
 
 public class UDPServerService extends Service {
     private AsyncTask<Void, Void, Void> async;

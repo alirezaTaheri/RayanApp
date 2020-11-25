@@ -1,17 +1,14 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.varunest.sparkbutton.SparkButton;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;

@@ -1,40 +1,31 @@
 package rayan.rayanapp.Activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Fragments.ChangePasswordFragment;
-import rayan.rayanapp.Fragments.CreateGroupFragment;
+import rayan.rayanapp.Fragments.EditUserFragment;
+import rayan.rayanapp.Fragments.EditUserFragment.ClickOnChangePassword;
 import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Fragments.EditUserFragment;
-import rayan.rayanapp.Fragments.EditUserFragment.ClickOnChangePassword;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
-public class ProfileActivity extends AppCompatActivity implements ClickOnChangePassword, OnBottomSheetSubmitClicked {
+public class ProfileActivity extends BaseActivity implements ClickOnChangePassword, OnBottomSheetSubmitClicked {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
     EditUserFragment editUserFragment;
     YesNoButtomSheetFragment yesNoButtomSheetFragment;
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

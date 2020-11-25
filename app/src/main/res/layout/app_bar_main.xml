@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:background="@color/white"
         android:orientation="vertical">
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginLeft="12dp"
@@ -20,14 +20,14 @@
         app:cardElevation="5dp"
         app:cardCornerRadius="12dp"
         app:cardBackgroundColor="@android:color/white">
-        <android.support.design.widget.AppBarLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:layoutDirection="rtl"
             android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:theme="@style/AppTheme">
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 app:contentInsetStartWithNavigation="-10dp"
                 app:contentInsetLeft="-10dp"
@@ -39,9 +39,9 @@
                 <include layout="@layout/toolbar_main"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-            </android.support.v7.widget.Toolbar>
-        </android.support.design.widget.AppBarLayout>
-    </android.support.v7.widget.CardView>
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
+    </androidx.cardview.widget.CardView>
         <include layout="@layout/content_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

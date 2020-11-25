@@ -1,18 +1,15 @@
 package rayan.rayanapp.Helper;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
@@ -20,9 +17,8 @@ import rayan.rayanapp.Data.LocallyChange;
 import rayan.rayanapp.Persistance.database.LocallyChangesDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.DeviceResponse;
 
 public class ControlRequests {
     LocallyChangesDatabase lcd;

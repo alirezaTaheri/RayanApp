@@ -1,22 +1,19 @@
 package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -27,17 +24,14 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Adapters.recyclerView.GroupsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 //<<<<<<< HEAD
 //<<<<<<< HEAD
 //=======
 import rayan.rayanapp.Util.SnackBarSetup;
-import rayan.rayanapp.ViewModels.ChangeDeviceAccessPointFragmentViewModel;
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
 //=======
 
-import rayan.rayanapp.Util.SnackBarSetup;
-import rayan.rayanapp.ViewModels.ChangeDeviceAccessPointFragmentViewModel;
 //>>>>>>> 61f7df95c05f5e7b5402a088a45aa1e4642821eb
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 

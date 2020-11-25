@@ -1,7 +1,7 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.support.annotation.Nullable;
-import android.support.v7.widget.AppCompatCheckBox;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatCheckBox;
 import android.view.View;
 import android.widget.TextView;
 
@@ -10,7 +10,7 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import rayan.rayanapp.Listeners.OnContactClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 public class ContactViewHolder  extends BaseViewHolder<User, OnContactClicked<User>> {
 

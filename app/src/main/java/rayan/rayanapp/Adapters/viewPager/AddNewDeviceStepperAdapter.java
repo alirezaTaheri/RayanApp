@@ -1,9 +1,8 @@
 package rayan.rayanapp.Adapters.viewPager;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import android.util.Log;
 
 import com.stepstone.stepper.BlockingStep;
@@ -11,16 +10,12 @@ import com.stepstone.stepper.Step;
 import com.stepstone.stepper.adapter.AbstractFragmentStepAdapter;
 import com.stepstone.stepper.viewmodel.StepViewModel;
 
-import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Fragments.FinishAddNewDeviceFragment;
 import rayan.rayanapp.Fragments.NewDevicePhysicalVerificationFragment;
-import rayan.rayanapp.Fragments.NewDeviceSetAccessPoint;
 import rayan.rayanapp.Fragments.NewDeviceSetConfigurationFragment;
-import rayan.rayanapp.Fragments.NewDeviceSetGroupFragment;
 import rayan.rayanapp.Fragments.NewDevice_Plug_PhysicalVerificationFragment;
 import rayan.rayanapp.Fragments.NewDevice_Switch_PhysicalVerificationFragment;
 import rayan.rayanapp.Fragments.NewDevicesListFragment;
-import rayan.rayanapp.R;
 
 public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
 

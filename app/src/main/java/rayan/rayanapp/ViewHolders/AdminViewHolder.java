@@ -1,8 +1,7 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
-import android.support.v7.content.res.AppCompatResources;
+import androidx.annotation.Nullable;
+
 import android.view.View;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -12,10 +11,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.Util.AppConstants;
-
-import static rayan.rayanapp.App.RayanApplication.getContext;
 
 public class AdminViewHolder extends BaseViewHolder<User, OnAdminClicked<User>> {
     private final String TAG = AdminViewHolder.class.getSimpleName();

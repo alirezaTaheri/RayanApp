@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/parent"
+    android:layout_margin="20dp"
+    android:padding="10dp"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/ms_black"
+        android:id="@+id/title"
+        android:text="قوانین، شرایط و سیاست حریم خصوصی"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/icon"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp" />
+    <ImageView
+        android:id="@+id/icon"
+        app:layout_constraintBottom_toBottomOf="@id/title"
+        app:layout_constraintRight_toLeftOf="@id/title"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/title"
+        app:srcCompat="@drawable/ic_info_black_24dp"
+        android:tint="@color/blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <WebView
+        android:id="@+id/text"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="400dp" />
+    <TextView
+        android:id="@+id/confirm"
+        android:text="قبول دارم"
+        app:layout_constraintTop_toBottomOf="@+id/text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="15dp"
+        android:textSize="16.5sp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="25dp"
+        android:textColor="@color/white"
+        android:background="@drawable/button_backgrand"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,7 +20,7 @@
         android:layoutDirection="rtl"
         android:gravity="center_horizontal"
         android:orientation="vertical">
-        <android.support.v7.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bottomSheetText"
             android:layout_width="wrap_content"
             android:layout_gravity="center"
@@ -36,7 +36,7 @@
         android:layout_marginBottom="25dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/submitBtn"
             android:layout_width="0dp"
             android:layout_weight="0.5"
@@ -46,7 +46,7 @@
            android:layout_marginLeft="8dp"
             android:layout_marginRight="25dp"
             app:backgroundTint="@color/baseColor"/>
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/cancelBtn"
             android:layout_width="0dp"
             android:layout_weight="0.5"

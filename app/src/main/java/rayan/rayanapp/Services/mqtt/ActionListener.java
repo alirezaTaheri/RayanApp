@@ -1,11 +1,10 @@
 package rayan.rayanapp.Services.mqtt;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -15,9 +14,6 @@ import java.util.ArrayList;
 
 import rayan.rayanapp.Fragments.DevicesFragment;
 import rayan.rayanapp.Mqtt.MqttClient;
-import rayan.rayanapp.Mqtt.MqttClientService;
-import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
-import rayan.rayanapp.ViewModels.MainActivityViewModel;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Services.mqtt.internal.Connections;
 import rayan.rayanapp.Services.mqtt.model.Subscription;

@@ -14,7 +14,7 @@
         android:clickable="true"
         android:layout_height="55dp">
 
-        <android.support.v7.widget.AppCompatCheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/checkbox"
             android:layout_centerVertical="true"
             android:shadowColor="@color/ms_black"

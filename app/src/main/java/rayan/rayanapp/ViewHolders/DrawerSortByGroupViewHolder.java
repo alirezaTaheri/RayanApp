@@ -1,10 +1,9 @@
 package rayan.rayanapp.ViewHolders;
 
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -12,7 +11,7 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 
 public class DrawerSortByGroupViewHolder extends BaseViewHolder<Group, OnGroupClicked<Group>> {
 

@@ -1,6 +1,6 @@
 package rayan.rayanapp.Persistance.database;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.Context;
 
 import java.util.List;
@@ -10,8 +10,7 @@ import java.util.concurrent.Executors;
 import io.reactivex.Flowable;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.dao.UsersDAO;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.Util.AppConstants;
 
 public class UserDatabase {

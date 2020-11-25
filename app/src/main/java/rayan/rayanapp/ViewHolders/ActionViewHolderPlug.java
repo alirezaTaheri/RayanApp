@@ -1,11 +1,10 @@
 package rayan.rayanapp.ViewHolders;
 
 import android.animation.ValueAnimator;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,7 +15,6 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.Data.Device;
-import rayan.rayanapp.Listeners.OnToggleDeviceListener;
 import rayan.rayanapp.Listeners.ScenarioOnActionClickedListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Util.AppConstants;

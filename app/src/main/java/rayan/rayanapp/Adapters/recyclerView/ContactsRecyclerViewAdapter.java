@@ -5,7 +5,7 @@ import android.view.ViewGroup;
 
 import rayan.rayanapp.Listeners.OnContactClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.ViewHolders.ContactViewHolder;
 
 public class ContactsRecyclerViewAdapter extends GenericRecyclerViewAdapter<User,OnContactClicked<User>, ContactViewHolder> {

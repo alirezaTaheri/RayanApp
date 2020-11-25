@@ -1,6 +1,6 @@
 package rayan.rayanapp.Persistance.database;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.content.Context;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import io.reactivex.Flowable;
 import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.dao.UserMembershipDAO;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.Util.AppConstants;
 
 public class UserMembershipDatabase {

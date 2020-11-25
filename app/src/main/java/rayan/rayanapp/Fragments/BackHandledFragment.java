@@ -1,8 +1,7 @@
 package rayan.rayanapp.Fragments;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+import androidx.fragment.app.Fragment;
 
 public abstract class BackHandledFragment extends Fragment {
     protected BackHandlerInterface backHandlerInterface;
