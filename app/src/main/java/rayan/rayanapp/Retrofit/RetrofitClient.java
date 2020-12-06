@@ -1,6 +1,7 @@
 package rayan.rayanapp.Retrofit;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,15 +20,22 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
+import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Util.AppConstants;
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -148,6 +156,7 @@ public class RetrofitClient {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             return builder
                     .addInterceptor(interceptor)
+                    .addInterceptor(new LoginInterceptor())
                     .cache(null)
 //                .readTimeout(10, TimeUnit.SECONDS)
 //                .connectTimeout(10, TimeUnit.SECONDS)
@@ -155,5 +164,39 @@ public class RetrofitClient {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    public static class LoginInterceptor implements Interceptor {
+
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Request request = chain.request();
+            Response response = chain.proceed(request);
+            try {
+                if (response.code() == 401 || response.message().toLowerCase().contains(AppConstants.UNAUTHORIZED.toLowerCase())) {
+                    Log.e("LoginInterceptor", "Request Failed Because of expired Token");
+                    Log.e("LoginInterceptor","=-=-=-=-=-=-=-=-=-=-=-=-");
+                    Log.e("LoginInterceptor","Response: "+response);
+                    Log.e("LoginInterceptor","Token: "+request.header("Authorization"));
+                    Log.e("LoginInterceptor","Code & Message: "+response.code() + "  |  " + response.message());
+                    String newToken;
+                    ApiService apiService = ApiUtils.getApiService();
+                    retrofit2.Response<BaseResponse> responseCall = apiService.loginCall(RayanApplication.getPref().getUsername(), RayanApplication.getPref().getPassword()).execute();
+                    newToken = responseCall.body().getData().getToken();
+                    Log.e("LoginInterceptor", "NewToken has gotten: " + newToken);
+                    if (newToken != null) {
+                        RayanApplication.getPref().saveToken(newToken);
+                        Request newRequest = request.newBuilder().header(AppConstants.HEADER_AUTHORIZATION, newToken).build();
+                        Response newResponse = chain.proceed(newRequest);
+                        return newResponse;
+                    }
+                }
+            }catch (Exception e){
+                Log.e("LoginInterceptor", "Unexpected Error Occurred: "+e);
+                e.printStackTrace();
+                return response;
+            }
+            return response;
+        }
+
     }
 }

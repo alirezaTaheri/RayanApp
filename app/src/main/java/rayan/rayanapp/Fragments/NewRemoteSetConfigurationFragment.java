@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,7 @@ import rayan.rayanapp.Data.Remote;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Listeners.AddNewRemoteNavListener;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.AddNewRemoteViewModel;
 

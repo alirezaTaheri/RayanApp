@@ -11,12 +11,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.pm.ShortcutInfoCompat;
 import android.support.v4.content.pm.ShortcutManagerCompat;
 import android.support.v4.graphics.drawable.IconCompat;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,10 +29,8 @@ import rayan.rayanapp.Activities.GroupsActivity;
 import rayan.rayanapp.Activities.MainActivity;
 import rayan.rayanapp.Adapters.recyclerView.GroupsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnGroupClicked;
-import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Util.SnackBarSetup;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 public class GroupsListFragment extends Fragment implements OnGroupClicked<Group> {

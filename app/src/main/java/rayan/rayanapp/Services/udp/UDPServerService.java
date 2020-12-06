@@ -40,16 +40,14 @@ import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.VerifyDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.device.VerifyDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.VerifyDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.VerifyDeviceResponse;
 import rayan.rayanapp.Util.AppConstants;
 import retrofit2.Response;
 
 public class UDPServerService extends Service {
-    private AsyncTask<Void, Void, Void> async;
     private boolean Server_active = true;
     public boolean isRunnig = false;
-    private AppDatabase dataBase;
     private DeviceDatabase deviceDatabase;
     private int port;
     private ApiService apiService;
@@ -62,7 +60,6 @@ public class UDPServerService extends Service {
         byte[] lMsg = new byte[4096];
         DatagramPacket dp = new DatagramPacket(lMsg, lMsg.length);
         DatagramSocket ds = null;
-        dataBase = AppDatabase.getInstance(getApplicationContext());
         deviceDatabase = new DeviceDatabase(this);
         try{
             ds = new DatagramSocket(port);
@@ -164,48 +161,12 @@ public class UDPServerService extends Service {
                                             deviceDatabase.updateDevice(device);
                                         } else {
                                             Log.e(TAG, "An Unknown Device Detected...");
-//                                    JsonObject jsonObject = new JsonObject();
-//                                    jsonObject.addProperty("event", AppConstants.TO_DEVICE_NODE);
-//                                    jsonObject.addProperty("src", RayanApplication.getPref().getId());
-//                                    sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
                                         }
-//                            } else Log.e(TAG, "There is a Unverified Device");
                                         break;
                                     case "YES":
                                         verifyDevice(device, senderIP);
-//                                        src = jsonMessage.getString("src");
-//                                        name = jsonMessage.getString("name");
-//                                        ssid = jsonMessage.getString("ssid");
-//                                        style = jsonMessage.getString("style");
-//                                        type = jsonMessage.getString("type");
-//                                        decodedName = Base64.decode(name, Base64.DEFAULT);
-//                                        device = deviceDatabase.getDevice(src);
-//                                        Log.d(TAG, "YESYESYES" + device);
-//                                        if (device != null) {
-//                                            ((RayanApplication) getApplication()).getDevicesAccessibilityBus().send(src);
-//                                            device.setLocallyAccessibility(true);
-//                                            device.setIp(senderIP);
-//                                            device.setName1(new String(decodedName, "UTF-8"));
-//                                            device.setSsid(ssid);
-//                                            device.setStyle(style);
-//                                            deviceDatabase.updateDevice(device);
-//                                        }
-////                            else{
-////                                device = new Device(src, new String(decodedName, "UTF-8"), "", type, "", new Topic(), "","");
-////                                device.setSsid(ssid);
-////                                device.setStyle(style);
-////                                device.setIp(senderIP);
-////                                deviceDatabase.addDevice(device);
-////                            }
-//                                        JsonObject jsonObject = new JsonObject();
-//                                        jsonObject.addProperty("event", AppConstants.TO_DEVICE_TLMS);
-//                                        jsonObject.addProperty("src", RayanApplication.getPref().getId());
-//                                        sendUDPMessage.sendUdpMessage(senderIP, jsonObject.toString());
-//                                        break;
                                     case "wrong_stword":
-
                                         break;
-
                                 }
                             }else Log.e(TAG, "Auth Is Wrong");
                         }else{
@@ -225,9 +186,9 @@ public class UDPServerService extends Service {
                                 case AppConstants.EVENT_NODE_DISCOVER:
                                     verifyDevice(device, senderIP);
                                     break;
-                                    case "hmac":
-                                        Log.e(TAG, "HMAC Is: " + sha1(jsonObject.getString("text"), jsonObject.getString("k")));
-                                        break;
+                                case "hmac":
+                                    Log.e(TAG, "HMAC Is: " + sha1(jsonObject.getString("text"), jsonObject.getString("k")));
+                                    break;
                                 case "en":
                                     String a = jsonObject.getString("text");
                                     Log.e("Encrypting", "Encrypted is: " + Encryptor.encrypt(a, jsonObject.getString("k")));
@@ -239,7 +200,7 @@ public class UDPServerService extends Service {
                             }
                         }else {
                             Log.d(TAG, "No Device With ChipId: " + src);
-                            switch (jsonObject.getString("cmd")){
+                            switch (jsonObject.getString("result")){
                                 case "hmac":
                                     Log.e(TAG, "HMAC Is: " + sha1(jsonObject.getString("text"), jsonObject.getString("k")));
                                     break;
@@ -255,8 +216,8 @@ public class UDPServerService extends Service {
                         }
                     }
                 }
-                //{"src":"5bf94a4ec7b255005bbed354", "cmd":"YES", "type":"switch_2", "ssid":"SomeSSID", "style":"connected", "name":"2KrYsdiq2LDYqtiw\n"}
-                //{"src":"14337767", "cmd":"tgl","pin1":"on", "pin2":"off"}
+                //{"src":"5bf94a4ec7b255005bbed354", "result":"YES", "type":"switch_2", "ssid":"SomeSSID", "style":"connected", "name":"2KrYsdiq2LDYqtiw\n"}
+                //{"src":"14337767", "result":"tgl","pin1":"on", "pin2":"off"}
             }
         }
         catch (Exception e) {
@@ -342,109 +303,109 @@ public class UDPServerService extends Service {
     public void verifyDevice(Device device, String ip){
         Log.d(TAG, "Verifying This Device: " + device + " IP is: " + ip);
         try {
-        VerifyDeviceRequest verifyDeviceRequest = new VerifyDeviceRequest();
-        List<String> currentList = tempVerification.get(device.getChipId());
-        if (currentList == null){
-            List<String> verificationList = new ArrayList<>();
-            verificationList.add(verifyDeviceRequest.getAuth());
-            tempVerification.put(device.getChipId(), verificationList);
-        }else{
-            currentList.add(verifyDeviceRequest.getAuth());
-            tempVerification.put(device.getChipId(), currentList);
-        }
-        Log.e(TAG, "Putting Auth To Header: " + verifyDeviceRequest.ToString());
-        Log.e(TAG, "Putting Auth To Header: " + sha1(verifyDeviceRequest.ToString(), device.getSecret()));
+            VerifyDeviceRequest verifyDeviceRequest = new VerifyDeviceRequest();
+            List<String> currentList = tempVerification.get(device.getChipId());
+            if (currentList == null){
+                List<String> verificationList = new ArrayList<>();
+                verificationList.add(verifyDeviceRequest.getAuth());
+                tempVerification.put(device.getChipId(), verificationList);
+            }else{
+                currentList.add(verifyDeviceRequest.getAuth());
+                tempVerification.put(device.getChipId(), currentList);
+            }
+            Log.e(TAG, "Putting Auth To Header: " + verifyDeviceRequest.ToString());
+            Log.e(TAG, "Putting Auth To Header: " + sha1(verifyDeviceRequest.ToString(), device.getSecret()));
             Observable.just(device)
                     .flatMap(d -> {
                         verifyDeviceRequest.setSTWORD(Encryptor.encrypt(device.getHeader().concat("#").concat(device.getStatusWord()).concat("#"), device.getSecret()));
                         return apiService.verifyDevice(sha1(verifyDeviceRequest.ToString(), d.getSecret()), AppConstants.getDeviceAddress(ip,AppConstants.TO_DEVICE_VERIFY), verifyDeviceRequest).subscribeOn(Schedulers.io());
                     })
-                .takeWhile(verifyDeviceResponse -> {
-                    if (verifyDeviceResponse.body().getError()!=null&verifyDeviceResponse.body().getError().equals(AppConstants.WRONG_STWORD)){
-                        device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(verifyDeviceResponse.body().getSTWORD(),device.getSecret()).split("#")[1])+1));
-                        device.setHeader(Encryptor.decrypt(verifyDeviceResponse.body().getSTWORD(),device.getSecret()).split("#")[0]);
-                        return true;
-                    }
-                    if (verifyDeviceResponse.body().getAuth() != null){
-                        Log.e(TAG, "Auth Detected: "+ verifyDeviceResponse.body().getAuth());
-                        try {
-                            Log.e(TAG, "String Auth Was: " + tempVerification.get(device.getChipId()));
+                    .takeWhile(verifyDeviceResponse -> {
+                        if (verifyDeviceResponse.body().getError()!=null&verifyDeviceResponse.body().getError().equals(AppConstants.WRONG_STWORD)){
+                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(verifyDeviceResponse.body().getSTWORD(),device.getSecret()).split("#")[1])+1));
+                            device.setHeader(Encryptor.decrypt(verifyDeviceResponse.body().getSTWORD(),device.getSecret()).split("#")[0]);
+                            return true;
+                        }
+                        if (verifyDeviceResponse.body().getAuth() != null){
+                            Log.e(TAG, "Auth Detected: "+ verifyDeviceResponse.body().getAuth());
+                            try {
+                                Log.e(TAG, "String Auth Was: " + tempVerification.get(device.getChipId()));
 //                        String originalAuth = AppConstants.sha1(tempVerification.get(device.getChipId()), device.getSecret());
 //                        Log.e(TAG, "Orginal Auth: " + originalAuth);
-                            if (checkVerificationString(device.getChipId(), device.getSecret(), verifyDeviceResponse.body().getAuth())){
-                                Log.e(TAG, "Auth is OK");
-                                if (verifyDeviceResponse.body().getResult().equals(AppConstants.FROM_DEVICE_VERIFY_SUCCESSFUL)) {
-                                    Log.e(TAG, "Verify_done received from device");
-                                    String pin1, pin2, name, statusWord, src;
-                                    byte[] decodedName;
-                                    src = verifyDeviceResponse.body().getSrc();
-                                    pin1 = verifyDeviceResponse.body().getPort1();
-                                    pin2 = verifyDeviceResponse.body().getPort2();
-                                    name = verifyDeviceResponse.body().getName();
-                                    statusWord = null;
-                                    if (verifyDeviceResponse.body().getSTWORD() != null) {
-                                        statusWord = verifyDeviceResponse.body().getSTWORD();
-                                    } else Log.e(TAG, "There is no stword");
-                                    decodedName = Base64.decode(name, Base64.DEFAULT);
-                                    Log.d(TAG, "Verifying This Device: " + device);
-                                    if (device != null) {
-                                        ((RayanApplication) getApplication()).getDevicesAccessibilityBus().send(src);
-                                        device.setLocallyAccessibility(true);
-                                        device.setIp(ip);
-                                        device.setStyle(verifyDeviceResponse.body().getStyle());
-                                        device.setName1(new String(decodedName, "UTF-8"));
-                                        device.setPin1(pin1);
-                                        device.setPin2(pin2);
-                                        if (statusWord != null) {
-                                            Log.e(getClass().getSimpleName(), "Received Stword: " + statusWord + " Decoding with Key: " + device.getSecret());
-                                            Log.e("Decrypting", "Plain text Decrypted is: " + Encryptor.decrypt(statusWord, device.getSecret()));
-                                            Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
-                                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
-                                            device.setHeader(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]);
-                                            Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
+                                if (checkVerificationString(device.getChipId(), device.getSecret(), verifyDeviceResponse.body().getAuth())){
+                                    Log.e(TAG, "Auth is OK");
+                                    if (verifyDeviceResponse.body().getResult().equals(AppConstants.FROM_DEVICE_VERIFY_SUCCESSFUL)) {
+                                        Log.e(TAG, "Verify_done received from device");
+                                        String pin1, pin2, name, statusWord, src;
+                                        byte[] decodedName;
+                                        src = verifyDeviceResponse.body().getSrc();
+                                        pin1 = verifyDeviceResponse.body().getPort1();
+                                        pin2 = verifyDeviceResponse.body().getPort2();
+                                        name = verifyDeviceResponse.body().getName();
+                                        statusWord = null;
+                                        if (verifyDeviceResponse.body().getSTWORD() != null) {
+                                            statusWord = verifyDeviceResponse.body().getSTWORD();
+                                        } else Log.e(TAG, "There is no stword");
+                                        decodedName = Base64.decode(name, Base64.DEFAULT);
+                                        Log.d(TAG, "Verifying This Device: " + device);
+                                        if (device != null) {
+                                            ((RayanApplication) getApplication()).getDevicesAccessibilityBus().send(src);
+                                            device.setLocallyAccessibility(true);
+                                            device.setIp(ip);
+                                            device.setStyle(verifyDeviceResponse.body().getStyle());
+                                            device.setName1(new String(decodedName, "UTF-8"));
+                                            device.setPin1(pin1);
+                                            device.setPin2(pin2);
+                                            if (statusWord != null) {
+                                                Log.e(getClass().getSimpleName(), "Received Stword: " + statusWord + " Decoding with Key: " + device.getSecret());
+                                                Log.e("Decrypting", "Plain text Decrypted is: " + Encryptor.decrypt(statusWord, device.getSecret()));
+                                                Log.e(getClass().getSimpleName(), "Next Stword: " + (Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
+                                                device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[1]) + 1));
+                                                device.setHeader(Encryptor.decrypt(statusWord, device.getSecret()).split("#")[0]);
+                                                Log.e(getClass().getSimpleName(), "New Stword With ending:" + device.getStatusWord());
+                                            }
+                                            deviceDatabase.updateDevice(device);
                                         }
-                                        deviceDatabase.updateDevice(device);
+                                    }else{
+                                        Log.e(TAG, "Not_verified received from device");
                                     }
                                 }else{
-                                    Log.e(TAG, "Not_verified received from device");
+                                    Log.e(TAG, "Verification Failed Because of Wrong AUTH");
                                 }
-                            }else{
-                                Log.e(TAG, "Verification Failed Because of Wrong AUTH");
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchAlgorithmException e) {
+                                e.printStackTrace();
+                            } catch (InvalidKeyException e) {
+                                e.printStackTrace();
                             }
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        } catch (NoSuchAlgorithmException e) {
-                            e.printStackTrace();
-                        } catch (InvalidKeyException e) {
-                            e.printStackTrace();
+                        }else{
+                            Log.e(TAG, "Verification Failed Because of empty auth");
                         }
-                    }else{
-                        Log.e(TAG, "Verification Failed Because of empty auth");
-                    }
-                    return false;
-                })
-        .subscribe(new Observer<Response<VerifyDeviceResponse>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
+                        return false;
+                    })
+                    .subscribe(new Observer<Response<VerifyDeviceResponse>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
 
-            }
+                        }
 
-            @Override
-            public void onNext(Response<VerifyDeviceResponse> verifyDeviceResponse) {
-                Log.e(TAG, "onNext() called with: verifyDeviceResponse = [" + verifyDeviceResponse + "]");
+                        @Override
+                        public void onNext(Response<VerifyDeviceResponse> verifyDeviceResponse) {
+                            Log.e(TAG, "onNext() called with: verifyDeviceResponse = [" + verifyDeviceResponse + "]");
 
-            }
+                        }
 
-            @Override
-            public void onError(Throwable e) {
-                Log.e(TAG, "onError() called with: e = [" + e + "]");
-            }
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e(TAG, "onError() called with: e = [" + e + "]");
+                        }
 
-            @Override
-            public void onComplete() {
+                        @Override
+                        public void onComplete() {
 
-            }
-        });
+                        }
+                    });
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -457,9 +418,9 @@ public class UDPServerService extends Service {
     public boolean checkVerificationString(String chipId, String secret, String auth) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         List<String> deviceAuthList = tempVerification.get(chipId);
         if (deviceAuthList != null)
-        for (String expectedAuth: deviceAuthList)
-            if (auth.equals(AppConstants.sha1(expectedAuth, secret)))
-                return true;
+            for (String expectedAuth: deviceAuthList)
+                if (auth.equals(AppConstants.sha1(expectedAuth, secret)))
+                    return true;
         return false;
     }
 }

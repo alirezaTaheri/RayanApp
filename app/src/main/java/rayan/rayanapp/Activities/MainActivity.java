@@ -49,6 +49,9 @@ import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
+import com.thanosfisherman.wifiutils.WifiUtils;
+import com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode;
+import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -91,15 +94,11 @@ import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.Mqtt.MqttClient;
 import rayan.rayanapp.Mqtt.MqttClientService;
-import rayan.rayanapp.Persistance.database.DeviceDatabase;
-import rayan.rayanapp.Persistance.database.GroupDatabase;
-import rayan.rayanapp.Persistance.database.RemoteDataDatabase;
-import rayan.rayanapp.Persistance.database.RemoteDatabase;
 import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Retrofit.ApiService;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.UDPServerService;
 import rayan.rayanapp.Util.AppConstants;
@@ -472,12 +471,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startService(new Intent(this, UDPServerService.class));
             RayanApplication.getPref().saveLocalBroadcastAddress(mainActivityViewModel.getBroadcastAddress().toString().replace("/", ""));
             mainActivityViewModel.sendNodeToAll();
-            mainActivityViewModel.getGroups1().observe(this, new android.arch.lifecycle.Observer<StartupApiRequests.requestStatus>() {
-                @Override
-                public void onChanged(@Nullable StartupApiRequests.requestStatus requestStatus) {
-                    Log.e("3$$$$$", "^^^^^^^^^^^^^^^^^^^" + requestStatus);
-                }
-            });
+//            mainActivityViewModel.getGroups1().observe(this, new android.arch.lifecycle.Observer<StartupApiRequests.requestStatus>() {
+//                @Override
+//                public void onChanged(@Nullable StartupApiRequests.requestStatus requestStatus) {
+//                    Log.e("3$$$$$", "^^^^^^^^^^^^^^^^^^^" + requestStatus);
+//                }
+//            });
         }
         ((RayanApplication)getApplication()).getMsc().init();
     }
@@ -720,7 +719,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
 //        startService(new Intent(this, AlwaysOnService.class));
-
+//        WifiUtils.withContext(getApplicationContext())
+//                .connectWith("Rayan_remote_hub_222222_f", "12345678")
+//                .onConnectionResult(new ConnectionSuccessListener() {
+//                    @Override
+//                    public void success() {
+//                        Log.e("isSuccessful" , "isisisisi: ");
+//                        Toast.makeText(MainActivity.this, "به دستگاه متصل شد", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void failed(@androidx.annotation.NonNull ConnectionErrorCode errorCode) {
+//                        Log.e("NOTsUCCESSFULL" , "Error isisisisi: " + errorCode);
+//                        Toast.makeText(MainActivity.this, "خطا در اتصال به دستگاه", Toast.LENGTH_SHORT).show();
+//                    }
+//                })
+//                .start();
+//        WifiUtils.withContext(getApplicationContext())
+//                .connectWith("Rayan_remote_hub_222222_f", "12345678")
+//                .setTimeout(40000)
+//                .onConnectionResult(new ConnectionSuccessListener() {
+//                    @Override
+//                    public void success() {
+//                        Toast.makeText(MainActivity.this, "SUCCESS!", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void failed(@NonNull ConnectionErrorCode errorCode) {
+//                        Toast.makeText(MainActivity.this, "EPIC FAIL!" + errorCode.toString(), Toast.LENGTH_SHORT).show();
+//                    }
+//                })
+//                .start();
+//        mainActivityViewModel.getGroups();
 //        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
 //            this.drawerLayout.closeDrawer(GravityCompat.START);
 //        } else {
@@ -729,11 +759,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        DeviceDatabase deviceDatabase = new DeviceDatabase(this);
 //        RemoteDataDatabase remoteDataDatabase = new RemoteDataDatabase(this);
 //        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
-        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
+//        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
 //        GroupDatabase groupDatabase = new GroupDatabase(this);
 //        Log.e(TAG, "G"+groupDatabase.getAllGroups());
 //        Log.e(TAG, "G"+deviceDatabase.getAllDevices());
-        Log.e(TAG, "G"+remoteHubDatabase.getAllRemoteHubs());
+//        Log.e(TAG, "G"+remoteHubDatabase.getAllRemoteHubs());
 //        Log.e(TAG, "G"+remoteDatabase.getAllRemotes());
 //        Log.e(TAG, "G"+remoteDataDatabase.getAllRemoteDatas());
 //        groupDatabase.getAllCount("");
@@ -1620,24 +1650,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////        } catch (UnsupportedEncodingException e) {
 ////            e.printStackTrace();
 ////        }
-//    }//{"src":"111111","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"yyz+4yK0mByoiYrkw1D3pA=="}
+//    }//{"src":"111111","result":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"yyz+4yK0mByoiYrkw1D3pA=="}
 //}//
 
-//{"text":"yxEX1vOqupgRIiIE6mi11szCSG6glHizIdaPimHgGJoMk5B5jC/aTuoLF5p7MTJlz/yIH4seE3HatSek9ipis8JNmUzJX7tnKI7E14ur5jZ7y9Xr0TUIv3HQcU0sfMf3", "cmd":"en", "src":""}
-//{"cmd":"YES", "src":"5958528"}
-//{"text":"G9DU4Dr/jyMuH6OTchlQebccrrbqa7JrIfGuKZ8RurU=", "cmd":"de", "src":""}
-//{"text":"xpq/VGgyD0pAf94O1fmSgg==", "cmd":"de", "src":"","k":"8nro4q0emv8k1uv5"}
-//{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "cmd":"de", "src":""}
-//{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "cmd":"de", "src":"", "k":"vg4mseo0ouo2zf1j"}
-//{"src":"222222","cmd":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"juO+H8ZKWVwZvMP8r/RQgw=="}
-//{"text":"ho813pvToMH+YszQT9RVdg==", "cmd":"de", "src":"", "k":"q916zpzn15rcimcv"}
-//{"text":"tffd9rtikd202gcw", "cmd":"hmac", "src":"5958528", "k":"zmk4rid5h3e1mk66"}
-//{"text":"5mrr48f1nlgex7cy", "cmd":"en", "src":"137067", "k":"zmk4rid5h3e1mk66"}
+//{"text":"yxEX1vOqupgRIiIE6mi11szCSG6glHizIdaPimHgGJoMk5B5jC/aTuoLF5p7MTJlz/yIH4seE3HatSek9ipis8JNmUzJX7tnKI7E14ur5jZ7y9Xr0TUIv3HQcU0sfMf3", "result":"en", "src":""}
+//{"result":"YES", "src":"5958528"}
+//{"text":"G9DU4Dr/jyMuH6OTchlQebccrrbqa7JrIfGuKZ8RurU=", "result":"de", "src":""}
+//{"text":"xpq/VGgyD0pAf94O1fmSgg==", "result":"de", "src":"","k":"8nro4q0emv8k1uv5"}
+//{"text":"PKa/MINB25FvvfbOwFA2sGbC+OPoM+m3AWoTi7OK/l4=", "result":"de", "src":""}
+//{"text":"50tLQ4W90zvVMENvGd0DZw==\n", "result":"de", "src":"", "k":"vg4mseo0ouo2zf1j"}
+//{"src":"222222","result":"TLMSDONE", "name":"ab","pin1":"on","pin2":"off", "stword":"juO+H8ZKWVwZvMP8r/RQgw=="}
+//{"text":"ho813pvToMH+YszQT9RVdg==", "result":"de", "src":"", "k":"q916zpzn15rcimcv"}
+//{"text":"tffd9rtikd202gcw", "result":"hmac", "src":"5958528", "k":"zmk4rid5h3e1mk66"}
+//{"text":"5mrr48f1nlgex7cy", "result":"en", "src":"137067", "k":"zmk4rid5h3e1mk66"}
 
-//{"text":"abcdefgh#25#", "cmd":"en", "src":"5958528", "k":"2kd6xdeesfc8kh2i"}
+//{"text":"abcdefgh#25#", "result":"en", "src":"5958528", "k":"2kd6xdeesfc8kh2i"}
 //
 /*
-{"text":"P27upkIy3kIvJnhRL/p59A==", "cmd":"de", "src":"", "k":"zmk4rid5h3e1mk66"}
+{"text":"P27upkIy3kIvJnhRL/p59A==", "result":"de", "src":"", "k":"zmk4rid5h3e1mk66"}
  */
 
 // 24 Bahman

@@ -98,4 +98,4 @@
 -dontwarn org.jetbrains.annotations.NotNull
 -keep class rayan.rayanapp.Data.** { *; }
 -keep class rayan.rayanapp.Retrofit.** { *; }
--keep class rayan.rayanapp.Retrofit.Models.** { *; }
+-keep class rayan.rayanapp.Retrofit.switches.version_1.Models.** { *; }

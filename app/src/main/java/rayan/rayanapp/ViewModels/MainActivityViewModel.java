@@ -52,10 +52,10 @@ import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddDeviceToGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.Services.mqtt.ActionListener;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.mqtt.MyMqttCallbackHandler;
@@ -259,7 +259,7 @@ public class MainActivityViewModel extends DevicesFragmentViewModel {
     public void sendNodeToAll(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("src", RayanApplication.getPref().getId());
-        jsonObject.addProperty("cmd", AppConstants.TO_DEVICE_NODE);
+        jsonObject.addProperty("result", AppConstants.TO_DEVICE_NODE);
         sendUDPMessage.sendUdpMessage(RayanApplication.getPref().getLocalBroadcastAddress(), jsonObject.toString());
         counterObservable.takeWhile(aLong -> aLong<2)
                 .subscribe(new Observer<Long>() {

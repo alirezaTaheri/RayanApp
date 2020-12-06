@@ -16,8 +16,8 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Fragments.CreateGroupFragment;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.CreateGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
 
 public class CreateGroupViewModel extends DevicesFragmentViewModel {
     private final String TAG = CreateGroupFragment.class.getSimpleName();

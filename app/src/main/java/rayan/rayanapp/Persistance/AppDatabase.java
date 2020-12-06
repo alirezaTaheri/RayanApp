@@ -21,8 +21,8 @@ import rayan.rayanapp.Persistance.database.dao.RemotesDAO;
 import rayan.rayanapp.Persistance.database.dao.ScenariosDAO;
 import rayan.rayanapp.Persistance.database.dao.UserMembershipDAO;
 import rayan.rayanapp.Persistance.database.dao.UsersDAO;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 @Database(entities = {Device.class, RemoteHub.class, Remote.class, RemoteData.class, Group.class, User.class,UserMembership.class, LocallyChange.class, Scenario.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {

@@ -8,11 +8,9 @@ import java.util.List;
 
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.Util.diffUtil.GroupsDiffCallBack;
-import rayan.rayanapp.ViewHolders.DrawerItemViewHolder;
 import rayan.rayanapp.ViewHolders.DrawerSortByGroupViewHolder;
-import rayan.rayanapp.ViewHolders.GroupViewHolder;
 
 public class SortByGroupRecyclerViewAdapter extends GenericRecyclerViewAdapter<Group,OnGroupClicked<Group>, DrawerSortByGroupViewHolder>  {
 

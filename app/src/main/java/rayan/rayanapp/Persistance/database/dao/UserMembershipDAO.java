@@ -11,7 +11,7 @@ import java.util.List;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import rayan.rayanapp.Data.UserMembership;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 @Dao
 public interface UserMembershipDAO extends BaseDAO<UserMembership>{

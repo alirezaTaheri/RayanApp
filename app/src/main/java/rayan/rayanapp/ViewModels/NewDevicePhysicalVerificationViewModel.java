@@ -16,15 +16,12 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.PhysicalVerificationRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ChangeNameResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.PhysicalVerificationRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.PlugPhysicalVerificationRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.DeviceBaseResponse;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.RemoteHub.Install.RemoteHubInstaller;
+import rayan.rayanapp.Util.SingleLiveEvent;
 
 public class NewDevicePhysicalVerificationViewModel extends NewDeviceSetConfigurationFragmentViewModel {
     private final String TAG = NewDevicePhysicalVerificationViewModel.class.getSimpleName();
@@ -32,6 +29,10 @@ public class NewDevicePhysicalVerificationViewModel extends NewDeviceSetConfigur
         super(application);
     }
 
+    public SingleLiveEvent<String> to_remoteHub_physical_verification(){
+        RemoteHubInstaller installer = new RemoteHubInstaller();
+        return installer.to_remoteHub_physical_verification();
+    }
 
     public LiveData<DeviceBaseResponse> toDeviceITET(){
         final MutableLiveData<DeviceBaseResponse> results = new MutableLiveData<>();

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.ViewHolders.AdminViewHolder;
 
 public class AdminsRecyclerViewAdapter extends GenericRecyclerViewAdapter<User,OnAdminClicked<User>, AdminViewHolder>  {

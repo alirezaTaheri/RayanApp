@@ -10,7 +10,7 @@ import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 
 public class DrawerSortByGroupViewHolder extends BasicViewHolder<Group, OnGroupClicked<Group>> {
 

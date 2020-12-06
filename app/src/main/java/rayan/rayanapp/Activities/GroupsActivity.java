@@ -1,9 +1,7 @@
 package rayan.rayanapp.Activities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -28,10 +26,9 @@ import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.OnAddUserToGroupSubmitClicked;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
-import rayan.rayanapp.Listeners.OnToolbarNameChange;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class GroupsActivity extends AppCompatActivity implements EditGroupFragment.ClickOnEditGroupButton, EditGroupFragment2.ClickOnButton, GroupsListFragment.ClickOnGroup, DoneWithFragment, OnBottomSheetSubmitClicked, OnAddUserToGroupSubmitClicked {

@@ -5,13 +5,12 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
-import android.database.Cursor;
 
 import java.util.List;
 
 import io.reactivex.Flowable;
 import rayan.rayanapp.Persistance.models.BaseDevicesSummary;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 
 @Dao
 public interface GroupsDAO extends BaseDAO<Group> {

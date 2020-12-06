@@ -2,11 +2,8 @@ package rayan.rayanapp.Persistance.database;
 
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
 import android.util.Log;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,7 +11,7 @@ import java.util.concurrent.Executors;
 import io.reactivex.Flowable;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.dao.GroupsDAO;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 
 public class GroupDatabase {
     private AppDatabase appDatabase;

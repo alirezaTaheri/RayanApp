@@ -32,6 +32,7 @@ public class ProgressDialog extends Dialog {
         this.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.dialog_progress_2);
+        setCanceledOnTouchOutside(false);
         ButterKnife.bind(this);
         text.setText("لطفا کمی صبرکنید...");
     }

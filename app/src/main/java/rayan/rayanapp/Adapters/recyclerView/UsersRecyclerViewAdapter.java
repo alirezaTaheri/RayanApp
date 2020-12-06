@@ -5,7 +5,7 @@ import android.view.ViewGroup;
 
 import rayan.rayanapp.Listeners.OnUserClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.ViewHolders.UserViewHolder;
 
 public class UsersRecyclerViewAdapter extends GenericRecyclerViewAdapter<User,OnUserClicked<User>, UserViewHolder>  {

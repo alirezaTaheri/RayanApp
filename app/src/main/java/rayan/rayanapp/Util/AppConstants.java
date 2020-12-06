@@ -16,12 +16,17 @@ import javax.crypto.spec.SecretKeySpec;
 import rayan.rayanapp.Helper.Encryptor;
 
 public class AppConstants {
+    public final static String[] SUPPORTED_TYPES = {AppConstants.BaseDeviceType_REMOTE_HUB, AppConstants.BaseDeviceType_SWITCH_1, AppConstants.BaseDeviceType_SWITCH_2, AppConstants.BaseDeviceType_TOUCH_2, AppConstants.BaseDeviceType_PLUG};
+    public final static String[] REMOTE_HUB_VALID_VERSIONS = {"1.0"};
+    public final static String[] SWITCH_VALID_VERSIONS = {"1.0", "2.0"};
+    public final static String[] PLUG_VALID_VERSIONS = {"1.0", "2.0"};
+    public final static String[] TOUCH_2_VALID_VERSIONS = {"1.0", "2.0"};
     public final static String MQTT = "mqtt";
     public final static String UDP = "udp";
     public final static int UDP_SEND_PORT = 2000;
     public final static int UDP_RECEIVE_PORT = 3000;
     public final static int FTP_PORT = 21;
-    public final static int HTTP_TO_DEVICE_PORT = 3000;
+    public final static int HTTP_TO_DEVICE_PORT = 80;
     public final static int UDP_MESSAGING_TIMEOUT = 4000;
     public final static int MQTT_MESSAGING_TIMEOUT = 4000;
     public final static int HTTP_MESSAGING_TIMEOUT = 4000;
@@ -39,6 +44,7 @@ public class AppConstants {
 //    public final static String MQTT_HOST = "api3.mahdiesrafili.ir";
 //    public final static String MQTT_HOST = "157.119.190.160";
     public final static int MQTT_PORT_SSL = 8883;
+    public final static int MQTT_PORT_TCP = 1883;
     public final static int MQTT_PORT = 1883;
     //New Devices
     public final static String NEW_DEVICE_TYPE_SWITCH = "switch";
@@ -61,6 +67,8 @@ public class AppConstants {
     public final static String NEW_DEVICE_IP = "192.168.4.1";
 //    public final static String NEW_DEVICE_IP = "192.168.137.1";
     public final static String GET_VERSION = "version";
+    public final static String VERSION_1_0 = "1.0";
+    public final static String VERSION_2_0 = "2.0";
     public final static String NODE_INFO = "info";
     public final static String NAMING_PREFIX_PIN1 = "_1";
     public final static String NAMING_PREFIX_PIN2 = "_2";
@@ -70,17 +78,23 @@ public class AppConstants {
     public final static String TO_DEVICE_NODE = "NODE?";
     public final static String TO_DEVICE_TLMS = "TLMS";
     public final static String TO_DEVICE_VERIFY = "verify";
+    public final static String NODE_DISCOVER = "node_discover";
+    public final static String AUTH_DISCOVER = "auth";
     public final static String TO_DEVICE_NOT_VERIFY = "not_verify";
     public final static String FROM_DEVICE_VERIFY_SUCCESSFUL = "successful";
     public final static String OPERATION_DONE = "Done";
     public final static String MISSING_PARAMS = "Missing_Parameters";
     public final static String NOT_FOUND = "Not_found";
     public final static String DEVICE_TOGGLE = "tgl";
+    public final static String CMD = "cmd";
     public final static String DEVICE_TOGGLE_CMD = "toggle";
     public final static String ERROR = "error";
+    public final static String ERROR_RESULT = "error";
     public final static String SERVER_ERROR= "SERVER_ERROR";
     public final static String FORBIDDEN = "Forbidden";
     public final static String AUTHENTICATION_ERROR= "Forbidden";
+    public final static String UNAUTHORIZED= "unauthorized";
+    public final static String HEADER_AUTHORIZATION= "Authorization";
     public final static int MOBILE_DATA = 0;
     public final static int WIFI_NETWORK = 1;
     public final static int VPN_NETWORK = 17;
@@ -169,6 +183,7 @@ public class AppConstants {
     public final static String NULL_SSID = "Null SSID";
     public final static String UNKNOWN_IP = "Unknown IP";
     public final static String SUCCESS_DESCRIPTION = "success";
+    public final static String SUCCESS_RESULT = "successful";
     public final static String SUCCESSFUL = "successful";
     public final static String CONTINUE = "continue";
     public final static String ERROR_DESCRIPTION = "error";

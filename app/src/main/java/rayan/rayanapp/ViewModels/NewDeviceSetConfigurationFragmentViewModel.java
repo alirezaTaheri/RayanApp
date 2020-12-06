@@ -9,6 +9,7 @@ import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import com.thanosfisherman.wifiutils.WifiUtils;
@@ -18,13 +19,9 @@ import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -34,30 +31,23 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.NewDevice;
-import rayan.rayanapp.Data.RemoteHub;
-import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteHubToGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteHubTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.device.RemoteHubBaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddDeviceToGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.CreateTopicRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditDeviceTopicRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.RegisterDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.DeviceBaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.SetPrimaryConfigResponse;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.RemoteHub.Install.RemoteHubInstaller;
 import rayan.rayanapp.Util.SingleLiveEvent;
 
 public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListViewModel {
@@ -145,26 +135,10 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<RemoteHubResponse> createTopicRemoteHubObservable(CreateTopicRemoteHubRequest createTopicRemoteHubRequest){
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .createTopicRemoteHub(RayanApplication.getPref().getToken(), createTopicRemoteHubRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
     private Observable<BaseResponse> addDeviceToGroupObservable(AddDeviceToGroupRequest addDeviceToGroupRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .addDeviceToGroup(RayanApplication.getPref().getToken(), addDeviceToGroupRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    private Observable<BaseResponse> addRemoteHubToGroupObservable(AddRemoteHubToGroupRequest addRemoteHubToGroupRequest){
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .addRemoteHubToGroup(RayanApplication.getPref().getToken(), addRemoteHubToGroupRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -203,25 +177,11 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    private Observable<RemoteHubResponse> editRemoteHubTopicObservable(EditRemoteHubTopicRequest editRemoteHubTopicRequest){
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .editRemoteHubTopic(RayanApplication.getPref().getToken(), editRemoteHubTopicRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
 
     private Observable<DeviceResponse> editDeviceObservable(EditDeviceRequest editDeviceRequest){
         ApiService apiService = ApiUtils.getApiService();
         return apiService
                 .editDevice(RayanApplication.getPref().getToken(), editDeviceRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-    private Observable<RemoteHubResponse> editRemoteHubObservable(EditRemoteHubRequest editRemoteHubRequest){
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .editRemoteHub(RayanApplication.getPref().getToken(), editRemoteHubRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -263,15 +223,10 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    private Observable<BaseResponse> deleteRemoteHubObservable(DeleteRemoteHubRequest deleteRemoteHubRequest){
-        ApiService apiService = ApiUtils.getApiService();
-        return apiService
-                .deleteRemoteHubFromGroup(RayanApplication.getPref().getToken(), deleteRemoteHubRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
+
     Disposable disposable;
-    Disposable setConfigDeviceDisposable;
+    private Disposable setConfigDeviceDisposable;
+    private Disposable resend_config_disposable;
     public Disposable getConfigDeviceDisposable(){
         return setConfigDeviceDisposable;
     }
@@ -391,122 +346,6 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
 
     }
 
-    public SingleLiveEvent<SetPrimaryConfigResponse> registerRemoteHubAndSendInfo(WifiManager wifiManager, AddNewDeviceActivity activity, AddRemoteHubRequest addRemoteHubRequest, String ip){
-        SingleLiveEvent<SetPrimaryConfigResponse> result = new SingleLiveEvent<>();
-        ApiService apiService = ApiUtils.getApiService();
-        apiService
-                .addRemoteHub(RayanApplication.getPref().getToken(),addRemoteHubRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .flatMap(response-> {
-                    Log.e(TAG, "Device Registration Passed\nRemoving Device from previous group..."+response);
-                    RemoteHub d = response.getData().getRemoteHub();
-                    activity.getNewDevice().setId(d.getId());
-                    activity.getNewDevice().setUsername(d.getUsername());
-                    if (response.getStatus().getDescription().equals(AppConstants.ERROR) && response.getData().getMessage() != null && response.getData().getMessage().equals(AppConstants.DUPLICATE_REMOTE_HUB))
-                        activity.getNewDevice().setPassword(d.getDevicePassword());
-                    else
-                        activity.getNewDevice().setPassword(d.getPassword());
-                    RemoteHub existingRemoteHub = remoteHubDatabase.getRemoteHub(activity.getNewDevice().getChip_id());
-                    if (existingRemoteHub != null){
-                        Log.e(TAG, "Deleting Device From previous Group: " + existingRemoteHub);
-                        activity.getNewDevice().setPreGroupId(existingRemoteHub.getGroupId());
-
-                        return deleteRemoteHubObservable(new DeleteRemoteHubRequest(existingRemoteHub.getId(), existingRemoteHub.getGroupId()));
-                    }
-                    else {
-                        Log.e(TAG, "There is no such device to delete from group ");
-                        return Observable.just(1);
-                    }
-                })
-                .flatMap(deviceResponse ->{
-                    Log.e(TAG, "Device Registration Passed\nAdding Device To new Group...");
-                    return addRemoteHubToGroupObservable(new AddRemoteHubToGroupRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId()));
-                })
-                .flatMap(baseResponse -> editRemoteHubTopicObservable(new EditRemoteHubTopicRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getName(), activity.getNewDevice().getType(), activity.getNewDevice().getSsid())))
-                .flatMap(deviceResponse -> {
-                    if (deviceResponse.getStatus().getDescription().equals(AppConstants.ERROR) && deviceResponse.getData().getMessage().equals(AppConstants.FORBIDDEN)){
-                        Toast.makeText(activity, "شما قادر به نصب این دستگاه نیستید", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Action is forbidden... Operation will fail");
-                        return null;
-                    }
-                    Log.e(TAG, "Device Specification successfully Changed...");
-                    return createTopicRemoteHubObservable(new CreateTopicRemoteHubRequest(activity.getNewDevice().getId(), activity.getNewDevice().getGroup().getId(), activity.getNewDevice().getChip_id(), AppConstants.MQTT_HOST));
-                })
-                .flatMap(baseResponse -> editRemoteHubObservable(new EditRemoteHubRequest(activity.getNewDevice().getName(),
-                        activity.getNewDevice().getVersion(),activity.getNewDevice().getSsid(),null,
-                        activity.getNewDevice().getId())))
-                .flatMap(deviceBaseResponse ->{
-                    Log.e(TAG, "Topic Creation Passed\nConnecting to device...");
-                    activity.getNewDevice().setTopic(deviceBaseResponse.getData().getRemoteHub().getTopic());
-                    byte[] data = activity.getNewDevice().getName().getBytes();
-                    String baseName = Base64.encodeToString(data, Base64.DEFAULT);
-                    activity.getNewDevice().setName(baseName);
-                    String secret;
-                    Log.e(TAG, "New Device Chip ID: " + activity.getNewDevice().getChip_id());
-                    Log.e(TAG, "Found Device is: " + remoteHubDatabase.getRemoteHub(activity.getNewDevice().getChip_id()));
-                    if (remoteHubDatabase.getRemoteHub(activity.getNewDevice().getChip_id()) != null){
-                        secret = remoteHubDatabase.getRemoteHub(activity.getNewDevice().getChip_id()).getSecret();
-                        Log.e(TAG, secret + "A device with this chip id is already saved on device and password will be: " + (activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret));
-                        return connectToDeviceObservable(activity, wifiManager, activity.getNewDevice().getStatus().equals(NewDevice.NodeStatus.NEW)? AppConstants.DEVICE_PRIMARY_PASSWORD : secret);
-                    }
-                    Log.e(TAG, "this device never registerd in this device before password will be:  " + AppConstants.DEVICE_PRIMARY_PASSWORD);
-                    return connectToDeviceObservable(activity, wifiManager, AppConstants.DEVICE_PRIMARY_PASSWORD);
-                })
-                .flatMap(s -> {
-                    Log.e(TAG,"Ok Now we will wait for n seconds"+s);
-                    return Observable.timer(8,TimeUnit.SECONDS);})
-                .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(deviceResponse -> {
-                    Toast.makeText(activity, "ارسال اطلاعات به دستگاه", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Ok Response of connection is here: "+deviceResponse);
-                    return toDeviceFirstConfigObservable(new SetPrimaryConfigRequest(activity.getNewDevice().getSsid(), activity.getNewDevice().getPwd(), activity.getNewDevice().getName(), AppConstants.MQTT_HOST, String.valueOf(AppConstants.MQTT_PORT_SSL), activity.getNewDevice().getTopic().getTopic(), activity.getNewDevice().getUsername(), activity.getNewDevice().getPassword(), AppConstants.DEVICE_CONNECTED_STYLE, activity.getNewDevice().getGroup().getSecret()), ip);
-                })
-                .subscribe(new Observer<SetPrimaryConfigResponse>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        disposable = d;
-                        setConfigDeviceDisposable = d;
-                    }
-
-                    @Override
-                    public void onNext(SetPrimaryConfigResponse deviceBaseResponse) {
-                        Log.e(TAG, "OnNext::::" + deviceBaseResponse);
-                        result.postValue(deviceBaseResponse);
-                        disposable.dispose();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "Flow of install onError::::" + e);
-                        SetPrimaryConfigResponse errorResponse = new SetPrimaryConfigResponse();
-                        if (e instanceof SocketTimeoutException){
-                            errorResponse.setCmd(AppConstants.SOCKET_TIME_OUT);
-                        }
-                        else if (e instanceof UnknownHostException){
-                            errorResponse.setCmd(AppConstants.UNKNOWN_HOST_EXCEPTION);
-                        }
-                        else if (e.toString().contains("Unauthorized"))
-                            login();
-                        else if (e instanceof ConnectException)
-                            errorResponse.setCmd(AppConstants.CONNECT_EXCEPTION);
-                        else{
-                            errorResponse.setCmd(AppConstants.UNKNOWN_EXCEPTION);
-                        }
-                        e.printStackTrace();
-                        result.postValue(errorResponse);
-                        disposable.dispose();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.e(TAG, "onComplete::::" );
-                    }
-                });
-        return result;
-
-    }
-
     public SingleLiveEvent<SetPrimaryConfigResponse> sendInfoToDevice(WifiManager wifiManager,AddNewDeviceActivity activity, RegisterDeviceRequest registerDeviceRequest, String ip){
 //        if (RayanApplication.getPref().getIsNodeSoundOn())
 //            WifiHandler.removeNetwork(activity, activity.getNewDevice().getAccessPointName());
@@ -561,7 +400,27 @@ public class NewDeviceSetConfigurationFragmentViewModel extends NewDevicesListVi
 
     }
 
+//    =============================== RemoteHub ==============================
+    public SingleLiveEvent<RemoteHubBaseResponse> installRemoteHub(WifiManager wifiManager,
+                                                                      AddNewDeviceActivity activity,
+                                                                      NewDevice newDevice,
+                                                                      String ip){
+        RemoteHubInstaller remoteHubInstaller = new RemoteHubInstaller();
+        Pair<Disposable,SingleLiveEvent<RemoteHubBaseResponse>> output = remoteHubInstaller.install(remoteHubDatabase,
+                wifiManager,
+                activity,
+                newDevice,
+                ip);
+        setConfigDeviceDisposable = output.first;
+        return output.second;
+    }
 
+    public SingleLiveEvent<String> resend_config_to_remoteHub(NewDevice newDevice, String ip){
+        RemoteHubInstaller installer = new RemoteHubInstaller();
+        Pair<Disposable,SingleLiveEvent<String>> output = installer.resend_config(newDevice, ip);
+        resend_config_disposable = output.first;
+        return output.second;
+    }
 
     private String getCurrentSSID(WifiManager wifiManager){
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();

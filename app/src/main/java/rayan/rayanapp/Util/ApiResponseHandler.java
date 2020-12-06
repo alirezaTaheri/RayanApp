@@ -5,7 +5,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Remote;
@@ -19,9 +18,8 @@ import rayan.rayanapp.Persistance.database.RemoteDatabase;
 import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 import rayan.rayanapp.Persistance.database.UserDatabase;
 import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 public class ApiResponseHandler {
     public void syncGroups(DeviceDatabase deviceDatabase, GroupDatabase groupDatabase, UserDatabase userDatabase,
@@ -257,11 +255,13 @@ public class ApiResponseHandler {
             List<UserMembership> memberships = new ArrayList<>();
             for (int a = 0; a < serverGroups.size(); a++) {
                 Group g = serverGroups.get(a);
-                Log.e("ererere", "erere000"+g.getDevices());
+                Log.e("Iterating", ""+g.getName() + g.getRemoteHubs().size());
+                Log.e("ererere", "erere000: "+g.getRemoteHubs());
                 List<String> remoteHubsid = new ArrayList<>();
-                    for (int f = 0; f < g.getRemoteHubs().size(); f++) {
-                        remoteHubsid.add(g.getRemoteHubs().get(f).getId());
-                    }
+                for (int f = 0; f < g.getRemoteHubs().size(); f++) {
+                    remoteHubsid.add(g.getRemoteHubs().get(f).getId());
+                }
+                Log.e("blbl", "blah: "+remoteHubsid);
 
                 List<User> admins = g.getAdmins();
                 List<Device> devices = new ArrayList<>();
@@ -306,6 +306,7 @@ public class ApiResponseHandler {
                         RemoteHub remoteHub = remoteHubs.get(z);
                         Log.e("JDJDJD", "Passed"+remoteHub);
                         remoteHub.setGroupId(g.getId());
+                        remoteHub.setSecret(g.getSecret());
                         remoteHub.setPosition(nOd);
                         if (remoteHub.getName() == null)
                             remoteHub.setName(AppConstants.UNKNOWN_NAME);
@@ -341,11 +342,6 @@ public class ApiResponseHandler {
                         }
                     }
                 }
-                for (int z = 0;z<remoteHubs.size();z++)
-                    if (remoteHubs.get(z).getGroupId() == null) {
-                        Log.e("FFFFFFF", "Deleting: "+remoteHubs.get(z));
-                        remoteHubs.remove(z);
-                    }
                 for (int c = 0; c < g.getHumanUsers().size(); c++) {
                     User user = g.getHumanUsers().get(c);
                     UserMembership userMembership = new UserMembership(g.getId(), user.getId());
@@ -378,6 +374,11 @@ public class ApiResponseHandler {
                 }
                 newDevices.addAll(devices);
             }
+            for (int z = 0;z<remoteHubs.size();z++)
+                if (remoteHubs.get(z).getGroupId() == null) {
+                    Log.e("FFFFFFF", "Deleting: "+remoteHubs.get(z));
+                    remoteHubs.remove(z);
+                }
             List<Device> oldDevices = deviceDatabase.getAllDevices();
             List<Group> oldGroups = groupDatabase.getAllGroups();
             List<RemoteHub> oldRemoteHubs = remoteHubDatabase.getAllRemoteHubs();

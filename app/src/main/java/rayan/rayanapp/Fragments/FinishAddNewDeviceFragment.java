@@ -61,6 +61,7 @@ public class FinishAddNewDeviceFragment extends Fragment implements BlockingStep
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_finish_add_new_device, container, false);
         ButterKnife.bind(this, view);
+        message.setText("دستگاه با موفقیت نصب شد و تا لحاظاتی دیگر قابل دسترسی می‌شود");
         return view;
     }
 

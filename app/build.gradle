@@ -163,7 +163,7 @@ dependencies {
     implementation 'com.thanosfisherman.wifiutils:wifiutils:1.6.1'
     implementation 'android.arch.persistence.room:rxjava2:1.1.1'
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.3'
-    implementation 'com.airbnb.android:lottie:2.5.5'
+    implementation 'com.airbnb.android:lottie:3.0.3-support'
     implementation 'com.android.volley:volley:1.1.0'
     implementation project(':org.eclipse.paho.android.service')
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'

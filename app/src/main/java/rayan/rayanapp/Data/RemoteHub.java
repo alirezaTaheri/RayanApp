@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Topic;
 
 //@SuppressLint("ParcelCreator")
 @Entity
@@ -25,7 +25,7 @@ public class RemoteHub extends BaseDevice implements Parcelable {
     @SerializedName("_id")
     private String id;
     private String username, password;
-    private String name,version;
+    private String name;
     @SerializedName("topic")
     @Expose
     @Embedded(prefix = "topic_")
@@ -53,7 +53,6 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         this.chipId = remoteHub.getChipId();
         this.id = remoteHub.getId();
         this.name = remoteHub.getName();
-        this.version = remoteHub.getVersion();
         this.topic = remoteHub.getTopic();
         this.ssid = remoteHub.getSsid();
         this.mac = remoteHub.getMac();
@@ -77,7 +76,6 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         username = in.readString();
         password = in.readString();
         name = in.readString();
-        version = in.readString();
         topic = in.readParcelable(Topic.class.getClassLoader());
         ssid = in.readString();
         mac = in.readString();
@@ -101,7 +99,6 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         dest.writeString(username);
         dest.writeString(password);
         dest.writeString(name);
-        dest.writeString(version);
         dest.writeParcelable(topic, flags);
         dest.writeString(ssid);
         dest.writeString(mac);
@@ -174,14 +171,6 @@ public class RemoteHub extends BaseDevice implements Parcelable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 
     public Topic getTopic() {
@@ -304,7 +293,6 @@ public class RemoteHub extends BaseDevice implements Parcelable {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
-                ", version='" + version + '\'' +
                 ", topic=" + topic +
                 ", ssid='" + ssid + '\'' +
                 ", mac='" + mac + '\'' +

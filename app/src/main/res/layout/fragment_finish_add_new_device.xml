@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.NewDevice_Switch_PhysicalVerificationFragment">
+    android:padding="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragments.FinishAddNewDeviceFragment">
 
     <TextView
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="16sp"
         android:id="@+id/command"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="دستگاه با موفقیت نصب شد و تا لحظاتی دیگر قابل دسترسی می‌شود" />
+        android:layout_height="wrap_content"
+        android:text="Done" />
 
-</FrameLayout>
+    <com.airbnb.lottie.LottieAnimationView
+        app:layout_constraintTop_toBottomOf="@+id/command"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_gravity="center"
+        android:id="@+id/animation_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        app:lottie_fileName="animation_done.json"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true" />
+</android.support.constraint.ConstraintLayout>

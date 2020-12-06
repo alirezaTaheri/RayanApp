@@ -3,7 +3,6 @@ package rayan.rayanapp.Helper;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.apache.commons.net.util.Base64;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -24,7 +23,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -36,11 +34,11 @@ import rayan.rayanapp.Listeners.ToggleDeviceAnimationProgress;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
-import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ToggleDevice;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.TlmsDoneResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.YesResponse;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
 import rayan.rayanapp.Util.AppConstants;
@@ -119,7 +117,7 @@ public class SendMessageToDevice {
                                     //without lc
                                     lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                 }
-                                else if (lastMessage.getJSONObject("lc").getString("cmd").contains("1")){
+                                else if (lastMessage.getJSONObject("lc").getString("result").contains("1")){
                                     //with lc1 pin 1
                                     if (lastMessage.getJSONObject("lc").has("lc")){
                                         Object lc2 = lastMessage.getJSONObject("lc").get("lc");
@@ -129,7 +127,7 @@ public class SendMessageToDevice {
                                         lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                     }
                                 }
-                                else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("cmd").contains("1")){
+                                else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("result").contains("1")){
                                     //with lc2 pin 1
                                     lastMessage.getJSONObject("lc").put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                 }
@@ -140,7 +138,7 @@ public class SendMessageToDevice {
 
                             }
 //                            if (lastMessage != null) {
-//                                if (!lastMessage.has("lc") || !((JSONObject)lastMessage.get("lc")).has("lc") && ((String)(lastMessage).get("cmd")).contains("1"))
+//                                if (!lastMessage.has("lc") || !((JSONObject)lastMessage.get("lc")).has("lc") && ((String)(lastMessage).get("result")).contains("1"))
 //                                    lastMessage.put("lc", rayanApplication.getJSON(device.getPort1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
 //                                else {
 //                                    JSONObject lc2 = (JSONObject) ((JSONObject)lastMessage.get("lc")).get("lc");
@@ -236,7 +234,7 @@ public class SendMessageToDevice {
                                     //without lc
                                     lastMessage.put("lc", rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
                                 }
-                                else if (((String)((JSONObject)lastMessage.get("lc")).get("cmd")).contains("2")){
+                                else if (((String)((JSONObject)lastMessage.get("lc")).get("result")).contains("2")){
                                     //with lc1 pin 2
                                     if (((JSONObject)lastMessage.get("lc")).has("lc")){
                                         Object lc2 = ((JSONObject)lastMessage.get("lc")).get("lc");
@@ -246,7 +244,7 @@ public class SendMessageToDevice {
                                         lastMessage.put("lc", rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
                                     }
                                 }
-                                else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("cmd").contains("2")){
+                                else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("result").contains("2")){
                                     //with lc2 pin 2
                                     ((JSONObject)lastMessage.get("lc")).put("lc", rayanApplication.getJSON(device.getPin2().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_2 : AppConstants.ON_2, arguments));
                                 }

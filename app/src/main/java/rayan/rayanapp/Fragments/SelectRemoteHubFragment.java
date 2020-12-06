@@ -1,14 +1,12 @@
 package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,17 +23,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Activities.AddNewRemoteActivity;
 import rayan.rayanapp.Adapters.recyclerView.DevicesRecyclerViewAdapter;
-import rayan.rayanapp.Adapters.recyclerView.GroupsRecyclerViewAdapter;
 import rayan.rayanapp.Data.RemoteHub;
-import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.DevicesFragmentViewModel;
-import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;
 
 
 public class SelectRemoteHubFragment extends BottomSheetDialogFragment {

@@ -1,7 +1,7 @@
 package rayan.rayanapp.Data;
 
 import okhttp3.ResponseBody;
-import rayan.rayanapp.Retrofit.Models.Responses.device.Ready4SettingsResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.Ready4SettingsResponse;
 import retrofit2.Response;
 
 public class CustomResponse {

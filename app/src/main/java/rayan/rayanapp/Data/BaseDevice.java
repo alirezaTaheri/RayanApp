@@ -6,8 +6,8 @@ public class BaseDevice {
     private int position, inGroupPosition, favoritePosition;
     private String deviceType;
     private String baseId;
-    private boolean favorite;
-
+    private boolean favorite, verified;
+    private String version;
     public BaseDevice() {
     }
 
@@ -26,6 +26,8 @@ public class BaseDevice {
         this.baseId = baseDevice.getBaseId();
         this.favorite = baseDevice.isFavorite();
         this.favoritePosition = baseDevice.getFavoritePosition();
+        this.version = baseDevice.getVersion();
+        this.verified = baseDevice.isVerified();
     }
 
     public boolean isFavorite() {
@@ -42,6 +44,14 @@ public class BaseDevice {
 
     public void setFavoritePosition(int favoritePosition) {
         this.favoritePosition = favoritePosition;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
 
     public int getPosition() {
@@ -66,5 +76,13 @@ public class BaseDevice {
 
     public void setDeviceType(String deviceType) {
         this.deviceType = deviceType;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

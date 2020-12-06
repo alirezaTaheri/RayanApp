@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import rayan.rayanapp.App.RayanApplication;
+import rayan.rayanapp.Dialogs.PrivacyPolicyDialog;
 import rayan.rayanapp.Fragments.EditUserFragment;
 import rayan.rayanapp.Fragments.RegisterUserFragment;
 import rayan.rayanapp.R;
@@ -25,5 +27,9 @@ public class SignUpUserActivity extends AppCompatActivity {
         transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.signup_frameLayout, RegisterUserFragment.newInstance("", ""));
         transaction.commit();
+        if (!RayanApplication.getPref().isPrivacyPolicyAccepted()) {
+            PrivacyPolicyDialog privacyPolicyDialog = new PrivacyPolicyDialog(this, "این متن سیاست است");
+            privacyPolicyDialog.show();
+        }
     }
 }

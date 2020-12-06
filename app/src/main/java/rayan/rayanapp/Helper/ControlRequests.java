@@ -17,8 +17,8 @@ import rayan.rayanapp.Data.LocallyChange;
 import rayan.rayanapp.Persistance.database.LocallyChangesDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditDeviceTopicRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.DeviceResponse;
 
 public class ControlRequests {
     LocallyChangesDatabase lcd;

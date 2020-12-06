@@ -42,10 +42,10 @@ import rayan.rayanapp.Persistance.database.GroupDatabase;
 import rayan.rayanapp.Persistance.database.ScenarioDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDeviceWithLastCommand;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ToggleDevice;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ToggleDeviceWithLastCommand;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.ToggleDeviceResponse;
 import rayan.rayanapp.Services.mqtt.Connection;
 import rayan.rayanapp.Util.AppConstants;
 import retrofit2.Response;
@@ -132,7 +132,7 @@ public class ScenariosFragmentViewModel extends DevicesFragmentViewModel{
                                     //without lc
                                     lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.OFF_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                 }
-                                else if (lastMessage.getJSONObject("lc").getString("cmd").contains("1")){
+                                else if (lastMessage.getJSONObject("lc").getString("result").contains("1")){
                                     //with lc1 pin 1
                                     if (lastMessage.getJSONObject("lc").has("lc")){
                                         Object lc2 = lastMessage.getJSONObject("lc").get("lc");
@@ -142,7 +142,7 @@ public class ScenariosFragmentViewModel extends DevicesFragmentViewModel{
                                         lastMessage.put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.OFF_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                     }
                                 }
-                                else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("cmd").contains("1")){
+                                else if (((JSONObject)lastMessage.get("lc")).has("lc") && lastMessage.getJSONObject("lc").getJSONObject("lc").getString("result").contains("1")){
                                     //with lc2 pin 1
                                     lastMessage.getJSONObject("lc").put("lc", rayanApplication.getJSON(device.getPin1().equals(AppConstants.OFF_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
                                 }
@@ -153,7 +153,7 @@ public class ScenariosFragmentViewModel extends DevicesFragmentViewModel{
 
                             }
 //                            if (lastMessage != null) {
-//                                if (!lastMessage.has("lc") || !((JSONObject)lastMessage.get("lc")).has("lc") && ((String)(lastMessage).get("cmd")).contains("1"))
+//                                if (!lastMessage.has("lc") || !((JSONObject)lastMessage.get("lc")).has("lc") && ((String)(lastMessage).get("result")).contains("1"))
 //                                    lastMessage.put("lc", rayanApplication.getJSON(device.getPort1().equals(AppConstants.ON_STATUS) ? AppConstants.OFF_1 : AppConstants.ON_1, arguments));
 //                                else {
 //                                    JSONObject lc2 = (JSONObject) ((JSONObject)lastMessage.get("lc")).get("lc");
@@ -393,7 +393,7 @@ public class ScenariosFragmentViewModel extends DevicesFragmentViewModel{
 //                                mqttBackup.get(device.getChipId()+AppConstants.NAMING_PREFIX_PIN1).dispose();
 //                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.body().getSTWORD(),device.getSecret()).split("#")[1])+1));
 //                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
-//                            if (toggleDeviceResponse.body().getCmd().equals("wrong_stword"))
+//                            if (toggleDeviceResponse.body().getResult().equals("wrong_stword"))
 //                                return true;
 //                            else{
 //                                Device deviceToUpdate = new Device(device);
@@ -570,7 +570,7 @@ public class ScenariosFragmentViewModel extends DevicesFragmentViewModel{
 //                            device.setStatusWord(String.valueOf(Integer.parseInt(Encryptor.decrypt(toggleDeviceResponse.getSTWORD(),device.getSecret()).split("#")[1])+1));
 //                            Log.e("TAGTAGTAG", "Should I go: " + toggleDeviceResponse);
 ////                            if (toggleDeviceResponse.getMsg() != null)
-//                            if (toggleDeviceResponse.getCmd().equals("wrong_stword"))
+//                            if (toggleDeviceResponse.getResult().equals("wrong_stword"))
 //                                return true;
 //                            else{
 //                                Device deviceToUpdate = new Device(device);

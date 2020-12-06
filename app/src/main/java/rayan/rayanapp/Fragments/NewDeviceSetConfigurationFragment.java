@@ -32,11 +32,9 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.AddRemoteHubRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Util.AppConstants;
-import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.NewDeviceSetConfigurationFragmentViewModel;
 
 public class NewDeviceSetConfigurationFragment extends BackHandledFragment implements BlockingStep {
@@ -65,17 +63,17 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     }
     @OnClick(R.id.changeAccessPoint)
     void changeAccessPoint(){
-        ChangeDeviceAccessPointFragment.newInstance(((AddNewDeviceActivity)getActivity()).getNewDevice().getSsid()).show(getActivity().getSupportFragmentManager(), "changeAccessPoint");
+        ChangeDeviceAccessPointFragment.newInstance(AddNewDeviceActivity.getNewDevice().getSsid()).show(activity.getSupportFragmentManager(), "changeAccessPoint");
     }
 
     @OnClick(R.id.changeGroup)
     void changeGroup(){
-        ChangeGroupFragment.newInstance().show(getActivity().getSupportFragmentManager(), "changeGroup");
+        ChangeGroupFragment.newInstance().show(activity.getSupportFragmentManager(), "changeGroup");
     }
 
     @Override
     public boolean onBackPressed() {
-        ((AddNewDeviceActivity)getActivity()).setStepperPosition(0);
+        (activity).setStepperPosition(0);
         return true;
     }
 
@@ -107,9 +105,9 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 
     public void setAccessPointTitle(String title){
         changeAccessPoint.setText(title);
-        View view = getActivity().getCurrentFocus();
+        View view = activity.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
@@ -129,11 +127,11 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
 
     public void groupCreated(){
         ChangeGroupFragment changeGroupFragment = (ChangeGroupFragment)getChildFragmentManager().findFragmentByTag("changeGroup");
-        for (int a = 0; a<getActivity().getSupportFragmentManager().getFragments().size();a++){
-            Log.e("TAGGGGG: " , "TAG of: " +a+" Is: "+ getActivity().getSupportFragmentManager().getFragments().get(a).getTag());
-            Log.e("TAGGGGG: " , "Activity of: " +a+" Is: "+ getActivity().getSupportFragmentManager().getFragments().get(a).getActivity());
-            Log.e("TAGGGGG: " , "Id of: " +a+" Is: "+ getActivity().getSupportFragmentManager().getFragments().get(a).getId());
-            Log.e("TAGGGGG: " , "Parent Fragment of: " +a+" Is: "+ getActivity().getSupportFragmentManager().getFragments().get(a).getParentFragment());
+        for (int a = 0; a<activity.getSupportFragmentManager().getFragments().size();a++){
+            Log.e("TAGGGGG: " , "TAG of: " +a+" Is: "+ activity.getSupportFragmentManager().getFragments().get(a).getTag());
+            Log.e("TAGGGGG: " , "Activity of: " +a+" Is: "+ activity.getSupportFragmentManager().getFragments().get(a).getActivity());
+            Log.e("TAGGGGG: " , "Id of: " +a+" Is: "+ activity.getSupportFragmentManager().getFragments().get(a).getId());
+            Log.e("TAGGGGG: " , "Parent Fragment of: " +a+" Is: "+ activity.getSupportFragmentManager().getFragments().get(a).getParentFragment());
         }
 //        changeGroupFragment.selectGroupMode();
     }
@@ -143,22 +141,21 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
         if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
             Toast.makeText(getContext(), "لطفا نام دستگاه را وارد کنید", Toast.LENGTH_SHORT).show();
-//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "لطفا نام دستگاه را وارد کنید");
-        else if (((AddNewDeviceActivity) getActivity()).getNewDevice().getGroup() == null || ((AddNewDeviceActivity) getActivity()).getNewDevice().getGroup().getId().trim().length() < 1)
+//            SnackBarSetup.snackBarSetup(activity.findViewById(android.R.id.content), "لطفا نام دستگاه را وارد کنید");
+        else if (AddNewDeviceActivity.getNewDevice().getGroup() == null || AddNewDeviceActivity.getNewDevice().getGroup().getId().trim().length() < 1)
             Toast.makeText(getContext(), "لطفا یک گروه را انتخاب کنید", Toast.LENGTH_SHORT).show();
-//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "لطفا یک گروه را انتخاب کنید");
-        else if (((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid() == null || ((AddNewDeviceActivity) getActivity()).getNewDevice().getSsid().trim().length() < 1)
+//            SnackBarSetup.snackBarSetup(activity.findViewById(android.R.id.content), "لطفا یک گروه را انتخاب کنید");
+        else if (AddNewDeviceActivity.getNewDevice().getSsid() == null || AddNewDeviceActivity.getNewDevice().getSsid().trim().length() < 1)
             Toast.makeText(getContext(), "لطفا یک مودم را انتخاب کنید", Toast.LENGTH_SHORT).show();
-//            SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content), "لطفا یک مودم را انتخاب کنید");
+//            SnackBarSetup.snackBarSetup(activity.findViewById(android.R.id.content), "لطفا یک مودم را انتخاب کنید");
         else {
-            Log.e("GGbbGG", "Installing"+activity.getNewDevice());
             mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
                 if (aBoolean) {
-                    ProgressDialog progressDialog = new ProgressDialog(getActivity());
-
+                    ProgressDialog progressDialog = new ProgressDialog(activity);
                     callback.getStepperLayout().showProgress("درحال برقراری ارتباط با دستگاه" + "\n" + "لطفا کمی صبرکنید");
-                    ((AddNewDeviceActivity) getActivity()).getNewDevice().setName(nameEditText.getText().toString());
-                    if (activity.getNewDevice().getType()!= null & !activity.getNewDevice().getType().equals(AppConstants.DEVICE_TYPE_RemoteHub)) {
+                    AddNewDeviceActivity.getNewDevice().setName(nameEditText.getText().toString());
+                    Log.e("ConfigurationFragment", "Installing: "+AddNewDeviceActivity.getNewDevice());
+                    if (AddNewDeviceActivity.getNewDevice().getType()!= null & !AddNewDeviceActivity.getNewDevice().getType().equals(AppConstants.DEVICE_TYPE_RemoteHub)) {
                         progressDialog.show();
                         progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -169,8 +166,8 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                             }
                         });
                         mViewModel.registerDeviceSendToDevice(
-                                (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
-                                ((AddNewDeviceActivity) getActivity()), new RegisterDeviceRequest(((AddNewDeviceActivity) getActivity()).getNewDevice().getChip_id(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getName(), ((AddNewDeviceActivity) getActivity()).getNewDevice().getType())
+                                (WifiManager) Objects.requireNonNull(activity).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
+                                ((AddNewDeviceActivity) activity), new RegisterDeviceRequest(AddNewDeviceActivity.getNewDevice().getChip_id(), AddNewDeviceActivity.getNewDevice().getName(), AddNewDeviceActivity.getNewDevice().getType())
                                 , AppConstants.NEW_DEVICE_IP)
                                 .observe(this, s -> {
                                     if (s != null && s.getResult() != null)
@@ -191,13 +188,13 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                                             case AppConstants.UNKNOWN_HOST_EXCEPTION:
                                                 Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
                                                 break;
-                                                default:
-                                                    if (s.getResult().contains(AppConstants.SUCCESSFUL)) {
-                                                        ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
-                                                        ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
-                                                        callback.goToNextStep();
-                                                    }
-                                                    break;
+                                            default:
+                                                if (s.getResult().contains(AppConstants.SUCCESSFUL)) {
+                                                    AddNewDeviceActivity.getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
+                                                    ((AddNewDeviceActivity) activity).getStepperAdapter().notifyDataSetChanged();
+                                                    callback.goToNextStep();
+                                                }
+                                                break;
                                         }
                                     else
                                         Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
@@ -205,56 +202,52 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                                     progressDialog.dismiss();
                                 });
                     }
-                    else if (activity.getNewDevice().getType()!= null & activity.getNewDevice().getType().equals(AppConstants.DEVICE_TYPE_RemoteHub)) {
+                    else if (AddNewDeviceActivity.getNewDevice().getType()!= null & AddNewDeviceActivity.getNewDevice().getType().equals(AppConstants.DEVICE_TYPE_RemoteHub)) {
                         progressDialog.show();
                         progressDialog.cancel.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Log.e(getClass().getSimpleName(), ">>>>>>>>>>>>>>>>>Canceling The Process");
+                                Log.e(getClass().getSimpleName(), ">>>>>>>>>>>>>>>>>Canceling The Installation Process");
                                 mViewModel.getConfigDeviceDisposable().dispose();
                                 progressDialog.dismiss();
                             }
                         });
-                        activity.getNewDevice().setUsername(activity.getNewDevice().getChip_id());
-                        mViewModel.registerRemoteHubAndSendInfo(
-                                (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
-                                ((AddNewDeviceActivity) getActivity()), new AddRemoteHubRequest(activity.getNewDevice())
-                                , AppConstants.NEW_DEVICE_IP)
+                        mViewModel.installRemoteHub(
+                                (WifiManager) Objects.requireNonNull(activity).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
+                                activity,
+                                AddNewDeviceActivity.getNewDevice(),
+                                AppConstants.NEW_DEVICE_IP)
                                 .observe(this, s -> {
-                                    if (s != null && s.getCmd() != null)
-                                        switch (s.getCmd()) {
-                                            case AppConstants.NEW_DEVICE_TOGGLE_CMD:
-                                                ((AddNewDeviceActivity) getActivity()).getNewDevice().setToggleCount(Integer.parseInt(s.getCount()));
-                                                ((AddNewDeviceActivity) getActivity()).getStepperAdapter().notifyDataSetChanged();
-                                                callback.goToNextStep();
-                                                break;
-                                            case AppConstants.NEW_DEVICE_PHV_START:
-                                                callback.goToNextStep();
-                                                break;
-                                            case AppConstants.SOCKET_TIME_OUT:
-                                                AddNewDeviceActivity.getNewDevice().setFailed(true);
-                                                Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                                                break;
-                                            case AppConstants.UNKNOWN_EXCEPTION:
-                                                Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
-                                                break;
-                                            case AppConstants.CONNECT_EXCEPTION:
-                                                Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
-                                                break;
-                                            case AppConstants.UNKNOWN_HOST_EXCEPTION:
-                                                Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
-                                                break;
-                                        }
-                                    else
+                            if (s != null && s.getResult() != null)
+                                switch (s.getResult()) {
+                                    case AppConstants.SUCCESS_RESULT:
+                                        activity.getStepperAdapter().notifyDataSetChanged();
+                                        callback.goToNextStep();
+                                        break;
+                                    case AppConstants.SOCKET_TIME_OUT:
+                                        AddNewDeviceActivity.getNewDevice().setFailed(true);
                                         Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
-                                    callback.getStepperLayout().hideProgress();
-                                    progressDialog.dismiss();
-                                });
+                                        break;
+                                    case AppConstants.UNKNOWN_EXCEPTION:
+                                        Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case AppConstants.CONNECT_EXCEPTION:
+                                        Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                                        Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
+                                        break;
+                                }
+                            else
+                                Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                            callback.getStepperLayout().hideProgress();
+                            progressDialog.dismiss();
+                        });
                     }
                     else
                         Toast.makeText(activity, "نوع دستگاه انتخابی مشخص نیست", Toast.LENGTH_SHORT).show();
                 } else {
-                    ProvideInternetFragment.newInstance().show(getActivity().getSupportFragmentManager(), "provideInternet");
+                    ProvideInternetFragment.newInstance().show(activity.getSupportFragmentManager(), "provideInternet");
                 }
             });
         }

@@ -274,7 +274,7 @@ public class DevicesManagementListFragment extends BackHandledFragment implement
 ////        if (disposable != null)
 ////            disposable.dispose();
 ////        disposable = ((RayanApplication)getActivity().getApplication()).getBus().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(o -> {
-////            if (o.getString("cmd").equals(AppConstants.SETTINGS)){
+////            if (o.getString("result").equals(AppConstants.SETTINGS)){
 ////                SnackBarSetup.snackBarSetup(getActivity().findViewById(android.R.id.content),"Message: " + o);
 ////                waiting.remove(device.getChipId());
 ////                transaction = fragmentManager.beginTransaction();

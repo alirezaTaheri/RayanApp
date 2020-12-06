@@ -43,6 +43,10 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
                 return NewDevicesListFragment.newInstance();
             case 1:
                 return NewDeviceSetConfigurationFragment.newInstance();
+            case 2:
+                return NewDevicePhysicalVerificationFragment.newInstance();
+            case 3:
+                return FinishAddNewDeviceFragment.newInstance();
 //            case 2:
 //                return NewDeviceSetAccessPoint.newInstance();
 //            case 3:
@@ -67,10 +71,6 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
 //                    physicalFragment = NewDevice_Plug_PhysicalVerificationFragment.newInstance();
 //            }
 //            Log.e("iiiiiiiiiii", "iiiiiiiiii: " + physicalFragment);
-            case 2:
-                return NewDevicePhysicalVerificationFragment.newInstance();
-            case 3:
-                return FinishAddNewDeviceFragment.newInstance();
         }
         return  null;
     }
@@ -81,24 +81,31 @@ public class AddNewDeviceStepperAdapter extends AbstractFragmentStepAdapter {
         StepViewModel.Builder builder = new StepViewModel.Builder(context);
         switch (position){
             case 0:
-                    builder.setTitle("انتخاب دستگاه")
+                builder.setTitle("انتخاب دستگاه")
                         .setEndButtonVisible(true)
                         .setBackButtonLabel("بازگشت به صفحه‌اصلی")
+                        .setBackButtonStartDrawableResId(R.drawable.ms_ic_chevron_right)
+                        .setNextButtonEndDrawableResId(R.drawable.ms_ic_chevron_left)
                         .setEndButtonLabel("بعدی");
                 break;
             case 1:
                 builder.setTitle("تنظیمات")
                         .setBackButtonLabel("قبلی")
+                        .setBackButtonStartDrawableResId(R.drawable.ms_ic_chevron_right)
+                        .setNextButtonEndDrawableResId(R.drawable.ms_ic_chevron_left)
                         .setEndButtonLabel("بعدی");
                 break;
             case 2:
                 builder.setTitle("دسترسی‌فیزیکی")
                         .setBackButtonLabel("قبلی")
+                        .setBackButtonStartDrawableResId(R.drawable.ms_ic_chevron_right)
+                        .setNextButtonEndDrawableResId(R.drawable.ms_ic_chevron_left)
                         .setEndButtonLabel("بعدی");
                 break;
             case 3:
                 builder.setTitle("پایان")
                         .setBackButtonLabel("قبلی")
+                        .setNextButtonEndDrawableResId(R.drawable.ms_ic_chevron_left)
                         .setBackButtonVisible(false)
                         .setEndButtonLabel("بازگشت به صفحه‌اصلی");
                 break;

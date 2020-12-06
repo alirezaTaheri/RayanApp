@@ -1,9 +1,7 @@
 package rayan.rayanapp.ViewModels;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -27,15 +25,11 @@ import rayan.rayanapp.Data.Remote;
 import rayan.rayanapp.Data.RemoteData;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteDatasResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.AddRemoteRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteDatasResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteHubsResponse;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SingleLiveEvent;
-import rayan.rayanapp.Util.api.StartupApiRequests;
 
 public class AddNewRemoteViewModel extends DevicesFragmentViewModel {
     private final String[] types = {"TV","AC","Learn"};

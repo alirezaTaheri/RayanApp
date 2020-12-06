@@ -35,13 +35,13 @@ import rayan.rayanapp.Persistance.database.UserDatabase;
 import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponsev3;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteDatasResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.GroupsResponsev3;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteDatasResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteHubsResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemotesResponse;
 import rayan.rayanapp.Util.ApiResponseHandler;
 import retrofit2.HttpException;
 
@@ -201,7 +201,7 @@ public class StartupApiRequests {
         newRemotes = new ArrayList<>();
         newRemoteDatas = new ArrayList<>();
         MutableLiveData<requestStatus> requestStatusLiveData = new MutableLiveData<>();
-        Observable.concat(getGroupObservablev3(newGroups), getRemoteHubsObservablev3(newRemoteHubs, newRemotes), getRemoteDatasObservablev3((newRemoteDatas)))
+        Observable.concat(getGroupObservablev3(newGroups), getRemoteHubsObservablev3(newRemoteHubs, newRemotes))
                 .subscribe(new Observer<Object>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -216,10 +216,7 @@ public class StartupApiRequests {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("v3v3v3v3", "Composed onError: "+ e + newGroups.size()+" / "+newRemoteHubs.size() + " / " + newRemotes + " / "+newRemoteDatas);
-                        if (e instanceof HttpException && ((HttpException) e).message().contains("Unauthorized")) {
-                            loginObservablev3().subscribe(loginObserver(requestStatusLiveData, doAfterLogin.GET_GROUPS));
-                            requestStatusLiveData.postValue(requestStatus.AUTHENTICATION_ERROR);
-                        }
+                        requestStatusLiveData.postValue(requestStatus.ERROR);
                     }
 
                     @Override

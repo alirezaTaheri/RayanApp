@@ -29,8 +29,8 @@ import butterknife.OnClick;
 import rayan.rayanapp.Adapters.recyclerView.ContactsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.OnContactClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 import rayan.rayanapp.ViewModels.EditGroupFragmentViewModel;
 
 public class UsersListDialogFragment extends BottomSheetDialogFragment implements OnContactClicked<User> {

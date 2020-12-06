@@ -3,64 +3,66 @@ package rayan.rayanapp.Retrofit;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddDeviceToGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteHubToGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddRemoteRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.ChangePasswordRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.CreateTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditDeviceTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteHubRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteHubTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditRemoteRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.SendFilesToDevicePermitRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeAccessPointRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ChangeNameRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.EndSettingsRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.FactoryResetRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.MqttTopicRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.PlugPhysicalVerificationRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.Ready4SettingsRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.RegisterDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.SetPrimaryConfigRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDevice;
-import rayan.rayanapp.Retrofit.Models.Requests.device.ToggleDeviceWithLastCommand;
-import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.UpdateRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.device.VerifyDeviceRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.DeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.GroupsResponsev3;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteDatasResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemoteHubsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.RemotesResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.api.SendFilesToDevicePermitResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.AllFilesListResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.DeviceBaseResponse;
-import rayan.rayanapp.Retrofit.Models.Requests.api.ConfirmCodeRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.ForgetPasswordRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.RegisterUserRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.device.EndSettingsResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.SetPrimaryConfigResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.TlmsDoneResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.ToggleDeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.VerifyDeviceResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.VersionResponse;
-import rayan.rayanapp.Retrofit.Models.Responses.device.YesResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.PhysicalVerificationRequest_RemoteHub;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.PrimaryConfigRequest_RemoteHub_v1;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.device.RemoteHubBaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddAdminRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddDeviceToGroupRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.AddRemoteHubRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.AddRemoteHubToGroupRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.AddRemoteRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddUserByMobileRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.ChangePasswordRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.CreateGroupRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.CreateTopicRemoteHubRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.CreateTopicRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteDeviceRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.DeleteRemoteHubRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditDeviceTopicRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.EditRemoteHubRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.EditRemoteHubTopicRequest;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.EditRemoteRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditUserRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.SendFilesToDevicePermitRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ChangeAccessPointRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ChangeNameRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.EndSettingsRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.FactoryResetRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.MqttTopicRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.PlugPhysicalVerificationRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.Ready4SettingsRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.RegisterDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ToggleDevice;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.ToggleDeviceWithLastCommand;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.UpdateDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.UpdateRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.VerifyDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.DeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.GroupsResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.GroupsResponsev3;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteDatasResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteHubResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteHubsResponse;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemotesResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.SendFilesToDevicePermitResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.AllFilesListResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.DeviceBaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.ConfirmCodeRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.ForgetPasswordRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.RegisterUserRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.SetPrimaryConfigResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.TlmsDoneResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.VerifyDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.VersionResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.YesResponse;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.Body;
@@ -70,7 +72,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
-import retrofit2.http.Part;
 import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
 
@@ -88,28 +89,17 @@ public interface ApiService {
 
     @POST("api/v3/users/login")
     @FormUrlEncoded
+    Call<BaseResponse> loginCall(@Field("username") String username, @Field("password") String password);
+
+    @POST("api/v3/users/login")
+    @FormUrlEncoded
     Observable<BaseResponse> loginv3(@Field("username") String username, @Field("password") String password);
 
     @GET("api/v3/groups/")
     Observable<GroupsResponse> getGroups(@Header("Authorization") String token);
 
-    @GET("api/v3/remotehubs/")
-    Observable<RemoteHubsResponse> getRemoteHubs(@Header("Authorization") String token, @QueryMap Map<String, String> params);
-
-    @GET("api/v3/remotes/")
-    Observable<RemotesResponse> getRemotes(@Header("Authorization") String token, @QueryMap Map<String, String> params);
-
     @GET("api/v3/groups/")
     Observable<GroupsResponsev3> getGroupsv3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
-
-    @GET("api/v3/remotehubs/")
-    Observable<RemoteHubsResponse> getRemoteHubsv3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
-
-    @GET("api/v3/remotes/")
-    Observable<RemotesResponse> getRemotesv3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
-
-    @GET("api/v3/maindataes/")
-    Observable<RemoteDatasResponse> getRemoteDatasv3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
 
     @POST("api/v3/groups/addusermobile")
     Observable<BaseResponse> addUserByMobile(@Header("Authorization") String token, @Body AddUserByMobileRequest addUserByMobileRequest);
@@ -122,9 +112,6 @@ public interface ApiService {
 
     @POST("api/v3/groups/delete_device")
     Observable<BaseResponse> deleteDeviceFromGroup(@Header("Authorization") String token, @Body DeleteDeviceRequest deleteDeviceRequest);
-
-    @POST("api/v3/groups/delete_remote_hub")
-    Observable<BaseResponse> deleteRemoteHubFromGroup(@Header("Authorization") String token, @Body DeleteRemoteHubRequest deleteRemoteHubRequest);
 
     @POST("api/v3/groups/deleteadmin")
     Observable<BaseResponse> deleteAdmin(@Header("Authorization") String token, @Body DeleteUserRequest deleteUserRequest);
@@ -145,33 +132,11 @@ public interface ApiService {
     @POST("api/v3/groups/edit_topic_device")
     Observable<DeviceResponse> editDeviceTopic(@Header("Authorization") String token, @Body EditDeviceTopicRequest editDeviceTopicRequest);
 
-    @POST("api/v3/groups/edit_topic_remote_hub")
-    Observable<RemoteHubResponse> editRemoteHubTopic(@Header("Authorization") String token, @Body EditRemoteHubTopicRequest editRemoteHubTopicRequest);
-
     @POST("api/v3/devicev2s/edit")
     Observable<DeviceResponse> editDevice(@Header("Authorization") String token, @Body EditDeviceRequest editDeviceRequest);
 
-    @POST("api/v3/remotehubs/add_remote")
-    Observable<RemoteHubsResponse> addRemote(@Header("Authorization") String token, @Body AddRemoteRequest addRemoteRequest);
-
-    @POST("api/v3/remotehubs/edit")
-    Observable<RemoteHubResponse> editRemoteHub(@Header("Authorization") String token, @Body EditRemoteHubRequest editRemoteHubRequest);
-
-    @POST("api/v3/remotehubs")
-    Observable<RemoteHubResponse> addRemoteHub(@Header("Authorization") String token, @Body AddRemoteHubRequest addRemoteHubRequest);
-
-    @POST("api/v3/remotehubs/edit_remote")
-    Observable<DeviceResponse> editRemote(@Header("Authorization") String token, @Body EditRemoteRequest editRemoteRequest);
-
-    @FormUrlEncoded
-    @POST("api/v3/remotehubs/delete_remote")
-    Observable<RemoteHubsResponse> deleteRemote(@Header("Authorization") String token, @Field("remoteHub_id") String remoteHub_id, @Field("remote_id") String remote_id);
-
     @POST("api/v3/groups/add_topic_device")
     Observable<DeviceResponse> createTopic(@Header("Authorization") String token, @Body CreateTopicRequest createTopicRequest);
-
-    @POST("api/v3/groups/add_topic_remote_hub")
-    Observable<RemoteHubResponse> createTopicRemoteHub(@Header("Authorization") String token, @Body CreateTopicRemoteHubRequest createTopicRequest);
 
     @POST("api/v3/users/edit")
     Observable<BaseResponse> editUser(@Header("Authorization") String token, @Body EditUserRequest editUserRequest);
@@ -184,9 +149,6 @@ public interface ApiService {
 
     @POST("api/v3/groups/add_device")
     Observable<BaseResponse> addDeviceToGroup(@Header("Authorization") String token, @Body AddDeviceToGroupRequest addDeviceToGroupRequest);
-
-    @POST("api/v3/groups/add_remote_hub")
-    Observable<BaseResponse> addRemoteHubToGroup(@Header("Authorization") String token, @Body AddRemoteHubToGroupRequest addDeviceToGroupRequest);
 
     @POST
     Observable<Response<String>> changeName(@Header("auth") String auth, @Url String url, @Body ChangeNameRequest changeNameRequest);
@@ -248,5 +210,59 @@ public interface ApiService {
 
     @POST("api/v3/users/forgetpass")
     Observable<BaseResponse> forgetPassword(@Header("Authorization") String token, @Body ForgetPasswordRequest forgetPasswordRequest);
+
+//    ============================== Remote Hubs =============================
+
+    @POST("api/v3/remotehubs")
+    Observable<RemoteHubResponse> addRemoteHub(@Header("Authorization") String token, @Body AddRemoteHubRequest addRemoteHubRequest);
+
+    @GET("api/v3/remotehubs/")
+    Observable<RemoteHubsResponse> getRemoteHubs(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+    @GET("api/v3/remotes/")
+    Observable<RemotesResponse> getRemotes(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+    @POST("api/v3/groups/edit_topic_remote_hub")
+    Observable<RemoteHubResponse> editRemoteHubTopic(@Header("Authorization") String token, @Body EditRemoteHubTopicRequest editRemoteHubTopicRequest);
+
+    @POST("api/v3/groups/add_remote_hub")
+    Observable<BaseResponse> addRemoteHubToGroup(@Header("Authorization") String token, @Body AddRemoteHubToGroupRequest addDeviceToGroupRequest);
+
+    @POST("api/v3/groups/add_topic_remote_hub")
+    Observable<RemoteHubResponse> createTopicRemoteHub(@Header("Authorization") String token, @Body CreateTopicRemoteHubRequest createTopicRequest);
+
+    @POST("api/v3/remotehubs/add_remote")
+    Observable<RemoteHubsResponse> addRemote(@Header("Authorization") String token, @Body AddRemoteRequest addRemoteRequest);
+
+    @POST("api/v3/remotehubs/edit")
+    Observable<RemoteHubResponse> editRemoteHub(@Header("Authorization") String token, @Body EditRemoteHubRequest editRemoteHubRequest);
+
+    @POST("api/v3/remotehubs/edit_remote")
+    Observable<DeviceResponse> editRemote(@Header("Authorization") String token, @Body EditRemoteRequest editRemoteRequest);
+
+    @FormUrlEncoded
+    @POST("api/v3/remotehubs/delete_remote")
+    Observable<RemoteHubsResponse> deleteRemote(@Header("Authorization") String token, @Field("remoteHub_id") String remoteHub_id, @Field("remote_id") String remote_id);
+
+    @POST("api/v3/groups/delete_remote_hub")
+    Observable<BaseResponse> deleteRemoteHubFromGroup(@Header("Authorization") String token, @Body DeleteRemoteHubRequest deleteRemoteHubRequest);
+
+    @GET("api/v3/remotehubs/")
+    Observable<RemoteHubsResponse> getRemoteHubsv3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+    @GET("api/v3/remotes/")
+    Observable<RemotesResponse> getRemotesv3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+    @GET("api/v3/maindataes/")
+    Observable<RemoteDatasResponse> getRemoteDatasv3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+//    ---------------------------- Version 1 ----------------------------------
+    @POST
+    @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
+    Observable<RemoteHubBaseResponse> sendFirstConfig_RemoteHub_v1(@Url String url, @Body PrimaryConfigRequest_RemoteHub_v1 setPrimaryConfigRequest);
+
+    @POST
+    @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
+    Observable<RemoteHubBaseResponse> to_remoteHub_physical_verification(@Url String url, @Body PhysicalVerificationRequest_RemoteHub baseRequest);
 
 }

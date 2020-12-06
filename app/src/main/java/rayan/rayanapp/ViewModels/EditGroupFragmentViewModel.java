@@ -30,14 +30,14 @@ import rayan.rayanapp.Persistance.database.UserDatabase;
 import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddAdminRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.AddUserByMobileRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.BaseResponse;
-import rayan.rayanapp.Retrofit.Models.Requests.api.DeleteUserRequest;
-import rayan.rayanapp.Retrofit.Models.Requests.api.EditGroupRequest;
-import rayan.rayanapp.Retrofit.Models.Responses.api.Group;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddAdminRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddUserByMobileRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.DeleteUserRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.EditGroupRequest;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 public class EditGroupFragmentViewModel extends DevicesFragmentViewModel {
     GroupDatabase groupDatabase;

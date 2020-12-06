@@ -13,7 +13,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Listeners.OnAdminClicked;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.Models.Responses.api.User;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.User;
 
 public class GroupUserViewHolder extends BasicViewHolder<User, OnAdminClicked<User>> {
     private final String TAG = GroupUserViewHolder.class.getSimpleName();

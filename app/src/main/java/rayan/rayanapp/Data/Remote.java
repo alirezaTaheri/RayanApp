@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Topic;
 
 @Entity
 public class Remote extends BaseDevice implements Parcelable{

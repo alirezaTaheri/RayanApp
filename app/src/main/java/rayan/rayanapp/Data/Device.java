@@ -7,12 +7,11 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import rayan.rayanapp.Retrofit.Models.Responses.api.Topic;
+import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Topic;
 import rayan.rayanapp.Util.AppConstants;
 
 @Entity
