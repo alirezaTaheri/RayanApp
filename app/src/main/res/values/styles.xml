@@ -9,6 +9,10 @@
         <!--<item name="android:statusBarColor">@color/white</item>-->
     </style>
 
+    <style name="AppTheme.AppCompat.Dialog.Alert.NoFloating" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
     <style name="AppBaseThemeDarkStatusBar" parent="AppTheme">
         <!-- Customize your theme here. -->
         <item name="android:statusBarColor">@color/grey_light_4</item>

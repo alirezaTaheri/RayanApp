@@ -323,7 +323,7 @@ public class EditGroupFragment extends Fragment {
 
     void clickOnLeaveGroup() {
         userId = RayanApplication.getPref().getId();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment3", "ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟");
+        YesNoBottomSheetFragment bottomSheetFragment = new YesNoBottomSheetFragment().instance("EditGroupFragment3", "ترک گروه", "بازگشت", "آیا مایل به ترک گروه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 

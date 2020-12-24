@@ -1,9 +1,11 @@
 package rayan.rayanapp.Activities;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -14,10 +16,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Data.Button;
 import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteData;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Fragments.ACRemoteFragment;
@@ -48,20 +55,37 @@ public class AddNewRemoteActivity extends AppCompatActivity {
     private AddNewRemoteNavListener currentFragment;
     @BindView(R.id.message)
     TextView message;
+    @BindView(R.id.nextModel)
+    TextView bottomNext;
     @BindView(R.id.remotePanel)
     ConstraintLayout remotePanel;
     @BindView(R.id.next)
     TextView nextButton;
+    @BindView(R.id.bottom_message)
+    TextView bottomMessage;
     RemoteHub remoteHub;
     Remote remote;
+    private boolean settings;
     private Bundle newRemoteData = new Bundle();
+    private List<Button> learnedButtons = new ArrayList<>();
+    private ArrayList<RemoteData> remoteData = new ArrayList<>();
     private final String TAG = "AddNewRemoteActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_new_remote_activity);
-        if (getIntent().getExtras() != null)
+        if (getIntent().getExtras() != null) {
             remoteHub = getIntent().getExtras().getParcelable("remoteHub");
+            settings = getIntent().getExtras().getBoolean("settings");
+            newRemoteData.putBoolean("learn", getIntent().getExtras().getBoolean("learn"));
+            remote = getIntent().getExtras().getParcelable("remote");
+            remoteData = getIntent().getExtras().getParcelableArrayList("remoteData");
+        }
+        Log.e(TAG, "RemoteHub"+remoteHub);
+        Log.e(TAG, "Remote"+remote);
+        Log.e(TAG, "RemoteData"+remoteData);
+        Log.e(TAG, "Settings"+settings);
+        Log.e(TAG, "Learn"+newRemoteData.getBoolean("learn"));
         ButterKnife.bind(this);
         viewModel = ViewModelProviders.of(this).get(AddNewRemoteViewModel.class);
         fm = getSupportFragmentManager();
@@ -69,15 +93,32 @@ public class AddNewRemoteActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         newRemoteData.putString("remoteHubId", remoteHub!=null?remoteHub.getId():"");
         onFragmentChanged();
-        selectLearnedFragment= NewRemoteSelectLearnedFragment.newInstance();
-        currentFragment = (NewRemoteSelectLearnedFragment) selectLearnedFragment;
-        if (savedInstanceState == null) {
-            ft.add(R.id.container, selectLearnedFragment)
+        if (!settings) {
+            selectLearnedFragment = NewRemoteSelectLearnedFragment.newInstance();
+            currentFragment = (NewRemoteSelectLearnedFragment) selectLearnedFragment;
+            if (savedInstanceState == null) {
+                ft.add(R.id.container, selectLearnedFragment)
+                        .commit();
+            }
+        }else{
+            newRemoteControlBase = remote.getType().equals(AppConstants.REMOTE_TYPE_TV)? TvRemoteFragment.newInstance(remote, newRemoteData.getBoolean("learn"), remoteData):
+                    ACRemoteFragment.newInstance(remote, newRemoteData.getBoolean("learn"), remoteData);
+            currentFragment = newRemoteControlBase;
+            fm.beginTransaction().add(R.id.container, newRemoteControlBase)
                     .commit();
+            remotePanel.setVisibility(View.VISIBLE);
+            nextButton.setText("ذخیره");
+            findViewById(R.id.nextModel).setOnClickListener(v -> newRemoteControlBase.showButtons());
+            message.setText("دکمه مورد نظر خود را لمس کنید");
+            bottomNext.setText("مشاهده همه");
+            bottomMessage.setText("تعداد دکمه‌های ایجاد شده: 0");
+
         }
     }
 
-
+    public AddNewRemoteViewModel getViewModel(){
+        return viewModel;
+    }
     public void setSelectedBrand(String selectedBrand) {
         this.selectedBrand = selectedBrand;
     }
@@ -103,55 +144,129 @@ public class AddNewRemoteActivity extends AppCompatActivity {
                     .addToBackStack(null)
                     .commit();
         } else if (currentFragment instanceof NewRemoteSelectBrandFragment) {
-            newRemoteControlBase = newRemoteData.getString("type").equals(AppConstants.REMOTE_TYPE_TV)? TvRemoteFragment.newInstance():
-            ACRemoteFragment.newInstance(newRemoteData.getString("brand"));
+            modifyRemote(newRemoteData);
+            newRemoteControlBase = newRemoteData.getString("type").equals(AppConstants.REMOTE_TYPE_TV)? TvRemoteFragment.newInstance(remote, newRemoteData.getBoolean("learn"), new ArrayList<>()):
+                    ACRemoteFragment.newInstance(remote, newRemoteData.getBoolean("learn"), new ArrayList<>());
             currentFragment = newRemoteControlBase;
             fm.beginTransaction().add(R.id.container, newRemoteControlBase)
                     .addToBackStack(null)
                     .commit();
         } else if (currentFragment instanceof NewRemoteControlBase) {
-            modifyRemote(newRemoteData);
             Log.e(TAG, "AFTER: "+remote);
-            setConfigurationFragment = NewRemoteSetConfigurationFragment.newInstance(remote);
-            currentFragment = setConfigurationFragment;
-            fm.beginTransaction().add(R.id.container, setConfigurationFragment)
-                    .addToBackStack(null)
-                    .commit();
+            learnedButtons = newRemoteData.getParcelableArrayList("buttons");
+            if (!settings) {
+                modifyRemote(newRemoteData);
+                setConfigurationFragment = NewRemoteSetConfigurationFragment.newInstance(remote, newRemoteData.getBoolean("learn"));
+                currentFragment = setConfigurationFragment;
+                fm.beginTransaction().add(R.id.container, setConfigurationFragment)
+                        .addToBackStack(null)
+                        .commit();
+            } else {
+                List<String> buttonNames = new ArrayList<>();
+                for (Button b: learnedButtons)
+                    buttonNames.add(b.getName());
+                progressDialog.show();
+                viewModel.addEditRemoteDataEditRemote(learnedButtons,remote, remoteData).observe(this, s -> {
+                    List<String> data_ids = new ArrayList<>();
+                    progressDialog.dismiss();
+                    switch (s.first){
+                        case AppConstants.SUCCESSFUL:
+                            Toast.makeText(this, "ریموت با موفقیت ویرایش شد", Toast.LENGTH_SHORT).show();
+                            viewModel.getGroupsv3();
+                            onBackPressed();
+                            break;
+                        case AppConstants.FORBIDDEN:
+                            Toast.makeText(this, "شما دسترسی لازم برای این کار را ندارید", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.SOCKET_TIME_OUT:
+                            AddNewDeviceActivity.getNewDevice().setFailed(true);
+                            Toast.makeText(this, "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.CONNECT_EXCEPTION:
+                            Toast.makeText(this, "ارسال پیام موفق نبود", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                            Toast.makeText(this, "ارتباط با اینترنت را بررسی کنید", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.UNKNOWN_EXCEPTION:
+                            Toast.makeText(this, "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
+                            break;
+                            default:
+                                if (buttonNames.contains(s.first))
+                                    data_ids.add(s.second);
+
+                    }
+                });
+            }
         }else if (currentFragment instanceof NewRemoteSetConfigurationFragment) {
             modifyRemote(newRemoteData);
             progressDialog.show();
-            progressDialog.cancel.setOnClickListener(v -> {
-                progressDialog.dismiss();
-                viewModel.getAddRemoteDisposable().dispose();
-            });
-            viewModel.addRemote(remote).observe(this,s -> {
-                Log.e(TAG, "Remote Successfully Added");
-                progressDialog.dismiss();
-                switch (s){
-                    case AppConstants.FORBIDDEN:
-                        Toast.makeText(this, "شما دسترسی لازم برای این کار را ندارید", Toast.LENGTH_SHORT).show();
-                        break;
-                    case AppConstants.OPERATION_DONE:
-                        Log.e(this.getClass().getSimpleName(), "DONE CHANGENAME");
-                        Toast.makeText(this, "ریموت با موفقیت اضافه شد", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        break;
-                    case AppConstants.SOCKET_TIME_OUT:
-                        Log.e(this.getClass().getSimpleName(), "SOCKET_TIME_OUT CHANGENAME");
-                        Toast.makeText(this, "خطای اتصال", Toast.LENGTH_SHORT).show();
-                        break;
-                    case AppConstants.NETWORK_ERROR:
-                        Log.e(this.getClass().getSimpleName(), "NETWORK_ERROR CHANGENAME");
-                        Toast.makeText(this, "خطای اتصال", Toast.LENGTH_SHORT).show();
-                        break;
-                    case AppConstants.ERROR:
-                        Log.e(this.getClass().getSimpleName(), "ERROR CHANGENAME");
-                        Toast.makeText(this, "خطایی رخ داد", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            });
+            if (!newRemoteData.getBoolean("learn")) {
+                progressDialog.cancel.setOnClickListener(v -> {
+                    progressDialog.dismiss();
+                    viewModel.getAddRemoteDisposable().dispose();
+                });
+                viewModel.addRemote(remote).observe(this,s -> {
+                    Log.e(TAG, "Remote Successfully Added");
+                    progressDialog.dismiss();
+                    switch (s) {
+                        case AppConstants.FORBIDDEN:
+                            Toast.makeText(this, "شما دسترسی لازم برای این کار را ندارید", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.OPERATION_DONE:
+                            Log.e(this.getClass().getSimpleName(), "DONE CHANGENAME");
+                            Toast.makeText(this, "ریموت با موفقیت اضافه شد", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            break;
+                        case AppConstants.SOCKET_TIME_OUT:
+                            AddNewDeviceActivity.getNewDevice().setFailed(true);
+                            Toast.makeText(this, "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.CONNECT_EXCEPTION:
+                            Toast.makeText(this, "ارسال پیام موفق نبود", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                            Toast.makeText(this, "ارتباط با اینترنت را بررسی کنید", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.UNKNOWN_EXCEPTION:
+                            Toast.makeText(this, "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                });
+            }
+            else {
+                viewModel.addRemoteDataCreateRemote(learnedButtons, remote).observe(this, s -> {
+                    Log.e(TAG, "AddRemoteDataResponse: "+s);
+                    switch(s){
+                        case AppConstants.SUCCESSFUL:
+                            Toast.makeText(this, "ریموت با موفقیت ایجاد شد", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            break;
+                        case AppConstants.FORBIDDEN:
+                            Toast.makeText(this, "شما دسترسی لازم برای این کار را ندارید", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.SOCKET_TIME_OUT:
+                            AddNewDeviceActivity.getNewDevice().setFailed(true);
+                            Toast.makeText(this, "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.CONNECT_EXCEPTION:
+                            Toast.makeText(this, "ارسال پیام موفق نبود", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                            Toast.makeText(this, "ارتباط با اینترنت را بررسی کنید", Toast.LENGTH_SHORT).show();
+                            break;
+                        case AppConstants.UNKNOWN_EXCEPTION:
+                            Toast.makeText(this, "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                    Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                });
+            }
         }
         else {
             Log.e("::::::", "DATA: " + newRemoteData);
@@ -176,6 +291,9 @@ public class AddNewRemoteActivity extends AppCompatActivity {
     public void setMessage(String message) {
         this.message.setText(message);
     }
+    public void setBottomMessage(String message) {
+        this.bottomMessage.setText(message);
+    }
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -186,31 +304,41 @@ public class AddNewRemoteActivity extends AppCompatActivity {
         fm.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                String topFragment = fm.getFragments().get(fm.getFragments().size() - 1).getClass().getName();
-                if (topFragment.equals(selectLearnedFragment.getClass().getName())){
-                    setMessage("قصد انجام چه کاری را دارید؟");
-                } else if (topFragment.equals(selectTypeFragment.getClass().getName())){
-                    setMessage("لطفا نوع دستگاه خود را انتخاب کنید");
-                }else if (topFragment.equals(selectBrandFragment.getClass().getName())){
-                    remotePanel.setVisibility(View.GONE);
-                    nextButton.setText("بعدی");
-                    setMessage("لطفا برند دستگاه مورد نظر را وارد کنید");
-                }else if (topFragment.equals(newRemoteControlBase.getClass().getName())){
-                    if (getCurrentFocus() != null) {
-                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                    }
-                    remotePanel.setVisibility(View.VISIBLE);
-                    findViewById(R.id.nextModel).setOnClickListener(v -> newRemoteControlBase.nextModel());
-                    nextButton.setText("بعدی");
-                    message.setText("لطفا ریموت متناسب با دستگاه را انتخاب کنید");
-                }else if (topFragment.equals(setConfigurationFragment.getClass().getName())){
-                    remotePanel.setVisibility(View.GONE);
-                    nextButton.setText("تمام");
-                    setMessage("لطفا نام و مشخصات ریموت را وارد کنید");
-                }
+                handleFragmentChange();
             }
         });
+    }
+    public void handleFragmentChange(){
+        String topFragment = fm.getFragments().get(fm.getFragments().size() - 1).getClass().getName();
+        if (topFragment.equals(selectLearnedFragment.getClass().getName())){
+            setMessage("قصد انجام چه کاری را دارید؟");
+        } else if (topFragment.equals(selectTypeFragment.getClass().getName())){
+            setMessage("لطفا نوع دستگاه خود را انتخاب کنید");
+        }else if (topFragment.equals(selectBrandFragment.getClass().getName())){
+            remotePanel.setVisibility(View.GONE);
+            nextButton.setText("بعدی");
+            setMessage("لطفا برند دستگاه مورد نظر را وارد کنید");
+        }else if (topFragment.equals(newRemoteControlBase.getClass().getName())){
+            if (getCurrentFocus() != null) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+            remotePanel.setVisibility(View.VISIBLE);
+            nextButton.setText("بعدی");
+            if (!newRemoteData.getBoolean("learn")){
+                findViewById(R.id.nextModel).setOnClickListener(v -> newRemoteControlBase.nextModel());
+                message.setText("لطفا ریموت متناسب با دستگاه را انتخاب کنید");
+            }else{
+                findViewById(R.id.nextModel).setOnClickListener(v -> newRemoteControlBase.showButtons());
+                message.setText("دکمه مورد نظر خود را لمس کنید");
+                bottomNext.setText("مشاهده همه");
+                bottomMessage.setText("تعداد دکمه‌های ایجاد شده: 0");
+            }
+        }else if (topFragment.equals(setConfigurationFragment.getClass().getName())){
+            remotePanel.setVisibility(View.GONE);
+            nextButton.setText("تمام");
+            setMessage("لطفا نام و مشخصات ریموت را وارد کنید");
+        }
     }
     public void modifyRemote(Bundle data){
         remote = new Remote();
@@ -219,9 +347,9 @@ public class AddNewRemoteActivity extends AppCompatActivity {
             remote.setTopic(new Topic(remoteHub.getGroupId()+"/"+remoteHub.getId()+"/"));
         }
         remote.setName(data.getString("name"));
-        remote.setType(data.getString("type"));
-        remote.setBrand(data.getString("brand"));
-        remote.setModel(data.getString("model"));
+        remote.setType(data.getString(AppConstants.PARAM_TYPE));
+        remote.setBrand(data.getString(AppConstants.PARAM_BRAND));
+        remote.setModel(data.getString(AppConstants.PARAM_MODEL));
         remote.setRemoteHubId(data.getString("remoteHubId"));
         remote.setVisibility(data.getBoolean("visibility"));
         remote.setFavorite(data.getBoolean("favorite"));

@@ -31,9 +31,6 @@ public class RemoteTypeViewHolder extends BasicViewHolder<String, OnRemoteTypeCl
         } else if(item.equals("AC")){
             name.setText("کولرگازی");
             icon.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(),R.drawable.ic_air_conditioner));
-        }else if (item.equals("Learn")){
-            name.setText("ساختن ریموت دلخواه");
-            icon.setImageDrawable(ContextCompat.getDrawable(itemView.getContext(),R.drawable.ic_add_2));
         }
         itemView.setOnClickListener(v -> listener.onRemoteTypeClicked(item, getAdapterPosition()));
         if (((NewRemoteSelectTypeFragment)listener).getSelectedType().equals(item))

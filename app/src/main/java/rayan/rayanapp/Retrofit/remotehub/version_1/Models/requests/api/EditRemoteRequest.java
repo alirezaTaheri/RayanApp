@@ -16,6 +16,7 @@ public class EditRemoteRequest {
         this.remote.setVisible(remote.isVisibility());
         this.remote.setAccessible(remote.isAccessible());
         this.remote.setFavorite(remote.isFavorite());
+        this.remote.setMain_data_ids(remote.getRemoteDatas());
         this.remoteHub_id = remote.getRemoteHubId();
     }
 
@@ -26,8 +27,12 @@ public class EditRemoteRequest {
         private String remoteHubId;
         private String type;
         private String groupId;
+        private List<String> main_data_ids;
         private boolean accessible,learned,visible,favorite;
 
+        public void setMain_data_ids(List<String> main_data_ids) {
+            this.main_data_ids = main_data_ids;
+        }
 
         public void setFavorite(boolean favorite) {
             this.favorite = favorite;

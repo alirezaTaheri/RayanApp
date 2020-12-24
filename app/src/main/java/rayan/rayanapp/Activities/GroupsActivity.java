@@ -22,7 +22,7 @@ import rayan.rayanapp.Fragments.EditGroupFragment;
 import rayan.rayanapp.Fragments.EditGroupFragment2;
 import rayan.rayanapp.Fragments.EditGroupUsersFragment;
 import rayan.rayanapp.Fragments.GroupsListFragment;
-import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
+import rayan.rayanapp.Fragments.YesNoBottomSheetFragment;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.Listeners.OnAddUserToGroupSubmitClicked;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
@@ -44,7 +44,7 @@ public class GroupsActivity extends AppCompatActivity implements EditGroupFragme
     EditGroupAdminsFragment editGroupAdminsFragment;
     EditGroupUsersFragment editGroupUsersFragment;
     EditGroupFragment2 editGroupFragment2;
-    YesNoButtomSheetFragment yesNoButtomSheetFragment;
+    YesNoBottomSheetFragment yesNoBottomSheetFragment;
 
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -59,8 +59,8 @@ public class GroupsActivity extends AppCompatActivity implements EditGroupFragme
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("");
-        yesNoButtomSheetFragment = new YesNoButtomSheetFragment();
-        yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
+        yesNoBottomSheetFragment = new YesNoBottomSheetFragment();
+        yesNoBottomSheetFragment.setOnBottomSheetSubmitClicked(this);
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
         groupsListFragment = GroupsListFragment.newInstance();

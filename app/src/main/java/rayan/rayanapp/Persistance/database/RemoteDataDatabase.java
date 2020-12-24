@@ -36,6 +36,10 @@ public class RemoteDataDatabase {
         return remoteDatasDAO.getAllLive();
     }
 
+    public LiveData<List<RemoteData>> getAllDataOfRemote(String remoteId){
+        return remoteDatasDAO.getDataOfRemoteLive(remoteId);
+    }
+
     public List<RemoteData> getAllRemoteDatas(){
         return remoteDatasDAO.getAll();
     }

@@ -111,7 +111,7 @@ public class EditGroupFragment2 extends Fragment{
             alertDialog.dismiss();
         });
         alertDialog.show();
-//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupFragment2_DeleteGroup", "حذف گروه", "بازگشت", "آیا مایل به حذف گروه هستید؟");
+//        YesNoBottomSheetFragment bottomSheetFragment = new YesNoBottomSheetFragment().instance("EditGroupFragment2_DeleteGroup", "حذف گروه", "بازگشت", "آیا مایل به حذف گروه هستید؟");
 //        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 

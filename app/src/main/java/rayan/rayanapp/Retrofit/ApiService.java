@@ -3,8 +3,14 @@ package rayan.rayanapp.Retrofit;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import rayan.rayanapp.Retrofit.remote.GetSingleRemoteDataResponse;
+import rayan.rayanapp.Retrofit.remote.MainData;
+import rayan.rayanapp.Retrofit.remote.RemoteBrandsResponse;
+import rayan.rayanapp.Retrofit.remote.RemoteDataResponse;
+import rayan.rayanapp.Retrofit.remote.RemoteModelsResponse;
 import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.PhysicalVerificationRequest_RemoteHub;
 import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.PrimaryConfigRequest_RemoteHub_v1;
+import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.SendDataRemoteHubRequest;
 import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.device.RemoteHubBaseResponse;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddAdminRequest;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.api.AddDeviceToGroupRequest;
@@ -171,7 +177,7 @@ public interface ApiService {
     Observable<Response<VerifyDeviceResponse>> verifyDevice(@Header("auth") String auth, @Url String url, @Body VerifyDeviceRequest verifyDeviceRequest);
     @POST
     Observable<ToggleDeviceResponse> togglePin2(@Url String url, @Body ToggleDevice toggleDevice);
-//    @Headers( "Content-Type: application/json; charset=utf-8")
+    //    @Headers( "Content-Type: application/json; charset=utf-8")
 //    @Headers("Cache-Control: no-cache")
     @Headers("Cache-Control: no-cache")
     @POST
@@ -238,7 +244,7 @@ public interface ApiService {
     Observable<RemoteHubResponse> editRemoteHub(@Header("Authorization") String token, @Body EditRemoteHubRequest editRemoteHubRequest);
 
     @POST("api/v3/remotehubs/edit_remote")
-    Observable<DeviceResponse> editRemote(@Header("Authorization") String token, @Body EditRemoteRequest editRemoteRequest);
+    Observable<RemoteHubResponse> editRemote(@Header("Authorization") String token, @Body EditRemoteRequest editRemoteRequest);
 
     @FormUrlEncoded
     @POST("api/v3/remotehubs/delete_remote")
@@ -256,7 +262,16 @@ public interface ApiService {
     @GET("api/v3/maindataes/")
     Observable<RemoteDatasResponse> getRemoteDatasv3(@Header("Authorization") String token, @QueryMap Map<String, String> params);
 
-//    ---------------------------- Version 1 ----------------------------------
+    @GET("api/v3/maindataes/")
+    Observable<GetSingleRemoteDataResponse> getRemoteDatasById(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+    @POST("api/v3/maindataes/")
+    Observable<RemoteDataResponse> addRemoteData(@Header("Authorization") String token, @Body MainData request);
+
+    @POST("api/v3/maindataes/edit")
+    Observable<RemoteDataResponse> editRemoteData(@Header("Authorization") String token, @Body MainData request);
+
+    //    ---------------------------- Version 1 ----------------------------------
     @POST
     @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
     Observable<RemoteHubBaseResponse> sendFirstConfig_RemoteHub_v1(@Url String url, @Body PrimaryConfigRequest_RemoteHub_v1 setPrimaryConfigRequest);
@@ -264,5 +279,36 @@ public interface ApiService {
     @POST
     @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
     Observable<RemoteHubBaseResponse> to_remoteHub_physical_verification(@Url String url, @Body PhysicalVerificationRequest_RemoteHub baseRequest);
+
+    @POST
+    @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
+    Observable<Response<String>> send_data_remoteHub_v1(@Url String url, @Body SendDataRemoteHubRequest request);
+
+    @POST
+    @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
+    Observable<Response<String>> enter_settings_remoteHub_v1(@Url String url, @Body rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.BaseRequest request);
+
+    @POST
+    @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
+    Observable<Response<String>> exit_settings_remoteHub_v1(@Url String url, @Body rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.BaseRequest request);
+
+    @POST
+    @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
+    Observable<Response<String>> enter_learn_remoteHub_v1(@Url String url, @Body rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.BaseRequest request);
+
+    @POST
+    @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
+    Observable<Response<String>> exit_learn_remoteHub_v1(@Url String url, @Body rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.BaseRequest request);
+
+    @POST
+    @Headers({"Content-Type: application/json", "User-Agent: RayanApp"})
+    Observable<Response<String>> get_IR_signal_remoteHub_v1(@Url String url, @Body rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.BaseRequest request);
+
+    //    ------------------------------- Remote --------------------------------------
+    @GET("api/v3/maindataes/brands")
+    Observable<RemoteBrandsResponse> getAllRemoteBrands(@Header("Authorization") String token, @QueryMap Map<String, String> params);
+
+    @GET("api/v3/maindataes/models")
+    Observable<RemoteModelsResponse> getAllRemoteModles(@Header("Authorization") String token, @QueryMap Map<String, String> params);
 
 }

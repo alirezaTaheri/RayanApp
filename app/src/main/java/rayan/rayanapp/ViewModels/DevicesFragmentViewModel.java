@@ -34,6 +34,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteData;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Data.UserMembership;
 import rayan.rayanapp.Fragments.DevicesFragment;
@@ -64,6 +65,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
     private UserMembershipDatabase membershipDatabase;
     protected RemoteHubDatabase remoteHubDatabase;
     protected RemoteDatabase remoteDatabase;
+    protected RemoteDataDatabase remoteDataDatabase;
     private ApiService apiService;
     private StartupApiRequests startupApiRequests;
     public DevicesFragmentViewModel(@NonNull Application application) {
@@ -73,6 +75,7 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
         userDatabase = new UserDatabase(application);
         remoteHubDatabase = new RemoteHubDatabase(application);
         remoteDatabase = new RemoteDatabase(application);
+        remoteDataDatabase = new RemoteDataDatabase(application);
         membershipDatabase = new UserMembershipDatabase(application);
         executorService= Executors.newSingleThreadExecutor();
         apiService = ApiUtils.getApiService();
@@ -112,6 +115,9 @@ public class DevicesFragmentViewModel extends AndroidViewModel {
 
     public LiveData<List<Remote>> getRemotesOfRemoteHub(String remoteHubId){
             return remoteDatabase.getRemotesOfRemoteHub(remoteHubId);
+    }
+    public LiveData<List<RemoteData>> getDataOfRemote(String remoteId){
+        return remoteDataDatabase.getAllDataOfRemote(remoteId);
     }
     public RemoteHub getRemoteHub(String remoteHubId){
             return remoteHubDatabase.getRemoteHub(remoteHubId);

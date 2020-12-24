@@ -35,6 +35,8 @@ import rayan.rayanapp.Persistance.database.UserDatabase;
 import rayan.rayanapp.Persistance.database.UserMembershipDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
+import rayan.rayanapp.Retrofit.remote.GetSingleRemoteDataResponse;
+import rayan.rayanapp.Retrofit.remote.RemoteDataResponse;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.BaseResponse;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.GroupsResponse;
@@ -43,6 +45,7 @@ import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteDa
 import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemoteHubsResponse;
 import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.api.RemotesResponse;
 import rayan.rayanapp.Util.ApiResponseHandler;
+import rayan.rayanapp.Util.AppConstants;
 import retrofit2.HttpException;
 
 public class StartupApiRequests {
@@ -200,8 +203,10 @@ public class StartupApiRequests {
         newRemoteHubs = new ArrayList<>();
         newRemotes = new ArrayList<>();
         newRemoteDatas = new ArrayList<>();
+        List<String> remoteDataToGet = new ArrayList<>();
         MutableLiveData<requestStatus> requestStatusLiveData = new MutableLiveData<>();
-        Observable.concat(getGroupObservablev3(newGroups), getRemoteHubsObservablev3(newRemoteHubs, newRemotes))
+        Observable.concat(getGroupObservablev3(newGroups), getRemoteHubsObservablev3(newRemoteHubs, newRemotes, remoteDataToGet),
+                getRemoteDataListByIdObservable(remoteDataToGet, newRemoteDatas))
                 .subscribe(new Observer<Object>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -396,7 +401,7 @@ public class StartupApiRequests {
                     }
                 });
     }
-    private Observable<RemoteHubsResponse> getRemoteHubsObservablev3(List<RemoteHub> newRemoteHubs, List<Remote> newRemotes){
+    private Observable<RemoteHubsResponse> getRemoteHubsObservablev3(List<RemoteHub> newRemoteHubs, List<Remote> newRemotes, List<String> remoteDataIds){
         return Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
                 .flatMap(new Function<Long, Observable<RemoteHubsResponse>>() {
                     @Override
@@ -421,6 +426,7 @@ public class StartupApiRequests {
                                 List<Remote> remotes = results.get(i).getRemotes();
                                 for (int j = 0; j<remotes.size();j++){
                                     remotes.get(j).setRemoteHubId(remoteHub.getId());
+                                    remoteDataIds.addAll(remotes.get(j).getRemoteDatas());
                                 }
                                 newRemotes.addAll(remotes);
                             }
@@ -436,6 +442,22 @@ public class StartupApiRequests {
                 });
     }
 
+    private Observable<GetSingleRemoteDataResponse> getRemoteDataListByIdObservable(List<String> remoteDataToGet, List<RemoteData> newRemoteDatas){
+        Log.e(TAG, "Should Get: " + remoteDataToGet);
+        return Observable.fromIterable(remoteDataToGet)
+                .flatMap(this::getSingleRemoteDataByIdObservable)
+                .doOnNext(response-> newRemoteDatas.add(response.getData().getRemoteData()))
+                .doOnError(throwable -> {
+                    Log.e(TAG, "Error in Getting RemoteData: " + throwable);
+                    throwable.printStackTrace();
+                });
+    }
+    private Observable<GetSingleRemoteDataResponse> getSingleRemoteDataByIdObservable(String remoteDataId){
+        Map<String,String> params = new HashMap<>();
+        params.put("_id", remoteDataId);
+        return apiService.getRemoteDatasById(RayanApplication.getPref().getToken(), params)
+                .subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
+    }
     private Observable<RemoteDatasResponse> getRemoteDatasObservablev3(List<RemoteData> newRemoteData){
         return Observable.interval(0, 1, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
                 .flatMap(new Function<Long, Observable<RemoteDatasResponse>>() {

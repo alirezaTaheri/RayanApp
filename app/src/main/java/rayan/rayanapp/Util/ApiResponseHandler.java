@@ -450,6 +450,7 @@ public class ApiResponseHandler {
                             remoteHubs.get(b).setPosition(oldRemoteHubs.get(a).getPosition());
                             remoteHubs.get(b).setInGroupPosition(oldRemoteHubs.get(a).getInGroupPosition());
                             remoteHubs.get(b).setFavoritePosition(oldRemoteHubs.get(a).getFavoritePosition());
+                            remoteHubs.get(b).setState(oldRemoteHubs.get(a).getState());
                         }
                     }
                     if (!exist) remoteHubDatabase.deleteRemoteHub(oldRemoteHubs.get(a));
@@ -502,6 +503,7 @@ public class ApiResponseHandler {
             remoteDatabase.addRemotes(remotes);
             remoteDataDatabase.addRemoteDatas(remotedatas);
             membershipDatabase.addUserMemberships(memberships);
+            Log.e("VVVV", "Added Remotes: " + remotes);
             Log.e("vvvvv", groups.size() + "Added" + remoteHubs.size()+remoteHubs);
             Log.e("vvvvv", remotedatas.size() + "Added" + remotes.size());
         }catch (Exception e){

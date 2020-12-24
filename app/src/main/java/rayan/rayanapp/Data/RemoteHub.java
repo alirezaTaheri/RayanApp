@@ -12,7 +12,9 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+import java.util.Random;
 
+import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Topic;
 
 //@SuppressLint("ParcelCreator")
@@ -253,6 +255,23 @@ public class RemoteHub extends BaseDevice implements Parcelable {
         this.statusWord = statusWord;
     }
 
+    public String getEncryptedStatusWordToGo(){
+        return Encryptor.encrypt(generateRandom().concat("#").concat(getStatusWord()).concat("#").concat(generateRandom()),getSecret());
+    }
+
+    public void decrypt_setStatusWord(String newStatusWord){
+        this.statusWord = String.valueOf(Integer.parseInt(Encryptor.decrypt(newStatusWord,getSecret()).split("#")[1])+1);
+    }
+    private String generateRandom(){
+        String ALLOWED_CHARACTERS = "0123456789asdfghjklqwertyuiopzxcvbnm";
+        final Random random=new Random();
+        int sizeOfAuth = random.nextInt(12)+8;
+        final StringBuilder sb=new StringBuilder(sizeOfAuth);
+        for(int i=0;i<sizeOfAuth;++i)
+            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
+        return sb.toString();
+    }
+
     public String getHeader() {
         return header;
     }
@@ -287,7 +306,8 @@ public class RemoteHub extends BaseDevice implements Parcelable {
 
     @Override
     public String toString() {
-        return "RemoteHub{" +
+        return "{" +
+                "state='" + getState() + '\'' +
                 "chipId='" + chipId + '\'' +
                 ", id='" + id + '\'' +
                 ", username='" + username + '\'' +

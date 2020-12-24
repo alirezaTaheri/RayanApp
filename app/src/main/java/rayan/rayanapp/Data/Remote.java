@@ -4,6 +4,8 @@ import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -14,6 +16,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Topic;
+import rayan.rayanapp.Util.dataConverter.StringListConverter;
 
 @Entity
 public class Remote extends BaseDevice implements Parcelable{
@@ -29,7 +32,8 @@ public class Remote extends BaseDevice implements Parcelable{
     @SerializedName("user_id")
     private String creatorId;
     @SerializedName("main_data_ids")
-    @Ignore
+    @Expose
+    @TypeConverters(StringListConverter.class)
     private List<String> remoteDatas;
     @SerializedName("remote_hub_id")
     private String remoteHubId;

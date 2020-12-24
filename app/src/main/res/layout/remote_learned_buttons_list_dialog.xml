@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp"
+    android:background="@drawable/background_progress_dialog">
+    <TextView
+        android:text="لیست دکمه‌های ایجاد شده"
+        android:id="@+id/title"
+        android:textSize="17sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:text="دکمه ای اضافه نشده است"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/emptyRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <android.support.constraint.ConstraintLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:background="@drawable/background_confirm_button_learn"
+            android:id="@+id/confirm"
+            android:layout_margin="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/cancel"
+            android:text="تایید"
+            android:textAlignment="center"
+            android:padding="10dp"
+            android:layout_width="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:background="@drawable/background_cancel_button_learn"
+            android:id="@+id/cancel"
+            android:layout_margin="10dp"
+            android:textAlignment="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/confirm"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:text="بستن"
+            android:textColor="@color/white"
+            android:padding="10dp"
+            android:layout_width="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_height="wrap_content" />
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>
+</android.support.v4.widget.NestedScrollView>

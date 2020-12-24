@@ -161,7 +161,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                     }
                 else
                     for (int a = 0; a<remoteHubs.size();a++){
-                        if (remoteHubs.get(a).isVisibility()){
+                        if (remoteHubs.get(a).isVisibility() && !remoteHubs.get(a).isVerified()){
                             finalRemoteHubs.add(remoteHubs.get(a));
                         }
                     }
@@ -205,7 +205,7 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                     }
                 else
                     for (int a = 0; a<devices.size();a++){
-                        if (!devices.get(a).isHidden()){
+                        if (!devices.get(a).isHidden() && devices.get(a).isVerified()){
                             finalDevices.add(devices.get(a));
                         }
                     }
@@ -631,7 +631,9 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
         Remote remote = (Remote) item;
         Log.e("onClick_Remote", "Item:"+remote+ position);
         Intent intent = new Intent(activity, RemoteActivity.class);
-        intent.putExtra("type", remote.getType());
+        Bundle b = new Bundle();
+        b.putParcelable("remote", remote);
+        intent.putExtras(b);
         startActivity(intent);
     }
 }

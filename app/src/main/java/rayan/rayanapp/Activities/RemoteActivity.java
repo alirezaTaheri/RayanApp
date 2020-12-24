@@ -25,7 +25,7 @@ public class RemoteActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         fm = getSupportFragmentManager();
         ft = fm.beginTransaction();
-        RemoteFragment remoteFragment = RemoteFragment.newInstance(getIntent().getStringExtra("type"));
+        RemoteFragment remoteFragment = RemoteFragment.newInstance(getIntent().getExtras().getParcelable("remote"));
         if (savedInstanceState == null) {
             ft.add(R.id.container, remoteFragment)
                     .commit();

@@ -170,7 +170,7 @@ public class CreateGroupFragment extends Fragment {
     @OnClick(R.id.createGroup)
     public void createGroup(){
         nameTxt=name.getText().toString();
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("CreateGroupFragment","ایجاد گروه", "بازگشت", "آیا مایل به ایجاد گروه هستید؟");
+        YesNoBottomSheetFragment bottomSheetFragment = new YesNoBottomSheetFragment().instance("CreateGroupFragment","ایجاد گروه", "بازگشت", "آیا مایل به ایجاد گروه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 

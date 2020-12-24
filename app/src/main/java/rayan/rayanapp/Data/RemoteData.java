@@ -2,12 +2,14 @@ package rayan.rayanapp.Data;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
 @Entity
-public class RemoteData {
+public class RemoteData implements Parcelable {
     @PrimaryKey
     @NonNull
     @SerializedName("_id")
@@ -27,6 +29,29 @@ public class RemoteData {
         this.mainFrame = mainFrame;
         this.remoteId = remoteId;
     }
+
+    protected RemoteData(Parcel in) {
+        id = in.readString();
+        model = in.readString();
+        button = in.readString();
+        type = in.readString();
+        brand = in.readString();
+        frequency = in.readString();
+        mainFrame = in.readString();
+        remoteId = in.readString();
+    }
+
+    public static final Creator<RemoteData> CREATOR = new Creator<RemoteData>() {
+        @Override
+        public RemoteData createFromParcel(Parcel in) {
+            return new RemoteData(in);
+        }
+
+        @Override
+        public RemoteData[] newArray(int size) {
+            return new RemoteData[size];
+        }
+    };
 
     @NonNull
     public String getId() {
@@ -105,5 +130,22 @@ public class RemoteData {
                 ", mainFrame='" + mainFrame + '\'' +
                 ", remoteId='" + remoteId + '\'' +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(model);
+        dest.writeString(button);
+        dest.writeString(type);
+        dest.writeString(brand);
+        dest.writeString(frequency);
+        dest.writeString(mainFrame);
+        dest.writeString(remoteId);
     }
 }

@@ -1,6 +1,6 @@
 package rayan.rayanapp.Data;
 
-import rayan.rayanapp.Util.AppConstants;
+import android.arch.persistence.room.Ignore;
 
 public class BaseDevice {
     private int position, inGroupPosition, favoritePosition;
@@ -8,6 +8,7 @@ public class BaseDevice {
     private String baseId;
     private boolean favorite, verified;
     private String version;
+    private String state;
     public BaseDevice() {
     }
 
@@ -28,6 +29,15 @@ public class BaseDevice {
         this.favoritePosition = baseDevice.getFavoritePosition();
         this.version = baseDevice.getVersion();
         this.verified = baseDevice.isVerified();
+        this.state = baseDevice.getState();
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public boolean isFavorite() {

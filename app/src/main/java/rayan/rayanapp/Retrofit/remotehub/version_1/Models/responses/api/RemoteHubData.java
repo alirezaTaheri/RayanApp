@@ -22,7 +22,7 @@ public class RemoteHubData {
 //    @SerializedName("data")
     @SerializedName("remoteHub")
     @Expose
-    private RemoteHub remotes;
+    private RemoteHub remoteHub;
 
     @SerializedName("token")
     @Expose
@@ -49,11 +49,11 @@ public class RemoteHubData {
     }
 
     public RemoteHub getRemoteHub() {
-        return remotes;
+        return remoteHub;
     }
 
-    public void setRemotes(RemoteHub remotes) {
-        this.remotes = remotes;
+    public void setRemoteHub(RemoteHub remoteHub) {
+        this.remoteHub = remoteHub;
     }
 
     public String getToken() {
@@ -77,7 +77,7 @@ public class RemoteHubData {
         return "RemoteHubsData{" +
 //                "user=" + user +
                 ", message='" + message + '\'' +
-                ", remotes=" + remotes +
+                ", remoteHub=" + remoteHub +
                 ", token='" + token + '\'' +
                 ", count=" + count +
                 '}';

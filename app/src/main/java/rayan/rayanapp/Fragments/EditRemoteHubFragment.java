@@ -292,7 +292,7 @@ public class EditRemoteHubFragment extends BackHandledFragment implements DoneWi
     ProgressDialog progressDialog;
     @OnClick(R.id.factoryReset)
     public void onResetClicked(){
-        YesNoButtomSheetFragment bottomSheetFragment = YesNoButtomSheetFragment.instance("resetRemoteHub","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
+        YesNoBottomSheetFragment bottomSheetFragment = YesNoBottomSheetFragment.instance("resetRemoteHub","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 

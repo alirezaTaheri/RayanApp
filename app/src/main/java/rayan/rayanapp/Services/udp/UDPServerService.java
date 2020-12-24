@@ -35,23 +35,28 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
+import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Persistance.AppDatabase;
 import rayan.rayanapp.Persistance.database.DeviceDatabase;
+import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.VerifyDeviceRequest;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.VerifyDeviceResponse;
 import rayan.rayanapp.Util.AppConstants;
+import rayan.rayanapp.Util.RemoteHub.Verification.UDPNodeDiscovery;
 import retrofit2.Response;
 
 public class UDPServerService extends Service {
     private boolean Server_active = true;
     public boolean isRunnig = false;
     private DeviceDatabase deviceDatabase;
+    private RemoteHubDatabase remoteHubDatabase;
+
     private int port;
     private ApiService apiService;
-
+    private UDPNodeDiscovery udpNodeDiscovery;
     private final String TAG = UDPServerService.class.getSimpleName();
 
     @SuppressLint({"NewApi", "StaticFieldLeak"})
@@ -61,6 +66,7 @@ public class UDPServerService extends Service {
         DatagramPacket dp = new DatagramPacket(lMsg, lMsg.length);
         DatagramSocket ds = null;
         deviceDatabase = new DeviceDatabase(this);
+        remoteHubDatabase = new RemoteHubDatabase(this);
         try{
             ds = new DatagramSocket(port);
             ds.setReuseAddress(true);
@@ -68,9 +74,9 @@ public class UDPServerService extends Service {
                 ds.receive(dp);
                 String message = new String(lMsg, 0, dp.getLength());
                 isRunnig = ds.isConnected();
-                Log.e(TAG,"UDP Message "+message + "Address of Received" + dp.getAddress().toString());
                 String senderIP = dp.getAddress().toString();
                 senderIP = senderIP.replace("/","");
+                Log.e(TAG,"UDP Message "+message + " | Address:" + senderIP);
                 if (message.contains("\r\n")) {
                     Log.e(TAG, "Message Has Acceptable Structure");
                     String[] msg = message.split("\r\n");
@@ -173,7 +179,8 @@ public class UDPServerService extends Service {
                             Log.e(TAG, "Device is null");
                         }
                     }else Log.e(TAG, "Second Part Of Message Is Not Json");
-                }else {
+                }
+                else {
                     Log.e(TAG, "With No Auth");
                     if (isJSONValid(message)){
                         Log.e(TAG, "Valid Json Structure Detected");
@@ -198,20 +205,33 @@ public class UDPServerService extends Service {
                                     Log.e("Decrypting", "Decrypted is: " + Encryptor.decrypt(b, jsonObject.getString("k")));
                                     break;
                             }
-                        }else {
-                            Log.d(TAG, "No Device With ChipId: " + src);
-                            switch (jsonObject.getString("result")){
-                                case "hmac":
-                                    Log.e(TAG, "HMAC Is: " + sha1(jsonObject.getString("text"), jsonObject.getString("k")));
-                                    break;
-                                case "en":
-                                    String a = jsonObject.getString("text");
-                                    Log.e("Encrypting", "Encrypted is: " + Encryptor.encrypt(a, jsonObject.getString("k")));
-                                    break;
-                                case "de":
-                                    String b = jsonObject.getString("text");
-                                    Log.e("Decrypting", "Decrypted is: " + Encryptor.decrypt(b, jsonObject.getString("k")));
-                                    break;
+                        }
+                        else {
+                            RemoteHub remoteHub = remoteHubDatabase.getRemoteHub(src);
+                            if (remoteHub != null){
+                                switch (jsonObject.getString("event")){
+                                    case AppConstants.NODE_DISCOVER:
+                                        udpNodeDiscovery.resolve(remoteHub, jsonObject, senderIP, remoteHubDatabase, deviceDatabase);
+                                        break;
+                                        default:
+                                            Log.e(TAG, "Message Type is undefined");
+                                }
+                            }
+                            else{
+                                Log.d(TAG, "Nothing With ChipId: " + src);
+                                switch (jsonObject.getString("result")){
+                                    case "hmac":
+                                        Log.e(TAG, "HMAC Is: " + sha1(jsonObject.getString("text"), jsonObject.getString("k")));
+                                        break;
+                                    case "en":
+                                        String a = jsonObject.getString("text");
+                                        Log.e("Encrypting", "Encrypted is: " + Encryptor.encrypt(a, jsonObject.getString("k")));
+                                        break;
+                                    case "de":
+                                        String b = jsonObject.getString("text");
+                                        Log.e("Decrypting", "Decrypted is: " + Encryptor.decrypt(b, jsonObject.getString("k")));
+                                        break;
+                                }
                             }
                         }
                     }
@@ -258,6 +278,8 @@ public class UDPServerService extends Service {
             @Override
             public void run() {
                 super.run();
+                udpNodeDiscovery = new UDPNodeDiscovery();
+                udpNodeDiscovery.discover();
                 runUdpServer();
             }
         };

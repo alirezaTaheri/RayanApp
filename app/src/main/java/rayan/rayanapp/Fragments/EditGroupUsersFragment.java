@@ -130,7 +130,7 @@ public class EditGroupUsersFragment extends Fragment implements OnAdminClicked<U
             alertDialog.dismiss();
         });
         alertDialog.show();
-//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupUsersFragmentRemoveUser", "حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر گروه هستید؟");
+//        YesNoBottomSheetFragment bottomSheetFragment = new YesNoBottomSheetFragment().instance("EditGroupUsersFragmentRemoveUser", "حذف کاربر", "بازگشت", "آیا مایل به حذف کاربر گروه هستید؟");
 //        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 

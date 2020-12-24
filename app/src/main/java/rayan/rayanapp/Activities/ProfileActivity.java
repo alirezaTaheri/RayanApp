@@ -7,17 +7,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Fragments.ChangePasswordFragment;
-import rayan.rayanapp.Fragments.CreateGroupFragment;
-import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
+import rayan.rayanapp.Fragments.YesNoBottomSheetFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Fragments.EditUserFragment;
@@ -31,7 +27,7 @@ public class ProfileActivity extends AppCompatActivity implements ClickOnChangeP
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
     EditUserFragment editUserFragment;
-    YesNoButtomSheetFragment yesNoButtomSheetFragment;
+    YesNoBottomSheetFragment yesNoBottomSheetFragment;
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
@@ -44,8 +40,8 @@ public class ProfileActivity extends AppCompatActivity implements ClickOnChangeP
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("");
-        yesNoButtomSheetFragment=new YesNoButtomSheetFragment();
-        yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
+        yesNoBottomSheetFragment =new YesNoBottomSheetFragment();
+        yesNoBottomSheetFragment.setOnBottomSheetSubmitClicked(this);
         toolbar.setNavigationOnClickListener(view -> onBackPressed());
         fragmentManager = getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();

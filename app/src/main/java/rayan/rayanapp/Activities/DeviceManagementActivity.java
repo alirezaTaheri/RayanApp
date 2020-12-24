@@ -9,8 +9,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -18,18 +16,15 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Fragments.BackHandledFragment;
 import rayan.rayanapp.Fragments.DevicesManagementListFragment;
 import rayan.rayanapp.Fragments.EditDeviceFragment;
 import rayan.rayanapp.Fragments.EditRemoteFragment;
 import rayan.rayanapp.Fragments.EditRemoteHubFragment;
-import rayan.rayanapp.Fragments.ProvideInternetFragment;
-import rayan.rayanapp.Fragments.YesNoButtomSheetFragment;
+import rayan.rayanapp.Fragments.YesNoBottomSheetFragment;
 import rayan.rayanapp.Helper.DialogPresenter;
 import rayan.rayanapp.Listeners.DoneWithSelectAccessPointFragment;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
@@ -46,7 +41,7 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
     public EditDeviceFragment editDeviceFragment;
     public EditRemoteHubFragment editRemoteHubFragment;
     public EditRemoteFragment editRemoteFragment;
-    YesNoButtomSheetFragment yesNoButtomSheetFragment;
+    YesNoBottomSheetFragment yesNoBottomSheetFragment;
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
     DevicesManagementActivityViewModel viewModel;
@@ -65,8 +60,8 @@ public class DeviceManagementActivity extends AppCompatActivity implements Devic
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        yesNoButtomSheetFragment=new YesNoButtomSheetFragment();
-        yesNoButtomSheetFragment.setOnBottomSheetSubmitClicked(this);
+        yesNoBottomSheetFragment =new YesNoBottomSheetFragment();
+        yesNoBottomSheetFragment.setOnBottomSheetSubmitClicked(this);
         Objects.requireNonNull(getSupportActionBar()).setTitle("");
         fragmentManager = getSupportFragmentManager();
          transaction = fragmentManager.beginTransaction();

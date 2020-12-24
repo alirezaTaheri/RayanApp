@@ -4,22 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/AppBaseThemeDarkStatusBar"
+    android:clipChildren="false"
     android:background="@color/ms_black">
-
-    <ImageView
-        android:focusable="true"
-        android:clickable="true"
-        android:id="@+id/tempDown"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:padding="10dp"
-        android:background="@drawable/background_remote_rounded_button_"
+    <android.support.constraint.ConstraintLayout
         app:layout_constraintBottom_toBottomOf="@+id/temp"
         app:layout_constraintEnd_toStartOf="@+id/temp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/temp"
-        android:tint="@color/white"
-        app:srcCompat="@drawable/ic_minus" />
+        android:tag="Temp Down"
+        android:id="@+id/tempDown"
+        android:layout_width="wrap_content"
+        android:background="@drawable/background_remote_rounded_button_"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:focusable="false"
+            android:clickable="false"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:padding="10dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_minus" />
+    </android.support.constraint.ConstraintLayout>
 
     <TextView
         android:focusable="true"
@@ -36,38 +41,50 @@
         app:layout_constraintEnd_toStartOf="@+id/tempUp"
         app:layout_constraintStart_toEndOf="@+id/tempDown"
         app:layout_constraintTop_toBottomOf="@+id/guideline2" />
-
-    <ImageView
-        android:focusable="true"
-        android:clickable="true"
+    <android.support.constraint.ConstraintLayout
+        android:tag="Temp Up"
         android:id="@+id/tempUp"
-        android:padding="10dp"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@drawable/background_remote_rounded_button_"
         app:layout_constraintBottom_toBottomOf="@+id/temp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/temp"
         app:layout_constraintTop_toTopOf="@+id/temp"
-        app:srcCompat="@drawable/ic_add" />
+        android:background="@drawable/background_remote_rounded_button_"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:focusable="false"
+            android:clickable="false"
+            android:padding="10dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:srcCompat="@drawable/ic_add" />
+    </android.support.constraint.ConstraintLayout>
 
-
-    <ImageView
-        android:focusable="true"
-        android:clickable="true"
+    <android.support.constraint.ConstraintLayout
+        android:tag="Power"
         android:id="@+id/power"
-        android:layout_width="0dp"
-        android:layout_height="55dp"
-        android:layout_marginBottom="48dp"
         android:background="@drawable/button_backgrand"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:padding="13dp"
+        android:layout_width="0dp"
+        android:layout_marginBottom="48dp"
         app:layout_constraintWidth_percent="0.8"
-        android:tint="@color/white"
-        app:srcCompat="@drawable/ic_power" />
+        android:layout_height="wrap_content">
+        <ImageView
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:focusable="false"
+            android:padding="13dp"
+            android:clickable="false"
+            android:layout_width="wrap_content"
+            android:layout_height="55dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_power" />
+    </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline2"
@@ -76,22 +93,26 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="20dp"
         app:layout_constraintGuide_percent="0.1" />
-
-    <ImageView
-        android:focusable="true"
-        android:clickable="true"
+    <android.support.constraint.ConstraintLayout
+        android:tag="Mode"
         android:id="@+id/mode"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
-        android:padding="20dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/background_remote_rounded_button_"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
         app:layout_constraintEnd_toStartOf="@id/airVolume"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        android:tint="@color/white"
-        app:srcCompat="@drawable/ic_ice" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:focusable="false"
+            android:clickable="false"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:padding="20dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/background_remote_rounded_button_"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_ice" />
+    </android.support.constraint.ConstraintLayout>
 
     <TextView
         android:id="@+id/textView2"
@@ -107,20 +128,25 @@
         app:layout_constraintHorizontal_bias="0.684"
         app:layout_constraintStart_toStartOf="@+id/mode" />
 
-    <ImageView
-        android:focusable="true"
-        android:clickable="true"
+    <android.support.constraint.ConstraintLayout
+        android:tag="Air Volume"
         android:id="@+id/airVolume"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
-        android:padding="20dp"
-        android:background="@drawable/background_remote_rounded_button_"
         app:layout_constraintBottom_toBottomOf="@+id/mode"
         app:layout_constraintEnd_toStartOf="@+id/more"
         app:layout_constraintStart_toEndOf="@+id/mode"
         app:layout_constraintTop_toTopOf="@+id/mode"
-        android:tint="@color/white"
-        app:srcCompat="@drawable/ic_fan" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:focusable="false"
+            android:clickable="false"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:padding="20dp"
+            android:background="@drawable/background_remote_rounded_button_"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_fan" />
+    </android.support.constraint.ConstraintLayout>
 
     <TextView
         android:id="@+id/textView3"
@@ -135,20 +161,25 @@
         app:layout_constraintTop_toTopOf="@id/textView2"
         app:layout_constraintBottom_toBottomOf="@+id/textView2"/>
 
-    <ImageView
-        android:focusable="true"
-        android:clickable="true"
+    <android.support.constraint.ConstraintLayout
+        android:tag="More"
         android:id="@+id/more"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
-        android:padding="20dp"
         android:background="@drawable/background_remote_rounded_button_"
         app:layout_constraintBottom_toBottomOf="@+id/airVolume"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/airVolume"
         app:layout_constraintTop_toTopOf="@+id/airVolume"
-        android:tint="@color/white"
-        app:srcCompat="@drawable/ic_more_" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:focusable="false"
+            android:clickable="false"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:padding="20dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_more_" />
+    </android.support.constraint.ConstraintLayout>
 
     <TextView
         android:textColor="@color/white"

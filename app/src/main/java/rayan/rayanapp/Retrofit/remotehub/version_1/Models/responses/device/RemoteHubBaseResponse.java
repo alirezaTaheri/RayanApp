@@ -1,7 +1,7 @@
 package rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.device;
 
 public class RemoteHubBaseResponse {
-    protected String result,version,src,error;
+    protected String result,version,src,error,STWORD;
 
     public RemoteHubBaseResponse() {
     }
@@ -42,6 +42,14 @@ public class RemoteHubBaseResponse {
         this.error = error;
     }
 
+    public String getSTWORD() {
+        return STWORD;
+    }
+
+    public void setSTWORD(String STWORD) {
+        this.STWORD = STWORD;
+    }
+
     @Override
     public String toString() {
         return "RemoteHubBaseResponse{" +
@@ -49,6 +57,7 @@ public class RemoteHubBaseResponse {
                 ", version='" + version + '\'' +
                 ", src='" + src + '\'' +
                 ", error='" + error + '\'' +
+                ", STWORD='" + STWORD + '\'' +
                 '}';
     }
 }

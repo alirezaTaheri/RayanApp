@@ -3,10 +3,13 @@ package rayan.rayanapp.Fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,11 +31,17 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rayan.rayanapp.Activities.AddNewRemoteActivity;
 import rayan.rayanapp.Activities.DeviceManagementActivity;
+import rayan.rayanapp.Data.Button;
 import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteData;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Dialogs.YesNoDialog;
+import rayan.rayanapp.Listeners.BottomSheetClickListener;
+import rayan.rayanapp.Listeners.LearnedButtonClickListener;
 import rayan.rayanapp.Listeners.OnBottomSheetSubmitClicked;
+import rayan.rayanapp.Listeners.RemoteDataClickListener;
 import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
@@ -40,18 +49,26 @@ import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SnackBarSetup;
 import rayan.rayanapp.ViewModels.EditDeviceFragmentViewModel;
 
-public class EditRemoteFragment extends BackHandledFragment implements OnBottomSheetSubmitClicked, YesNoDialogListener {
+public class EditRemoteFragment extends BackHandledFragment implements BottomSheetClickListener, YesNoDialogListener, RemoteDataClickListener {
     private final String newSSID= "newSSID";
     private final String newName="newName";
     private final String newPass="newPass";
     @BindView(R.id.name)
     EditText name;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    @BindView(R.id.emptyRecyclerView)
+    TextView emptyRecyclerView;
+    @BindView(R.id.buttonsCount)
+    TextView buttonsCount;
     EditDeviceFragmentViewModel editDeviceFragmentViewModel;
     Remote remote;
-    List<Remote> remotes = new ArrayList<>();
     DeviceManagementActivity activity;
     private final String TAG = "EditRemoteFragment";
     Bundle changedData = new Bundle();
+    ButtonsAdapter buttonsAdapter;
+
+    private ArrayList<RemoteData> remoteData = new ArrayList<>();
     public EditRemoteFragment() {
     }
 
@@ -73,6 +90,15 @@ public class EditRemoteFragment extends BackHandledFragment implements OnBottomS
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         remote = getArguments().getParcelable("remote");
+        editDeviceFragmentViewModel = ViewModelProviders.of(this).get(EditDeviceFragmentViewModel.class);
+        editDeviceFragmentViewModel.getDataOfRemote(remote.getId()).observe(this, data -> {
+            Log.e(TAG, "Data Of this remote is: " + data);
+            buttonsCount.setText(String.valueOf(data.size()));
+            remoteData.clear();
+            remoteData.addAll(data);
+            buttonsAdapter.notifyDataSetChanged();
+            if (data.size()==0) emptyRecyclerView.setVisibility(View.VISIBLE);
+        });
         setHasOptionsMenu(true);
     }
 
@@ -81,9 +107,11 @@ public class EditRemoteFragment extends BackHandledFragment implements OnBottomS
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_remote, container, false);
         ButterKnife.bind(this, view);
-        editDeviceFragmentViewModel = ViewModelProviders.of(this).get(EditDeviceFragmentViewModel.class);
         init();
-
+        buttonsAdapter = new ButtonsAdapter(remoteData, this);
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setAdapter(buttonsAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -122,6 +150,8 @@ public class EditRemoteFragment extends BackHandledFragment implements OnBottomS
                 type.setText("ریموت کولر");
                 break;
         }
+        Log.e("KLFJDLKFJ", "Editing remote: "+remote);
+        buttonsCount.setText(String.valueOf(remote.getRemoteDatas().size()));
         name.setText(remote.getName());
         RemoteHub remoteHub = editDeviceFragmentViewModel.getRemoteHubById(remote.getRemoteHubId());
         accessPointSsid.setText(remoteHub.getName());
@@ -143,8 +173,20 @@ public class EditRemoteFragment extends BackHandledFragment implements OnBottomS
     }
 
     @Override
-    public void submitClicked(String tag) {
-
+    public void submitClicked(String tag, Object object, int position) {
+        switch (tag){
+            case "deleteButton":
+                List<String> newRemoteData = new ArrayList<>();
+                remoteData.remove(position);
+                for (RemoteData data: remoteData)
+                    newRemoteData.add(data.getId());
+                remote.setRemoteDatas(newRemoteData);
+                editDeviceFragmentViewModel.editRemote(remote).observe(this, s -> {
+                    Log.e(TAG, "Response of editing Remote: "+s);
+                    editDeviceFragmentViewModel.getGroupsv3();
+                });
+                break;
+        }
     }
 
     @Override
@@ -263,5 +305,66 @@ public class EditRemoteFragment extends BackHandledFragment implements OnBottomS
         visibilityButton.setImageDrawable(ContextCompat.getDrawable(activity,remote.isVisibility()?R.drawable.ic_visibility_on:R.drawable.ic_visibility_off));
         editDeviceFragmentViewModel.editRemote(remote);
         SnackBarSetup.snackBarSetup(Objects.requireNonNull(activity).findViewById(android.R.id.content), remote.getName().concat(remote.isVisibility()?" به موردعلاقه ها اضافه شد":" از موردعلاقه ها حذف شد"));
+    }
+    @OnClick(R.id.learn)
+    public void onLearnClicked(){
+        Intent intent = new Intent(activity, AddNewRemoteActivity.class);
+        Bundle b = new Bundle();
+        b.putBoolean("settings", true);
+        b.putBoolean("learn", true);
+        b.putParcelable("remote", remote);
+        b.putParcelableArrayList("remoteData", remoteData);
+        intent.putExtras(b);
+        startActivity(intent);
+    }
+
+    ConfirmBottomSheetFragment confirmDialog;
+    @Override
+    public void onDeleteClicked(RemoteData button, int position) {
+        confirmDialog = ConfirmBottomSheetFragment.instance("deleteButton", "بله","خیر","آیا مایل به حذف این دکمه از ریموت هستید؟", button, position);
+        confirmDialog.show(getChildFragmentManager(), "deleteButton");
+    }
+
+
+    public class ButtonsAdapter extends RecyclerView.Adapter<ButtonViewHolder>{
+        public ButtonsAdapter(List<RemoteData> buttons, RemoteDataClickListener listener) {
+            this.buttons = buttons;
+            this.listener = listener;
+        }
+        RemoteDataClickListener listener;
+        private List<RemoteData> buttons = new ArrayList<>();
+        @NonNull
+        @Override
+        public ButtonViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            return new ButtonViewHolder(LayoutInflater.from(activity).inflate(R.layout.item_learned_button, viewGroup, false), listener);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ButtonViewHolder viewHolder, int i) {
+            viewHolder.bind(buttons.get(i));
+        }
+
+        @Override
+        public int getItemCount() {
+            return buttons.size();
+        }
+    }
+    public class ButtonViewHolder extends RecyclerView.ViewHolder{
+
+        @BindView(R.id.name)
+        TextView name;
+        @BindView(R.id.delete)
+        ImageView delete;
+        RemoteDataClickListener listener;
+        public ButtonViewHolder(@NonNull View itemView, RemoteDataClickListener listener) {
+            super(itemView);
+            this.listener = listener;
+        }
+
+        public void bind(RemoteData button){
+            ButterKnife.bind(this, itemView);
+            name.setText(button.getButton());
+            delete.setOnClickListener(v -> listener.onDeleteClicked(button, getAdapterPosition()));
+        }
     }
 }

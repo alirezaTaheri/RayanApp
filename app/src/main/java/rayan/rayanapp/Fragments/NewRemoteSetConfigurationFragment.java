@@ -52,9 +52,11 @@ public class NewRemoteSetConfigurationFragment extends Fragment implements AddNe
     AddNewRemoteActivity activity;
     private Remote remote;
     private RemoteHub remoteHub;
-    public static NewRemoteSetConfigurationFragment newInstance(Remote remote) {
+    private boolean learn;
+    public static NewRemoteSetConfigurationFragment newInstance(Remote remote, boolean learn) {
         Bundle b = new Bundle();
         b.putParcelable("remote", remote);
+        b.putBoolean("learn", learn);
         NewRemoteSetConfigurationFragment setConfigurationFragment = new NewRemoteSetConfigurationFragment();
         setConfigurationFragment.setArguments(b);
         return setConfigurationFragment;
@@ -72,10 +74,15 @@ public class NewRemoteSetConfigurationFragment extends Fragment implements AddNe
         viewModel = ViewModelProviders.of(this).get(AddNewRemoteViewModel.class);
         ButterKnife.bind(this, v);
         remote = getArguments().getParcelable("remote");
+        learn = getArguments().getBoolean("learn");
 //        nameEditText.setText("");
 
         Log.e("FRTFRTFRT", "Adding New Remote " + remote.getRemoteHubId()+remote);
-        remoteHub = viewModel.getRemoteHub(remote.getRemoteHubId());
+        remoteHub = viewModel.getRemoteHubById(remote.getRemoteHubId());
+        if (learn){
+            v.findViewById(R.id.changeRemoteHub).setVisibility(View.GONE);
+            v.findViewById(R.id.remoteHub).setClickable(false);
+        }
         remoteHubName.setText(remoteHub != null ? remoteHub.getName(): "انتخاب کنید");
         Group group = viewModel.getGroup(remote.getGroupId());
         groupName.setText(group != null ? group.getName(): "---");

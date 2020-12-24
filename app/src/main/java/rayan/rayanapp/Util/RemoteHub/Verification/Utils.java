@@ -1,5 +1,7 @@
 package rayan.rayanapp.Util.RemoteHub.Verification;
 
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import rayan.rayanapp.Services.udp.SendUDPMessage;
+import rayan.rayanapp.Util.AppConstants;
 
 public class Utils {
 
@@ -47,6 +50,8 @@ public class Utils {
             @Override
             public void subscribe(ObservableEmitter<String> emitter) throws Exception {
                 new SendUDPMessage().sendUdpMessage(ip, msg);
+                Log.e("Sending UDP", msg + " | To: " + ip);
+                emitter.onNext(AppConstants.SUCCESSFUL);
                 emitter.onComplete();
             }
         });

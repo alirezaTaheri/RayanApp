@@ -230,7 +230,7 @@ public class EditDeviceFragment extends BackHandledFragment implements DoneWithS
 //                    break;
 //            }
 //        });
-        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
+        YesNoBottomSheetFragment bottomSheetFragment = new YesNoBottomSheetFragment().instance("resetDevice","تایید", "لغو", "آیا مایل به ریست کردن دستگاه هستید؟");
         bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
     @SuppressLint("CheckResult")

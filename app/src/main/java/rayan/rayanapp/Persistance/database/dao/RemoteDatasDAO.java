@@ -20,6 +20,9 @@ public interface RemoteDatasDAO extends BaseDAO<RemoteData>{
     @Query("SELECT * FROM RemoteData ")
     LiveData<List<RemoteData>> getAllLive();
 
+    @Query("SELECT * FROM RemoteData WHERE remoteId = :remoteId")
+    LiveData<List<RemoteData>> getDataOfRemoteLive(String remoteId);
+
     @Query("SELECT * FROM RemoteData ")
     List<RemoteData> getAll();
 

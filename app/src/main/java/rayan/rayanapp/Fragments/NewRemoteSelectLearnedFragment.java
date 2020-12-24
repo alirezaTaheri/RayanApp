@@ -76,7 +76,7 @@ public class NewRemoteSelectLearnedFragment extends Fragment implements AddNewRe
     @Override
     public void verifyStatus() {
         Bundle data = new Bundle();
-        data.putBoolean("learned", learned);
+        data.putBoolean("learn", learned);
         goToNextStep(data);
     }
 

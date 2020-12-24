@@ -1,5 +1,6 @@
 package rayan.rayanapp.Fragments;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Build;
@@ -19,7 +20,9 @@ import android.view.ViewGroup;
 import android.view.Window;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,6 +31,7 @@ import rayan.rayanapp.Adapters.recyclerView.RemoteBrandsRecyclerViewAdapter;
 import rayan.rayanapp.Listeners.AddNewRemoteNavListener;
 import rayan.rayanapp.Listeners.OnRemoteBrandClicked;
 import rayan.rayanapp.R;
+import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.AddNewRemoteViewModel;
 
 
@@ -35,6 +39,7 @@ public class NewRemoteSelectBrandFragment extends Fragment implements OnRemoteBr
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    private String type;
     RemoteBrandsRecyclerViewAdapter recyclerViewAdapter;
     private AddNewRemoteViewModel mViewModel;
     private List<String> allBrands = new ArrayList<>();
@@ -43,9 +48,9 @@ public class NewRemoteSelectBrandFragment extends Fragment implements OnRemoteBr
     SearchView searchView;
     AddNewRemoteActivity activity;
     private Pair<String, Integer> selectedBrand = new Pair<>("",-1);
-    public static NewRemoteSelectBrandFragment newInstance(String selectedType) {
+    public static NewRemoteSelectBrandFragment newInstance(String type) {
         Bundle b = new Bundle();
-        b.putString("selectedType", selectedType);
+        b.putString("type", type);
         NewRemoteSelectBrandFragment selectBrandFragment = new NewRemoteSelectBrandFragment();
         selectBrandFragment.setArguments(b);
         return selectBrandFragment;
@@ -65,20 +70,6 @@ public class NewRemoteSelectBrandFragment extends Fragment implements OnRemoteBr
         ButterKnife.bind(this, v);
 //        ((AutoCompleteTextView) searchView.findViewById(R.id.search_src_text)).setBackgroundColor(ContextCompat.getColor(getContext(), R.color.grey_light_4));;
 //        searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text).setBackgroundColor(ContextCompat.getColor(getContext(), R.color.grey_light_4));
-        return v;
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(AddNewRemoteViewModel.class);
-        allBrands = mViewModel.getAllBrands();
-        allBrands2 = mViewModel.getAllBrands();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewAdapter = new RemoteBrandsRecyclerViewAdapter(getActivity(), allBrands);
         recyclerViewAdapter.setListener(this);
@@ -97,6 +88,29 @@ public class NewRemoteSelectBrandFragment extends Fragment implements OnRemoteBr
                 return true;
             }
         });
+        return v;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mViewModel = ViewModelProviders.of(this).get(AddNewRemoteViewModel.class);
+        Map<String, String> params = new HashMap<>();
+        type = getArguments().getString("type");
+        params.put(AppConstants.PARAM_TYPE, type);
+        allBrands = mViewModel.getAllBrands(params);
+        allBrands2 = mViewModel.getAllBrands(params);
+
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override

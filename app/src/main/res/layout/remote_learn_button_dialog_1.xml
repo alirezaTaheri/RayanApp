@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:padding="8dp"
+    android:background="@drawable/background_progress_dialog"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:id="@+id/title"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:text="لطفا ریموت دستگاه خود را به سمت ریموت هوشمند گرفته و دکمه مورد نظر خود را بفشارید"
+        android:layout_width="match_parent"
+        android:textSize="17sp"
+        android:layout_height="wrap_content" />
+    <com.airbnb.lottie.LottieAnimationView
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_gravity="center"
+        android:id="@+id/animation_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="H,1:1"
+        android:layout_centerHorizontal="true"
+        app:lottie_fileName="animation_remote.json"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true" />
+    <TextView
+        android:id="@+id/subtitle"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/animation_view"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:text="در انتظار دریافت پیام از سوی ریموت هوشمند"
+        android:layout_width="match_parent"
+        android:textSize="15sp"
+        android:layout_height="wrap_content" />
+</android.support.constraint.ConstraintLayout>

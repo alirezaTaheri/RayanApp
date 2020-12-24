@@ -21,6 +21,11 @@ public class AppConstants {
     public final static String[] SWITCH_VALID_VERSIONS = {"1.0", "2.0"};
     public final static String[] PLUG_VALID_VERSIONS = {"1.0", "2.0"};
     public final static String[] TOUCH_2_VALID_VERSIONS = {"1.0", "2.0"};
+    public final static String[] AC_REMOTE_BUTTONS = {"Power","Temp Down","Temp Up","More","Mode","Air Volume"};
+    public final static String[] TV_REMOTE_BUTTONS = {"Power","Home","Menu","Channel Up","Channel Down","Volume Up","Volume Down","Mute","Back","OK","Up","Down","Right","Left","More","Button 123"};
+    public final static String LEARN_IR_SIGNAL_REGEX = "<IR\\+RECVRAW(\\+\\d+){2}(,\\d+)+>";
+    public final static String REMOTE_HUB_STATE_LEARN = "learn";
+    public final static String REMOTE_HUB_STATE_WAITING_LEARN = "learn waiting";
     public final static String MQTT = "mqtt";
     public final static String UDP = "udp";
     public final static int UDP_SEND_PORT = 2000;
@@ -61,6 +66,12 @@ public class AppConstants {
     public final static String NEW_DEVICE_PHV_TIMEOUT = "phv_timeout";
     public final static String NEW_DEVICE_config = "config";
     public final static String PRIMARY_CONFIG = "config init";
+    public final static String REMOTE_HUB_SEND_DATA = "send data";
+    public final static String REMOTE_HUB_ENTER_SETTINGS = "enter settings mode";
+    public final static String REMOTE_HUB_EXIT_SETTINGS = "exit settings mode";
+    public final static String REMOTE_HUB_ENTER_LEARN = "enter learn mode";
+    public final static String REMOTE_HUB_EXIT_LEARN = "exit learn mode";
+    public final static String REMOTE_HUB_GET_IR_SIGNAL = "get IR signal";
     public final static String PRIMARY_CONFIG_TRUE = "primary_config_true";
     public final static String PRIMARY_CONFIG_FALSE = "primary_config_false";
     public final static String EXPIRED = "EXPIRED";
@@ -79,6 +90,7 @@ public class AppConstants {
     public final static String TO_DEVICE_TLMS = "TLMS";
     public final static String TO_DEVICE_VERIFY = "verify";
     public final static String NODE_DISCOVER = "node_discover";
+    public final static String AUTH = "auth";
     public final static String AUTH_DISCOVER = "auth";
     public final static String TO_DEVICE_NOT_VERIFY = "not_verify";
     public final static String FROM_DEVICE_VERIFY_SUCCESSFUL = "successful";
@@ -138,6 +150,7 @@ public class AppConstants {
     public final static String CHANGE_NAME = "change_name";
     public final static String CHANGE_NAME_TRUE = "change_hname_true";
     public final static String SOCKET_TIME_OUT = "SocketTimeoutException";
+    public final static String TIME_OUT_EXCEPTION = "TimeoutException";
     public final static String CONNECT_EXCEPTION = "ConnectException";
     public final static String UNKNOWN_EXCEPTION = "UnknownException";
     public final static String UNKNOWN_HOST_EXCEPTION = "UnknownHostException";
@@ -163,6 +176,10 @@ public class AppConstants {
     public final static String DEVICE_TYPE_Remote = "remote";
     public final static String REMOTE_TYPE_AC = "AC";
     public final static String REMOTE_TYPE_TV = "TV";
+    public final static String PARAM_BRAND= "brand";
+    public final static String PARAM_MODEL = "model";
+    public final static String PARAM_TYPE = "type";
+
     public final static String BaseDeviceType_SWITCH_1 = "switch_1";
     public final static String BaseDeviceType_SWITCH_2 = "switch_2";
     public final static String BaseDeviceType_TOUCH_2 = "touch_2";
@@ -180,10 +197,21 @@ public class AppConstants {
     public final static String UNKNOWN_SSID = "Unknown SSID";
     public final static String UNKNOWN_NAME = "Unknown NAME";
     public final static String UNKNOWN_REMOTE_TYPE = "Unknown Remote Type";
+    public final static String SSID = "SSID";
     public final static String NULL_SSID = "Null SSID";
     public final static String UNKNOWN_IP = "Unknown IP";
     public final static String SUCCESS_DESCRIPTION = "success";
     public final static String SUCCESS_RESULT = "successful";
+    public final static String LEARN_ERROR = "in_ir_learn_mode";
+    public final static String ALREADY_LEARN_ERROR = "already_in_ir_learn_mode";
+    public final static String NOT_IN_LEARN_ERROR = "not_in_ir_learn_mode";
+    public final static String LEARN_TIMEOUT = "learning_timed_out";
+    public final static String FULL_LEARN_ERROR = "full_ir_learn_mode";
+    public final static String SETTINGS_MODE_ERROR = "in_settings_mode";
+    public final static String ALREADY_SETTINGS_MODE_ERROR = "already_in_settings_mode";
+    public final static String FULL_SETTINGS_ERROR = "full_settings";
+    public final static String WRONG_FORMAT_ERROR = "raw_data_wrong_format";
+    public final static String UNKNOWN_ERROR = "unknown error";
     public final static String SUCCESSFUL = "successful";
     public final static String CONTINUE = "continue";
     public final static String ERROR_DESCRIPTION = "error";
@@ -221,6 +249,7 @@ public class AppConstants {
     }
     public static String getDeviceAddress(String ip, String cmd){
         String address = "http://"+ip+":"+AppConstants.HTTP_TO_DEVICE_PORT+"/";
+//        String address = "http://6effcf91-1321-4fe6-8c18-e49878e78d48.mock.pstmn.io:"+AppConstants.HTTP_TO_DEVICE_PORT+"/";
         switch (cmd){
             case AppConstants.PRIMARY_CONFIG:
                 address = address.concat("api/v1/config/init");
@@ -254,6 +283,24 @@ public class AppConstants {
                 break;
             case AppConstants.NODE_INFO:
                 address = address.concat("api/v1/system/info");
+                break;
+            case AppConstants.REMOTE_HUB_SEND_DATA:
+                address = address.concat("api/v1/remote/send_signal");
+                break;
+            case AppConstants.REMOTE_HUB_ENTER_SETTINGS:
+                address = address.concat("api/v1/settings/enter");
+                break;
+            case AppConstants.REMOTE_HUB_EXIT_SETTINGS:
+                address = address.concat("api/v1/settings/exit");
+                break;
+            case AppConstants.REMOTE_HUB_ENTER_LEARN:
+                address = address.concat("api/v1/ir_remote/learn/enter");
+                break;
+            case AppConstants.REMOTE_HUB_EXIT_LEARN:
+                address = address.concat("api/v1/ir_remote/learn/exit");
+                break;
+            case AppConstants.REMOTE_HUB_GET_IR_SIGNAL:
+                address = address.concat("api/v1/ir_remote/learn/get_key_ir");
                 break;
                 default: throw new RuntimeException("No Suitable Found");
         }

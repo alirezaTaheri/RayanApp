@@ -35,6 +35,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Data.BaseDevice;
 import rayan.rayanapp.Data.Device;
 import rayan.rayanapp.Data.Remote;
+import rayan.rayanapp.Data.RemoteData;
 import rayan.rayanapp.Data.RemoteHub;
 import rayan.rayanapp.Helper.Encryptor;
 import rayan.rayanapp.Helper.RayanUtils;
@@ -99,7 +100,7 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    private Observable<DeviceResponse> editRemoteObservable(EditRemoteRequest editRemoteRequest){
+    protected Observable<RemoteHubResponse> editRemoteObservable(EditRemoteRequest editRemoteRequest){
         Log.e("editRemoteObservable", "editing Remote: " + editRemoteRequest);
         return apiService
                 .editRemote(RayanApplication.getPref().getToken(), editRemoteRequest)
@@ -290,19 +291,19 @@ public class EditDeviceFragmentViewModel extends DevicesFragmentViewModel {
     public MutableLiveData<String> editRemote(Remote remote){
         MutableLiveData<String> results = new MutableLiveData<>();
         editRemoteObservable(new EditRemoteRequest(remote))
-                .subscribe(new Observer<Object>() {
+                .subscribe(new Observer<RemoteHubResponse>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         Log.d(TAG+"editRemote", "onSubscribe() called with: d = [" + d + "]");
                     }
                     @Override
-                    public void onNext(Object o) {
-                        if (o instanceof DeviceResponse){
-                            DeviceResponse deviceResponse = (DeviceResponse) o;
-                            if (deviceResponse.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
+                    public void onNext(RemoteHubResponse o) {
+                        if (o instanceof RemoteHubResponse){
+                            RemoteHubResponse response = (RemoteHubResponse) o;
+                            if (response.getStatus().getDescription().equals(AppConstants.SUCCESS_DESCRIPTION))
                                 results.postValue(AppConstants.OPERATION_DONE);
-                            else if (deviceResponse.getData().getMessage() != null)
-                                results.postValue(deviceResponse.getData().getMessage());
+                            else if (response.getData().getMessage() != null)
+                                results.postValue(response.getData().getMessage());
                             else results.postValue(AppConstants.ERROR);
                         }
                         Log.d(TAG+"?><?><?><?><", "onNext() called with: o = [" + o + "]");

@@ -121,7 +121,7 @@ public class EditGroupAdminsFragment extends Fragment implements OnAdminClicked<
             alertDialog.dismiss();
         });
         alertDialog.show();
-//        YesNoButtomSheetFragment bottomSheetFragment = new YesNoButtomSheetFragment().instance("EditGroupAdminsFragmentRemoveAdmin", "حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
+//        YesNoBottomSheetFragment bottomSheetFragment = new YesNoBottomSheetFragment().instance("EditGroupAdminsFragmentRemoveAdmin", "حذف مدیر", "بازگشت", "آیا مایل به حذف مدیر گروه هستید؟");
 //        bottomSheetFragment.show(getActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
