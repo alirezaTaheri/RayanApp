@@ -44,12 +44,12 @@ public class RemoteLearnButtonStep1 extends Fragment {
         activity.getViewModel().enter_learn(remoteHub).observe(this, s -> {
             Log.e(TAG, "Response Received Enter Learn: " + s);
             if (s.isSuccessful()) {
-                    remoteHub.setState(AppConstants.REMOTE_HUB_STATE_LEARN);
                     Toast.makeText(activity, "دکمه دریافت شد", Toast.LENGTH_SHORT).show();
                     learnDialog.go_next_step(s.getMessage());
             }
             else{
                 Toast.makeText(activity, s.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                learnDialog.close();
             }
         });
 

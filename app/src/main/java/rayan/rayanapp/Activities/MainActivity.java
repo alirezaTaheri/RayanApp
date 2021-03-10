@@ -55,13 +55,19 @@ import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import org.apache.commons.net.util.Base64;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import butterknife.BindView;
@@ -94,6 +100,10 @@ import rayan.rayanapp.Listeners.NetworkConnectivityListener;
 import rayan.rayanapp.Listeners.OnGroupClicked;
 import rayan.rayanapp.Mqtt.MqttClient;
 import rayan.rayanapp.Mqtt.MqttClientService;
+import rayan.rayanapp.Persistance.database.DeviceDatabase;
+import rayan.rayanapp.Persistance.database.GroupDatabase;
+import rayan.rayanapp.Persistance.database.RemoteDataDatabase;
+import rayan.rayanapp.Persistance.database.RemoteDatabase;
 import rayan.rayanapp.Persistance.database.RemoteHubDatabase;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
@@ -751,21 +761,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                })
 //                .start();
 //        mainActivityViewModel.getGroups();
-//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-//            this.drawerLayout.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
 //        DeviceDatabase deviceDatabase = new DeviceDatabase(this);
 //        RemoteDataDatabase remoteDataDatabase = new RemoteDataDatabase(this);
 //        RemoteDatabase remoteDatabase = new RemoteDatabase(this);
 //        RemoteHubDatabase remoteHubDatabase = new RemoteHubDatabase(this);
 //        GroupDatabase groupDatabase = new GroupDatabase(this);
 //        Log.e(TAG, "G"+groupDatabase.getAllGroups());
-//        Log.e(TAG, "G"+deviceDatabase.getAllDevices());
-//        Log.e(TAG, "G"+remoteHubDatabase.getAllRemoteHubs());
-//        Log.e(TAG, "G"+remoteDatabase.getAllRemotes());
-//        Log.e(TAG, "G"+remoteDataDatabase.getAllRemoteDatas());
+//        Log.e(TAG, "D"+deviceDatabase.getAllDevices());
+//        Log.e(TAG, "RH"+remoteHubDatabase.getAllRemoteHubs());
+//        Log.e(TAG, "R"+remoteDatabase.getAllRemotes());
+//        Log.e(TAG, "RD"+remoteDataDatabase.getAllRemoteDatas());
+
 //        groupDatabase.getAllCount("");
 //
 //        mainActivityViewModel.getGroupsv3();
@@ -1082,7 +1093,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////            }
 ////        });
     }
-
+    private String sha1(String s, String keyString) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        Log.e(TAG, "Encoding " + s + " With: "+keyString);
+        SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), "HmacSHA1");
+        Mac mac = Mac.getInstance("HmacSHA1");
+        mac.init(key);
+        byte[] bytes = mac.doFinal(s.getBytes("UTF-8"));
+        return new String(Base64.encodeBase64(bytes));
+    }
     private final static char[] hexArray = "0123456789abcdef".toCharArray();
 
     private static String bytesToHex(byte[] bytes) {

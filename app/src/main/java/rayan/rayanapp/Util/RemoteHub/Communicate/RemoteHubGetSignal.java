@@ -22,7 +22,7 @@ import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
 import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device.BaseRequest;
 import rayan.rayanapp.Retrofit.remotehub.version_1.Models.responses.device.RemoteHubBaseResponse;
-import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_2.Models.responses.device.ToggleDeviceResponse;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.Util.SingleLiveEvent;
 import retrofit2.Response;

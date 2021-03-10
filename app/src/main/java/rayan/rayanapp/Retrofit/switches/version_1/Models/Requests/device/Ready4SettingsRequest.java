@@ -8,10 +8,10 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Util.AppConstants;
 
 public class Ready4SettingsRequest extends BaseRequest{
-    private String STWORD;
+    private String stword;
 
     public Ready4SettingsRequest(String stword) {
-        this.STWORD = stword;
+        this.stword = stword;
         this.setCmd(AppConstants.SETTINGS);
         this.setSrc(RayanApplication.getPref().getId());
     }
@@ -19,7 +19,7 @@ public class Ready4SettingsRequest extends BaseRequest{
     @Override
     public String toString() {
         return "Ready4SettingsRequest{" +
-                "STWORD='" + STWORD + '\'' +
+                "stword='" + stword + '\'' +
                 '}';
     }
 

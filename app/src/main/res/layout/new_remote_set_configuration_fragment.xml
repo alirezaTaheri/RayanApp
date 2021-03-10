@@ -19,7 +19,7 @@
         <EditText
             android:id="@+id/name"
             android:imeOptions="actionDone"
-            android:hint="نام دستگاه"
+            android:hint="نام ریموت"
             android:textDirection="rtl"
             android:inputType="text"
             android:textColorHint="#676767"

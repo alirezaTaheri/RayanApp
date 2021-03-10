@@ -304,7 +304,6 @@ public class ApiResponseHandler {
                 for (int z = 0; z < remoteHubs.size(); z++) {
                     if (remoteHubsid.contains(remoteHubs.get(z).getId())) {
                         RemoteHub remoteHub = remoteHubs.get(z);
-                        Log.e("JDJDJD", "Passed"+remoteHub);
                         remoteHub.setGroupId(g.getId());
                         remoteHub.setSecret(g.getSecret());
                         remoteHub.setPosition(nOd);
@@ -314,6 +313,7 @@ public class ApiResponseHandler {
                             remoteHub.setSsid(AppConstants.UNKNOWN_SSID);
                         remoteHub.setVisibility(true);
                         remoteHub.setInGroupPosition(devices.size() + z);
+                        Log.e("JDJDJD", "Passed"+remoteHub);
                         nOd++;
                         for (int i = 0; i < remotes.size(); i++) {
                             if (remotes.get(i).getRemoteHubId().equals(remoteHubs.get(z).getId())) {
@@ -506,6 +506,7 @@ public class ApiResponseHandler {
             Log.e("VVVV", "Added Remotes: " + remotes);
             Log.e("vvvvv", groups.size() + "Added" + remoteHubs.size()+remoteHubs);
             Log.e("vvvvv", remotedatas.size() + "Added" + remotes.size());
+            Log.e("vvvvv", "DEVICES::"+deviceDatabase.getAllDevices().size());
         }catch (Exception e){
             Log.e("eeeeeeeeeeeeeeeeeeeee", "error: " + e);
             e.printStackTrace();

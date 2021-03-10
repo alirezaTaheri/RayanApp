@@ -5,7 +5,7 @@ import android.util.Log;
 import com.google.gson.GsonBuilder;
 
 import rayan.rayanapp.App.RayanApplication;
-import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_2.Models.requests.device.BaseRequest;
 
 public class PhysicalVerificationRequest_RemoteHub extends BaseRequest{
 

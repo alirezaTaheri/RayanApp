@@ -54,7 +54,7 @@ import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
 import rayan.rayanapp.Receivers.ConnectionLiveData;
 import rayan.rayanapp.Receivers.WifiScanReceiver;
-import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.SetPrimaryConfigRequest;
+import rayan.rayanapp.Retrofit.switches.version_2.Models.requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.api.Group;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.GroupsListFragmentViewModel;

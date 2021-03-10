@@ -54,6 +54,7 @@ public class RemoteHubSendMessage {
         SingleLiveEvent<LiveResponse> callback = new SingleLiveEvent<>();
         Observable.concat(enter_learn_observable(remoteHub, callback), get_IR_signal_observable(remoteHub, callback)
         ,exit_learn_observable(remoteHub, callback))
+                .timeout(10000,TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Response<String>>() {
                     @Override public void onSubscribe(Disposable d) { Log.e(TAG, "Staring To Send Request"); }
@@ -75,7 +76,7 @@ public class RemoteHubSendMessage {
                 .flatMap(re -> apiService.enter_learn_remoteHub_v1(AppConstants.getDeviceAddress(remoteHub.getIp(), AppConstants.REMOTE_HUB_ENTER_LEARN), new BaseRequest(remoteHub.getEncryptedStatusWordToGo())))
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
-                .timeout(4, TimeUnit.SECONDS)
+                .timeout(10000,TimeUnit.MILLISECONDS)
                 .takeWhile(response -> {
                     Log.e(TAG, "Auth: "+response.headers().get(AppConstants.AUTH));
                     if (response.headers().get(AppConstants.AUTH) != null && sha1(response.body(), remoteHub.getSecret()).equals(response.headers().get("auth"))){

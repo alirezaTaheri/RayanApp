@@ -205,9 +205,10 @@ public class DevicesFragment extends Fragment implements OnDeviceClickListener<B
                     }
                 else
                     for (int a = 0; a<devices.size();a++){
-                        if (!devices.get(a).isHidden() && devices.get(a).isVerified()){
+                        Log.e("HEHEHEHE",""+devices.get(a));
+//                        if (!devices.get(a).isHidden() && devices.get(a).isVerified()){
                             finalDevices.add(devices.get(a));
-                        }
+//                        }
                     }
                 DevicesFragment.this.devices = finalDevices;
                 synchronized (baseDevices) {

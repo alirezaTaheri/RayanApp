@@ -11,7 +11,7 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Util.AppConstants;
 
 public class VerifyDeviceRequest extends BaseRequest{
-    private String auth,STWORD;
+    private String auth;
     @Expose(serialize = false, deserialize = false)
     private transient String ALLOWED_CHARACTERS = "0123456789asdfghjklqwertyuiopzxcvbnm";
     transient private int sizeOfAuth = 16;
@@ -40,20 +40,12 @@ public class VerifyDeviceRequest extends BaseRequest{
     public String toString() {
         return "VerifyDeviceRequest{" +
                 "auth='" + auth + '\'' +
-                ", STWORD='" + STWORD + '\'' +
+                ", ALLOWED_CHARACTERS='" + ALLOWED_CHARACTERS + '\'' +
                 ", sizeOfAuth=" + sizeOfAuth +
                 '}';
     }
 
     public String getAuth() {
         return auth;
-    }
-
-    public String getSTWORD() {
-        return STWORD;
-    }
-
-    public void setSTWORD(String STWORD) {
-        this.STWORD = STWORD;
     }
 }

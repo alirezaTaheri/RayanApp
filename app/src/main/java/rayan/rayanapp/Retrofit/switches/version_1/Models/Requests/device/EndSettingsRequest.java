@@ -8,10 +8,10 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Util.AppConstants;
 
 public class EndSettingsRequest extends BaseRequest{
-    private String STWORD;
+    private String stword;
 
     public EndSettingsRequest(String stword) {
-        this.STWORD = stword;
+        this.stword = stword;
         this.setCmd(AppConstants.END_SETTINGS);
         this.setSrc(RayanApplication.getPref().getId());
     }
@@ -19,7 +19,7 @@ public class EndSettingsRequest extends BaseRequest{
     @Override
     public String toString() {
         return "EndSettingsRequest{" +
-                "STWORD='" + STWORD + '\'' +
+                "stword='" + stword + '\'' +
                 '}';
     }
 

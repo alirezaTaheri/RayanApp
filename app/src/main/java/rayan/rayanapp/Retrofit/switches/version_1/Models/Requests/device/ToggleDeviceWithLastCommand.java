@@ -15,7 +15,7 @@ public class ToggleDeviceWithLastCommand extends BaseRequest{
         this.setSrc(RayanApplication.getPref().getId());
         this.stword = stword;
         lc = new JsonObject();
-        lc.addProperty("result", lc_cmd);
+        lc.addProperty("cmd", lc_cmd);
         this.setCmd(cmd);
     }
 

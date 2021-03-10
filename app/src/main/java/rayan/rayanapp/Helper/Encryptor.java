@@ -77,11 +77,14 @@ public class Encryptor {
 
 //            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding");
 //            Cipher cipher = Cipher.getInstance("AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
+//            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7PADDING");
             cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(secret.getBytes(), "AES"));
+            Log.e("QWQWQWQWQ", "RERERERERE" + new String(cipher.doFinal(ivAndCipherText), "utf-8"));
             return new String(cipher.doFinal(ivAndCipherText), "utf-8");
         } catch (Exception e) {
             Log.e("Error takes place", "Error: " +e);
+            e.printStackTrace();
             return null;
         }
     }

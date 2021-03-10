@@ -33,9 +33,9 @@ import rayan.rayanapp.Util.AppConstants;
 public class LoginViewModel extends ViewModel {
     private final String TAG = LoginViewModel.class.getSimpleName();
 
-//<<<<<<< HEAD
+    //<<<<<<< HEAD
     public final MutableLiveData<BaseResponse> loginResponse = new MutableLiveData<>();
-//=======
+    //=======
 //    private MutableLiveData<BaseResponse> loginResponse = new MutableLiveData<>();
 //>>>>>>> 1603fc81d4a5d3a7cc5890deaf896d735dffe242
     public boolean isConnected(Context context){
@@ -97,7 +97,7 @@ public class LoginViewModel extends ViewModel {
             public void onNext(@NonNull BaseResponse baseResponse) {
                 Log.d(TAG,"OnNext "+baseResponse);
 //<<<<<<< HEAD
-                    loginResponse.setValue(baseResponse);
+                loginResponse.setValue(baseResponse);
 //=======
 //                RayanApplication.getPref().saveToken(baseResponse.getData().getToken());
 //                loginResponse.setValue(baseResponse);

@@ -1,4 +1,4 @@
-package rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device;
+package rayan.rayanapp.Retrofit.switches.version_2.Models.requests.device;
 
 import android.util.Log;
 

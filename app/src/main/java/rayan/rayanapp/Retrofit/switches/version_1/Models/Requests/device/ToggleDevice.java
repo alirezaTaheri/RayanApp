@@ -7,19 +7,17 @@ import com.google.gson.GsonBuilder;
 import rayan.rayanapp.App.RayanApplication;
 
 public class ToggleDevice extends BaseRequest{
-    private String STWORD;
-    private int port1, port2;
-    public ToggleDevice(int port1, int port2, String STWORD) {
+    private String stword;
+    public ToggleDevice(String cmd, String stword) {
         this.setSrc(RayanApplication.getPref().getId());
-        this.STWORD = STWORD;
-        this.port1 = port1;
-        this.port2 = port2;
+        this.stword = stword;
+        this.setCmd(cmd);
     }
 
 //    public String ToString(){
 //        JsonObject jsonObject = new JsonObject();
-//        jsonObject.addProperty("STWORD", STWORD);
-//        jsonObject.addProperty("result", getResult());
+//        jsonObject.addProperty("stword", stword);
+//        jsonObject.addProperty("cmd", getCmd());
 //        jsonObject.addProperty("src", getSrc());
 //        return jsonObject.toString();
 //    }
@@ -31,23 +29,14 @@ public class ToggleDevice extends BaseRequest{
         return s;
     }
 
-    @Override
-    public String toString() {
-        return "ToggleDevice{" +
-                "STWORD='" + STWORD + '\'' +
-                ", port1=" + port1 +
-                ", port2=" + port2 +
-                '}';
-    }
-
-    //    public ToggleDevice(String result, String STWORD,String lc) {
-//        this.setResult(result);
+    //    public ToggleDevice(String cmd, String stword,String lc) {
+//        this.setCmd(cmd);
 //        this.setSrc(RayanApplication.getPref().getId());
-//        this.STWORD = STWORD;
+//        this.stword = stword;
 //        this.lc = new ToggleDevice(lc, RayanApplication.getPref().getId(), 0);
 //    }
 //    public ToggleDevice(String lc, String src, int a ) {
-//        this.setResult(lc);
+//        this.setCmd(lc);
 //        this.setSrc(src);
 //    }
 }

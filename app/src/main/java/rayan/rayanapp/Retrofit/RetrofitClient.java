@@ -1,6 +1,7 @@
 package rayan.rayanapp.Retrofit;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
@@ -41,6 +42,10 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+import static rayan.rayanapp.Util.AppConstants.CONNECT_TIMEOUT;
+import static rayan.rayanapp.Util.AppConstants.READ_TIMEOUT;
+import static rayan.rayanapp.Util.AppConstants.WRITE_TIMEOUT;
+
 /**
  * Created by alireza321 on 20/12/2018.
  */
@@ -50,6 +55,7 @@ public class RetrofitClient {
     private static Retrofit retrofit2;
 
     public static Retrofit getRetrofitInstance(String BASE_URL){
+        HandleFakeRequest.fillBodyMap();
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         httpClient.addInterceptor(new Interceptor() {
@@ -84,12 +90,13 @@ public class RetrofitClient {
     }
     public static Retrofit getRetrofitInstanceScalar(String BASE_URL){
         if (retrofit2 == null){
+            HandleFakeRequest.fillBodyMap();
             HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
             httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient.Builder okhttpClient = new OkHttpClient.Builder();
             okhttpClient.addInterceptor(httpLoggingInterceptor);
             retrofit2 = new Retrofit.Builder()
-                    .client(okhttpClient.build())
+                    .client(okhttpClient.addInterceptor(new LoginInterceptor()).build())
                     .addConverterFactory(ScalarsConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -170,7 +177,29 @@ public class RetrofitClient {
         @Override
         public Response intercept(Chain chain) throws IOException {
             Request request = chain.request();
-            Response response = chain.proceed(request);
+            Response response = HandleFakeRequest.check(request,chain);
+            int connectTimeout = chain.connectTimeoutMillis();
+            int readTimeout = chain.readTimeoutMillis();
+            int writeTimeout = chain.writeTimeoutMillis();
+            String connectNew = request.header(CONNECT_TIMEOUT);
+            String readNew = request.header(READ_TIMEOUT);
+            String writeNew = request.header(WRITE_TIMEOUT);
+
+            if (!TextUtils.isEmpty(connectNew)) {
+                connectTimeout = Integer.valueOf(connectNew);
+            }
+            if (!TextUtils.isEmpty(readNew)) {
+                readTimeout = Integer.valueOf(readNew);
+            }
+            if (!TextUtils.isEmpty(writeNew)) {
+                writeTimeout = Integer.valueOf(writeNew);
+            }
+            if (response!=null)return response;
+            response = chain
+                    .withConnectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                    .withReadTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                    .withWriteTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                    .proceed(request);
             try {
                 if (response.code() == 401 || response.message().toLowerCase().contains(AppConstants.UNAUTHORIZED.toLowerCase())) {
                     Log.e("LoginInterceptor", "Request Failed Because of expired Token");

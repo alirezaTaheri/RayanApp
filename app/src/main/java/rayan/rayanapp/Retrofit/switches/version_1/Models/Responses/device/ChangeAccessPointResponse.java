@@ -1,44 +1,22 @@
 package rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device;
 
 public class ChangeAccessPointResponse extends DeviceBaseResponse{
-    private String name, STWORD,result,error;
+    private String name, stword;
 
     public String getName() {
         return name;
     }
 
-    public String getSTWORD() {
-        return STWORD;
+    public String getStword() {
+        return stword;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public void setSTWORD(String STWORD) {
-        this.STWORD = STWORD;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
-    //    public String ToString(){
+//    public String ToString(){
 //        JsonObject jsonObject = new JsonObject();
-//        jsonObject.addProperty("result", getResult());
+//        jsonObject.addProperty("cmd", getCmd());
 //        jsonObject.addProperty("src", getSrc());
-//        jsonObject.addProperty("STWORD", STWORD);
+//        jsonObject.addProperty("stword", stword);
 //        return jsonObject.toString();
 //    }
 
@@ -47,17 +25,4 @@ public class ChangeAccessPointResponse extends DeviceBaseResponse{
 //        Log.e("><><><", "Gson: " + s);
 //        return s;
 //    }
-
-
-    @Override
-    public String toString() {
-        return "ChangeAccessPointResponse{" +
-                "name='" + name + '\'' +
-                ", STWORD='" + STWORD + '\'' +
-                ", result='" + result + '\'' +
-                ", error='" + error + '\'' +
-                ", src='" + src + '\'' +
-                ", result='" + cmd + '\'' +
-                '}';
-    }
 }

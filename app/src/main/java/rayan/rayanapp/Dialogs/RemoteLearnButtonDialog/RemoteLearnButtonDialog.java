@@ -78,6 +78,11 @@ public class RemoteLearnButtonDialog extends DialogFragment implements RemoteLea
         confirmButton.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void close() {
+        dismiss();
+    }
+
     @OnClick(R.id.confirm)
     public void onConfirmClicked(){
         String name = step2.onConfirmClicked();

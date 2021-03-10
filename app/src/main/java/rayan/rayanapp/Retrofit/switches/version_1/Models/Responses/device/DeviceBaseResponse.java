@@ -1,6 +1,8 @@
 package rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device;
 
-public class DeviceBaseResponse {
+import rayan.rayanapp.Retrofit.switches.base.BaseResponse_Device;
+
+public class DeviceBaseResponse extends BaseResponse_Device {
     protected String src;
     protected String cmd;
 
@@ -27,7 +29,12 @@ public class DeviceBaseResponse {
     public String toString() {
         return "DeviceBaseResponse{" +
                 "nid='" + src + '\'' +
-                ", result='" + cmd + '\'' +
+                ", cmd='" + cmd + '\'' +
                 '}';
+    }
+
+    @Override
+    public String getOutput() {
+        return cmd;
     }
 }

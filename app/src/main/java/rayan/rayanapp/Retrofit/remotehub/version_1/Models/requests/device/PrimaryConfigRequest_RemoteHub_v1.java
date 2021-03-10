@@ -1,6 +1,6 @@
 package rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.device;
 
-import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_2.Models.requests.device.BaseRequest;
 import rayan.rayanapp.Util.AppConstants;
 
 public class PrimaryConfigRequest_RemoteHub_v1 extends BaseRequest{

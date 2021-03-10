@@ -16,6 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 import rayan.rayanapp.Helper.Encryptor;
 
 public class AppConstants {
+    public final static String CURRENT_VERSION = "v2";
     public final static String[] SUPPORTED_TYPES = {AppConstants.BaseDeviceType_REMOTE_HUB, AppConstants.BaseDeviceType_SWITCH_1, AppConstants.BaseDeviceType_SWITCH_2, AppConstants.BaseDeviceType_TOUCH_2, AppConstants.BaseDeviceType_PLUG};
     public final static String[] REMOTE_HUB_VALID_VERSIONS = {"1.0"};
     public final static String[] SWITCH_VALID_VERSIONS = {"1.0", "2.0"};
@@ -24,6 +25,9 @@ public class AppConstants {
     public final static String[] AC_REMOTE_BUTTONS = {"Power","Temp Down","Temp Up","More","Mode","Air Volume"};
     public final static String[] TV_REMOTE_BUTTONS = {"Power","Home","Menu","Channel Up","Channel Down","Volume Up","Volume Down","Mute","Back","OK","Up","Down","Right","Left","More","Button 123"};
     public final static String LEARN_IR_SIGNAL_REGEX = "<IR\\+RECVRAW(\\+\\d+){2}(,\\d+)+>";
+    public final static String CONNECT_TIMEOUT = "CONNECT_TIMEOUT";
+    public final static String READ_TIMEOUT = "READ_TIMEOUT";
+    public final static String WRITE_TIMEOUT = "WRITE_TIMEOUT";
     public final static String REMOTE_HUB_STATE_LEARN = "learn";
     public final static String REMOTE_HUB_STATE_WAITING_LEARN = "learn waiting";
     public final static String MQTT = "mqtt";
@@ -285,7 +289,7 @@ public class AppConstants {
                 address = address.concat("api/v1/system/info");
                 break;
             case AppConstants.REMOTE_HUB_SEND_DATA:
-                address = address.concat("api/v1/remote/send_signal");
+                address = address.concat("api/v1/ir_remote/send_signal");
                 break;
             case AppConstants.REMOTE_HUB_ENTER_SETTINGS:
                 address = address.concat("api/v1/settings/enter");

@@ -13,8 +13,8 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import rayan.rayanapp.Retrofit.ApiService;
 import rayan.rayanapp.Retrofit.ApiUtils;
-import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.BaseRequest;
-import rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device.ToggleDeviceResponse;
+import rayan.rayanapp.Retrofit.switches.version_2.Models.requests.device.BaseRequest;
+import rayan.rayanapp.Retrofit.switches.version_2.Models.responses.device.ToggleDeviceResponse;
 import rayan.rayanapp.Util.AppConstants;
 
 public class TestDeviceFragmentViewModel extends AndroidViewModel {

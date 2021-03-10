@@ -1,6 +1,7 @@
 package rayan.rayanapp.Fragments;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.wifi.WifiManager;
@@ -32,8 +33,8 @@ import rayan.rayanapp.Activities.AddNewDeviceActivity;
 import rayan.rayanapp.Dialogs.ProgressDialog;
 import rayan.rayanapp.Listeners.DoneWithFragment;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.remotehub.version_1.Models.requests.api.AddRemoteHubRequest;
-import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.RegisterDeviceRequest;
+import rayan.rayanapp.Retrofit.switches.base.BaseResponse_Device;
+import rayan.rayanapp.Retrofit.switches.version_2.Models.requests.device.RegisterDeviceRequest;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.NewDeviceSetConfigurationFragmentViewModel;
 
@@ -141,13 +142,10 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
     public void onNextClicked(StepperLayout.OnNextClickedCallback callback) {
         if (TextUtils.isEmpty(nameEditText.getText().toString().trim()))
             Toast.makeText(getContext(), "لطفا نام دستگاه را وارد کنید", Toast.LENGTH_SHORT).show();
-//            SnackBarSetup.snackBarSetup(activity.findViewById(android.R.id.content), "لطفا نام دستگاه را وارد کنید");
         else if (AddNewDeviceActivity.getNewDevice().getGroup() == null || AddNewDeviceActivity.getNewDevice().getGroup().getId().trim().length() < 1)
             Toast.makeText(getContext(), "لطفا یک گروه را انتخاب کنید", Toast.LENGTH_SHORT).show();
-//            SnackBarSetup.snackBarSetup(activity.findViewById(android.R.id.content), "لطفا یک گروه را انتخاب کنید");
         else if (AddNewDeviceActivity.getNewDevice().getSsid() == null || AddNewDeviceActivity.getNewDevice().getSsid().trim().length() < 1)
             Toast.makeText(getContext(), "لطفا یک مودم را انتخاب کنید", Toast.LENGTH_SHORT).show();
-//            SnackBarSetup.snackBarSetup(activity.findViewById(android.R.id.content), "لطفا یک مودم را انتخاب کنید");
         else {
             mViewModel.internetProvided().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe((aBoolean, throwable) -> {
                 if (aBoolean) {
@@ -163,6 +161,36 @@ public class NewDeviceSetConfigurationFragment extends BackHandledFragment imple
                                 Log.e(getClass().getSimpleName(), ">>>>>>>>>>>>>>>>>Canceling The Process");
                                 mViewModel.getConfigDeviceDisposable().dispose();
                                 progressDialog.dismiss();
+                            }
+                        });
+                        mViewModel.installSwitch(
+                                (WifiManager) Objects.requireNonNull(activity).getApplicationContext().getSystemService(Context.WIFI_SERVICE),
+                                new RegisterDeviceRequest(AddNewDeviceActivity.getNewDevice().getChip_id(),AddNewDeviceActivity.getNewDevice().getName(), AddNewDeviceActivity.getNewDevice().getType()),
+                                activity,
+                                AppConstants.NEW_DEVICE_IP
+                        ).observe(this, new Observer<BaseResponse_Device>() {
+                            @Override
+                            public void onChanged(@Nullable BaseResponse_Device s) {
+                                switch (s.getOutput()) {
+                                    case AppConstants.SUCCESSFUL:
+                                        callback.goToNextStep();
+                                        break;
+                                    case AppConstants.SOCKET_TIME_OUT:
+                                        AddNewDeviceActivity.getNewDevice().setFailed(true);
+                                        Toast.makeText(getContext(), "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case AppConstants.UNKNOWN_EXCEPTION:
+                                        Toast.makeText(getContext(), "یک مشکل ناشناخته رخ داده است", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case AppConstants.CONNECT_EXCEPTION:
+                                        Toast.makeText(getContext(), "ارسال پیام به دستگاه موفق نبود", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case AppConstants.UNKNOWN_HOST_EXCEPTION:
+                                        Toast.makeText(getContext(), "متاسفانه نمی‌توان با دستگاه ارتباط برقرار کرد", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         });
                         mViewModel.registerDeviceSendToDevice(

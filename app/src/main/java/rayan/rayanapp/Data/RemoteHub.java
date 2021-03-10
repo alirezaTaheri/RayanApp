@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -260,12 +261,17 @@ public class RemoteHub extends BaseDevice implements Parcelable {
     }
 
     public void decrypt_setStatusWord(String newStatusWord){
-        this.statusWord = String.valueOf(Integer.parseInt(Encryptor.decrypt(newStatusWord,getSecret()).split("#")[1])+1);
+        this.statusWord = String.valueOf(
+                Integer.parseInt(
+                        Encryptor.decrypt(
+                                newStatusWord,
+                                getSecret()
+                        ).split("#")[1])+1);
     }
     private String generateRandom(){
         String ALLOWED_CHARACTERS = "0123456789asdfghjklqwertyuiopzxcvbnm";
         final Random random=new Random();
-        int sizeOfAuth = random.nextInt(12)+8;
+        int sizeOfAuth = random.nextInt(6);
         final StringBuilder sb=new StringBuilder(sizeOfAuth);
         for(int i=0;i<sizeOfAuth;++i)
             sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));

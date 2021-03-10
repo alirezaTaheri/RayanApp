@@ -4,7 +4,6 @@ public class RegisterDeviceRequest {
     private String username;
     private String device_name;
     private String device_type;
-    private String ap_ssid, ap_mac;
 
     public RegisterDeviceRequest(String username, String device_name, String device_type) {
         this.username = username;

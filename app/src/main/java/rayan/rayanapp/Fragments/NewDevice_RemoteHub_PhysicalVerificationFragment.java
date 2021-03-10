@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -32,7 +31,6 @@ import rayan.rayanapp.Dialogs.YesNoDialog;
 import rayan.rayanapp.Listeners.StepperItemSimulation;
 import rayan.rayanapp.Listeners.YesNoDialogListener;
 import rayan.rayanapp.R;
-import rayan.rayanapp.Retrofit.switches.version_1.Models.Requests.device.SetPrimaryConfigRequest;
 import rayan.rayanapp.Util.AppConstants;
 import rayan.rayanapp.ViewModels.NewDevicePhysicalVerificationViewModel;
 

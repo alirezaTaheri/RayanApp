@@ -8,10 +8,10 @@ import rayan.rayanapp.App.RayanApplication;
 import rayan.rayanapp.Util.AppConstants;
 
 public class FactoryResetRequest extends BaseRequest{
-    private String STWORD;
+    private String stword;
 
     public FactoryResetRequest(String stword) {
-        this.STWORD = stword;
+        this.stword = stword;
         this.setCmd(AppConstants.FACTORY_RESET);
         this.setSrc(RayanApplication.getPref().getId());
     }
@@ -19,7 +19,7 @@ public class FactoryResetRequest extends BaseRequest{
     @Override
     public String toString() {
         return "Ready4SettingsRequest{" +
-                "STWORD='" + STWORD + '\'' +
+                "stword='" + stword + '\'' +
                 '}';
     }
 

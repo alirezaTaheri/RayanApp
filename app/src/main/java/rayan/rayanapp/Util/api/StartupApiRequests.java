@@ -221,6 +221,7 @@ public class StartupApiRequests {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("v3v3v3v3", "Composed onError: "+ e + newGroups.size()+" / "+newRemoteHubs.size() + " / " + newRemotes + " / "+newRemoteDatas);
+                        e.printStackTrace();
                         requestStatusLiveData.postValue(requestStatus.ERROR);
                     }
 

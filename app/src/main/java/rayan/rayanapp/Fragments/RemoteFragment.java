@@ -41,12 +41,13 @@ public class RemoteFragment extends Fragment implements View.OnClickListener {
     Remote remote;
     RemoteHub remoteHub;
     Map<String, RemoteData> remoteDataMap = new HashMap<>();
-    private final String TAG = "RemoteFragment";
+    private final static String TAG = "RemoteFragment";
     private RemoteViewModel viewModel;
     public static RemoteFragment newInstance(Remote remote) {
         RemoteFragment newRemoteFragment = new RemoteFragment();
         Bundle b = new Bundle();
         b.putParcelable("remote", remote);
+        Log.e(TAG, "remote:"+remote);
         newRemoteFragment.setArguments(b);
         return newRemoteFragment;
     }
@@ -82,6 +83,8 @@ public class RemoteFragment extends Fragment implements View.OnClickListener {
         viewModel = ViewModelProviders.of(this).get(RemoteViewModel.class);
         remote = getArguments().getParcelable("remote");
         remoteHub = viewModel.getRemoteHubById(remote.getRemoteHubId());
+        Log.e(TAG,"Remote: "+remote);
+        Log.e(TAG,"RemoteHub: "+remoteHub);
         viewModel.getDataOfRemote(remote.getId()).observe(this, data -> {
             Log.e(TAG, "RemoteData: "+data);
             remoteData = data;
@@ -113,8 +116,10 @@ public class RemoteFragment extends Fragment implements View.OnClickListener {
                         Toast.makeText(activity, "دستگاه در حالت یادگیری است", Toast.LENGTH_SHORT).show();
                         break;
                     case AppConstants.SOCKET_TIME_OUT:
-                        AddNewDeviceActivity.getNewDevice().setFailed(true);
-                        Toast.makeText(activity, "مشکلی در دسترسی وجود دارد", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "در زمان مشخص پاسخی دریافت نشد", Toast.LENGTH_SHORT).show();
+                        break;
+                    case AppConstants.TIME_OUT_EXCEPTION:
+                        Toast.makeText(activity, "در زمان مشخص پاسخی دریافت نشد", Toast.LENGTH_SHORT).show();
                         break;
                     case AppConstants.CONNECT_EXCEPTION:
                         Toast.makeText(activity, "ارسال پیام موفق نبود", Toast.LENGTH_SHORT).show();

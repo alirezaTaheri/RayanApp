@@ -19,7 +19,7 @@ repositories {
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "rayan.rayanapp"
+        applicationId "rayan.app"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 9
@@ -57,12 +57,12 @@ android {
         exclude 'META-INF/proguard/androidx-annotations.pro'
     }
 //    googleServices { disableVersionCheck = true }
-//    lintOptions {
-//        checkReleaseBuilds false
-//        // Or, if you prefer, you can continue to check for errors in release builds,
-//        // but continue the build even when errors are found:
-//        abortOnError false
-//    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
 
 }
 

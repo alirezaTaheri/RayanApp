@@ -45,6 +45,7 @@ public class RemoteHubSendData {
     }
 
     private Observable<Response<String>> send_data_observable(RemoteHub remoteHub, SingleLiveEvent<String> callback, SendDataRemoteHubRequest request){
+        Log.e(TAG, "RemoteHub:" + remoteHub);
         ApiService apiService = ApiUtils.getApiServiceScalar();
         return Observable.just(remoteHub)
                 .flatMap(a -> apiService.send_data_remoteHub_v1(AppConstants.getDeviceAddress(a.getIp(), AppConstants.REMOTE_HUB_SEND_DATA), request))
@@ -52,13 +53,17 @@ public class RemoteHubSendData {
                 .repeatWhen(throwableObservable -> throwableObservable.delay(200, TimeUnit.MILLISECONDS))
                 .timeout(4, TimeUnit.SECONDS)
                 .takeWhile(response -> {
+                    Log.e(TAG, "RR"+response);
+                    Log.e(TAG, "BB"+response.body());
                     if (response.headers().get(AppConstants.AUTH) != null){
                         Log.e(TAG, "Auth Is Not NUll");
-                        if (!sha1(response.body(), remoteHub.getSecret()).equals(response.headers().get("auth"))){
+                        if (sha1(response.body(), remoteHub.getSecret()).equals(response.headers().get("auth"))){
                             Log.e(TAG, "HMACs Are Equal");
                             RemoteHubBaseResponse wrappedResponse = RayanUtils.convertToObject(RemoteHubBaseResponse.class, response.body());
 //                            if (mqttBackup.get(device.getChipId()+"_1") != null && !mqttBackup.get(device.getChipId()+"_1").isDisposed())
 //                                mqttBackup.get(device.getChipId()+"_1").dispose();
+                            Log.e(TAG, "" + wrappedResponse);
+                            Log.e(TAG, "" + wrappedResponse.getSTWORD());
                             remoteHub.decrypt_setStatusWord(wrappedResponse.getSTWORD());
                             String res = wrappedResponse.getResult()==null?"":wrappedResponse.getResult();
                             String error = wrappedResponse.getError()==null?"":wrappedResponse.getError();
@@ -98,5 +103,13 @@ public class RemoteHubSendData {
             default: return AppConstants.UNKNOWN_EXCEPTION;
         }
     }
-    private String sha1(String s, String keyString) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException { SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), "HmacSHA1");Mac mac = Mac.getInstance("HmacSHA1");mac.init(key);byte[] bytes = mac.doFinal(s.getBytes("UTF-8"));return new String( Base64.encodeBase64(bytes) ); }
+
+    private String sha1(String s, String keyString) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        Log.e(TAG, "Encoding " + s + " With: "+keyString);
+        SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), "HmacSHA1");
+        Mac mac = Mac.getInstance("HmacSHA1");
+        mac.init(key);
+        byte[] bytes = mac.doFinal(s.getBytes("UTF-8"));
+        return new String(Base64.encodeBase64(bytes));
+    }
 }

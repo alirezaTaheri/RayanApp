@@ -18,7 +18,7 @@ public class UpdateResponse extends DeviceBaseResponse{
 
     public String ToString(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("result", getCmd());
+        jsonObject.addProperty("cmd", getCmd());
         jsonObject.addProperty("src", getSrc());
         jsonObject.addProperty("stword", stword);
         return jsonObject.toString();

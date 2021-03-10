@@ -3,18 +3,27 @@ package rayan.rayanapp.Retrofit.switches.version_1.Models.Responses.device;
 import com.google.gson.JsonObject;
 
 public class FactoryResetResponse extends DeviceBaseResponse{
-    private String STWORD, result,error;
+    private String stword;
 
-    public String getSTWORD() {
-        return STWORD;
+    public String getStword() {
+        return stword;
+    }
+
+    @Override
+    public String toString() {
+        return "Ready4SettingsResponse{" +
+                "stword='" + stword + '\'' +
+                ", src='" + src + '\'' +
+                ", cmd='" + cmd + '\'' +
+                '}';
     }
 
 
     public String ToString(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("result", getCmd());
+        jsonObject.addProperty("cmd", getCmd());
         jsonObject.addProperty("src", getSrc());
-        jsonObject.addProperty("STWORD", STWORD);
+        jsonObject.addProperty("stword", stword);
         return jsonObject.toString();
     }
 //    public String ToString(){
@@ -22,35 +31,4 @@ public class FactoryResetResponse extends DeviceBaseResponse{
 //        Log.e("><><><", "Gson: " + s);
 //        return s;
 //    }
-
-    public void setSTWORD(String STWORD) {
-        this.STWORD = STWORD;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
-
-    @Override
-    public String toString() {
-        return "FactoryResetResponse{" +
-                "STWORD='" + STWORD + '\'' +
-                ", result='" + result + '\'' +
-                ", error='" + error + '\'' +
-                ", src='" + src + '\'' +
-                ", result='" + cmd + '\'' +
-                '}';
-    }
 }

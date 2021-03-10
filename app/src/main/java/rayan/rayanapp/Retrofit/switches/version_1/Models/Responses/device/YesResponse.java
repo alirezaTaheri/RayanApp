@@ -26,7 +26,7 @@ public class YesResponse extends TlmsDoneResponse {
                 ", pin1='" + pin1 + '\'' +
                 ", pin2='" + pin2 + '\'' +
                 ", src='" + src + '\'' +
-                ", result='" + cmd + '\'' +
+                ", cmd='" + cmd + '\'' +
                 '}';
     }
 }

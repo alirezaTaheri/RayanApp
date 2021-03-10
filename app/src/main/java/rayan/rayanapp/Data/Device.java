@@ -336,32 +336,29 @@ public class Device extends BaseDevice implements Parcelable {
 
     @Override
     public String toString() {
-        return "{" +
-//                "chipId='" + chipId + '\'' +
-                "baseType='" + getDeviceType() + '\'' +
-                "posin='" + getPosition() + '\'' +
-                "grouppos='" + getInGroupPosition() + '\'' +
+        return
+                "chipId='" + chipId + '\'' +
                 ", name1='" + name1 + '\'' +
-////                ", name2='" + name2 + '\'' +
-//                ", pin1='" + pin1 + '\'' +
-//                ", pin2='" + pin2 + '\'' +
-//                ", id='" + id + '\'' +
+                ", name2='" + name2 + '\'' +
+                ", pin1='" + pin1 + '\'' +
+                ", pin2='" + pin2 + '\'' +
+                ", id='" + id + '\'' +
                 ", type='" + type + '\'' +
-//                ", username='" + username + '\'' +
-//                ", topic=" + topic +
-//                ", groupId='" + groupId + '\'' +
-//                ", style='" + style + '\'' +
-//                ", ssid='" + ssid + '\'' +
-//                ", devicePassword='" + devicePassword + '\'' +
+                ", username='" + username + '\'' +
+                ", topic=" + topic +
+                ", groupId='" + groupId + '\'' +
+                ", style='" + style + '\'' +
+                ", ssid='" + ssid + '\'' +
+                ", devicePassword='" + devicePassword + '\'' +
                 ", ip='" + ip + '\'' +
-//                ", password='" + password + '\'' +
-//                ", favorite=" + favorite +
-//                ", locallyAccessibility=" + locallyAccessibility +
-//                ", onlineAccessibility=" + onlineAccessibility +
-//                ", statusWord='" + statusWord + '\'' +
-//                ", secret='" + secret + '\'' +
-//                ", hidden=" + hidden +
-//                ", Header=" + header +
+                ", password='" + password + '\'' +
+                ", locallyAccessibility=" + locallyAccessibility +
+                ", onlineAccessibility=" + onlineAccessibility +
+                ", statusWord='" + statusWord + '\'' +
+                ", secret='" + secret + '\'' +
+                ", hidden=" + hidden +
+                ", header='" + header + '\'' +
+                ", create_at='" + create_at + '\'' +
                 '}';
     }
 
